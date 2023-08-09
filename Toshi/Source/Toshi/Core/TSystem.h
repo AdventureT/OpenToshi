@@ -11,6 +11,20 @@ namespace Toshi
 	
 	class TCStringPool;
 
+	class TSystem
+	{
+	public:
+		static unsigned char* GetScratchMem() { return ms_aScratchMem; }
+		static TCStringPool* GetCStringPool();
+
+		static TCStringPool* CreateCStringPoolExplicit(int unk, int unk2);
+		static TCStringPool* CreateCStringPoolExplicit(const char* a_szFileName, int unk, int unk2);
+	private:
+		inline static unsigned char ms_aScratchMem[0x400];
+		static inline TCStringPool* ms_poTCStringPool = TNULL;
+	};
+
+
 	class TSystemManager : public TSingleton<TSystemManager>
 	{
 	public:
@@ -46,10 +60,9 @@ namespace Toshi
 	public:
 		static TBOOL Create();
 
-		static TCStringPool* CreateCStringPoolExplicit(int unk, int unk2);
-		static TCStringPool* CreateCStringPoolExplicit(const char* a_szFileName, int unk, int unk2);
+		
 
-		static inline TCStringPool* ms_poTCStringPool = TNULL;
+		
 
 	private:
 		TEmitter<TSystemManager, TBOOL> m_Emitter; // 0x00

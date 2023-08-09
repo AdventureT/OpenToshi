@@ -38,6 +38,7 @@ namespace Toshi {
 
 		if (file == TNULL)
 		{
+			Toshi::TLogFile::GetSingleton()->Print("WARNING: Could not open string pool file %s for reading\n");
 			return TFALSE;
 		}
 

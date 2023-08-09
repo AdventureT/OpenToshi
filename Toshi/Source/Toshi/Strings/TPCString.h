@@ -1,6 +1,6 @@
 #pragma once
 #include <Toshi/Strings/TCString.h>
-#include "Toshi/Strings/TPooledCString.h"
+#include <Toshi/Core/TFreeList.h>
 
 namespace Toshi
 {
@@ -38,10 +38,83 @@ namespace Toshi
 
 	private:
 		int m_iMaxSize;           // 0x0
-		int m_iStringCount;       // 0x4
+		int m_iStringCount;       // 0x4 !!! m_oStringPool !!!
 		int m_iCapacity;          // 0x8
 		StringPools m_oStringPool;// 0xC
 	};
+
+	class TPooledCString
+	{
+	public:
+		TPooledCString()
+		{
+			m_iCount = 0;
+			m_pCStringPool = TNULL;
+		}
+
+		TPooledCString(const char* a_szString, TCStringPool* a_pStringPool) : m_oString(a_szString)
+		{
+			m_iCount = 0;
+			m_pCStringPool = a_pStringPool;
+		}
+
+		~TPooledCString()
+		{
+			if (m_pCStringPool)
+			{
+				m_pCStringPool->Remove(*this);
+			}
+			delete m_oString;
+		}
+
+		static TFreeList& GetFreeList()
+		{
+			return ms_oFreeList;
+		}
+
+		static void* operator new(uint32_t size, char*, int)
+		{
+			return ms_oFreeList.New(size);
+		}
+
+		static void* operator new(uint32_t size)
+		{
+			return ms_oFreeList.New(size);
+		}
+
+		static void* operator new(uint32_t size, void* data)
+		{
+			// No fuck you
+			return data;
+		}
+
+		static void operator delete(void* data)
+		{
+			ms_oFreeList.Delete(data);
+		}
+
+	public:
+
+		void Delete()
+		{
+			if (m_pCStringPool)
+			{
+				m_pCStringPool->Remove(*this);
+			}
+			delete m_oString;
+			ms_oFreeList.Delete(this);
+		}
+
+	public:
+
+		int m_iCount;                 // 0x0
+		TCString m_oString;           // 0x4
+		TCStringPool* m_pCStringPool;  // 0xC
+
+		static TFreeList ms_oFreeList;
+	};
+	
+
 
 	class TPCString
 	{

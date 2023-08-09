@@ -25,7 +25,7 @@ AApplication AApplication::g_oTheApp;
 
 bool AApplication::OnCreate(int argc, char** argv)
 {
-	Toshi::TSystemManager::CreateCStringPoolExplicit("data\\strpool.dat", 1024, 12000);
+	Toshi::TSystem::CreateCStringPoolExplicit("data\\strpool.dat", 1024, 12000);
 	
 	TApplication::OnCreate(argc, argv);
 	return true;
