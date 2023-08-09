@@ -4,7 +4,7 @@ namespace Toshi
 {
 	void TDebug_Printf(char const* text, ...) 
 	{
-
+		//TDebug_VPrintf(0, text, ...);
 	}
 
 	static void TDebug_VPrintf(uint32_t flag, const char*, char*)
@@ -23,6 +23,10 @@ namespace Toshi
 		inline static bool m_bEnableDebugFile;
 
 		static void PrintIndent();
+		static bool IsValidAddress(const void* address)
+		{
+			return address != TNULL && *(int*)address != 0xCDCDCDCD && address > (void*)0x50;
+		}
 
 		static bool AssertHandler(char* expression, char* file, int line, bool& ignored);
 	};

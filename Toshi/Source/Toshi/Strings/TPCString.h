@@ -2,6 +2,8 @@
 #include <Toshi/Strings/TCString.h>
 #include <Toshi/Core/TFreeList.h>
 
+#define TCSTRINGPOOL_MAX_STRING_SIZE 0x400
+
 namespace Toshi
 {
 	class TPooledCString;

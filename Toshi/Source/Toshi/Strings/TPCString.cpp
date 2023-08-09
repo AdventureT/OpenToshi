@@ -34,49 +34,57 @@ namespace Toshi {
 	TBOOL TCStringPool::ReadFile(const char* a_szFileName)
 	{
 		TFileManager* fileManager = TFileManager::GetSingleton();
-		TFile* file = fileManager->CreateFile(a_szFileName, 1);
+		TFile* pFile = fileManager->CreateFile(a_szFileName, 1);
 
-		if (file == TNULL)
+		if (pFile == TNULL)
 		{
-			Toshi::TLogFile::GetSingleton()->Print("WARNING: Could not open string pool file %s for reading\n");
+			TOSHI_WARN("WARNING: Could not open string pool file %s for reading\n", a_szFileName);
 			return TFALSE;
 		}
 
+		TASSERT(TDebug::IsValidAddress(pFile));
+
 		int stringCount = 0;
-		file->Read(&stringCount, 4);
+		pFile->Read(&stringCount, 4);
 
 		int stringsSize = 0;
-		file->Read(&stringsSize, 4);
+		pFile->Read(&stringsSize, 4);
 
-		if (stringCount != 0 && stringsSize != 0)
+		if (stringCount == 0 || stringsSize == 0)
 		{
-			auto strings = new char* [stringsSize];
-			int read = file->Read(strings, stringsSize);
-			fileManager->DestroyFile(file);
-
-			if (read != stringsSize)
-			{
-				delete[] strings;
-				return TFALSE;
-			}
-
-			if (m_iCapacity < stringCount)
-			{
-				InitStringPool(stringCount);
-			}
-			m_iStringCount = stringCount;
-
-			StringPool* pool = new StringPool[m_iStringCount];
-
-			for (size_t i = 0; i < m_iStringCount; i++)
-			{
-				pool[i].m_szStrings = new TCString();
-				pool[i].count = 0;
-			}
-
-			TTODO("WTH");
-
+			TOSHI_WARN("WARNING: No strings to preload for string pool\n");
+			return TFALSE;
 		}
+
+		auto pNewBuffer = new char* [stringsSize];
+
+		TASSERT(TDebug::IsValidAddress(pNewBuffer));
+
+		int read = pFile->Read(pNewBuffer, stringsSize);
+		fileManager->DestroyFile(pFile);
+
+		if (read != stringsSize)
+		{
+			TOSHI_WARN("WARNING: Could not load strings because of buffer size mismatch\n");
+			delete[] pNewBuffer;
+			return TFALSE;
+		}
+
+		if (m_iCapacity < stringCount)
+		{
+			InitStringPool(stringCount);
+		}
+		m_iStringCount = stringCount;
+
+		StringPool* pool = new StringPool[m_iStringCount];
+
+		for (size_t i = 0; i < m_iStringCount; i++)
+		{
+			pool[i].m_szStrings = new TCString();
+			pool[i].count = 0;
+		}
+
+		TTODO("WTH");
 
 		return TFALSE;
 	}
