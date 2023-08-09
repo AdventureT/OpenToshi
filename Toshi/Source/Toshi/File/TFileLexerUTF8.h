@@ -17,7 +17,7 @@ namespace Toshi {
 		public:
 			TFileLexer::TOKEN m_type = TFileLexer::TOKEN_UNKNOWN;
 			int m_unknown = 0;
-			TString8 m_value;
+			TCString m_value;
 		};
 
 		struct LookaheadTokens
@@ -84,7 +84,7 @@ namespace Toshi {
 		TBOOL m_bFlags[4];                   // 0x4C
 		TBOOL m_bAllowPreprocessor;          // 0x6C
 		TBOOL m_bUnk7;                       // 0x6D
-		TArray<TString8>::Storage m_Defines; // 0x70
+		TArray<TCString>::Storage m_Defines; // 0x70
 		TGenericEmitter m_oEmitter;          // 0x80
 	};
 

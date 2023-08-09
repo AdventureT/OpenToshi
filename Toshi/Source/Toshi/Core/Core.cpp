@@ -1,6 +1,6 @@
 #include "ToshiPCH.h"
 #include "Core.h"
-#include "Toshi/Strings/TString8.h"
+#include "Toshi/Strings/TCString.h"
 #include "Platform/Windows/DX11/TRender_DX11.h"
 #include "../resource.h"
 

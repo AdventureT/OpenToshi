@@ -34,7 +34,7 @@ namespace Toshi
     protected:
         TNativeFile(TNativeFileSystem* pFS);
 
-        TBOOL Open(const TString8& a_FileName, FileMode a_Mode);
+        TBOOL Open(const TCString& a_FileName, FileMode a_Mode);
         void Close();
 
         friend TNativeFileSystem;

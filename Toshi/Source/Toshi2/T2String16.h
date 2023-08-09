@@ -24,7 +24,7 @@ namespace Toshi
 
 		static int Format(wchar_t* a_pcString, int size, const wchar_t* a_pcFormat, ...)
 		{
-			TString8 buffer2;
+			TCString buffer2;
 			va_list args;
 
 			va_start(args, a_pcFormat);
@@ -36,7 +36,7 @@ namespace Toshi
 
 		static int Format(wchar_t* a_pcString, const wchar_t* a_pcFormat, ...)
 		{
-			TString8 buffer2;
+			TCString buffer2;
 			va_list args;
 
 			va_start(args, a_pcFormat);

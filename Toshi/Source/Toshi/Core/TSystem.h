@@ -8,8 +8,8 @@
 namespace Toshi
 {
 	class TScheduler;
-
-	class TPString8Pool;
+	
+	class TCStringPool;
 
 	class TSystemManager : public TSingleton<TSystemManager>
 	{
@@ -46,27 +46,10 @@ namespace Toshi
 	public:
 		static TBOOL Create();
 
-	public:
-		static void CreateStringPool()
-		{
-			TASSERT(ms_poStringPool == TNULL);
-			ms_poStringPool = new TPString8Pool*;
-			*ms_poStringPool = TNULL;
-		}
+		static TCStringPool* CreateCStringPoolExplicit(int unk, int unk2);
+		static TCStringPool* CreateCStringPoolExplicit(const char* a_szFileName, int unk, int unk2);
 
-		static TPString8Pool* GetStringPool()
-		{
-			TASSERT(ms_poStringPool != TNULL);
-			return *ms_poStringPool;
-		}
-
-		static TPString8Pool* SetStringPool(TPString8Pool* a_pStringPool)
-		{
-			return std::exchange(*ms_poStringPool, a_pStringPool);
-		}
-
-	private:
-		inline static TPString8Pool** ms_poStringPool;
+		static inline TCStringPool* ms_poTCStringPool = TNULL;
 
 	private:
 		TEmitter<TSystemManager, TBOOL> m_Emitter; // 0x00

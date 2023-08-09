@@ -3,7 +3,7 @@
 #include "Toshi/File/TFile.h"
 #include "Toshi/Core/TSystem.h"
 #include "Toshi/Core/TStack.h"
-#include "Toshi/Strings/TString16.h"
+#include "Toshi/Strings/TWString.h"
 #include "Toshi2/T2String16.h"
 
 namespace Toshi
@@ -120,7 +120,7 @@ namespace Toshi
 		uint32_t m_uiQuatCount;                          // 0x38
 		uint32_t m_uiCustDataSize;                       // 0x3C
 		TXUIStringTable* m_pStringTable;                 // 0x40
-		TString16 m_ID;                                  // 0x44
+		TWString m_ID;                                  // 0x44
         TStack<const wchar_t*, 32> m_oIDComparisonStack; // 0x50
     public:
         static inline int s_iUIDCount = 0;

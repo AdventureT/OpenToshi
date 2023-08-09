@@ -32,7 +32,7 @@ namespace Toshi
         TFileManager::GetSingletonSafe()->MountFileSystem(this);
     }
 
-    TFile* TNativeFileSystem::CreateFile(TString8 const& fn, uint32_t flags)
+    TFile* TNativeFileSystem::CreateFile(TCString const& fn, uint32_t flags)
     {
         TNativeFile* nativeFile = new TNativeFile(this);
 
@@ -54,12 +54,12 @@ namespace Toshi
         }
     }
 
-    TBOOL TNativeFileSystem::MakeDirectory(TString8 const& string)
+    TBOOL TNativeFileSystem::MakeDirectory(TCString const& string)
     {
         return CreateDirectoryA(string, TNULL);
     }
 
-    TBOOL TNativeFileSystem::GetNextFile(TString8& fileName, uint32_t flags)
+    TBOOL TNativeFileSystem::GetNextFile(TCString& fileName, uint32_t flags)
     {
         WIN32_FIND_DATAA findFileData;
 
@@ -475,7 +475,7 @@ namespace Toshi
         return fLastWriteTime;
     }
 
-    TBOOL TNativeFile::Open(const TString8& a_FileName, FileMode a_Mode)
+    TBOOL TNativeFile::Open(const TCString& a_FileName, FileMode a_Mode)
     {
         TASSERT(a_FileName.IsIndexValid(0), "TNativeFile::Open - wrong filename");
 

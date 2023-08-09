@@ -12,7 +12,7 @@ namespace Toshi
     {
         TASSERT(0 < m_DataSize, "DataSize is not empty");
         TRenderDX11* pRender = TRenderDX11::Interface();
-        TString8 path("Data\\TextureOverride\\");
+        TCString path("Data\\TextureOverride\\");
         path += m_TexName;
 
         ID3D11Resource* pResource = TNULL;

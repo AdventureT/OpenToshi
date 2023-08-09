@@ -1,6 +1,6 @@
 #include "ToshiPCH.h"
 #include "TDebugConsole_Win.h"
-#include "Toshi/Strings/TString8.h"
+#include "Toshi/Strings/TCString.h"
 
 #include <conio.h>
 
@@ -43,7 +43,7 @@ namespace Toshi
 
 	HWND TDebugConsole::FindConsole() const
 	{
-		TString8 str = TString8(TDebugConsoleUUID);
+		TCString str = TCString(TDebugConsoleUUID);
 
 		// Generate title for the console so we can find it's HWND
 		LARGE_INTEGER time;

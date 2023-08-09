@@ -19,7 +19,7 @@ namespace Toshi {
 		Unload();
 	}
 
-	TBOOL TDLL::Load(const TString8& a_sFileName)
+	TBOOL TDLL::Load(const TCString& a_sFileName)
 	{
 		Unload();
 		m_sFileName = a_sFileName;
@@ -39,7 +39,7 @@ namespace Toshi {
 		}
 	}
 
-	void* TDLL::GetAddress(const TString8& a_sSymbolName)
+	void* TDLL::GetAddress(const TCString& a_sSymbolName)
 	{
 		void* pAddress = GetProcAddress(GetDLL(), a_sSymbolName);
 		TASSERT(pAddress != TNULL);
