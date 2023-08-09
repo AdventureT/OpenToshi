@@ -3,17 +3,13 @@
 #include "Toshi/Utils/TSingleton.h"
 #include "Toshi/Core/THPTimer.h"
 
-#ifdef TOSHI_ENABLE_DEPRECATED
-#include "Toshi/Strings/TCStringPool.h"
-#else
-#include "Toshi/Strings/TPooledCString.h"
-#endif // TOSHI_ENABLE_DEPRECATED
-
 #include <utility>
 
 namespace Toshi
 {
 	class TScheduler;
+
+	class TPString8Pool;
 
 	class TSystemManager : public TSingleton<TSystemManager>
 	{
@@ -50,12 +46,6 @@ namespace Toshi
 	public:
 		static TBOOL Create();
 
-#ifdef TOSHI_ENABLE_DEPRECATED
-		static TCStringPool* CreateCStringPoolExplicit(int unk, int unk2);
-		static TCStringPool* CreateCStringPoolExplicit(const char* a_szFileName, int unk, int unk2);
-
-		static inline TCStringPool* ms_poTCStringPool = TNULL;
-#else
 	public:
 		static void CreateStringPool()
 		{
@@ -77,7 +67,6 @@ namespace Toshi
 
 	private:
 		inline static TPString8Pool** ms_poStringPool;
-#endif // TOSHI_ENABLE_DEPRECATED
 
 	private:
 		TEmitter<TSystemManager, TBOOL> m_Emitter; // 0x00

@@ -5,6 +5,9 @@
 #include "Toshi2/T2Map.h"
 #include "Toshi/Core/TSystem.h"
 
+#define TPSTRING8_DECLARE(STR) extern Toshi::TPString8 g_str_##STR
+#define TPS8(STR) (&g_str_##STR)
+
 namespace Toshi {
 
 	class TPString8Pool;
@@ -84,27 +87,25 @@ namespace Toshi {
 		TPString8Pool* m_pPool;
 	};
 
-	class TPString8PoolAllocator : public T2GlobalAllocator
-	{
-	public:
-		TPooledString8* AllocateString(const char* a_szString, TPString8Pool* a_pPool, T2Allocator* a_pAllocator)
-		{
-			return T2GlobalAllocator::New<TPooledString8>(a_szString, a_pPool, a_pAllocator);
-		}
-	};
-
 	class TPString8Pool
 	{
 	public:
-		inline static TPString8PoolAllocator s_Allocator;
+		class Allocator : public T2GlobalAllocator
+		{
+		public:
+			TPooledString8* AllocateString(const char* a_szString, TPString8Pool* a_pPool, T2Allocator* a_pAllocator)
+			{
+				return T2GlobalAllocator::New<TPooledString8>(a_szString, a_pPool, a_pAllocator);
+			}
+		};
+
+		inline static Allocator s_Allocator;
 
 	public:
 		static void Create()
 		{
-#ifndef TOSHI_ENABLE_DEPRECATED
 			TSystemManager::SetStringPool(new TPString8Pool(1024, 0, &s_Allocator, 0));
 			TTODO("FUN_006c1a60 in Barnyard");
-#endif // !TOSHI_ENABLE_DEPRECATED
 		}
 
 		void Get(TPooledString8*& a_pOutString, const char* a_szString, bool* a_pWasInPool = TNULL);
@@ -115,21 +116,24 @@ namespace Toshi {
 			m_oMap.Remove(a_pString->GetString8());
 		}
 
-		TPString8PoolAllocator* GetAllocator() const
+		Allocator* GetAllocator() const
 		{
 			return m_pAllocator;
 		}
 
 	private:
-		TPString8Pool(int a_iUnknown1, int a_iUnknown2, TPString8PoolAllocator* a_pAllocator, void* m_pUnknown3);
+		TPString8Pool(int a_iUnknown1, int a_iUnknown2, Allocator* a_pAllocator, void* m_pUnknown3);
 
 	private:
-		TPString8PoolAllocator* m_pAllocator;
+		Allocator* m_pAllocator;
 		T2Map<const char*, TPooledString8*, TPooledString8::Comparator> m_oMap;
 	};
 
 	class TPString8
 	{
+	public:
+		inline static const TString8 ms_sEmpty = TString8("");
+
 	public:
 		__forceinline TPString8()
 		{
@@ -138,9 +142,7 @@ namespace Toshi {
 
 		__forceinline TPString8(const char* a_szString)
 		{
-#ifndef TOSHI_ENABLE_DEPRECATED
 			TSystemManager::GetStringPool()->Get(m_pPtr, a_szString, TNULL);
-#endif // !TOSHI_ENABLE_DEPRECATED
 		}
 
 		__forceinline TPString8(TPString8Pool* a_pPool, const char* a_szString)
@@ -169,7 +171,7 @@ namespace Toshi {
 
 		__forceinline const TString8& GetString8() const
 		{
-			return m_pPtr->m_oString;
+			return m_pPtr ? m_pPtr->m_oString : ms_sEmpty;
 		}
 
 		__forceinline const TPooledString8* GetPooledString() const
@@ -181,6 +183,26 @@ namespace Toshi {
 		{
 			Decrement();
 			m_pPtr = a_pPooledString;
+		}
+
+		__forceinline bool IsEqual(const TPString8& a_Other) const
+		{
+			return m_pPtr == a_Other.m_pPtr;
+		}
+
+		__forceinline bool IsEqual(const TPString8* a_pOther) const
+		{
+			return m_pPtr == a_pOther->m_pPtr;
+		}
+
+		__forceinline bool operator==(const TPString8& a_Other) const
+		{
+			return m_pPtr == a_Other.m_pPtr;
+		}
+
+		__forceinline bool operator!=(const TPString8& a_Other) const
+		{
+			return m_pPtr != a_Other.m_pPtr;
 		}
 
 		__forceinline TPString8& operator=(TPooledString8* a_pString)
@@ -204,17 +226,13 @@ namespace Toshi {
 		__forceinline TPString8& operator=(const char* a_szString)
 		{
 			Decrement();
-#ifndef TOSHI_ENABLE_DEPRECATED
-
 			TSystemManager::GetStringPool()->Get(m_pPtr, a_szString, TNULL);
-#endif // !TOSHI_ENABLE_DEPRECATED
-
 			return *this;
 		}
 
 		__forceinline operator const TString8*() const
 		{
-			return &m_pPtr->m_oString;
+			return m_pPtr ? &m_pPtr->m_oString : &ms_sEmpty;
 		}
 
 		__forceinline operator const TPooledString8*() const
@@ -233,6 +251,40 @@ namespace Toshi {
 
 	private:
 		TPooledString8* m_pPtr;
+	};
+
+	class TPString8Initialiser
+	{
+	public:
+		struct StringMap
+		{
+			TPString8* m_pString8;
+			const char* m_szCString;
+		};
+
+	public:
+		TPString8Initialiser(StringMap* a_pStrings, size_t a_iStringCount, TBOOL a_bFlag);
+
+		void Initialise(TPString8Pool* a_pStringPool);
+
+		TPString8Initialiser* Next() const
+		{
+			return m_pNextInitialiser;
+		}
+
+		static TPString8Initialiser* Head()
+		{
+			return ms_pHeadInitialiser;
+		}
+
+	private:
+		inline static TPString8Initialiser* ms_pHeadInitialiser;
+
+	private:
+		StringMap* m_pStrings;
+		size_t m_iCount;
+		TPString8Initialiser* m_pNextInitialiser;
+		TBOOL m_bFlag;
 	};
 
 	inline void TPooledString8::Delete()
