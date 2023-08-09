@@ -29,6 +29,6 @@
 #include "Toshi2/T2Flags.h"
 
 /* Platform specific headers */
-#ifdef TOSHI_SKU_WINDOWS
+#ifdef TOSHI_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif
