@@ -1,5 +1,6 @@
 #pragma once
 #include "TString.h"
+#include "TCString.h"
 
 namespace Toshi
 {
@@ -11,6 +12,7 @@ namespace Toshi
 	public:
 		TWString();
 		TWString(uint32_t size);
+		TWString(const TCString& a_cString);
 
 		// Returns TTRUE if allocated memory
 		TBOOL AllocBuffer(uint32_t a_iLength, TBOOL freeMemory = TTRUE);
@@ -19,6 +21,7 @@ namespace Toshi
 		TWString& Concat(const wchar_t* str, uint32_t size);
 
 		void Copy(const TWString& src, uint32_t size = -1);
+		void Copy(const TCString& src, uint32_t size = -1);
 
 		TWString Mid(uint32_t param_1, uint32_t param_2) const;
 		TWString Left(uint32_t param_1) { return Mid(param_1, 0); }

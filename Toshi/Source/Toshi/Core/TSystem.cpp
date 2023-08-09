@@ -50,6 +50,13 @@ namespace Toshi
 		return ms_poTCStringPool;
 	}
 
+	const wchar_t* TSystem::StringCharToUnicode(wchar_t* a_UnicodeString, const char* a_CharString, int a_iLength)
+	{
+		TASSERT((a_UnicodeString != TNULL) && (a_CharString != TNULL));
+		TIMPLEMENT();
+		return nullptr;
+	}
+
 	TCStringPool* TSystem::CreateCStringPoolExplicit(int unk, int unk2)
 	{
 		if (ms_poTCStringPool == TNULL)

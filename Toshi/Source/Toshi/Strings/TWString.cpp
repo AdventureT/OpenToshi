@@ -15,6 +15,12 @@ namespace Toshi
 		AllocBuffer(size, TTRUE);
 	}
 
+	TWString::TWString(const TCString& a_cString)
+	{
+		Reset();
+		Copy(a_cString);
+	}
+
 	TWString& TWString::Concat(const TWString& str, uint32_t size)
 	{
 		uint32_t len = str.Length();
@@ -164,5 +170,9 @@ namespace Toshi
 		AllocBuffer(size, TTRUE);
 		TUtil::MemCopy(m_pBuffer, src, size);
 		m_pBuffer[size] = 0;
+	}
+
+	void TWString::Copy(const TCString& src, uint32_t size)
+	{
 	}
 }

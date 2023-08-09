@@ -4,7 +4,7 @@
 
 class PPropertyName
 {
-
+public:
 	PPropertyName()
 	{
 		m_pName.m_pPooledString = TNULL;
@@ -43,6 +43,14 @@ class PPropertyName
 		}
 	}
 
+	void SetName(const Toshi::TPCString& a_pName);
+	void SetSubName(const Toshi::TPCString& a_pName);
+
+	Toshi::TPCString GetString() const;
+
+	const Toshi::TPCString& GetSubName() const { return m_pSubName; }
+	const Toshi::TPCString& GetName() const { return m_pName; }
+
 protected:
 	void Split(const Toshi::TPCString& a_pName);
 
@@ -50,14 +58,3 @@ protected:
 	Toshi::TPCString m_pName;
 	Toshi::TPCString m_pSubName;
 };
-
-class PPropertyBlock
-{
-
-};
-
-class PProperty
-{
-
-};
-
