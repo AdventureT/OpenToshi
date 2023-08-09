@@ -19,7 +19,6 @@ workspace "Toshi"
 
 group "Engine"
 	include "Toshi"
-	include "Shared"
 	include "OpenJPOG"
 	
 group "Third-Party"

@@ -10,12 +10,12 @@ namespace Toshi {
 
 		virtual ~TDLL();
 
-		TBOOL Load(const TString8& a_sFileName);
+		TBOOL Load(const TCString& a_sFileName);
 		void Unload();
 
-		void* GetAddress(const TString8& a_sSymbolName);
+		void* GetAddress(const TCString& a_sSymbolName);
 
-		const TString8& GetFileName() const
+		const TCString& GetFileName() const
 		{
 			return m_sFileName;
 		}
@@ -32,7 +32,7 @@ namespace Toshi {
 		}
 
 	private:
-		TString8 m_sFileName;
+		TCString m_sFileName;
 		HMODULE m_pDLL;
 	};
 }

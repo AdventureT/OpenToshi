@@ -1,6 +1,6 @@
 #pragma once
 #include "Toshi/Core/TDebugConsole.h"
-#include "Toshi/Strings/TString8.h"
+#include "Toshi/Strings/TCString.h"
 #include "TGlobalEmitter.h"
 
 namespace Toshi
@@ -53,7 +53,7 @@ namespace Toshi
 		TBOOL Execute();
 
 	private:
-		TString8 m_Name;                                                   // 0x4
+		TCString m_Name;                                                   // 0x4
 		uint32_t m_Flags;                                                  // 0x10
 		TBOOL m_IsVerbose;                                                  // 0x14
 		TGlobalListener<TApplication, TApplicationExitEvent> m_oExitEvent; // 0x1C

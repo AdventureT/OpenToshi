@@ -1,6 +1,6 @@
 #pragma once
 #include <stdlib.h>
-#include <Toshi/Strings/TString8.h>
+#include <Toshi/Strings/TCString.h>
 #include "T2Allocator.h"
 
 namespace Toshi
@@ -28,7 +28,7 @@ namespace Toshi
 
 		static int Format(char* a_pcString, int size, const char* a_pcFormat, ...)
 		{
-			TString8 buffer2;
+			TCString buffer2;
 			va_list args;
 
 			va_start(args, a_pcFormat);
@@ -43,7 +43,7 @@ namespace Toshi
 
 		static int Format(char* a_pcString, const char* a_pcFormat, ...)
 		{
-			TString8 buffer2;
+			TCString buffer2;
 			va_list args;
 
 			va_start(args, a_pcFormat);

@@ -36,8 +36,7 @@ project "OpenJPOG"
 	defines
 	{
 		"TOSHI_USER_CLIENT",
-		"SPDLOG_WCHAR_TO_UTF8_SUPPORT",
-		"TOSHI_ENABLE_DEPRECATED"
+		"SPDLOG_WCHAR_TO_UTF8_SUPPORT"
 	}
 	
 	postbuildcommands
@@ -52,7 +51,7 @@ project "OpenJPOG"
 
 		defines
 		{
-			"TOSHI_PLATFORM_WINDOWS"
+			"TOSHI_SKU_WINDOWS"
 		}
 
 	filter "configurations:Debug"

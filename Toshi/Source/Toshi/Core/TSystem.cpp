@@ -2,7 +2,7 @@
 #include "TSystem.h"
 #include "TScheduler.h"
 
-#include "Toshi/Strings/TPString8.h"
+#include "Toshi/Strings/TCStringPool.h"
 
 namespace Toshi
 {
@@ -41,4 +41,21 @@ namespace Toshi
 		return TTRUE;
 	}
 
+	TCStringPool* TSystemManager::CreateCStringPoolExplicit(int unk, int unk2)
+	{
+		if (ms_poTCStringPool == TNULL)
+		{
+			ms_poTCStringPool = new TCStringPool(unk, unk2);
+		}
+		return ms_poTCStringPool;
+	}
+
+	TCStringPool* TSystemManager::CreateCStringPoolExplicit(const char* a_szFileName, int unk, int unk2)
+	{
+		if (ms_poTCStringPool == TNULL)
+		{
+			ms_poTCStringPool = new TCStringPool(a_szFileName, unk, unk2);
+		}
+		return ms_poTCStringPool;
+	}
 }

@@ -70,7 +70,7 @@ namespace Toshi
 		TStringManager::String8CopySafe(textureName, a_textureName, 0x80);
 		TStringManager::String8ToLowerCase(textureName);
 
-		TString8 texName = TString8(textureName);
+		TCString texName = TCString(textureName);
 		int index = texName.FindReverse('\\', -1);
 		texName = texName.Right(index);
 		
