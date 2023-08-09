@@ -39,8 +39,7 @@ project "Toshi"
 	{
 		"TOSHI_USER_ENGINE",
 		"SPDLOG_WCHAR_TO_UTF8_SUPPORT",
-		"_CRT_SECURE_NO_WARNINGS",
-		"TOSHI_ENABLE_DEPRECATED"
+		"_CRT_SECURE_NO_WARNINGS"
 	}
 	
 	filter "files:**.c"
@@ -67,7 +66,7 @@ project "Toshi"
 
 		defines
 		{
-			"TOSHI_PLATFORM_WINDOWS"
+			"TOSHI_SKU_WINDOWS"
 		}
 
 	filter "configurations:Debug"
