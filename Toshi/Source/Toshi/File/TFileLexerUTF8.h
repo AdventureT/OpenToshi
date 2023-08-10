@@ -2,6 +2,7 @@
 #include "TFileLexer.h"
 #include "Toshi/File/TFile.h"
 #include "Toshi/Core/TArray.h"
+#include "Toshi/Strings/TPCString.h"
 
 namespace Toshi {
 
@@ -12,12 +13,65 @@ namespace Toshi {
 		struct Token
 		{
 		public:
+
+			Token()
+			{
+				m_type = TFileLexer::TOKEN_UNKNOWN;
+				m_iLine = 0;
+			}
+
+			~Token()
+			{
+
+			}
+
+			const TPCString& GetString() const
+			{
+				TASSERT(m_type == TFileLexer::TOKEN_IDENT || m_type == TFileLexer::TOKEN_STRING || m_type == TFileLexer::TOKEN_COMMENT);
+				return m_sValue;
+			}
+
+			TPCString& GetString()
+			{
+				TASSERT(m_type == TFileLexer::TOKEN_IDENT || m_type == TFileLexer::TOKEN_STRING || m_type == TFileLexer::TOKEN_COMMENT);
+				return m_sValue;
+			}
+
+			float GetFloat() const
+			{
+				TASSERT(m_type == TFileLexer::TOKEN_FLOAT);
+				return m_uiValue;
+			}
+
+			int GetInteger() const
+			{
+				TASSERT(m_type == TFileLexer::TOKEN_INTEGER);
+				return m_uiValue;
+			}
+
+			uint32_t GetUInteger() const
+			{
+				TASSERT(m_type == TFileLexer::TOKEN_UINTEGER);
+				return m_uiValue;
+			}
+
+			TFileLexer::TokenType GetType() const { return m_type; }
+			int GetLine() const { return m_iLine; }
+
+
 			void assign(const Token& token);
+			TCString tostring() const;
 
 		public:
-			TFileLexer::TOKEN m_type = TFileLexer::TOKEN_UNKNOWN;
-			int m_unknown = 0;
-			TCString m_value;
+			TFileLexer::TokenType m_type = TFileLexer::TOKEN_UNKNOWN;
+			int m_iLine = 0;
+			union
+			{
+				float m_fValue;
+				uint32_t m_uiValue;
+				int m_iValue;
+				TPCString m_sValue;
+			};
 		};
 
 		struct LookaheadTokens

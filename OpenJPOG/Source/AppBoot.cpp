@@ -19,14 +19,20 @@ app.Execute();
 #include <Platform/Windows/TSound_Win.h>
 #include "Toshi/Core/TSystem.h"
 #include <Toshi/Core/TFreeList.h>
+#include "Toshi/Plugins/PPropertyParser/PProperties.h"
+
 #include TOSHI_MULTIRENDER(TRender)
+
+TOSHI_NAMESPACE_USING
 
 AApplication AApplication::g_oTheApp;
 
 bool AApplication::OnCreate(int argc, char** argv)
 {
-	Toshi::TSystem::CreateCStringPoolExplicit("data\\strpool.dat", 1024, 12000);
-	
+	TSystem::CreateCStringPoolExplicit("data\\strpool.dat", 1024, 12000);
+	TTODO("SetCapacities");
+
+
 	TApplication::OnCreate(argc, argv);
 	return true;
 }

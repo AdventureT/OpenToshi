@@ -1,5 +1,6 @@
 #include "ToshiPCH.h"
 #include "PPropertyName.h"
+#include "Toshi/Strings/TWString.h"
 
 void PPropertyName::SetName(const Toshi::TPCString& a_pName)
 {

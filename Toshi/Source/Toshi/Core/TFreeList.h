@@ -14,6 +14,7 @@ namespace Toshi
 		int GetInitialSize() const { return m_iInitialSize; }
 
 		void SetGrowSize(int a_iGrowSize) { a_iGrowSize < 0 ? m_iGrowSize = 8 : m_iGrowSize = a_iGrowSize; }
+		void SetCapacity(int a_iCapacity);
 		void* New(uint32_t size);
 		
 		void Delete(void* a_pData);

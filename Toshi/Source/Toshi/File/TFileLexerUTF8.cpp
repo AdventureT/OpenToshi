@@ -149,7 +149,22 @@ namespace Toshi {
 
 	void TFileLexerUTF8::Token::assign(const Token& token)
 	{
+		if (m_type == TFileLexer::TOKEN_IDENT || m_type == TFileLexer::TOKEN_STRING || m_type == TFileLexer::TOKEN_COMMENT)
+		{
+			auto value = GetString();
+		}
 		TIMPLEMENT();
+	}
+
+	TCString TFileLexerUTF8::Token::tostring() const
+	{
+		TCString res = TCString();
+		if (m_type == TFileLexer::TOKEN_IDENT)
+		{
+			res += "IDENT:";
+			res += *GetString();
+		}
+		return TCString();
 	}
 
 }

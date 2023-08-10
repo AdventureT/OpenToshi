@@ -1,11 +1,13 @@
 #pragma once
 #include "TString.h"
-#include "TWString.h"
 #include "Toshi/Typedefs.h"
 #include "Toshi2/T2Allocator.h"
 
 namespace Toshi
 {
+
+	class TWString;
+
 	class TCString
 	{
 	public:

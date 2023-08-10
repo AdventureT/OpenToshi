@@ -50,6 +50,16 @@ void* Toshi::TFreeList::Allocate(int a_iNumber, int size)
 	return newList;
 }
 
+void Toshi::TFreeList::SetCapacity(int a_iCapacity)
+{
+	if (m_iInitialSize < m_iCapacity)
+	{
+		TFreeList* pData = TSTATICCAST(TFreeList*, Allocate(a_iCapacity - m_iInitialSize, m_iItemSize));
+		pData->m_pNextBlock = m_pLastNode;
+		m_pLastNode = pData;
+	}	
+}
+
 void* Toshi::TFreeList::New(uint32_t size)
 {
 	if (size != m_iItemSize)

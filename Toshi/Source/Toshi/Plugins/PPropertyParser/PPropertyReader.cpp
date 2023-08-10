@@ -3,6 +3,7 @@
 
 bool PPropertyReader::Open(const Toshi::TCString& a_szFileName)
 {
+
     return false;
 }
 

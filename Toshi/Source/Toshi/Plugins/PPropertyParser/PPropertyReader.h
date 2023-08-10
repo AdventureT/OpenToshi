@@ -4,7 +4,10 @@
 
 class PPropertyReaderParseError
 {
+	PPropertyReaderParseError()
+	{
 
+	}
 
 };
 
@@ -22,7 +25,7 @@ public:
 
 	Toshi::TEmitter<PPropertyReader, PPropertyReaderParseError>* GetParseErrorEmitter() { return &m_oErrorEmitter; }
 
-
+	Toshi::TCString m_szFileName; // 0x4
 	Toshi::TEmitter<PPropertyReader, PPropertyReaderParseError> m_oErrorEmitter;
 };
 

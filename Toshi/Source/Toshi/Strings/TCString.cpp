@@ -1,6 +1,6 @@
 #include "ToshiPCH.h"
 #include "TCString.h"
-
+#include "TWString.h"
 #include "Toshi/Core/TSystem.h"
 
 namespace Toshi
