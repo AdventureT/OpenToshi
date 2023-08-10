@@ -18,6 +18,7 @@ namespace Toshi
 		static TCStringPool* GetCStringPool();
 
 		static const wchar_t* StringCharToUnicode(wchar_t* a_UnicodeString, const char* a_CharString, int a_iLength);
+		static int StringLength(const char* a_String);
 
 		static TCStringPool* CreateCStringPoolExplicit(int unk, int unk2);
 		static TCStringPool* CreateCStringPoolExplicit(const char* a_szFileName, int unk, int unk2);

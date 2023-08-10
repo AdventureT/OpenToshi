@@ -53,8 +53,17 @@ namespace Toshi
 	const wchar_t* TSystem::StringCharToUnicode(wchar_t* a_UnicodeString, const char* a_CharString, int a_iLength)
 	{
 		TASSERT((a_UnicodeString != TNULL) && (a_CharString != TNULL));
+		StringLength(a_CharString);
 		TIMPLEMENT();
 		return nullptr;
+	}
+
+	int TSystem::StringLength(const char* a_String)
+	{
+		TASSERT(a_String != TNULL);
+		int iLength;
+		for (iLength = 0; *a_String++ != '\0'; iLength++);
+		return iLength;
 	}
 
 	TCStringPool* TSystem::CreateCStringPoolExplicit(int unk, int unk2)

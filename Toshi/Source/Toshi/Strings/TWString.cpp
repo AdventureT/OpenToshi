@@ -1,5 +1,6 @@
 #include "ToshiPCH.h"
 #include "TWString.h"
+#include <Toshi/Core/TSystem.h>
 
 namespace Toshi
 {
@@ -174,5 +175,12 @@ namespace Toshi
 
 	void TWString::Copy(const TCString& src, uint32_t size)
 	{
+		uint32_t srcLen = src.Length();
+		TASSERT(srcLen <= 0xFFFFFF, "Too big string");
+
+		if (srcLen < size || size == -1) { size = srcLen; }
+		AllocBuffer(size, TTRUE);
+		TSystem::StringCharToUnicode(m_pBuffer, src, size);
+		m_pBuffer[size] = 0;
 	}
 }
