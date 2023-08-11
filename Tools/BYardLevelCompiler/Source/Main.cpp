@@ -2,11 +2,11 @@
 
 // TOSHI_TMEMORY_FLAGS allows you to change the mode TMemory initializes with
 // Flags_NativeMethods stands for native memory management methods instead of using dlmalloc
-#define TOSHI_TMEMORY_FLAGS Toshi::TMemory::Flags_NativeMethods
+#define TOSHI_TMEMORY_FLAGS Toshi::TMemory::Flags_Standard
 
 // TOSHI_TMEMORY_SIZE allows you to change size of the global memory block
 // The value is not used when TMemory initialized with native methods
-#define TOSHI_TMEMORY_SIZE 0
+#define TOSHI_TMEMORY_SIZE 64 * 1024 * 1024
 
 // This file includes the entrypoint so set all the settings before including it
 #include "Toshi.h"
@@ -16,8 +16,9 @@
 #include <Toshi/Render/TTexture.h>
 #include <Toshi/Strings/TPString8.h>
 
-#include <TRBF/TRBF.h>
+#include <Plugins/PTRB.h>
 #include <Plugins/PPropertyParser/PProperties.h>
+#include <Plugins/PPropertyParser/PPropertiesWriter.h>
 
 #include "ModelHeader.h"
 #include "Materials.h"
@@ -30,15 +31,55 @@ TOSHI_NAMESPACE_USING
 TPSTRING8_DECLARE(AnimControllerType);
 TPSTRING8_DECLARE(AnimObjTypes);
 
+void LogProperties(const PProperties* properties)
+{
+	for (auto it = properties->Begin(); it != properties->End(); it++)
+	{
+		auto propName = it->GetName().GetString();
+
+		switch (it->GetValue()->GetType())
+		{
+		case PPropertyValue::Type::Int:
+			TOSHI_INFO("{} = {}", propName, it->GetValue()->GetInteger());
+			break;
+		case PPropertyValue::Type::String:
+			TOSHI_INFO("{} = {}", propName, it->GetValue()->GetString());
+			break;
+		case PPropertyValue::Type::Float:
+			TOSHI_INFO("{} = {}", propName, it->GetValue()->GetFloat());
+			break;
+		case PPropertyValue::Type::Bool:
+			TOSHI_INFO("{} = {}", propName, it->GetValue()->GetBoolean());
+			break;
+		case PPropertyValue::Type::UInt32:
+			TOSHI_INFO("{} = {}", propName, it->GetValue()->GetUINT32());
+			break;
+		case PPropertyValue::Type::Array:
+			TOSHI_INFO("{} = {} elements", propName, it->GetValue()->GetArray()->GetSize());
+			break;
+		case PPropertyValue::Type::Props:
+			TOSHI_INFO("{} = subitem", propName);
+			LogProperties(it->GetValue()->GetProperties());
+			break;
+		}
+	}
+}
+
 int TMain(int argc, char** argv)
 {
 	TTRB trb;
 	
 	if (TTRB::ERROR_OK == trb.Load("C:\\Stuff\\Barnyard\\Game\\Data\\AGopherShopGame.trb"))
 	{
-		auto properties = PProperties::LoadFromTRB(trb);
-		auto disablebreakpoints = properties->GetOptionalProperty("playercharacter")->GetProperties()->GetOptionalProperty("disablebreakpoints")->GetBoolean();
+		PProperties properties = *PProperties::LoadFromTRB(trb);
+		PPropertiesWriter::WriteTRB("C:\\dev\\pproperties_repacked.trb", properties, TTRUE);
 	}
+
+	/*if (TTRB::ERROR_OK == trb.Load("C:\\dev\\a.trb"))
+	{
+		auto properties = PProperties::LoadFromTRB(trb);
+		LogProperties(properties);
+	}*/
 
 	return 0;
 	/*TSystemManager::CreateStringPool();
@@ -57,7 +98,7 @@ int TMain(int argc, char** argv)
 
 	return 0;*/
 
-	TLib::TRBF::TRBF network;
+	PTRB::TRBF network;
 	network.ReadFromFile("C:\\Stuff\\Barnyard\\Game\\Data\\Networks\\park2.trb");
 
 	struct INetwork
@@ -226,18 +267,18 @@ int TMain(int argc, char** argv)
 
 	constexpr bool bSkipGrassModels = false;
 
-	std::vector<TLib::TRBF::TRBF*> trbfiles = {
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Barn_L0Mod0.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Barn_L0Mod1.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Barn_L0Mod2.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Barn_L0Mod3.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod0.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod1.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod2.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod3.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod4.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Hilltop_L0Mod0.trb"),
-		new TLib::TRBF::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Hilltop_L0Mod1.trb"),
+	std::vector<PTRB::TRBF*> trbfiles = {
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Barn_L0Mod0.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Barn_L0Mod1.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Barn_L0Mod2.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Barn_L0Mod3.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod0.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod1.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod2.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod3.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\BarnNorth_L0Mod4.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Hilltop_L0Mod0.trb"),
+		new PTRB::TRBF("C:\\Stuff\\Barnyard\\Game\\Data\\Terrain\\EnvMainO\\Hilltop_L0Mod1.trb"),
 	};
 
 	for (auto trbf : trbfiles)
@@ -260,9 +301,9 @@ int TMain(int argc, char** argv)
 		}
 	}
 
-	TLib::TRBF::TRBF outTrbf;
-	TLib::TRBF::SECT* sect = outTrbf.GetSECT();
-	TLib::TRBF::SYMB* symb = outTrbf.GetSYMB();
+	PTRB::TRBF outTrbf;
+	PTRB::SECT* sect = outTrbf.GetSECT();
+	PTRB::SYMB* symb = outTrbf.GetSYMB();
 
 	auto stack = sect->CreateStack();
 
