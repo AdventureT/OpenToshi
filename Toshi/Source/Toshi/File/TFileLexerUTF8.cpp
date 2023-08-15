@@ -84,6 +84,93 @@ namespace Toshi {
 		LookaheadTokens::Free(m_LookaheadTokens);
 	}
 
+	TFileLexerUTF8::Token TFileLexerUTF8::get_next_token()
+	{
+		if (m_bUnk7)
+		{
+			return Token(TFileLexer::TOKEN_UNKNOWN, m_iLine);
+		}
+
+		skipWhiteSpace();
+
+		if (m_piCharLookahead[m_iUnk4] == -1)
+		{
+			return Token(TFileLexer::TOKEN_UNKNOWN, m_iLine);
+		}
+
+		if (m_bUnk1)
+		{
+			TIMPLEMENT();
+			
+		}
+
+		return Token();
+	}
+
+	void TFileLexerUTF8::skipWhiteSpace()
+	{
+		TIMPLEMENT();
+	}
+
+	void TFileLexerUTF8::fillLookAhead()
+	{
+		while (m_iUnk5 != m_iUnk4)
+		{
+			m_piCharLookahead[m_iUnk5] = m_pFile->GetCChar();
+			m_iUnk5++;
+			m_iUnk5 &= m_iUnk3;
+		}
+	}
+
+	TFileLexerUTF8::Token TFileLexerUTF8::GetNextToken()
+	{
+		if (m_iTokenLookaheadBuffered < 1)
+		{
+			Token nextToken = get_next_token();
+			m_Token.assign(nextToken);
+		}
+		return Token();
+	}
+
+	const char* TFileLexerUTF8::tostring(TFileLexer::TokenType a_eType)
+	{
+		switch (a_eType)
+		{
+		case Toshi::TFileLexer::TOKEN_UNKNOWN:
+			return "EOF";
+		case Toshi::TFileLexer::TOKEN_SEMICOLON:
+			return "SEMI";
+		case Toshi::TFileLexer::TOKEN_COLON:
+			return "COLON";
+		case Toshi::TFileLexer::TOKEN_COMMA:
+			return "COMMA";
+		case Toshi::TFileLexer::TOKEN_DOT:
+			return "DOT";
+		case Toshi::TFileLexer::TOKEN_DOLLAR:
+			return "DOLLAR";
+		case Toshi::TFileLexer::TOKEN_OPENSQR:
+			return "OPENSQR";
+		case Toshi::TFileLexer::TOKEN_CLOSESQR:
+			return "CLOSESQR";
+		case Toshi::TFileLexer::TOKEN_OPENBRACE:
+			return "OPENBRACE";
+		case Toshi::TFileLexer::TOKEN_CLOSEBRACE:
+			return "CLOSEBRACE";
+		case Toshi::TFileLexer::TOKEN_OPENPAREN:
+			return "OPENPAREN";
+		case Toshi::TFileLexer::TOKEN_CLOSEPAREN:
+			return "CLOSEPAREN";
+		case Toshi::TFileLexer::TOKEN_LESSTHAN:
+			return "LESSTHAN";
+		case Toshi::TFileLexer::TOKEN_GREATERTHAN:
+			return "GREATERTHAN";
+		case Toshi::TFileLexer::TOKEN_EQUAL:
+			return "EQUAL";
+		default:
+			return "?????";
+		}
+	}
+
 	TBOOL TFileLexerUTF8::ComputePreprocessorAllow()
 	{
 		for (int i = 0; i < m_iSomeNum; i++)

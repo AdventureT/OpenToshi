@@ -4,6 +4,8 @@
 #include "Toshi/Core/TArray.h"
 #include "Toshi/Strings/TPCString.h"
 
+#define WORDBUF_SIZE 0x800
+
 namespace Toshi {
 
 	class TFileLexerUTF8 :
@@ -13,6 +15,11 @@ namespace Toshi {
 		struct Token
 		{
 		public:
+
+			Token(TFileLexer::TokenType a_eType, int a_iLine) : m_type(a_eType), m_iLine(a_iLine)
+			{
+				TASSERT(m_type != TFileLexer::TOKEN_IDENT && m_type != TFileLexer::TOKEN_STRING && m_type != TFileLexer::TOKEN_INTEGER && m_type != TFileLexer::TOKEN_FLOAT && m_type != TFileLexer::TOKEN_COMMENT);
+			}
 
 			Token()
 			{
@@ -108,10 +115,19 @@ namespace Toshi {
 			int m_iCount;
 		};
 
+	protected:
+		Token get_next_token();
+		void skipWhiteSpace();
+		void fillLookAhead();
+
 	public:
 		TFileLexerUTF8();
 		TFileLexerUTF8(TFile* a_pInputStream, int a_iTokenLookaheadSize);
 		~TFileLexerUTF8();
+
+		Token GetNextToken();
+
+		static const char* tostring(TFileLexer::TokenType a_eType);
 
 		TBOOL ComputePreprocessorAllow();
 		void SetCharacterLookaheadSize(int a_iLookaheadSize);
@@ -126,7 +142,7 @@ namespace Toshi {
 		int* m_piCharLookahead;              // 0x14
 		int m_iUnk4;                         // 0x18
 		int m_iUnk5;                         // 0x1C
-		int m_iUnk6;                         // 0x20
+		int m_iLine;                         // 0x20
 		int m_iTokenLookaheadSize;           // 0x24
 		int m_iTokenLookaheadMask;           // 0x28
 		Token m_Token;                       // 0x2C
