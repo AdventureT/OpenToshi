@@ -217,6 +217,8 @@ namespace Toshi {
 
 	void TFileLexerUTF8::Define(const char* a_szDefinition)
 	{
+		TOSHI_ERROR("Has some problems with allocating strings. Skipping for now...");
+		return;
 		bool bAlreadyDefined = TFALSE;
 
 		for (int i = 0; i < m_Defines.GetNumElements(); i++)
