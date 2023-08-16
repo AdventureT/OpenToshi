@@ -59,6 +59,15 @@ namespace Toshi
 		return ms_poTWStringPool;
 	}
 
+	TLocale* TSystem::GetLocale()
+	{
+		if (ms_poLocale == TNULL)
+		{
+			ms_poLocale = new TLocale();
+		}
+		return ms_poLocale;
+	}
+
 	const wchar_t* TSystem::StringCharToUnicode(wchar_t* a_UnicodeString, const char* a_CharString, int a_iLength)
 	{
 		TASSERT((a_UnicodeString != TNULL) && (a_CharString != TNULL));

@@ -136,7 +136,7 @@ namespace Toshi {
 
 	private:
 		TFile* m_pFile;                      // 0x04
-		int m_bUnk1;                         // 0x08
+		bool m_bOutputComments;              // 0x08
 		int m_iCharLookaheadSize;            // 0x0C
 		int m_iUnk3;                         // 0x10
 		int* m_piCharLookahead;              // 0x14

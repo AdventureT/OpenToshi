@@ -112,8 +112,8 @@ namespace Toshi
 		int m_iCount;                 // 0x0
 		TCString m_oString;           // 0x4
 		TCStringPool* m_pCStringPool;  // 0xC
-
-		static TFreeList ms_oFreeList;
+	private:
+		static inline TFreeList ms_oFreeList;
 	};
 	
 

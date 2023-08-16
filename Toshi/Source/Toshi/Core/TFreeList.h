@@ -4,7 +4,10 @@ namespace Toshi
 	class TFreeList
 	{
 	public:
+		TFreeList()
+		{
 
+		}
 		TFreeList(int size, int a_iInitialSize, int a_iGrowSize);
 
 		void* Allocate(int a_iNumber, int size);

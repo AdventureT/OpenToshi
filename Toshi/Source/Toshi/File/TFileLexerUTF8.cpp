@@ -7,13 +7,13 @@ namespace Toshi {
 		m_oEmitter(this)
 	{
 		m_pFile = 0;
-		m_bUnk1 = TFALSE;
+		m_bOutputComments = TFALSE;
 		m_iCharLookaheadSize = 0;
 		m_iUnk3 = 0;
 		m_piCharLookahead = TNULL;
 		m_iUnk4 = 0;
 		m_iUnk5 = 0;
-		m_iUnk6 = 0;
+		m_iLine = 0;
 		m_iTokenLookaheadSize = 1;
 		m_iTokenLookaheadMask = 1;
 		m_LookaheadTokens = LookaheadTokens::Allocate()->GetTokens();
@@ -41,13 +41,13 @@ namespace Toshi {
 		m_oEmitter(this)
 	{
 		m_pFile = 0;
-		m_bUnk1 = TFALSE;
+		m_bOutputComments = TFALSE;
 		m_iCharLookaheadSize = 0;
 		m_iUnk3 = 0;
 		m_piCharLookahead = TNULL;
 		m_iUnk4 = 0;
 		m_iUnk5 = 0;
-		m_iUnk6 = 0;
+		m_iLine = 0;
 		m_iTokenLookaheadSize = 1;
 		m_iTokenLookaheadMask = 1;
 		m_LookaheadTokens = LookaheadTokens::Allocate(a_iTokenLookaheadSize)->GetTokens();
@@ -98,7 +98,7 @@ namespace Toshi {
 			return Token(TFileLexer::TOKEN_UNKNOWN, m_iLine);
 		}
 
-		if (m_bUnk1)
+		if (m_bOutputComments)
 		{
 			TIMPLEMENT();
 			
@@ -208,7 +208,7 @@ namespace Toshi {
 	void TFileLexerUTF8::SetInputStream(TFile* a_pInputStream)
 	{
 		m_pFile = a_pInputStream;
-		m_iUnk6 = 1;
+		m_iLine = 1;
 		m_iSomeNum = 0;
 		m_bFlags[0] = TTRUE;
 		m_bAllowPreprocessor = ComputePreprocessorAllow();

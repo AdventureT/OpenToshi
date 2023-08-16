@@ -31,7 +31,7 @@ bool AApplication::OnCreate(int argc, char** argv)
 {
 	TSystem::CreateCStringPoolExplicit("data\\strpool.dat", 1024, 12000);
 	TTODO("SetCapacities");
-
+	Toshi::TSystem::GetLocale()->LoadInfo("Data/GUI/Locales/Locales.txt");
 
 	TApplication::OnCreate(argc, argv);
 	return true;

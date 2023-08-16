@@ -19,7 +19,7 @@ namespace Toshi
 		static unsigned char* GetScratchMem() { return ms_aScratchMem; }
 		static TCStringPool* GetCStringPool();
 		static TWStringPool* GetWStringPool();
-		
+		static TLocale* GetLocale();
 
 		static const wchar_t* StringCharToUnicode(wchar_t* a_UnicodeString, const char* a_CharString, int a_iLength);
 		static int StringLength(const char* a_String);
@@ -30,6 +30,7 @@ namespace Toshi
 		inline static unsigned char ms_aScratchMem[0x400];
 		static inline TCStringPool* ms_poTCStringPool = TNULL;
 		static inline TWStringPool* ms_poTWStringPool = TNULL;
+		static inline TLocale* ms_poLocale = TNULL;
 	};
 
 

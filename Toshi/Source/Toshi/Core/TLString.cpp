@@ -8,5 +8,6 @@ bool Toshi::TLocale::LoadInfo(const TCString& a_rFileName)
     TASSERT(pFile != TNULL);
     TOSHI_INFO("TLoacle::LoadInfo()...");
     TFileLexerUTF8 lexer = TFileLexerUTF8(pFile, 2);
+    TFileLexerUTF8::Token token = lexer.GetNextToken();
     return false;
 }
