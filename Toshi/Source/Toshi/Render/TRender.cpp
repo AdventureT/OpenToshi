@@ -14,7 +14,7 @@ namespace Toshi {
 		m_ScreenOffset = { 0, 0 };
 		m_eAspectRatio = ASPECT_RATIO_4_3;
 		m_pRenderContext = TNULL;
-		m_Unk5 = 0;
+		m_pCreatedRenderContext = TNULL;
 		m_HasDyingResources = TFALSE;
 		m_bDisplayCreated = TFALSE;
 		m_bCreated = TFALSE;
@@ -45,19 +45,22 @@ namespace Toshi {
 
 	TRender::~TRender()
 	{
-		delete m_ParamTable;
+		if (m_ParamTable)
+			delete m_ParamTable;
+		
 		TModelManager::DestroySingleton();
 		T2ResourceManager::DestroySingleton();
+		m_Unk1 = -1;
 	}
 
 	TBOOL TRender::Create()
 	{
 		TASSERT(TFALSE == IsCreated(), "TRender already created");
-		TRenderContext* a_pRenderContext = CreateRenderContext();
+		m_pCreatedRenderContext = CreateRenderContext();
 		
-		if (a_pRenderContext != TNULL)
+		if (m_pCreatedRenderContext != TNULL)
 		{
-			SetCurrentRenderContext(a_pRenderContext);
+			SetCurrentRenderContext(m_pCreatedRenderContext);
 			m_bCreated = TTRUE;
 			return TTRUE;
 		}
@@ -67,13 +70,23 @@ namespace Toshi {
 
 	TBOOL TRender::Destroy()
 	{
-		return TFALSE;
+		m_pRenderContext = TNULL;
+
+		if (m_pCreatedRenderContext != TNULL)
+		{
+			delete m_pCreatedRenderContext;
+			m_pCreatedRenderContext = TNULL;
+		}
+
+		m_bCreated = TFALSE;
+		return TTRUE;
 	}
 
 	TBOOL TRender::CreateDisplay()
 	{
 		TASSERT(TTRUE == IsCreated(), "TRender must be created");
 		TASSERT(TFALSE == IsDisplayCreated(), "Display already created");
+
 		m_bDisplayCreated = TTRUE;
 		return TTRUE;
 	}
@@ -167,29 +180,35 @@ namespace Toshi {
 		}
 	}
 
-	void TRender::GetScreenOffset(TVector2* pOutVec)
+	void TRender::GetScreenOffset(TVector2& a_rVec)
 	{
+		a_rVec.Set(m_ScreenOffset);
 	}
 
-	void TRender::SetScreenOffset(TVector2* pVec)
+	void TRender::SetScreenOffset(const TVector2& a_rVec)
 	{
+		m_ScreenOffset.Set(a_rVec);
 	}
 
-	void TRender::SetLightDirectionMatrix(TMatrix44* pMat)
+	void TRender::SetLightDirectionMatrix(const TMatrix44& a_rMatrix)
 	{
+		m_LightDirection = a_rMatrix;
 	}
 
-	void TRender::SetLightColourMatrix(TMatrix44* pMat)
+	void TRender::SetLightColourMatrix(const TMatrix44& a_rMatrix)
 	{
+		m_LightColour = a_rMatrix;
 	}
 
 	TBOOL TRender::CreateSystemResources()
 	{
-		return TFALSE;
+		return TTRUE;
 	}
 
 	void TRender::DestroySystemResources()
 	{
+		DestroyResourceRecurse(m_Resources.AttachedToRoot());
+		FlushDyingResources();
 	}
 
 	void TRender::DestroyDyingResources()
@@ -276,10 +295,18 @@ namespace Toshi {
 
 	void TRender::BeginScene()
 	{
+		TASSERT(TTRUE == IsCreated());
+		TASSERT(TTRUE == IsDisplayCreated());
+
+		m_iFrameCount += 1;
+		m_Transforms.Reset();
+		m_Transforms.Top().Identity();
 	}
 
 	void TRender::EndScene()
 	{
+		TASSERT(TTRUE == IsCreated());
+		TASSERT(TTRUE == IsDisplayCreated());
 	}
 
 	TRenderContext::TRenderContext(TRender* pRender)
@@ -296,8 +323,8 @@ namespace Toshi {
 		m_eCameraMode = CameraMode_Perspective;
 		m_ProjParams.m_fNearClip = 1.0f;
 		m_ProjParams.m_fFarClip = 1000.0f;
-		m_mModelViewMatrix.Identity();
-		m_mWorldViewMatrix.Identity();
+		m_oModelViewMatrix.Identity();
+		m_oWorldViewMatrix.Identity();
 
 		auto pDevice = pRender->GetCurrentDevice();
 		
@@ -314,18 +341,18 @@ namespace Toshi {
 
 	void TRenderContext::SetModelViewMatrix(const TMatrix44& a_rMatrix)
 	{
-		m_eFlags |= (FLAG_HASMODELVIEWMATRIX | FLAG_HASWORLDVIEWMATRIX);
-		m_mModelViewMatrix = a_rMatrix;
-		m_eFlags &= ~(FLAG_UNK1 | FLAG_UNK3);
+		m_eFlags |= (FLAG_DIRTY_WORLDMODELMATRIX | FLAG_DIRTY_VIEWMODELMATRIX);
+		m_oModelViewMatrix = a_rMatrix;
+		m_eFlags &= ~(FLAG_HAS_MODELWORLDMATRIX | FLAG_UNK3);
 
 		TRender::GetSingleton()->GetParamTable()->SetParameterM44(TRenderParamTable::M44PARAM_MODELVIEW, a_rMatrix);
 	}
 
 	void TRenderContext::SetWorldViewMatrix(const TMatrix44& a_rMatrix)
 	{
-		m_eFlags |= FLAG_HASWORLDVIEWMATRIX;
-		m_mWorldViewMatrix = a_rMatrix;
-		m_eFlags &= ~(FLAG_UNK1 | FLAG_UNK2 | FLAG_UNK4 | FLAG_UNK5 | FLAG_UNK6);
+		m_eFlags |= FLAG_DIRTY_VIEWMODELMATRIX;
+		m_oWorldViewMatrix = a_rMatrix;
+		m_eFlags &= ~(FLAG_HAS_MODELWORLDMATRIX | FLAG_HAS_VIEWWORLDMATRIX | FLAG_UNK4 | FLAG_UNK5 | FLAG_UNK6);
 	}
 
 	void TRenderContext::SetProjectionParams(const PROJECTIONPARAMS& params)
@@ -339,6 +366,51 @@ namespace Toshi {
 
 		m_ProjParams = params;
 		m_eFlags = (m_eFlags & (~(FLAG_UNK3 | FLAG_UNK4 | FLAG_UNK5 | FLAG_UNK6))) | FLAG_DIRTY;
+	}
+
+	const TMatrix44& TRenderContext::GetViewWorldMatrix()
+	{
+		if (!HASFLAG(m_eFlags & FLAG_HAS_VIEWWORLDMATRIX))
+		{
+			m_oViewWorldMatrix.InvertOrthogonal(m_oWorldViewMatrix);
+			m_eFlags |= FLAG_HAS_VIEWWORLDMATRIX;
+		}
+
+		return m_oViewWorldMatrix;
+	}
+
+	const TMatrix44& TRenderContext::GetModelWorldMatrix()
+	{
+		if (!HASFLAG(m_eFlags & FLAG_HAS_MODELWORLDMATRIX))
+		{
+			m_oModelWorldMatrix.Multiply(GetViewWorldMatrix(), m_oModelViewMatrix);
+			m_eFlags |= FLAG_HAS_MODELWORLDMATRIX;
+		}
+
+		TRender::GetSingleton()->GetParamTable()->SetParameterM44(TRenderParamTable::M44PARAM_MODELWORLD, m_oModelWorldMatrix);
+		return m_oModelWorldMatrix;
+	}
+
+	const TMatrix44& TRenderContext::GetViewModelMatrix()
+	{
+		if (HASFLAG(m_eFlags & FLAG_DIRTY_VIEWMODELMATRIX))
+		{
+			m_oViewModelMatrix.Invert(m_oModelViewMatrix);
+			m_eFlags &= ~FLAG_DIRTY_VIEWMODELMATRIX;
+		}
+		
+		return m_oViewModelMatrix;
+	}
+
+	const TMatrix44& TRenderContext::GetWorldModelMatrix()
+	{
+		if (HASFLAG(m_eFlags & FLAG_DIRTY_WORLDMODELMATRIX))
+		{
+			m_oViewModelMatrix.Invert(m_oModelViewMatrix);
+			m_eFlags &= ~FLAG_DIRTY_WORLDMODELMATRIX;
+		}
+
+		return m_oWorldModelMatrix;
 	}
 
 }
