@@ -11,7 +11,7 @@ namespace Toshi {
 		m_iCharLookaheadSize = 0;
 		m_iUnk3 = 0;
 		m_piCharLookahead = TNULL;
-		m_iUnk4 = 0;
+		m_iLastLookaheadIndex = 0;
 		m_iUnk5 = 0;
 		m_iLine = 0;
 		m_iTokenLookaheadSize = 1;
@@ -45,7 +45,7 @@ namespace Toshi {
 		m_iCharLookaheadSize = 0;
 		m_iUnk3 = 0;
 		m_piCharLookahead = TNULL;
-		m_iUnk4 = 0;
+		m_iLastLookaheadIndex = 0;
 		m_iUnk5 = 0;
 		m_iLine = 0;
 		m_iTokenLookaheadSize = 1;
@@ -93,7 +93,7 @@ namespace Toshi {
 
 		skipWhiteSpace();
 
-		if (m_piCharLookahead[m_iUnk4] == -1)
+		if (m_piCharLookahead[m_iLastLookaheadIndex] == -1)
 		{
 			return Token(TFileLexer::TOKEN_UNKNOWN, m_iLine);
 		}
@@ -114,7 +114,7 @@ namespace Toshi {
 
 	void TFileLexerUTF8::fillLookAhead()
 	{
-		while (m_iUnk5 != m_iUnk4)
+		while (m_iUnk5 != m_iLastLookaheadIndex)
 		{
 			m_piCharLookahead[m_iUnk5] = m_pFile->GetCChar();
 			m_iUnk5++;
@@ -129,7 +129,14 @@ namespace Toshi {
 			Token nextToken = get_next_token();
 			m_Token.assign(nextToken);
 		}
-		return Token();
+		else
+		{
+			m_Token.assign(*(m_LookaheadTokens + m_iTokenLookaheadFront * 3));
+			m_iTokenLookaheadFront++;
+			m_iTokenLookaheadFront &= m_iTokenLookaheadMask;
+			m_iTokenLookaheadBuffered--;
+		}
+		return Token(m_Token);
 	}
 
 	const char* TFileLexerUTF8::tostring(TFileLexer::TokenType a_eType)
@@ -197,7 +204,7 @@ namespace Toshi {
 		int iIntCount = 1 << ((a_iLookaheadSize * 2 - 1) >> 0x17) + 0x81 & 0x1f;
 		m_iCharLookaheadSize = iIntCount;
 		m_iUnk3 = iIntCount;
-		m_iUnk4 = 0;
+		m_iLastLookaheadIndex = 0;
 		m_iUnk5 = 0;
 		m_piCharLookahead = new int[iIntCount];
 
@@ -240,7 +247,27 @@ namespace Toshi {
 	{
 		if (m_type == TFileLexer::TOKEN_IDENT || m_type == TFileLexer::TOKEN_STRING || m_type == TFileLexer::TOKEN_COMMENT)
 		{
-			auto value = GetString();
+			if (token.m_type == TFileLexer::TOKEN_IDENT || token.m_type == TFileLexer::TOKEN_STRING || token.m_type == TFileLexer::TOKEN_COMMENT)
+			{
+				m_sValue = token.m_sValue;
+			}
+			else
+			{
+				// ~Token()?
+				
+			}
+		}
+		else if (m_type == TFileLexer::TOKEN_INTEGER)
+		{
+			m_iValue = token.m_iValue;
+		}
+		else if (m_type == TFileLexer::TOKEN_UINTEGER)
+		{
+			m_uiValue = token.m_uiValue;
+		}
+		else if (m_type == TFileLexer::TOKEN_FLOAT)
+		{
+			m_fValue = token.m_fValue;
 		}
 		TIMPLEMENT();
 	}

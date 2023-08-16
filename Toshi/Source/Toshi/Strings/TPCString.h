@@ -103,7 +103,7 @@ namespace Toshi
 			{
 				m_pCStringPool->Remove(*this);
 			}
-			delete m_oString;
+			m_oString.~TCString();
 			ms_oFreeList.Delete(this);
 		}
 

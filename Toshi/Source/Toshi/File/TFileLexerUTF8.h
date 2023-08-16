@@ -27,6 +27,12 @@ namespace Toshi {
 				m_iLine = 0;
 			}
 
+			Token(const Token& other)
+			{
+				m_type = TFileLexer::TOKEN_UNKNOWN;
+				assign(other);
+			}
+
 			~Token()
 			{
 
@@ -140,7 +146,7 @@ namespace Toshi {
 		int m_iCharLookaheadSize;            // 0x0C
 		int m_iUnk3;                         // 0x10
 		int* m_piCharLookahead;              // 0x14
-		int m_iUnk4;                         // 0x18
+		int m_iLastLookaheadIndex;           // 0x18
 		int m_iUnk5;                         // 0x1C
 		int m_iLine;                         // 0x20
 		int m_iTokenLookaheadSize;           // 0x24
