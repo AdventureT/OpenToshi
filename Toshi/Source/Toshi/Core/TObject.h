@@ -36,13 +36,21 @@ namespace Toshi
 		static TObject* CreateTObject()
 		{
 			if constexpr (Instantiable) { return new T(); }
-			else { return TNULL; }
+			else 
+			{
+				TASSERT(!"\"This class does not support dynamic creation!\"");
+				return TNULL; 
+			}
 		}
 
 		static TObject* CreateTObjectInPlace(void* ptr)
 		{
 			if constexpr (Instantiable) { return new (ptr) T(); }
-			else { return TNULL; }
+			else
+			{
+				TASSERT(!"\"This class does not support dynamic creation!\"");
+				return TNULL;
+			}
 		}
 
 		static TClass* GetClassStatic()

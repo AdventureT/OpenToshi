@@ -35,7 +35,11 @@ namespace Toshi {
 
 			~Token()
 			{
-
+				if (m_type == TFileLexer::TOKEN_IDENT || m_type == TFileLexer::TOKEN_STRING || m_type == TFileLexer::TOKEN_COMMENT)
+				{
+					TPCString string = GetString();
+					string.~TPCString();
+				}
 			}
 
 			const TPCString& GetString() const
@@ -121,10 +125,44 @@ namespace Toshi {
 			int m_iCount;
 		};
 
+		struct ParseError
+		{
+			const char* m_szMessage;
+			int m_iLine;
+
+		public:
+			ParseError& operator=(const ParseError& other)
+			{
+				m_szMessage = other.m_szMessage;
+				m_iLine = other.m_iLine;
+			}
+		};
+
 	protected:
+		void ThrowError(const char* m_szError)
+		{
+			ParseError error = { m_szError, m_iLine };
+			m_oEmitter.Throw(&error);
+		}
 		Token get_next_token();
 		void skipWhiteSpace();
 		void fillLookAhead();
+		void advance();
+		void advance(int a_dist)
+		{
+			TASSERT(a_dist < m_iCharLookaheadSize);
+			m_iLastLookaheadIndex += (a_dist + m_iLastLookaheadIndex) & m_iUnk3;
+			fillLookAhead();
+		}
+		int peek()
+		{
+			return m_piCharLookahead[m_iLastLookaheadIndex];
+		}
+		int peek(int a_dist)
+		{
+			TASSERT(a_dist < m_iCharLookaheadSize);
+			return m_piCharLookahead[(m_iLastLookaheadIndex + a_dist) & m_iUnk3];
+		}
 
 	public:
 		TFileLexerUTF8();
@@ -161,7 +199,7 @@ namespace Toshi {
 		TBOOL m_bAllowPreprocessor;          // 0x6C
 		TBOOL m_bUnk7;                       // 0x6D
 		TArray<TCString>::Storage m_Defines; // 0x70
-		TGenericEmitter m_oEmitter;          // 0x80
+		TEmitter<TFileLexerUTF8, ParseError> m_oEmitter;          // 0x80
 	};
 
 }

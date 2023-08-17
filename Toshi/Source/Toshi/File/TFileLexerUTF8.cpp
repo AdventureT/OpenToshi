@@ -86,6 +86,8 @@ namespace Toshi {
 
 	TFileLexerUTF8::Token TFileLexerUTF8::get_next_token()
 	{
+		int currentValue = peek();
+
 		if (m_bUnk7)
 		{
 			return Token(TFileLexer::TOKEN_UNKNOWN, m_iLine);
@@ -93,7 +95,7 @@ namespace Toshi {
 
 		skipWhiteSpace();
 
-		if (m_piCharLookahead[m_iLastLookaheadIndex] == -1)
+		if (currentValue == -1)
 		{
 			return Token(TFileLexer::TOKEN_UNKNOWN, m_iLine);
 		}
@@ -101,14 +103,120 @@ namespace Toshi {
 		if (m_bOutputComments)
 		{
 			TIMPLEMENT();
-			
+			if (peek(0) == '/' && peek(1) == '/')
+			{
+				advance(2);
+				for (size_t i = peek(); i != '\n' && i != '\r'; i = m_piCharLookahead[i])
+				{
+
+				}
+			}
 		}
+
+		if ((iswalpha(currentValue) != 0) || currentValue == '_')
+		{
+
+		}
+
+		if ((iswdigit(currentValue) == 0) && currentValue != '-')
+		{
+			if (currentValue == '.')
+			{
+				if (iswdigit(peek(1)) != 0)
+				{
+					TIMPLEMENT();
+				}
+			}
+			else if (currentValue == '"')
+			{
+				advance();
+				currentValue = peek();
+				do
+				{
+					TIMPLEMENT();
+				} while (true);
+			}
+
+			switch (currentValue)
+			{
+			case '$':
+				advance();
+				return Token(TFileLexer::TOKEN_DOLLAR, m_iLine);
+			case '(':
+				advance();
+				return Token(TFileLexer::TOKEN_OPENPAREN, m_iLine);
+			case ')':
+				advance();
+				return Token(TFileLexer::TOKEN_CLOSEPAREN, m_iLine);
+			case '*':
+				advance();
+				return Token(TFileLexer::TOKEN_ASTERISK, m_iLine);
+			case ',':
+				advance();
+				return Token(TFileLexer::TOKEN_COMMA, m_iLine);
+			case '.':
+				advance();
+				return Token(TFileLexer::TOKEN_DOT, m_iLine);
+			case ':':
+				advance();
+				return Token(TFileLexer::TOKEN_COLON, m_iLine);
+			case ';':
+				advance();
+				return Token(TFileLexer::TOKEN_SEMI, m_iLine);
+			case '<':
+				advance();
+				return Token(TFileLexer::TOKEN_LESSTHAN, m_iLine);
+			case '=':
+				advance();
+				return Token(TFileLexer::TOKEN_EQUAL, m_iLine);
+			case '>':
+				advance();
+				return Token(TFileLexer::TOKEN_GREATERTHAN, m_iLine);
+			case '[':
+				advance();
+				return Token(TFileLexer::TOKEN_OPENSQR, m_iLine);
+			case ']':
+				advance();
+				return Token(TFileLexer::TOKEN_CLOSESQR, m_iLine);
+			case '{':
+				advance();
+				return Token(TFileLexer::TOKEN_OPENBRACE, m_iLine);
+			case '}':
+				advance();
+				return Token(TFileLexer::TOKEN_CLOSEBRACE, m_iLine);
+			default:
+				ThrowError("Invalid character");
+				return Token();
+			}
+		}
+
 
 		return Token();
 	}
 
 	void TFileLexerUTF8::skipWhiteSpace()
 	{
+		int curChar = peek();
+		int i = 0;
+		do
+		{
+			bool bNewLine = false;
+			while (i = iswspace(curChar), i != 0 || (curChar == ~0x100))
+			{
+				advance();
+				if (curChar == '\n')
+				{
+					m_iLine++;
+					bNewLine = true;
+					
+				}
+				else
+				{
+					bNewLine = false;
+				}
+				curChar = peek();
+			}
+		} while (true);
 		TIMPLEMENT();
 	}
 
@@ -120,6 +228,13 @@ namespace Toshi {
 			m_iUnk5++;
 			m_iUnk5 &= m_iUnk3;
 		}
+	}
+
+	void TFileLexerUTF8::advance()
+	{
+		m_iLastLookaheadIndex = m_iLastLookaheadIndex + 1 & m_iUnk3;
+		m_piCharLookahead[m_iUnk5] = m_pFile->GetCChar();
+		m_iUnk5 = m_iLastLookaheadIndex;
 	}
 
 	TFileLexerUTF8::Token TFileLexerUTF8::GetNextToken()
@@ -145,7 +260,7 @@ namespace Toshi {
 		{
 		case Toshi::TFileLexer::TOKEN_UNKNOWN:
 			return "EOF";
-		case Toshi::TFileLexer::TOKEN_SEMICOLON:
+		case Toshi::TFileLexer::TOKEN_SEMI:
 			return "SEMI";
 		case Toshi::TFileLexer::TOKEN_COLON:
 			return "COLON";
@@ -253,8 +368,9 @@ namespace Toshi {
 			}
 			else
 			{
+				// Basically this = token
 				// ~Token()?
-				
+				this->~Token();
 			}
 		}
 		else if (m_type == TFileLexer::TOKEN_INTEGER)
