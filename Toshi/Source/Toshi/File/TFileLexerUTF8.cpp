@@ -113,10 +113,21 @@ namespace Toshi {
 			}
 		}
 
+		int len = 0;
+
 		if ((iswalpha(currentValue) != 0) || currentValue == '_')
 		{
+			do
+			{	
+				ms_Buffer[len++] = currentValue;
+				advance();
+				TASSERT(len < WORDBUF_SIZE);
+				currentValue = peek();
+			} while ((iswalnum(currentValue) != 0) || currentValue == '_');
+			ms_Buffer[len] = '\0';
 
 		}
+
 
 		if ((iswdigit(currentValue) == 0) && currentValue != '-')
 		{
@@ -201,20 +212,50 @@ namespace Toshi {
 		do
 		{
 			bool bNewLine = false;
-			while (i = iswspace(curChar), i != 0 || (curChar == ~0x100))
+			for (size_t i = iswspace(curChar); i != 0 || (curChar == ~0x100);)
 			{
 				advance();
 				if (curChar == '\n')
 				{
 					m_iLine++;
 					bNewLine = true;
-					
+
 				}
 				else
 				{
 					bNewLine = false;
 				}
 				curChar = peek();
+			}
+			if (!m_bAllowPreprocessor)
+			{
+				while (curChar != '#' || (!bNewLine))
+				{
+					advance();
+					if (curChar == '\n')
+					{
+						m_iLine++;
+						bNewLine = true;
+
+					}
+					else
+					{
+						bNewLine = false;
+					}
+					curChar = peek();
+				}
+			}
+			if (bNewLine && curChar == '#')
+			{
+				advance();
+				int len = 0;
+				while (iswspace(curChar) == 0 && curChar != -1)
+				{
+					ms_Buffer[len++] = curChar;
+					advance();
+					TASSERT(len < WORDBUF_SIZE);
+					curChar = peek();
+				}
 			}
 		} while (true);
 		TIMPLEMENT();
@@ -225,8 +266,7 @@ namespace Toshi {
 		while (m_iUnk5 != m_iLastLookaheadIndex)
 		{
 			m_piCharLookahead[m_iUnk5] = m_pFile->GetCChar();
-			m_iUnk5++;
-			m_iUnk5 &= m_iUnk3;
+			m_iUnk5 = m_iUnk5 + 1 & m_iUnk3;
 		}
 	}
 

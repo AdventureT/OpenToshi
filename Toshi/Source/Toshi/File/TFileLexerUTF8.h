@@ -179,6 +179,9 @@ namespace Toshi {
 		void Define(const char* a_szDefinition);
 
 	private:
+
+		static inline char ms_Buffer[WORDBUF_SIZE];
+
 		TFile* m_pFile;                      // 0x04
 		bool m_bOutputComments;              // 0x08
 		int m_iCharLookaheadSize;            // 0x0C
