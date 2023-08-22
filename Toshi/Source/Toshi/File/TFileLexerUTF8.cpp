@@ -257,6 +257,39 @@ namespace Toshi {
 					curChar = peek();
 				}
 			}
+			if (m_bOutputComments) return;
+			if (peek(0) != '/')
+			{
+				
+			}
+			if (peek(0) == '/' && peek(1) == '*')
+			{
+				advance(2);
+				do
+				{
+					if (peek(0) == '*')
+					{
+						if (peek(1) == '/')
+						{
+							//?
+							break;
+						}
+					}
+					if (peek(0) == -1)
+					{
+						m_oEmitter.Throw({ "Unterminated block comment /* ... */" , m_iLine });
+						return;
+					}
+					if (peek() == '\n')
+					{
+						m_iLine++;
+					}
+					advance();
+				} while (true);
+			}
+			TIMPLEMENT();
+			// Returing here cause we don't want a infinite loop
+			return;
 		} while (true);
 		TIMPLEMENT();
 	}
@@ -265,8 +298,7 @@ namespace Toshi {
 	{
 		while (m_iUnk5 != m_iLastLookaheadIndex)
 		{
-			m_piCharLookahead[m_iUnk5] = m_pFile->GetCChar();
-			m_iUnk5 = m_iUnk5 + 1 & m_iUnk3;
+			advance();
 		}
 	}
 
@@ -358,7 +390,7 @@ namespace Toshi {
 
 		int iIntCount = 1 << ((a_iLookaheadSize * 2 - 1) >> 0x17) + 0x81 & 0x1f;
 		m_iCharLookaheadSize = iIntCount;
-		m_iUnk3 = iIntCount;
+		m_iUnk3 = iIntCount - 1;
 		m_iLastLookaheadIndex = 0;
 		m_iUnk5 = 0;
 		m_piCharLookahead = new int[iIntCount];

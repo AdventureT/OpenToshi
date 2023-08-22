@@ -151,7 +151,7 @@ namespace Toshi {
 		void advance(int a_dist)
 		{
 			TASSERT(a_dist < m_iCharLookaheadSize);
-			m_iLastLookaheadIndex += (a_dist + m_iLastLookaheadIndex) & m_iUnk3;
+			m_iLastLookaheadIndex = a_dist + m_iLastLookaheadIndex & m_iUnk3;
 			fillLookAhead();
 		}
 		int peek()
@@ -161,7 +161,7 @@ namespace Toshi {
 		int peek(int a_dist)
 		{
 			TASSERT(a_dist < m_iCharLookaheadSize);
-			return m_piCharLookahead[(m_iLastLookaheadIndex + a_dist) & m_iUnk3];
+			return m_piCharLookahead[a_dist + m_iLastLookaheadIndex & m_iUnk3];
 		}
 
 	public:
