@@ -260,7 +260,34 @@ namespace Toshi {
 			if (m_bOutputComments) return;
 			if (peek(0) != '/')
 			{
-				
+				if (peek(1) != '/')
+				{
+					if (peek(0) == '/' && peek(1) == '*')
+					{
+						advance(2);
+						do
+						{
+							if (peek(0) == '*')
+							{
+								if (peek(1) == '/')
+								{
+									//?
+									break;
+								}
+							}
+							if (peek(0) == -1)
+							{
+								m_oEmitter.Throw({ "Unterminated block comment /* ... */" , m_iLine });
+								return;
+							}
+							if (peek() == '\n')
+							{
+								m_iLine++;
+							}
+							advance();
+						} while (true);
+					}
+				}
 			}
 			if (peek(0) == '/' && peek(1) == '*')
 			{

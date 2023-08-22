@@ -20,6 +20,8 @@ app.Execute();
 #include "Toshi/Core/TSystem.h"
 #include <Toshi/Core/TFreeList.h>
 #include "Toshi/Plugins/PPropertyParser/PProperties.h"
+#include "ARootTask.h"
+
 
 #include TOSHI_MULTIRENDER(TRender)
 
@@ -32,6 +34,9 @@ bool AApplication::OnCreate(int argc, char** argv)
 	TSystem::CreateCStringPoolExplicit("data\\strpool.dat", 1024, 12000);
 	TTODO("SetCapacities");
 	Toshi::TSystem::GetLocale()->LoadInfo("Data/GUI/Locales/Locales.txt");
+	Toshi::TScheduler* scheduler = new Toshi::TScheduler();
+	m_pRootTask = scheduler->CreateTask(TGetClass(ARootTask));
+	m_pRootTask->Activate(TTRUE);
 
 	TApplication::OnCreate(argc, argv);
 	return true;
