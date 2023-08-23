@@ -36,7 +36,12 @@ bool AApplication::OnCreate(int argc, char** argv)
 	Toshi::TSystem::GetLocale()->LoadInfo("Data/GUI/Locales/Locales.txt");
 	Toshi::TScheduler* scheduler = new Toshi::TScheduler();
 	m_pRootTask = scheduler->CreateTask(TGetClass(ARootTask));
-	m_pRootTask->Activate(TTRUE);
+	if (m_pRootTask)
+	{
+		if (!m_pRootTask->Create()) return TFALSE;
+		m_pRootTask->Activate(TTRUE);
+	}
+	
 
 	TApplication::OnCreate(argc, argv);
 	return true;
