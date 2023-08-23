@@ -1,16 +1,33 @@
 #include "pch.h"
 #include "AOptions.h"
-#include "Toshi/Plugins/PPropertyParser/PPropertyReader.h"
+
+TOSHI_NAMESPACE_USING
 
 AOptions::Result AOptions::LoadOptions()
 {
-	LoadOptions(-1, -1, "Data", sm_szOptionsName);
+	LoadOptions(-1, -1, "", sm_szOptionsName);
 	return Result();
 }
 
 AOptions::Result AOptions::LoadOptions(int a_iUnk, int a_iUnk2, const Toshi::TCString& a_szOptionsDir, const Toshi::TCString& a_szOptionsName)
 {
 	PPropertyReader reader = PPropertyReader();
-	Toshi::TCString::Format("%s/%s.ini", a_szOptionsDir, a_szOptionsName);
-	return Result();
+	TCString szFileName;
+	szFileName.Format("%s%s.ini", a_szOptionsDir.GetString(), a_szOptionsName.GetString());
+	if (!reader.Open(szFileName))
+	{
+		return RESULT_ERROR;
+	}
+	PProperties* props = new PProperties();
+	if (reader.LoadPropertyBlock(*props))
+	{
+		if (m_pUnkProps)
+		{
+			delete m_pUnkProps;
+		}
+		m_pUnkProps = props;
+		m_pCurProps = props;
+		return RESULT_OK;
+	}
+	return RESULT_ERROR;
 }

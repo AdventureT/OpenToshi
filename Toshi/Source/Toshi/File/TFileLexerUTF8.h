@@ -178,31 +178,34 @@ namespace Toshi {
 		void SetInputStream(TFile* a_pInputStream);
 		void Define(const char* a_szDefinition);
 
+		TEmitter<TFileLexerUTF8, ParseError>* GetParseErrorEmitter() { return &m_oEmitter; }
+		void SetOutputComments(TBOOL a_bOutputComments) { m_bOutputComments = a_bOutputComments; }
+
 	private:
 
 		static inline char ms_Buffer[WORDBUF_SIZE];
 
-		TFile* m_pFile;                      // 0x04
-		bool m_bOutputComments;              // 0x08
-		int m_iCharLookaheadSize;            // 0x0C
-		int m_iUnk3;                         // 0x10
-		int* m_piCharLookahead;              // 0x14
-		int m_iLastLookaheadIndex;           // 0x18
-		int m_iUnk5;                         // 0x1C
-		int m_iLine;                         // 0x20
-		int m_iTokenLookaheadSize;           // 0x24
-		int m_iTokenLookaheadMask;           // 0x28
-		Token m_Token;                       // 0x2C
-		Token* m_LookaheadTokens;            // 0x38
-		int m_iTokenLookaheadBuffered;       // 0x3C
-		int m_iTokenLookaheadFront;          // 0x40
-		int m_iTokenLookaheadBack;           // 0x44
-		int m_iSomeNum;                      // 0x48
-		TBOOL m_bFlags[4];                   // 0x4C
-		TBOOL m_bAllowPreprocessor;          // 0x6C
-		TBOOL m_bUnk7;                       // 0x6D
-		TArray<TCString>::Storage m_Defines; // 0x70
-		TEmitter<TFileLexerUTF8, ParseError> m_oEmitter;          // 0x80
+		TFile* m_pFile;                                    // 0x04
+		bool m_bOutputComments;                            // 0x08
+		int m_iCharLookaheadSize;                          // 0x0C
+		int m_iUnk3;                                       // 0x10
+		int* m_piCharLookahead;                            // 0x14
+		int m_iLastLookaheadIndex;                         // 0x18
+		int m_iUnk5;                                       // 0x1C
+		int m_iLine;                                       // 0x20
+		int m_iTokenLookaheadSize;                         // 0x24
+		int m_iTokenLookaheadMask;                         // 0x28
+		Token m_Token;                                     // 0x2C
+		Token* m_LookaheadTokens;                          // 0x38
+		int m_iTokenLookaheadBuffered;                     // 0x3C
+		int m_iTokenLookaheadFront;                        // 0x40
+		int m_iTokenLookaheadBack;                         // 0x44
+		int m_iSomeNum;                                    // 0x48
+		TBOOL m_bFlags[4];                                 // 0x4C
+		TBOOL m_bAllowPreprocessor;                        // 0x6C
+		TBOOL m_bUnk7;                                     // 0x6D
+		TArray<TCString>::Storage m_Defines;               // 0x70
+		TEmitter<TFileLexerUTF8, ParseError> m_oEmitter;   // 0x80
 	};
 
 }

@@ -1,5 +1,6 @@
 #pragma once
-#include "Toshi/Plugins/PPropertyParser/PProperties.h"
+#include "Toshi/Plugins/PPropertyParser/PPropertyReader.h"
+
 
 class AOptionChangeEvent
 {
@@ -16,15 +17,15 @@ class AOptions : public Toshi::TSingleton<AOptions>
 
 	enum Result
 	{
-
+		RESULT_OK = 0,
+		RESULT_ERROR = 3,
 	};
 
 public:
 
 	AOptions() : m_oOptionLoadEmitter(this), m_oOptionChangeEmitter(this), m_iAutoSaveState(1)
 	{
-		// Toshi::TFreeList::New((TFreeList *)ms_oFreelist_exref,0x18)
-		PProperties* props = new PProperties[24];
+		PProperties* props = new PProperties();
 		m_pUnkProps = props;
 		m_pCurProps = props;
 	}

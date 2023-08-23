@@ -151,20 +151,22 @@ namespace Toshi
 		return hasChanged;
 	}
 
-	TCString TCString::Format(const char* a_pcFormat, ...)
+	TCString& TCString::Format(const char* a_pcFormat, ...)
 	{
-		char buffer[0x400];
-		TCString buffer2;
 		va_list args;
+		char buffer[0x400];
 
 		va_start(args, a_pcFormat);
 
 		// TASSERT is only in T2String8
 		int iResult = _vsnprintf(buffer, sizeof(buffer), a_pcFormat, args);
 		TASSERT(iResult != -1, "PS2/GC/X360 do not correctly support _vsnprintf, this code will cause memory to be clobbered on those platforms! Increase the size of the destination string to avoid this problem")
-		buffer2.Copy(buffer, -1);
-		
-		return buffer2;
+			Copy(buffer, -1);
+
+		va_end(args);
+
+		return *this;
+
 	}
 
 	TCString& TCString::VFormat(const char* a_pcFormat, char* a_pcArgs)

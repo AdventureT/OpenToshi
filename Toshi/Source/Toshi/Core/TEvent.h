@@ -103,4 +103,18 @@ namespace Toshi
 
 		void Destroy() { TGenericEmitter::Destroy(); }
 	};
+
+	template <typename Caller, typename Owner, typename Data = Owner>
+	class TListener : public TGenericListener
+	{
+	public:
+
+		using t_Callback = TBOOL(*)(Caller*, Owner*, Data*);
+
+		TListener() : TGenericListener() {}
+
+		void Execute(Owner* pOwner, Data* pData) { TGenericListener::Execute(pOwner, pData); }
+		void Connect(TGenericEmitter* emitter, Caller* caller, t_Callback callback, int unk2) { TGenericListener::Connect(emitter, caller, TREINTERPRETCAST(TGenericListener::t_Callback, callback), unk2); }
+		void Disconnect() { TGenericListener::Disconnect(); }
+	};
 }
