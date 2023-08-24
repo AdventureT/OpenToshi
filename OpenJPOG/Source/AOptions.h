@@ -39,6 +39,8 @@ public:
 	Toshi::TEmitter<AOptions, AOptionLoadEvent>* GetOptionLoadEmitter() { return &m_oOptionLoadEmitter; }
 	Toshi::TEmitter<AOptions, AOptionChangeEvent>* GetOptionChangeEmitter() { return &m_oOptionChangeEmitter; }
 
+	TBOOL GetOption(const char* a_szOptionName, int& a_rVal);
+
 protected:
 	Result LoadOptions(int a_iUnk, int a_iUnk2, const Toshi::TCString& a_sStr1, const Toshi::TCString& a_sStr2);
 

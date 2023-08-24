@@ -9,6 +9,13 @@ AOptions::Result AOptions::LoadOptions()
 	return Result();
 }
 
+TBOOL AOptions::GetOption(const char* a_szOptionName, int& a_rVal)
+{
+	TPCString pcString = Toshi::TSystem::GetCStringPool()->Get(a_szOptionName);
+
+	return TBOOL();
+}
+
 AOptions::Result AOptions::LoadOptions(int a_iUnk, int a_iUnk2, const Toshi::TCString& a_szOptionsDir, const Toshi::TCString& a_szOptionsName)
 {
 	PPropertyReader reader = PPropertyReader();

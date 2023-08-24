@@ -23,6 +23,8 @@
 #include <Toshi/Utils/TUtil.h>
 #include <Toshi/Thread/TMutexLock.h>
 #include <Toshi/Strings/TStringManager.h>
+#include <Toshi/Core/TSystem.h>
+
 
 /* Toshi 2.0 Header Files */
 #include "Toshi2/T2Flags.h"

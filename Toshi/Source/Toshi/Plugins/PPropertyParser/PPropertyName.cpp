@@ -4,42 +4,12 @@
 
 void PPropertyName::SetName(const Toshi::TPCString& a_pName)
 {
-	if (m_pName.m_pPooledString != a_pName.m_pPooledString)
-	{
-		if (m_pName.m_pPooledString)
-		{
-			m_pName.m_pPooledString->m_iCount--;
-			if (m_pName.m_pPooledString->m_iCount == 0)
-			{
-				m_pName.m_pPooledString->Delete();
-			}
-		}
-		m_pName.m_pPooledString = a_pName.m_pPooledString;
-		if (a_pName.m_pPooledString)
-		{
-			a_pName.m_pPooledString->m_iCount++;
-		}
-	}
+	m_pName = a_pName;
 }
 
 void PPropertyName::SetSubName(const Toshi::TPCString& a_pSubName)
 {
-	if (m_pSubName.m_pPooledString != a_pSubName.m_pPooledString)
-	{
-		if (m_pSubName.m_pPooledString)
-		{
-			m_pSubName.m_pPooledString->m_iCount--;
-			if (m_pSubName.m_pPooledString->m_iCount == 0)
-			{
-				m_pSubName.m_pPooledString->Delete();
-			}
-		}
-		m_pSubName.m_pPooledString = a_pSubName.m_pPooledString;
-		if (a_pSubName.m_pPooledString)
-		{
-			a_pSubName.m_pPooledString->m_iCount++;
-		}
-	}
+	m_pName = a_pSubName;
 }
 
 Toshi::TPCString PPropertyName::GetString() const
