@@ -485,26 +485,79 @@ namespace Toshi {
 			{
 				m_sValue = token.m_sValue;
 			}
-			else
+			else if (token.m_type == TFileLexer::TOKEN_INTEGER)
 			{
-				// Basically this = token
-				// ~Token()?
-				this->~Token();
+				m_sValue.~TPCString();
+				m_iValue = token.m_iValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_UINTEGER)
+			{
+				m_sValue.~TPCString();
+				m_uiValue = token.m_uiValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_FLOAT)
+			{
+				m_sValue.~TPCString();
+				m_fValue = token.m_fValue;
 			}
 		}
 		else if (m_type == TFileLexer::TOKEN_INTEGER)
 		{
-			m_iValue = token.m_iValue;
+			if (token.m_type == TFileLexer::TOKEN_IDENT || token.m_type == TFileLexer::TOKEN_STRING || token.m_type == TFileLexer::TOKEN_COMMENT)
+			{
+				m_sValue = token.m_sValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_INTEGER)
+			{
+				m_iValue = token.m_iValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_UINTEGER)
+			{
+				m_uiValue = token.m_uiValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_FLOAT)
+			{
+				m_fValue = token.m_fValue;
+			}
 		}
 		else if (m_type == TFileLexer::TOKEN_UINTEGER)
 		{
-			m_uiValue = token.m_uiValue;
+			if (token.m_type == TFileLexer::TOKEN_IDENT || token.m_type == TFileLexer::TOKEN_STRING || token.m_type == TFileLexer::TOKEN_COMMENT)
+			{
+				m_sValue = token.m_sValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_INTEGER)
+			{
+				m_iValue = token.m_iValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_UINTEGER)
+			{
+				m_uiValue = token.m_uiValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_FLOAT)
+			{
+				m_fValue = token.m_fValue;
+			}
 		}
 		else if (m_type == TFileLexer::TOKEN_FLOAT)
 		{
-			m_fValue = token.m_fValue;
+			if (token.m_type == TFileLexer::TOKEN_IDENT || token.m_type == TFileLexer::TOKEN_STRING || token.m_type == TFileLexer::TOKEN_COMMENT)
+			{
+				m_sValue = token.m_sValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_INTEGER)
+			{
+				m_iValue = token.m_iValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_UINTEGER)
+			{
+				m_uiValue = token.m_uiValue;
+			}
+			else if (token.m_type == TFileLexer::TOKEN_FLOAT)
+			{
+				m_fValue = token.m_fValue;
+			}
 		}
-		TIMPLEMENT();
 	}
 
 	TCString TFileLexerUTF8::Token::tostring() const

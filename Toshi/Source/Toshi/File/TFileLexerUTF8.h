@@ -90,6 +90,7 @@ namespace Toshi {
 		public:
 			TFileLexer::TokenType m_type = TFileLexer::TOKEN_UNKNOWN;
 			int m_iLine = 0;
+			void* m_pValue;
 			union
 			{
 				float m_fValue;
