@@ -52,6 +52,7 @@ namespace Toshi {
 		m_iTokenLookaheadSize = 1;
 		m_iTokenLookaheadMask = 1;
 		m_LookaheadTokens = LookaheadTokens::Allocate(a_iTokenLookaheadSize)->GetTokens();
+		Toshi::TUtil::MemClear(m_LookaheadTokens, sizeof(LookaheadTokens) + sizeof(Token) * a_iTokenLookaheadSize);
 		m_iTokenLookaheadBuffered = 0;
 		m_iTokenLookaheadFront = 0;
 		m_iTokenLookaheadBack = 0;
@@ -365,6 +366,7 @@ namespace Toshi {
 			for (;m_iTokenLookaheadBuffered <= a_iDistance; m_iTokenLookaheadBuffered++)
 			{
 				Token nextToken = get_next_token();
+				TOSHI_INFO(nextToken.tostring());
 				m_LookaheadTokens[m_iTokenLookaheadBack].assign(nextToken);
 				m_iTokenLookaheadBack = m_iTokenLookaheadBack + 1 & m_iTokenLookaheadMask;
 			}
@@ -483,80 +485,20 @@ namespace Toshi {
 		{
 			if (token.m_type == TFileLexer::TOKEN_IDENT || token.m_type == TFileLexer::TOKEN_STRING || token.m_type == TFileLexer::TOKEN_COMMENT)
 			{
-				m_sValue = token.m_sValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_INTEGER)
-			{
-				m_sValue.~TPCString();
-				m_iValue = token.m_iValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_UINTEGER)
-			{
-				m_sValue.~TPCString();
-				m_uiValue = token.m_uiValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_FLOAT)
-			{
-				m_sValue.~TPCString();
-				m_fValue = token.m_fValue;
+				m_sValue = token.GetString();
 			}
 		}
 		else if (m_type == TFileLexer::TOKEN_INTEGER)
 		{
-			if (token.m_type == TFileLexer::TOKEN_IDENT || token.m_type == TFileLexer::TOKEN_STRING || token.m_type == TFileLexer::TOKEN_COMMENT)
-			{
-				m_sValue = token.m_sValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_INTEGER)
-			{
-				m_iValue = token.m_iValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_UINTEGER)
-			{
-				m_uiValue = token.m_uiValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_FLOAT)
-			{
-				m_fValue = token.m_fValue;
-			}
+			m_iValue = token.m_iValue;
 		}
 		else if (m_type == TFileLexer::TOKEN_UINTEGER)
 		{
-			if (token.m_type == TFileLexer::TOKEN_IDENT || token.m_type == TFileLexer::TOKEN_STRING || token.m_type == TFileLexer::TOKEN_COMMENT)
-			{
-				m_sValue = token.m_sValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_INTEGER)
-			{
-				m_iValue = token.m_iValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_UINTEGER)
-			{
-				m_uiValue = token.m_uiValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_FLOAT)
-			{
-				m_fValue = token.m_fValue;
-			}
+			m_uiValue = token.m_uiValue;
 		}
 		else if (m_type == TFileLexer::TOKEN_FLOAT)
 		{
-			if (token.m_type == TFileLexer::TOKEN_IDENT || token.m_type == TFileLexer::TOKEN_STRING || token.m_type == TFileLexer::TOKEN_COMMENT)
-			{
-				m_sValue = token.m_sValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_INTEGER)
-			{
-				m_iValue = token.m_iValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_UINTEGER)
-			{
-				m_uiValue = token.m_uiValue;
-			}
-			else if (token.m_type == TFileLexer::TOKEN_FLOAT)
-			{
-				m_fValue = token.m_fValue;
-			}
+			m_fValue = token.m_fValue;
 		}
 	}
 
@@ -568,7 +510,12 @@ namespace Toshi {
 			res += "IDENT:";
 			res += *GetString();
 		}
-		return TCString();
+		else if (m_type == TFileLexer::TOKEN_STRING)
+		{
+			res += "STRING:";
+			res += *GetString();
+		}
+		return res;
 	}
 
 }

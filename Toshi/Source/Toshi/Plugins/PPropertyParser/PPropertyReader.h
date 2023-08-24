@@ -20,8 +20,8 @@ public:
 
 private:
 	Toshi::TFileLexerUTF8::Token m_Token; // 0x0
-	int m_iUnk;                    // 0xC
-	int m_iUnk2;                   // 0x10
+	int m_iUnk;                           // 0xC
+	int m_iUnk2;                          // 0x10
 
 };
 

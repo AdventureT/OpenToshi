@@ -24,9 +24,6 @@ namespace Toshi {
 			Token(TFileLexer::TokenType a_eType, int a_iLine, const TPCString& a_rVal) : m_type(a_eType), m_iLine(a_iLine), m_sValue(a_rVal)
 			{
 				TASSERT(m_type == TFileLexer::TOKEN_IDENT || m_type == TFileLexer::TOKEN_STRING || m_type == TFileLexer::TOKEN_COMMENT);
-				//TPCString& str = GetString();
-				//str = TPCString();
-				//GetString() = a_rVal;
 			}
 
 			Token()
@@ -90,7 +87,6 @@ namespace Toshi {
 		public:
 			TFileLexer::TokenType m_type = TFileLexer::TOKEN_UNKNOWN;
 			int m_iLine = 0;
-			void* m_pValue;
 			union
 			{
 				float m_fValue;
