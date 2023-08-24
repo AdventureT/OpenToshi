@@ -4,9 +4,10 @@
 
 namespace Toshi {
 
-	TCStringPool::TCStringPool(int a_iMaxSize, int a_iCapacity)
+	TCStringPool::TCStringPool(int a_iGrowSize, int a_iSize) : m_oPooledCStrings(a_iGrowSize, a_iSize)
 	{
-		m_iStringCount = 0;
+		
+		/*m_iStringCount = 0;
 		m_iMaxSize = a_iMaxSize;
 		m_iCapacity = a_iCapacity;
 
@@ -19,10 +20,10 @@ namespace Toshi {
 			m_oStringPool.m_pCStringPool = new StringPool();
 			m_oStringPool.m_pCStringPool->m_szStrings = new TCString[a_iCapacity];
 			m_oStringPool.m_iCountOfPools = m_iCapacity;
-		}
+		}*/
 	}
 
-	TCStringPool::TCStringPool(const char* a_szFileName, int unk, int unk2) : TCStringPool(unk, unk2)
+	TCStringPool::TCStringPool(const char* a_szFileName, int a_iGrowSize, int a_iSize) : TCStringPool(a_iGrowSize, a_iSize)
 	{
 		ReadFile(a_szFileName);
 	}
@@ -38,7 +39,8 @@ namespace Toshi {
 		{
 			return TPCString();
 		}
-		return TPCString();
+		TPooledCString* pooledString = new TPooledCString(a_szStr, this);
+		return TPCString(pooledString);
 	}
 
 	TBOOL TCStringPool::ReadFile(const char* a_szFileName)
@@ -80,7 +82,7 @@ namespace Toshi {
 			return TFALSE;
 		}
 
-		if (m_iCapacity < stringCount)
+		/*if (m_iCapacity < stringCount)
 		{
 			InitStringPool(stringCount);
 		}
@@ -92,7 +94,7 @@ namespace Toshi {
 		{
 			pool[i].m_szStrings = new TCString();
 			pool[i].count = 0;
-		}
+		}*/
 
 		TTODO("WTH");
 
@@ -103,30 +105,30 @@ namespace Toshi {
 	{
 		// 0x10021540 JPOG
 
-		if (a_iStringCount == 0)
-		{
-			if (m_oStringPool.m_pCStringPool != TNULL)
-			{
-				delete[] m_oStringPool.m_pCStringPool;
-			}
-			m_oStringPool.m_pCStringPool = TNULL;
-			m_iCapacity = 0;
-			m_iStringCount = 0;
-		}
-		else
-		{
-			m_oStringPool.m_pCStringPool = new StringPool[a_iStringCount];
-			m_oStringPool.m_iCountOfPools++;
+		//if (a_iStringCount == 0)
+		//{
+		//	if (m_oStringPool.m_pCStringPool != TNULL)
+		//	{
+		//		delete[] m_oStringPool.m_pCStringPool;
+		//	}
+		//	m_oStringPool.m_pCStringPool = TNULL;
+		//	m_iCapacity = 0;
+		//	m_iStringCount = 0;
+		//}
+		//else
+		//{
+		//	m_oStringPool.m_pCStringPool = new StringPool[a_iStringCount];
+		//	m_oStringPool.m_iCountOfPools++;
 
-			int stringCount = a_iStringCount < m_iStringCount ? a_iStringCount : m_iStringCount;
+		//	int stringCount = a_iStringCount < m_iStringCount ? a_iStringCount : m_iStringCount;
 
-			for (int i = 0; i < stringCount; i++)
-			{
-				TIMPLEMENT();
-				//m_oStringPool.m_pCStringPool[i] = new StringPool();
-			}
+		//	for (int i = 0; i < stringCount; i++)
+		//	{
+		//		TIMPLEMENT();
+		//		//m_oStringPool.m_pCStringPool[i] = new StringPool();
+		//	}
 
-		}
+		//}
 
 	}
 

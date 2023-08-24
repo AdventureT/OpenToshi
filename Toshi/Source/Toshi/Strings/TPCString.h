@@ -1,6 +1,7 @@
 #pragma once
 #include <Toshi/Strings/TCString.h>
 #include <Toshi/Core/TFreeList.h>
+#include "Toshi/Core/TArray.h"
 
 #define TCSTRINGPOOL_MAX_STRING_SIZE 0x400
 
@@ -14,11 +15,11 @@ namespace Toshi
 	public:
 		TCStringPool()
 		{
-			TCStringPool(1024, 0);
+			TCStringPool(TCSTRINGPOOL_MAX_STRING_SIZE, 0);
 		}
 
-		TCStringPool(int unk, int unk2);
-		TCStringPool(const char* a_szFileName, int unk, int unk2);
+		TCStringPool(int a_iGrowSize, int a_iSize);
+		TCStringPool(const char* a_szFileName, int a_iGrowSize, int a_iSize);
 
 		struct StringPool
 		{
@@ -41,10 +42,9 @@ namespace Toshi
 		void InitStringPool(int a_iStringCount);
 
 	private:
-		int m_iMaxSize;           // 0x0
-		int m_iStringCount;       // 0x4 !!! m_oStringPool !!!
-		int m_iCapacity;          // 0x8
-		StringPools m_oStringPool;// 0xC
+		int m_iMaxSize;                      // 0x0
+		TArray<TPCString> m_oPooledCStrings; // 0x4
+		StringPools m_oStringPool;           // 0xC
 	};
 
 	class TPooledCString
@@ -177,15 +177,15 @@ namespace Toshi
 
 		TPCString& operator=(const TPCString& other)
 		{
-			if (m_pPooledString != other.m_pPooledString)
+			if (GetPtr() != other.GetPtr())
 			{
 				if (GetPtr())
 				{
 					m_pPooledString->m_iCount--;
 					if (m_pPooledString->m_iCount == 0) m_pPooledString->Delete();
 				}
-				m_pPooledString = other.m_pPooledString;
-				if (other.m_pPooledString)
+				m_pPooledString = other.GetPtr();
+				if (other.GetPtr())
 				{
 					m_pPooledString->m_iCount++;
 				}

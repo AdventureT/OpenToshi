@@ -126,6 +126,12 @@ namespace Toshi {
 			m_poArray = TNULL;
 		}
 
+		TArray(int a_iGrowSize, int a_iSize)
+		{
+			m_iIndex = 0;
+			m_poArray = new Storage(a_iGrowSize, a_iSize);
+		}
+
 		TArray(const TArray& other)
 		{
 			m_poArray = other.m_poArray;
@@ -201,6 +207,8 @@ namespace Toshi {
 			TASSERT(m_iIndex < m_poArray->m_iNumElements);
 			return m_poArray->m_pData[m_iIndex];
 		}
+
+		int Size() const { return m_iIndex; }
 
 		TArray& operator++()
 		{

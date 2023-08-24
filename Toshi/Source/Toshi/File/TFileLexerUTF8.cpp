@@ -127,6 +127,8 @@ namespace Toshi {
 			} while ((iswalnum(currentValue) != 0) || currentValue == '_');
 			ms_Buffer[len] = '\0';
 			TCStringPool* pool = TSystem::GetCStringPool();
+			TPCString poolString = pool->Get(ms_Buffer);
+			return Token(TFileLexer::TOKEN_IDENT, m_iLine, poolString);
 		}
 
 
