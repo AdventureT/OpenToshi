@@ -19,7 +19,7 @@ public:
 	}
 
 private:
-	TFileLexerUTF8::Token m_Token; // 0x0
+	Toshi::TFileLexerUTF8::Token m_Token; // 0x0
 	int m_iUnk;                    // 0xC
 	int m_iUnk2;                   // 0x10
 

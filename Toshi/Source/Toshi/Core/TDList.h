@@ -151,19 +151,16 @@ namespace Toshi
 		TNode m_Root;
 	};
 
-	class TGenericPriList
+	class TGenericPriList : public TGenericDList
 	{
 	public:
-		class TNode
+		class TNode : public TGenericDList::TNode
 		{
 		protected:
 			TNode()
 			{
 				Reset();
 			}
-
-			TNode* Next() const { return m_Next; }
-			TNode* Prev() const { return m_Prev; }
 
 			void SetPriority(int priority)
 			{
@@ -184,40 +181,33 @@ namespace Toshi
 				return *this;
 			}
 
-			TBOOL IsLinked() const { return this != m_Next; }
-			void Reset() { m_Next = this; m_Prev = this; SetPriority(0); }
+			TNode* Next() const
+			{
+				return (TNode*)TGenericDList::TNode::Next();
+			}
+
+			TNode* Prev() const
+			{
+				return (TNode*)TGenericDList::TNode::Prev();
+			}
+
+			void Reset() 
+			{
+				TGenericDList::TNode::Reset();
+				SetPriority(0); 
+			}
 
 			void InsertAfter(TNode* node)
 			{
-				TASSERT(!IsLinked(), "TNode::InsertAfter - TNode shouldn't be linked");
-
 				m_iPriority = -0x8000;
-				m_Prev = node;
-				m_Next = node->m_Next;
-				node->m_Next = this;
-				m_Next->m_Prev = this;
+				TGenericDList::TNode::InsertAfter(node);
 			}
 
 			void InsertBefore(TNode* node)
 			{
-				TASSERT(!IsLinked(), "TNode::InsertBefore - TNode shouldn't be linked");
-
 				m_iPriority = 0x7FFF;
-				m_Next = node;
-				m_Prev = node->m_Prev;
-				node->m_Prev = this;
-				m_Prev->m_Next = this;
+				TGenericDList::TNode::InsertBefore(node);
 			}
-
-			void Remove()
-			{
-				m_Prev->m_Next = m_Next;
-				m_Next->m_Prev = m_Prev;
-				m_Next = this; 
-				m_Prev = this;
-			}
-
-			
 			
 		public:
 			template<class T> friend class TPriList;
@@ -232,8 +222,6 @@ namespace Toshi
 			T* operator*() { return static_cast<T*>(this); }
 
 		public:
-			TNode* m_Next;
-			TNode* m_Prev;
 			int m_iPriority;
 		};
 
@@ -259,10 +247,10 @@ namespace Toshi
 			int priority = node->m_iPriority;
 			if (priority < 0)
 			{
-				TNode* curNode = m_Root.m_Next;
+				TNode* curNode = m_Root.Next();
 				while (curNode != &m_Root && curNode->m_iPriority <= priority)
 				{
-					curNode = curNode->m_Next->m_Next;
+					curNode = curNode->Next()->Next();
 				}
 				node->m_Next = curNode;
 				node->m_Prev = curNode->m_Next->m_Prev;
@@ -271,10 +259,10 @@ namespace Toshi
 			}
 			else
 			{
-				TNode* curNode = m_Root.m_Prev;
+				TNode* curNode = m_Root.Prev();
 				while (curNode != &m_Root && priority < curNode->m_iPriority)
 				{
-					curNode = curNode->m_Prev;
+					curNode = curNode->Prev();
 				}
 				node->m_Prev = curNode;
 				node->m_Next = curNode->m_Next;

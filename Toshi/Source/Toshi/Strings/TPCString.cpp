@@ -1,6 +1,7 @@
 #include "ToshiPCH.h"
 #include "TPCString.h"
 
+
 namespace Toshi {
 
 	TCStringPool::TCStringPool(int a_iMaxSize, int a_iCapacity)
@@ -29,6 +30,15 @@ namespace Toshi {
 	void TCStringPool::Remove(TPooledCString& a_pcString)
 	{
 		TIMPLEMENT();
+	}
+
+	TPCString TCStringPool::Get(const char* a_szStr)
+	{
+		if (a_szStr == TNULL || TSystem::StringLength(a_szStr) == 0)
+		{
+			return TPCString();
+		}
+		return TPCString();
 	}
 
 	TBOOL TCStringPool::ReadFile(const char* a_szFileName)

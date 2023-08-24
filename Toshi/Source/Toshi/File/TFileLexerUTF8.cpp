@@ -1,5 +1,6 @@
 #include "ToshiPCH.h"
 #include "TFileLexerUTF8.h"
+#include <Toshi/Core/TSystem.h>
 
 namespace Toshi {
 
@@ -125,7 +126,7 @@ namespace Toshi {
 				currentValue = peek();
 			} while ((iswalnum(currentValue) != 0) || currentValue == '_');
 			ms_Buffer[len] = '\0';
-
+			TCStringPool* pool = TSystem::GetCStringPool();
 		}
 
 

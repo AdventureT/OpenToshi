@@ -7,6 +7,7 @@
 namespace Toshi
 {
 	class TPooledCString;
+	class TPCString;
 
 	class TCStringPool
 	{
@@ -34,6 +35,7 @@ namespace Toshi
 	public:
 
 		void Remove(TPooledCString& a_pcString);
+		TPCString Get(const char* a_szStr);
 	protected:
 		TBOOL ReadFile(const char* a_szFileName);
 		void InitStringPool(int a_iStringCount);
