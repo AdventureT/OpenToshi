@@ -2,9 +2,8 @@
 
 namespace Toshi {
 
-	class TFileLexer
+	namespace TFileLexer
 	{
-	public:
 		enum TokenType {
 			TOKEN_UNKNOWN,
 			TOKEN_SEMI,
@@ -22,14 +21,13 @@ namespace Toshi {
 			TOKEN_LESSTHAN,
 			TOKEN_GREATERTHAN,
 			TOKEN_EQUAL,
-			TOKEN_IDENT = 16,
-			TOKEN_STRING = 17,
-			TOKEN_INTEGER = 18,
-			TOKEN_UINTEGER = 19,
-			TOKEN_FLOAT = 20,
-			TOKEN_COMMENT = 21,
+			TOKEN_IDENT,
+			TOKEN_STRING,
+			TOKEN_INTEGER,
+			TOKEN_UINTEGER,
+			TOKEN_FLOAT,
+			TOKEN_COMMENT,
 		};
-
-	};
+	}
 
 }
