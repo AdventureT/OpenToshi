@@ -11,16 +11,7 @@ TBOOL PPropertyReader::OnLexerParseError(PPropertyReader* a_this, TFileLexerUTF8
 bool PPropertyReader::Open(const Toshi::TCString& a_szFileName)
 {
     m_szFileName = a_szFileName;
-    if (m_pFile)
-    {
-        m_pFile->Destroy();
-        m_pFile = TNULL;
-    }
-    if (m_pLexer)
-    {
-        delete m_pLexer;
-        m_pLexer = TNULL;
-    }
+    Close();
     m_pFile = TFile::Create(a_szFileName);
     if (m_pFile)
     {
@@ -39,8 +30,29 @@ bool PPropertyReader::Open(const Toshi::TCString& a_szFileName, Toshi::TFile* a_
     return false;
 }
 
+void PPropertyReader::Close()
+{
+    if (m_pFile)
+    {
+        m_pFile->Destroy();
+        m_pFile = TNULL;
+    }
+    if (m_pLexer)
+    {
+        delete m_pLexer;
+        m_pLexer = TNULL;
+    }
+}
+
 TBOOL PPropertyReader::LoadPropertyBlock(PProperties& a_rProps)
 {
     TASSERT(m_pLexer != TNULL);
+    TFileLexerUTF8::Token nextToken = m_pLexer->PeekNextToken(0);
+    if (nextToken.GetType() == TFileLexer::TOKEN_UNKNOWN) return TFALSE;
+    return LoadProperty(&a_rProps);
+}
+
+TBOOL PPropertyReader::LoadProperty(PProperties* a_pProps)
+{
     return TBOOL();
 }

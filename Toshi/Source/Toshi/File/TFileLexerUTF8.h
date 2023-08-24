@@ -170,6 +170,7 @@ namespace Toshi {
 		~TFileLexerUTF8();
 
 		Token GetNextToken();
+		Token PeekNextToken(int a_iDistance);
 
 		static const char* tostring(TFileLexer::TokenType a_eType);
 

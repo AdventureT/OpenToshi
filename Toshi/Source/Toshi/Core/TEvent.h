@@ -6,7 +6,7 @@ namespace Toshi
 
 	class TGenericEmitter;
 
-	class TGenericListener : public TPriList<TGenericListener>::TNode
+	class TGenericListener : public TDList<TGenericListener>::TNode
 	{
 	public:
 		using t_Callback = TBOOL (*)(void*, void*, void*);
@@ -85,7 +85,7 @@ namespace Toshi
 		}
 
 	public:
-		TPriList<TGenericListener> m_Listeners;
+		TDList<TGenericListener> m_Listeners;
 		void* m_Owner;
 	};
 

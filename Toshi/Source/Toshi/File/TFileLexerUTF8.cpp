@@ -353,6 +353,23 @@ namespace Toshi {
 		return Token(m_Token);
 	}
 
+	TFileLexerUTF8::Token TFileLexerUTF8::PeekNextToken(int a_iDistance)
+	{
+		TASSERT(a_iDistance < m_iTokenLookaheadSize);
+		TASSERT(((m_iTokenLookaheadFront + m_iTokenLookaheadBuffered) & m_iTokenLookaheadMask) == m_iTokenLookaheadBack);
+		if (a_iDistance >= m_iTokenLookaheadBuffered)
+		{
+			for (;m_iTokenLookaheadBuffered <= a_iDistance; m_iTokenLookaheadBuffered++)
+			{
+				Token nextToken = get_next_token();
+				m_LookaheadTokens[m_iTokenLookaheadBack].assign(nextToken);
+				m_iTokenLookaheadBack = m_iTokenLookaheadBack + 1 & m_iTokenLookaheadMask;
+			}
+		}
+		m_Token.assign(m_LookaheadTokens[m_iTokenLookaheadFront + a_iDistance & m_iTokenLookaheadMask]);
+		return m_Token;
+	}
+
 	const char* TFileLexerUTF8::tostring(TFileLexer::TokenType a_eType)
 	{
 		switch (a_eType)
