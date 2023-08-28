@@ -12,7 +12,11 @@ AOptions::Result AOptions::LoadOptions()
 TBOOL AOptions::GetOption(const char* a_szOptionName, int& a_rVal)
 {
 	TPCString pcString = Toshi::TSystem::GetCStringPool()->Get(a_szOptionName);
+	auto val = m_pCurProps->GetProperty(pcString);
+	if (val != TNULL)
+	{
 
+	}
 	return TBOOL();
 }
 

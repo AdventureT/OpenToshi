@@ -108,7 +108,7 @@ namespace Toshi {
 			return m_oRoot.m_pNext;
 		}
 
-		const Iterator End() const
+		const TNode* End() const
 		{
 			return &m_oRoot;
 		}

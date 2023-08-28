@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Toshi/Core/TFreeList.h"
-#include "Toshi/Plugins/PPropertyParser/PPropertyValue.h"
 #include "Toshi/Core/TQList.h"
+#include <Toshi/Plugins/PPropertyParser/PPropertyName.h>
+
+class PPropertyValue;
 
 class PProperties : 
 	public Toshi::TGenericClassDerived<PProperties, Toshi::TObject, "PProperties", TMAKEVERSION(1, 0), TTRUE>

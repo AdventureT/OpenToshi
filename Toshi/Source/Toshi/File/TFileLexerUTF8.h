@@ -62,13 +62,13 @@ namespace Toshi {
 			float GetFloat() const
 			{
 				TASSERT(m_type == TFileLexer::TOKEN_FLOAT);
-				return m_uiValue;
+				return m_fValue;
 			}
 
 			int GetInteger() const
 			{
 				TASSERT(m_type == TFileLexer::TOKEN_INTEGER);
-				return m_uiValue;
+				return m_iValue;
 			}
 
 			uint32_t GetUInteger() const

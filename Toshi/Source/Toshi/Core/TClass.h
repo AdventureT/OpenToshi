@@ -1,6 +1,7 @@
 #pragma once
 
 #define TGetClass(X) X::GetClassStatic()
+#define ASSERT_ISA(class_name, object) TASSERT((object)->IsA(TGetClass(class_name)))
 
 namespace Toshi
 {

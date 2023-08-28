@@ -1,6 +1,7 @@
 #include "ToshiPCH.h"
 #include "PProperties.h"
 #include "PPropertyName.h"
+#include "PPropertyValue.h"
 
 const PPropertyValue* PProperties::GetProperty(const Toshi::TPCString& a_szPropertyName)
 {
@@ -12,7 +13,7 @@ const PPropertyValue* PProperties::GetProperty(const PPropertyName& a_szProperty
 {
     for (auto i = m_oProps.Begin(); i != m_oProps.End(); i++)
     {
-        if (i == )
+        
     }
     return TNULL;
 }
