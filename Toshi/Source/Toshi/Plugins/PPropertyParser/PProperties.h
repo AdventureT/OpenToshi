@@ -3,6 +3,7 @@
 #include "Toshi/Core/TFreeList.h"
 #include "Toshi/Core/TQList.h"
 #include <Toshi/Plugins/PPropertyParser/PPropertyName.h>
+#include "PPropertyValue.h"
 
 class PPropertyValue;
 
@@ -15,10 +16,14 @@ public:
 	{
 	public:
 
-		PProperty()
+		PProperty(const PPropertyName& a_oName, const PPropertyValue& a_oValue) : m_oName(a_oName), m_oValue(a_oValue)
 		{
-
+			
 		}
+
+		inline const PPropertyName& GetName() const;
+		inline int GetLine() const;
+		inline const PPropertyValue* GetValue() const;
 
 		static void* operator new(uint32_t size, char*, int)
 		{
@@ -43,7 +48,17 @@ public:
 
 		static Toshi::TFreeList& GetFreeList() { return ms_oFreelist; }
 
+
+	private:
+
+		PPropertyName m_oName;       // 0x8
+		PPropertyValue m_oValue;     // 0x10
+		int m_iLine;                 // 0x18
+		Toshi::TPCString m_sComment; // 0x1C
+
 		static inline Toshi::TFreeList ms_oFreelist;
+
+
 	};
 
 	PProperties()
@@ -73,6 +88,9 @@ public:
 	}
 
 	static Toshi::TFreeList& GetFreeList() { return ms_oFreelist; }
+
+	/*Toshi::TQList<PProperties::PProperty>::Iterator Begin() const { return m_oProps.Begin(); }
+	Toshi::TQList<PProperties::PProperty>::Iterator End() const { return m_oProps.End(); }*/
 
 	const PPropertyValue* GetProperty(const Toshi::TPCString& a_szPropertyName);
 	const PPropertyValue* GetProperty(const PPropertyName& a_szPropertyName) const;

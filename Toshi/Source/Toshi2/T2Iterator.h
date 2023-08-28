@@ -24,16 +24,6 @@ namespace Toshi
 			m_pPtr = pPtr;
 		}
 
-		/*TBOOL operator==(const T* ptr)
-		{
-			return m_pNode == ptr;
-		}*/
-
-		/*TBOOL operator!=(const T* ptr)
-		{
-			return m_pNode != ptr;
-		}*/
-
 		void operator=(const T2Iterator& other)
 		{
 			m_pPtr = other.m_pPtr;

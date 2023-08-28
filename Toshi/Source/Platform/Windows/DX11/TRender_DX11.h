@@ -407,7 +407,7 @@ namespace Toshi
 
 		static void RenderOverlay(float posX, float posY, float width, float height, ID3D11ShaderResourceView* pShaderResourceView, ID3D11PixelShader* pPixelShader, const TVector4* uvVec);
 	
-	private:
+	public:
 		void BuildAdapterDatabase();
 
 		void Initialize();

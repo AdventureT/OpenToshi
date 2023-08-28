@@ -22,6 +22,11 @@ public:
 		m_pSubName = other.m_pSubName;
 	}
 
+	TBOOL operator==(const PPropertyName& other) const
+	{
+		return m_pName.Compare(other.m_pName) == 0 && m_pSubName.Compare(other.m_pSubName) == 0;
+	}
+
 	void SetName(const Toshi::TPCString& a_pName);
 	void SetSubName(const Toshi::TPCString& a_pName);
 

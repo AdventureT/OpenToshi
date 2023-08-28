@@ -1,12 +1,11 @@
 #pragma once
-#include <Toshi/Plugins/PPropertyParser/PProperties.h>
+//#include <Toshi/Plugins/PPropertyParser/PProperties.h>
 
 class PPropertyValue
 {
 public:
-	static inline const Toshi::TClass* TYPE_PROPS = TGetClass(PProperties);
+	static const Toshi::TClass* TYPE_PROPS;
 	static inline const Toshi::TClass* TYPE_UNDEF = TNULL;
-	static int test;
 
 	PPropertyValue()
 	{
@@ -32,5 +31,3 @@ protected:
 private:
 	Toshi::TObject* m_pTObject;
 };
-
-int PPropertyValue::test = 0;
