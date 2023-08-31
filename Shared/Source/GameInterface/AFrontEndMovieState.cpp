@@ -23,7 +23,7 @@ AGameState::UpdateResult AFrontEndMovieState::OnUpdate(float deltaTime)
         if (m_InputHelper.IsJustDown(0x2A))
         {
             // Commenting this cause handling input is not finished atm and it would skip all instantly
-            // m_bSkip = true;
+            m_bSkip = true;
         }
     }
 

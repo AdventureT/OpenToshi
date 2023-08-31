@@ -30,6 +30,7 @@ public:
 
 	T& Top()
 	{
+		TASSERT(!IsEmpty());
 		return m_pStack[m_iTop];
 	}
 

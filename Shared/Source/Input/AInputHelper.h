@@ -9,9 +9,21 @@ public:
 		m_eInputContext = AInputMap::INPUTCONTEXT_UNK12;
 	}
 
-	enum ButtonInfo
+	enum FLAG
 	{
+		FLAG_UNK,
+		FLAG_ISDOWN,
+		FLAG_UNK2,
+		FLAG_UNK3,
+		FLAG_UNK4,
+	};
 
+	struct ButtonInfo
+	{
+		int m_iDoodad;	            // 0x0
+		int m_iFlag;           // 0x4
+		float m_iRepeatTime;    // 0x8
+		float m_iCurRepeatTime; // 0xC
 	};
 
 	void AddMapping(AInputMap::INPUTBUTTON a_eInputButton, AInputManager2::INPUTDEVICE a_eInputDevice, TBOOL bVal, float a_fRepeatTime);
@@ -35,6 +47,7 @@ public:
 		a_eInputDevice = a_iButtonDevice & 0xFFFF;
 	}
 
+	void UpdateButtonInfo(Toshi::TInputDevice* a_pDevice, ButtonInfo* a_pButtonInfo);
 	void UpdateButtonInfo(ButtonInfo* a_pButtonInfo, AInputManager2::INPUTDEVICE a_eInputDevice);
 
 	typedef Toshi::TComparator<int> ButtonMapComparator;
