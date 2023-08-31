@@ -83,7 +83,7 @@ TBOOL AInputHelper::IsJustDown(AInputMap::INPUTBUTTON a_eInputButton, AInputMana
 
 	auto t = *buttonDevice;
 
-	for (size_t i = buttonDevice->Size(); i != 0; i--)
+	for (size_t i = buttonDevice->Size() - 1; i != 0; i--)
 	{
 		auto value = t[i];
 		if (HASFLAG(value.m_iFlag & FLAG_ISDOWN))
