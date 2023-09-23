@@ -1,4 +1,4 @@
-project "OpenGlobs"
+project ("OpenGlobs (" .. _OPTIONS["renderer"] .. ")")
 	language "C++"
 	cppdialect "C++20"
 	staticruntime "on"
