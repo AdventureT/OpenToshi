@@ -54,6 +54,12 @@ project ("OpenGlobs (" .. _OPTIONS["renderer"] .. ")")
 		{
 			"TOSHI_SKU_WINDOWS"
 		}
+		
+	filter "options:renderer=DX11"
+		defines
+		{
+			"TOSHI_RENDERER_DX11"
+		}
 
 	filter "configurations:Debug"
 		kind "ConsoleApp"
