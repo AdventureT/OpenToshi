@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#ifdef TOSHI_DEBUG
-
 #include "AImGui.h"
 #define IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 #include "imgui.h"
@@ -191,5 +189,3 @@ void AImGui::EndScene()
 #endif // TOSHI_RENDERER_OPENGL
 	m_bIsInFrame = TFALSE;
 }
-
-#endif // TOSHI_DEBUG
