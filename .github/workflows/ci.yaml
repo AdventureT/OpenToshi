@@ -20,10 +20,10 @@ jobs:
         version: ${{ env.PREMAKE_VERSION }}
 
     - name: Premake
-      run: premake5 vs2022 --arch=x86 --renderer=DX11
+      run: premake5 vs2022 --arch=x86 --renderer=OpenGL
     
     - name: Build
       uses: microsoft/setup-msbuild@v1.1
     
-    - name: Build Toshi for release
-      run: msbuild 'Toshi (DX11).sln' -property:Configuration=Release
+    - name: Build OpenBlob for release
+      run: msbuild './OpenBlob/OpenBlob (OpenGL).vcxproj' -property:Configuration=Release
