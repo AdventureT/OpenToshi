@@ -1,0 +1,25 @@
+name: Toshi
+
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+    env:
+      PREMAKE_VERSION: 5.0.0-beta2
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: Setup premake
+      uses: ./
+      with:
+        version: ${{ env.PREMAKE_VERSION }}
+
+    - name: Compile
+      run: premake5 vs2022
