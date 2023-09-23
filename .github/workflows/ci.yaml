@@ -25,5 +25,5 @@ jobs:
     - name: Build
       uses: microsoft/setup-msbuild@v1.1
     
-    - name: Build OpenBlob for release
-      run: msbuild './OpenBlob/OpenBlob (DX11).vcxproj' -property:Configuration=Release
+    - name: Build OpenToshi for release
+      run: msbuild './Toshi (DX11).sln' -property:Configuration=Release
