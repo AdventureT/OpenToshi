@@ -1,5 +1,3 @@
-#ifdef TOSHI_DEBUG
-
 #pragma once
 #include "imgui.h"
 
@@ -34,5 +32,3 @@ private:
 private:
 	TBOOL m_bIsInFrame;
 };
-
-#endif // TOSHI_DEBUG
