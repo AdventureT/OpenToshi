@@ -73,6 +73,7 @@ namespace Toshi {
 		float GetDuration() const { return m_fDuration; }
 		const char* GetName() const { return m_szName; }
 		short GetUnk2() const { return m_iUnk2; }
+		int GetUnk3() const { return m_iUnk3; }
 
 	private:
 		const char* m_szName;
@@ -141,7 +142,7 @@ namespace Toshi {
 
 		int GetSequenceID(const char* a_sSequenceName, uint32_t a_iLength);
 		TSkeletonSequence* GetSequences() { return m_SkeletonSequences; }
-		TSkeletonSequence* GetSequence(uint32_t a_iSequence) { return &m_SkeletonSequences[a_iSequence]; }
+		TSkeletonSequence* GetSequence(short a_iSeqID) { TASSERT(a_iSeqID < m_iSequenceCount); return &m_SkeletonSequences[a_iSeqID]; }
 		TSkeletonSequence* GetSequence(const char* a_sSequenceName, uint32_t a_iLength) { return GetSequence(GetSequenceID(a_sSequenceName, a_iLength)); }
 
 		short GetSequenceCount() { return m_iSequenceCount; }
@@ -178,12 +179,22 @@ namespace Toshi {
 
 		void UpdateTime(float a_fDeltaTime);
 		void UpdateState(TBOOL a_bForceUpdate);
+		TMatrix44* GetBoneTransformCurrent(int a_iBone, TMatrix44& a_rMatrix);
 
-		void RemoveAnimation(TAnimation* a_pAnimation, float a_fValue);
+		TAnimation* AddAnimation(short a_iSequenceIndex, float a_fDestWeight, float a_fBlendInSpeed)
+		{
+			return AddAnimationFull(a_iSequenceIndex, a_fDestWeight, a_fBlendInSpeed, 0.0f, 0);
+		}
+
+		TAnimation* AddAnimationFull(short a_iSequenceIndex, float a_fDestWeight, float a_fBlendInSpeed, float a_fBlendOutSpeed, TAnimation::Flags a_eAnimFlags);
+		void RemoveAnimation(TAnimation* a_pAnimation, float a_fBlendOutSpeed);
 
 		void SetStateFromBasePose();
+		TAnimation* IsAnimating(short a_iSequenceIndex);
 
 		TSkeleton* GetSkeleton() { return m_pSkeleton; }
+		int GetSequenceMaxUnk3() const { return m_iSequenceMaxUnk3; }
+		void SetSequenceMaxUnk3(int a_iSequenceMaxUnk3) { m_iSequenceMaxUnk3 = a_iSequenceMaxUnk3; }
 
 	public:
 		inline static TMatrix44 g_aForwardMatrices[TANIMATION_MAXBONES];
@@ -203,7 +214,7 @@ namespace Toshi {
 		float m_fTotalWeight;
 		int m_iLastUpdateTimeFrame;
 		int m_iLastUpdateStateFrame;
-		int m_iUnk5;
+		int m_iSequenceMaxUnk3;
 	};
 
 }

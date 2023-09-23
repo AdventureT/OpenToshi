@@ -64,7 +64,7 @@ namespace Toshi {
 		pInstance->m_fTotalWeight = 0.0f;
 		pInstance->m_iLastUpdateStateFrame = 0;
 		pInstance->m_iLastUpdateTimeFrame = 0;
-		pInstance->m_iUnk5 = -1;
+		pInstance->m_iSequenceMaxUnk3 = -1;
 
 		for (int i = 0; i < GetAnimationMaxCount(); i++)
 		{
@@ -329,11 +329,161 @@ namespace Toshi {
 		}
 	}
 
-	void TSkeletonInstance::RemoveAnimation(TAnimation* a_pAnimation, float a_fValue)
+	TMatrix44* TSkeletonInstance::GetBoneTransformCurrent(int a_iBone, TMatrix44& a_rMatrix)
+	{
+		if (a_iBone < m_pSkeleton->GetAutoBoneCount())
+		{
+			auto pBone = m_pSkeleton->GetBone(a_iBone);
+			a_rMatrix.Multiply(m_pBones[a_iBone], pBone->GetTransform());
+			return &a_rMatrix;
+		}
+
+		a_rMatrix = m_pSkeleton->GetBone(a_iBone)->GetTransform();
+		return &a_rMatrix;
+	}
+
+	TAnimation* TSkeletonInstance::AddAnimationFull(short a_iSequenceIndex, float a_fDestWeight, float a_fBlendInSpeed, float a_fBlendOutSpeed, TAnimation::Flags a_eAnimFlags)
+	{
+		TAnimation* pAnimation = IsAnimating(a_iSequenceIndex);
+		TBOOL bZeroWeight = TFALSE;
+
+		if (pAnimation == TNULL)
+		{
+			bZeroWeight = TTRUE;
+			pAnimation = m_FreeAnimations.Begin();
+
+			if (m_FreeAnimations.IsEmpty())
+			{
+				// No free animations left, so take an oldest
+				// playing animation from the list of base animations
+				TQList<TAnimation>* pList = &m_BaseAnimations;
+
+				if (m_BaseAnimations.IsEmpty())
+				{
+					// No base animations are playing,
+					// so use list of overlay animations
+					pList = &m_OverlayAnimations;
+				}
+
+				pAnimation = m_OverlayAnimations.Begin();
+				
+				// Find animation with less weight than the one user wants to play
+				for (auto it = pAnimation->Next(); it != pList->End(); it++)
+				{
+					if (it->GetWeight() <= pAnimation->GetWeight() && pAnimation->GetWeight() != it->GetWeight())
+					{
+						pAnimation = it;
+					}
+				}
+
+				pAnimation->RemoveAnimation(0.0f);
+			}
+
+			pAnimation->Remove();
+			auto pSequence = m_pSkeleton->GetSequence(a_iSequenceIndex);
+
+			if (pSequence->IsOverlay())
+			{
+				m_OverlayAnimations.Push(pAnimation);
+				m_iOverlayAnimationCount++;
+			}
+			else
+			{
+				m_BaseAnimations.Push(pAnimation);
+				m_iBaseAnimationCount++;
+			}
+		}
+
+		pAnimation->SetSequence(a_iSequenceIndex);
+
+		pAnimation->SetSpeed(1.0f);
+		pAnimation->SetUnk3(0);
+		pAnimation->SetFlags(TAnimation::Flags_Active | a_eAnimFlags);
+
+		if (bZeroWeight)
+			pAnimation->SetWeight(0.0f);
+
+		TMath::Clip(pAnimation->GetWeight(), 0.0f, 1.0f);
+
+		float fDestWeight = TMath::Min(TMath::Max(0.0f, a_fDestWeight), 1.0f);
+
+		pAnimation->ResetTime();
+		pAnimation->SetDestWeightExplicit(fDestWeight);
+		pAnimation->SetBlendInSpeed(a_fBlendInSpeed);
+		pAnimation->SetBlendOutSpeed(a_fBlendOutSpeed);
+
+		if (a_fBlendInSpeed <= 0.0f)
+		{
+			pAnimation->SetWeight(fDestWeight);
+			pAnimation->SetMode(TAnimation::MODE_UNK2);
+		}
+		else
+		{
+			pAnimation->SetMode(TAnimation::MODE_UNK1);
+		}
+
+		TUtil::MemClear(pAnimation->GetBones(), sizeof(TAnimationBone) * m_pSkeleton->GetAutoBoneCount());
+		pAnimation->SetSkeletonInstance(this);
+
+		SetSequenceMaxUnk3(
+			TMath::Max(
+				TMath::Max(
+					GetSequenceMaxUnk3(),
+					TAnimation::FindSequenceMaxUnk3(m_BaseAnimations)
+				),
+				TAnimation::FindSequenceMaxUnk3(m_OverlayAnimations)
+			)
+		);
+
+		return pAnimation;
+	}
+
+	void TSkeletonInstance::RemoveAnimation(TAnimation* a_pAnimation, float a_fBlendOutSpeed)
 	{
 		TASSERT(TTRUE == a_pAnimation->IsActive());
 
-		TIMPLEMENT();
+		if (a_pAnimation)
+		{
+			if (a_fBlendOutSpeed <= 0.0f)
+			{
+				if (a_pAnimation->IsUpdateStateOnRemove())
+				{
+					a_pAnimation->SetUpdateStateOnRemove(TFALSE);
+					a_pAnimation->SetWeight(1.0f);
+					a_pAnimation->SetBlendOutSpeed(1.0f);
+					a_pAnimation->SetMode(TAnimation::MODE_UNK3);
+					m_iFlags |= 1;
+					return;
+				}
+
+				auto pSeq = a_pAnimation->GetSequencePtr();
+
+				if (TFALSE == pSeq->IsOverlay())
+					m_iBaseAnimationCount--;
+				else
+					m_iOverlayAnimationCount--;
+
+				a_pAnimation->SetFlags(TAnimation::Flags_None);
+				a_pAnimation->Remove();
+				m_FreeAnimations.PushFront(a_pAnimation);
+			}
+			else
+			{
+				a_pAnimation->SetBlendOutSpeed(a_fBlendOutSpeed);
+				a_pAnimation->SetDestWeightExplicit(0.0f);
+				a_pAnimation->SetMode(TAnimation::MODE_UNK3);
+			}
+
+			SetSequenceMaxUnk3(
+				TMath::Max(
+					TMath::Max(
+						GetSequenceMaxUnk3(),
+						TAnimation::FindSequenceMaxUnk3(m_BaseAnimations)
+					),
+					TAnimation::FindSequenceMaxUnk3(m_OverlayAnimations)
+				)
+			);
+		}
 	}
 
 	void TSkeletonInstance::SetStateFromBasePose()
@@ -343,6 +493,28 @@ namespace Toshi {
 			m_pSkeleton->GetBone(i);
 			m_pBones[i].Identity();
 		}
+	}
+
+	TAnimation* TSkeletonInstance::IsAnimating(short a_iSequenceIndex)
+	{
+		TASSERT(a_iSequenceIndex < m_pSkeleton->GetSequenceCount());
+
+		if (m_pSkeleton->GetSequenceCount() <= a_iSequenceIndex)
+			return TNULL;
+
+		for (auto it = m_BaseAnimations.Begin(); it != m_BaseAnimations.End(); it++)
+		{
+			if (it->GetSequence() == a_iSequenceIndex)
+				return it;
+		}
+
+		for (auto it = m_OverlayAnimations.Begin(); it != m_OverlayAnimations.End(); it++)
+		{
+			if (it->GetSequence() == a_iSequenceIndex)
+				return it;
+		}
+
+		return TNULL;
 	}
 
 	float TSkeletonSequenceBone::GetKeyPair(int a_iCurrentAnimTime, unsigned short& a_rCurrentKeyIndex, unsigned short& a_rLerpFromIndex, unsigned short& a_rLerpToIndex)

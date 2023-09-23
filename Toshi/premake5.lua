@@ -1,4 +1,4 @@
-project "Toshi"
+project (TOSHI_PROJECT_NAME)
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
@@ -69,6 +69,45 @@ project "Toshi"
 		defines
 		{
 			"TOSHI_SKU_WINDOWS"
+		}
+	
+	filter "options:renderer=DX11"
+		defines
+		{
+			"TOSHI_RENDERER_DX11"
+		}
+		
+		files
+		{
+			"Source/Platform/DX11/**.h",
+			"Source/Platform/DX11/**.cpp",
+			"Source/Platform/DX11/**.c",
+		}
+		
+	filter "options:renderer=OpenGL"
+		defines
+		{
+			"TOSHI_RENDERER_OPENGL",
+			"GLEW_STATIC"
+		}
+		
+		libdirs
+		{
+			"%{LibDir.glew}"
+		}
+		
+		files
+		{
+			"Source/Platform/SDL/**.h",
+			"Source/Platform/SDL/**.cpp",
+			"Source/Platform/SDL/**.c",
+		}
+		
+		includedirs
+		{
+			"%{IncludeDir.sdl2}",
+			"%{IncludeDir.glm}",
+			"%{IncludeDir.glew}"
 		}
 
 	filter "configurations:Debug"

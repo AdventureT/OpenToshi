@@ -1,7 +1,10 @@
 include "Settings.lua"
 include "Dependencies.lua"
 
-workspace "Toshi"
+TOSHI_PROJECT_NAME = "Toshi (" .. _OPTIONS["renderer"] .. ")"
+SHARED_PROJECT_NAME = "Shared"
+
+workspace ("Toshi (" .. _OPTIONS["renderer"] .. ")")
 	platforms "Windows"
 	configurations { "Debug", "Release", "Dist" }
 	
