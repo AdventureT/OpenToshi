@@ -23,7 +23,7 @@ private:
 
 private:
 	Toshi::TTRB m_AssetTRB;
-    Toshi::TSysMaterial* m_pCubeMaterial;
+	Toshi::TSysMaterial* m_pCubeMaterial;
 	Toshi::TSysMaterial* m_pPlaneMaterial;
 	Toshi::TSysMaterial* m_pTriangleMaterial;
 	Toshi::TMesh* m_pCube;
