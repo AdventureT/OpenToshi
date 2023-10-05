@@ -20,6 +20,7 @@ ATestModel::ATestModel()
 
     CreateCube();
     CreatePlane();
+	CreateTriangle();
 }
 
 ATestModel::~ATestModel()
@@ -28,8 +29,10 @@ ATestModel::~ATestModel()
 
     m_pCube->DestroyResource();
     m_pPlane->DestroyResource();
+	m_pTriangle->DestroyResource();
     delete m_pCubeMaterial;
-    delete m_pPlaneMaterial;
+	delete m_pPlaneMaterial;
+	delete m_pTriangleMaterial;
 }
 
 void ATestModel::Render(float deltaTime)
@@ -39,6 +42,7 @@ void ATestModel::Render(float deltaTime)
     Toshi::TMatrix44 worldView = pRenderContext->GetWorldViewMatrix();
     Toshi::TMatrix44 modelView;
 
+	/// Cube
     Toshi::TMatrix44 rotationMatrix;
     rotationMatrix.Identity();
     rotationMatrix.RotateY(m_CubeRotation);
@@ -54,14 +58,26 @@ void ATestModel::Render(float deltaTime)
     m_pCube->Render();
     m_CubeRotation += deltaTime;
 
-    modelMatrix.Identity();
-    modelMatrix.Scale(10.0f, 1.0f, 10.0f);
-    modelMatrix.SetTranslation(m_Position + Toshi::TVector3(0, 0.1f, 0));
+	/// Plane
+	modelMatrix.Identity();
+	modelMatrix.Scale(10.0f, 1.0f, 10.0f);
+	modelMatrix.SetTranslation(m_Position + Toshi::TVector3(0, 0.1f, 0));
 
-    modelView.Multiply(worldView, modelMatrix);
-    pRenderContext->SetModelViewMatrix(modelView);
+	modelView.Multiply(worldView, modelMatrix);
+	pRenderContext->SetModelViewMatrix(modelView);
 
-    m_pPlane->Render();
+	m_pPlane->Render();
+
+	/// Triangle
+	rotationMatrix.RotateY(0.0f);
+	modelMatrix.Identity();
+	modelMatrix.SetTranslation(m_Position + Toshi::TVector3(0, 0.1f, 0));
+	modelMatrix.Multiply(rotationMatrix);
+
+	modelView.Multiply(worldView, modelMatrix);
+	pRenderContext->SetModelViewMatrix(modelView);
+
+	m_pTriangle->Render();
 }
 
 void ATestModel::CreateCube()
@@ -110,41 +126,81 @@ void ATestModel::CreateCube()
 
 void ATestModel::CreatePlane()
 {
-    static SysMeshVertex s_Vertices[] = {
-        { { -1.0f, 1.0f,  -1.0f },  0xFFFFFFFF, { 0.0f, 0.0f } },
-        { {  1.0f, 1.0f,  -1.0f },  0xFFFFFFFF, { 12.0f, 0.0f } },
-        { {  -1.0f, 1.0f, 1.0f },   0xFFFFFFFF, { 0.0f, 12.0f } },
-        { {  1.0f, 1.0f,  1.0f },   0xFFFFFFFF, { 12.0f, 12.0f } },
-    };
+	static SysMeshVertex s_Vertices[] = {
+		{ { -1.0f, 1.0f,  -1.0f },  0xFFFFFFFF, { 0.0f, 0.0f } },
+		{ {  1.0f, 1.0f,  -1.0f },  0xFFFFFFFF, { 12.0f, 0.0f } },
+		{ {  -1.0f, 1.0f, 1.0f },   0xFFFFFFFF, { 0.0f, 12.0f } },
+		{ {  1.0f, 1.0f,  1.0f },   0xFFFFFFFF, { 12.0f, 12.0f } },
+	};
 
-    static uint16_t s_Indices[] = {
-        0, 1, 2, 3
-    };
+	static uint16_t s_Indices[] = {
+		0, 1, 2, 3
+	};
 
-    auto pTexManager = Toshi::TTextureManager::GetSingletonSafe();
-    auto pSysShader = Toshi::TSysShader::GetSingletonSafe();
+	auto pTexManager = Toshi::TTextureManager::GetSingletonSafe();
+	auto pSysShader = Toshi::TSysShader::GetSingletonSafe();
 
-    m_pPlaneMaterial = pSysShader->CreateMaterial();
-    m_pPlaneMaterial->SetFlag(Toshi::TMaterial::Flags_AlphaUpdate, TTRUE);
-    m_pPlaneMaterial->Create(Toshi::TSysMaterialHAL::BlendMode::Default);
+	m_pPlaneMaterial = pSysShader->CreateMaterial();
+	m_pPlaneMaterial->SetFlag(Toshi::TMaterial::Flags_AlphaUpdate, TTRUE);
+	m_pPlaneMaterial->Create(Toshi::TSysMaterialHAL::BlendMode::Default);
 
-    auto pTexture = pTexManager->FindTexture("slum_island_colour.tga");
-    pTexture->SetAlphaEnabled(TFALSE);
-    pTexture->SetSamplerId(3);
-    m_pPlaneMaterial->SetTexture(0, pTexture);
+	auto pTexture = pTexManager->FindTexture("slum_island_colour.tga");
+	pTexture->SetAlphaEnabled(TFALSE);
+	pTexture->SetSamplerId(3);
+	m_pPlaneMaterial->SetTexture(0, pTexture);
 
-    auto pMesh = pSysShader->CreateMesh("test_cube");
-    pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+	auto pMesh = pSysShader->CreateMesh("test_cube");
+	pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
 
-    Toshi::TSysMesh::TLockBuffer lock;
+	Toshi::TSysMesh::TLockBuffer lock;
 
-    if (pMesh->Lock(&lock))
-    {
-        Toshi::TUtil::MemCopy(lock.pVertexBufferData, s_Vertices, sizeof(s_Vertices));
-        Toshi::TUtil::MemCopy(lock.pIndexBufferData, s_Indices, sizeof(s_Indices));
-        pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
-    }
+	if (pMesh->Lock(&lock))
+	{
+		Toshi::TUtil::MemCopy(lock.pVertexBufferData, s_Vertices, sizeof(s_Vertices));
+		Toshi::TUtil::MemCopy(lock.pIndexBufferData, s_Indices, sizeof(s_Indices));
+		pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+	}
 
-    pMesh->SetMaterial(m_pPlaneMaterial);
-    m_pPlane = pMesh;
+	pMesh->SetMaterial(m_pPlaneMaterial);
+	m_pPlane = pMesh;
+}
+
+void ATestModel::CreateTriangle()
+{
+	static SysMeshVertex s_Vertices[] = {
+		{ { -0.5f,  0.5f, 0.0f }, 0xFFFFFFFF, { 0.0f, 0.0f } },
+		{ {  0.5f,  0.5f, 0.0f }, 0xFFFFFFFF, { 1.0f, 0.0f } },
+		{ {  0.0f, -0.5f, 0.0f }, 0xFFFFFFFF, { 0.5f, 1.0f } },
+	};
+
+	static uint16_t s_Indices[] = {
+		0, 1, 2
+	};
+
+	auto pTexManager = Toshi::TTextureManager::GetSingletonSafe();
+	auto pSysShader = Toshi::TSysShader::GetSingletonSafe();
+
+	m_pTriangleMaterial = pSysShader->CreateMaterial();
+	m_pTriangleMaterial->SetFlag(Toshi::TMaterial::Flags_AlphaUpdate, TTRUE);
+	m_pTriangleMaterial->Create(Toshi::TSysMaterialHAL::BlendMode::Default);
+
+	auto pTexture = pTexManager->FindTexture("water.tga");
+	pTexture->SetAlphaEnabled(TFALSE);
+	pTexture->SetSamplerId(3);
+	m_pTriangleMaterial->SetTexture(0, pTexture);
+
+	auto pMesh = pSysShader->CreateMesh("test_triangle");
+	pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+
+	Toshi::TSysMesh::TLockBuffer lock;
+
+	if (pMesh->Lock(&lock))
+	{
+		Toshi::TUtil::MemCopy(lock.pVertexBufferData, s_Vertices, sizeof(s_Vertices));
+		Toshi::TUtil::MemCopy(lock.pIndexBufferData, s_Indices, sizeof(s_Indices));
+		pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+	}
+
+	pMesh->SetMaterial(m_pTriangleMaterial);
+	m_pTriangle = pMesh;
 }
