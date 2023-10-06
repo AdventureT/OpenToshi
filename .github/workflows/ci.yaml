@@ -1,0 +1,29 @@
+name: Toshi
+
+on: [push]
+
+jobs:
+  win:
+    env:
+      PREMAKE_VERSION: 5.0.0-beta1
+
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+      with:
+        submodules: recursive
+    
+    - name: Setup premake
+      uses: abel0b/setup-premake@v2.3
+      with:
+        version: ${{ env.PREMAKE_VERSION }}
+
+    - name: Premake
+      run: premake5 vs2022 --arch=x86 --renderer=DX11
+    
+    - name: Build
+      uses: microsoft/setup-msbuild@v1.1
+    
+    - name: Build OpenToshi for release
+      run: msbuild './Toshi (DX11).sln' -property:Configuration=Release
