@@ -56,7 +56,7 @@ FMOD::Sound* AXUIFMODExAudio::GetSubSound(char* a_pSubSoundName)
 			return subSound;
 		}
 	}
-
+	return TNULL;
 }
 
 TBOOL AXUIFMODExAudio::PlaySound(FMOD::Sound* a_pSound, TFLOAT a_fVolume, FMOD::Channel* a_pChannel)
