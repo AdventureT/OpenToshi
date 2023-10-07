@@ -27,3 +27,9 @@ project "Shared"
 			"Source/**.cpp",
 			"Source/**.c"
 		}
+		
+	filter "options:renderer=DX11"
+		defines
+		{
+			"TOSHI_RENDERER_DX11"
+		}
