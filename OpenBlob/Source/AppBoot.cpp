@@ -17,6 +17,7 @@
 #include "Input/AInputManager2.h"
 #include "Console/AConsoleVar.h"
 #include "Cameras/ACameraManager.h"
+#include "Sound/AXUIFMODExAudio.h"
 
 #include <Toshi/Xui/TXUI.h>
 #include <Toshi/Core/TArray.h>
@@ -78,7 +79,7 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 
 		// Temp solution
 		Toshi::TXUI::ms_pXUIMemoryBlock = Toshi::TMemory::CreateHeap(0x10000, 4, "xui pile");
-		Toshi::TXUI::CreateSingleton();
+		auto txui = Toshi::TXUI::CreateSingleton();
 
 		size_t poolSize = 128 * 1024 * 1024;
 		void* mempool = malloc(poolSize);
@@ -88,6 +89,8 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 
 		FMOD::System* system = Toshi::TSound::GetSingleton()->GetSystem();
 		system->setFileSystem(NULL, NULL, NULL, NULL, NULL, NULL, 0);
+
+		txui->m_pAudio = new AXUIFMODExAudio();
 
 		//Toshi::TInputInterface::CreateSingleton();
 

@@ -33,6 +33,7 @@ public:
 	Options* m_Options; // 0x4
 
 	void SoundThings(TBOOL unk, float fUnk, float fUnk2);
+	TFLOAT GetPitch();
 
 	bool GetOptions(void* a_Options, uint32_t a_iMaxSize)
 	{

@@ -2,6 +2,7 @@
 #include "TXUIResource.h"
 #include "TXUIRenderer.h"
 #include "TXUICanvas.h"
+#include "TXUIAudio.h"
 #include "Toshi/Utils/TSingleton.h"
 #include "Toshi2/T2GUI/T2GUIContext.h"
 #include "Toshi/File/TTRB.h"
@@ -61,5 +62,6 @@ namespace Toshi
 		T2GUIContext* m_pContext;            // 0x015C
 		T2GUIRenderer* m_pRenderer;          // 0x0160
 		TXUIResourceTRB* m_pHeadTRBResource; // 0x0164
+		TXUIAudio* m_pAudio;                 // 0x0170
 	};
 }
