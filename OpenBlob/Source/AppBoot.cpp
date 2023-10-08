@@ -27,6 +27,7 @@
 #include <Toshi/Render/TRender.h>
 #include <Platform/Windows/TSound_Win.h>
 #include <Toshi/Input/TInputInterface.h>
+#include <GameInterface/AXUIState.h>
 
 #include TOSHI_MULTIRENDER(A2GUI/A2GUIRenderer)
 #include TOSHI_MULTIRENDER(TRender)
@@ -78,7 +79,8 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 		AInputManager2::CreateSingleton();
 
 		// Temp solution
-		Toshi::TXUI::ms_pXUIMemoryBlock = Toshi::TMemory::CreateHeap(0x10000, 4, "xui pile");
+		Toshi::TXUI::ms_pXUIMemoryBlock = AMemory::GetPool(AMemory::POOL_XUI);
+		Toshi::TXUI::ms_pXUITRBMemoryBlock = AMemory::GetPool(AMemory::POOL_XUI);
 		auto txui = Toshi::TXUI::CreateSingleton();
 
 		size_t poolSize = 128 * 1024 * 1024;
@@ -89,6 +91,9 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 
 		FMOD::System* system = Toshi::TSound::GetSingleton()->GetSystem();
 		system->setFileSystem(NULL, NULL, NULL, NULL, NULL, NULL, 0);
+
+		AXUIState::SetSkin1("commonskin.trb", "commonskin.xur");
+		AXUIState::SetSkin2("frontendskin.trb", "frontendskin.xur");
 
 		txui->m_pAudio = new AXUIFMODExAudio();
 

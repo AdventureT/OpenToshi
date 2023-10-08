@@ -16,6 +16,7 @@
 #include "TXUISliderBar.h"
 #include "TXUICheckBox.h"
 #include "TXUIList.h"
+#include "TXUIVisual.h"
 
 namespace Toshi {
 
@@ -349,8 +350,7 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiVisual"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIVisualData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiImage"), -1) == 0)
 		{

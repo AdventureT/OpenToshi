@@ -25,6 +25,9 @@ namespace Toshi
 		m_pRenderer = TNULL;
 		m_pCanvas = TNULL;
 		m_pContext = TNULL;
+		m_pAudio = TNULL;
+		m_pSkin1Resource = TNULL;
+		m_pSkin2Resource = TNULL;
 
 		m_FontTRB.SetMemoryFunctions(AssetTRBAllocator, AssetTRBDeallocator, TNULL);
 		m_TRB2.SetMemoryFunctions(AssetTRBAllocator, AssetTRBDeallocator, TNULL);
@@ -96,6 +99,32 @@ namespace Toshi
 	{
 		m_FontTRB.Load(a_pData);
 		TAssetInit::InitAssets(m_FontTRB, TTRUE, TFALSE);
+	}
+
+	void TXUI::SetSkin1(const char* a_szTRBFileName, const char* a_szXURFileName)
+	{
+		if (m_pSkin1Resource)
+		{
+			TAssetInit::DeinitAssets(m_TRB2);
+			m_TRB2.Close();
+		}
+		TTRB::ERROR error = m_TRB2.Load(a_szTRBFileName);
+		TASSERT(error == TTRB::ERROR_OK);
+		TAssetInit::InitAssets(m_TRB2, TTRUE, TFALSE);
+		m_pSkin1Resource = FindResource(a_szXURFileName);
+	}
+
+	void TXUI::SetSkin2(const char* a_szTRBFileName, const char* a_szXURFileName)
+	{
+		if (m_pSkin2Resource)
+		{
+			TAssetInit::DeinitAssets(m_TRB3);
+			m_TRB3.Close();
+		}
+		TTRB::ERROR error = m_TRB3.Load(a_szTRBFileName);
+		TASSERT(error == TTRB::ERROR_OK);
+		TAssetInit::InitAssets(m_TRB3, TTRUE, TFALSE);
+		m_pSkin2Resource = FindResource(a_szXURFileName);
 	}
 
 	void TXUIResourceTRB::Init()

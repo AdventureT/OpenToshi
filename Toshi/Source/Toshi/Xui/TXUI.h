@@ -40,6 +40,9 @@ namespace Toshi
 		void RemoveResource(TXUIResourceTRB* a_pResourceTrb);
 		void SetDefaultFont(const char* a_pData);
 
+		void SetSkin1(const char* a_szTRBFileName, const char* a_szXURFileName);
+		void SetSkin2(const char* a_szTRBFileName, const char* a_szXURFileName);
+
 		TXUIResource* FindResource(const char* a_sName);
 
 		static TMemoryHeap* MemoryBlock() { return ms_pXUIMemoryBlock; }
@@ -55,6 +58,8 @@ namespace Toshi
 		TTRB m_FontTRB;                      // 0x0080
 		TTRB m_TRB2;                         // 0x0094
 		TTRB m_TRB3;                         // 0x00A8
+		TXUIResource* m_pSkin1Resource;      // 0x00BC
+		TXUIResource* m_pSkin2Resource;      // 0x00C0
 		const char* m_pDefaultFont;          // 0x00C4
 		const char* m_sDefaultFont;          // 0x00C8
 		char m_sFontName;                    // 0x00CC
