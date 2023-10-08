@@ -11,8 +11,7 @@ Toshi::XURXUITextData::XURXUITextData() : Toshi::XURXUIElementData()
 	m_Font = 0;
 	m_TextStyle = 0x110;
 	m_LineSpacingAdjust = 0;
-	// this + 0x20 = TXUITEXT
-	// TClass::Find("TXUIText",(TClass *)&TXUIElement::m_sClass);
+	m_pClass = TClass::Find("TXUIText", TGetClass(TXUIElement));
 }
 
 TBOOL Toshi::XURXUITextData::IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType)

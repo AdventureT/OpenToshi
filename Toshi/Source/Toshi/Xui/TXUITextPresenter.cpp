@@ -14,6 +14,7 @@ XURXUITextPresenterData::XURXUITextPresenterData() : XURXUIElementData()
 	m_TextStyle = 0x100;
 	m_LineSpacingAdjust = 0;
 	m_DataAssociation = 0;
+	m_pClass = TClass::Find("TXUITextPresenter", TGetClass(TXUIElement));
 }
 
 TBOOL XURXUITextPresenterData::Load(TXUIResource& resource, uint8_t*& a_pData)
