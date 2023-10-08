@@ -4,7 +4,8 @@
 
 TOSHI_NAMESPACE_BEGIN
 
-class TXUIVisual
+class TXUIVisual :
+	public TGenericClassDerived<TXUIVisual, TXUIElement, "TXUIVisual", TMAKEVERSION(1, 0), TFALSE>
 {
 
 };
