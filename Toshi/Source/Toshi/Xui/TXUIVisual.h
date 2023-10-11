@@ -12,12 +12,14 @@ class TXUIVisual :
 
 class XURXUIVisualData : public XURXUIElementData
 {
-public:
-	static constexpr const char* sm_sTypeInfo = "XURXUIVisualData";
+	TXUI_TYPEINFO(XURXUIVisualData)
 
 public:
 
-	XURXUIVisualData();
+	XURXUIVisualData() : XURXUIElementData()
+	{
+		m_pClass = TClass::Find("TXUIVisual", TGetClass(TXUIElement));
+	}
 
 	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
 	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
@@ -25,7 +27,6 @@ public:
 	virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType) override;
 	virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
 	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
-	virtual const char* GetTypeInfo() const { return sm_sTypeInfo; }
 };
 
 TOSHI_NAMESPACE_END

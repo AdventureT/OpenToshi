@@ -3,11 +3,6 @@
 
 TOSHI_NAMESPACE_USING
 
-XURXUIVisualData::XURXUIVisualData() : XURXUIElementData()
-{
-    m_pClass = TClass::Find("TXUIVisual", TGetClass(TXUIElement));
-}
-
 TBOOL XURXUIVisualData::Load(TXUIResource& resource, uint8_t*& a_pData)
 {
     XURXUIElementData::Load(resource, a_pData);
