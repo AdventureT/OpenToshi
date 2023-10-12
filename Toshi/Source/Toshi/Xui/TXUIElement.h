@@ -18,6 +18,9 @@ if (TStringManager::String8Compare(propName1, propName2, -1) == 0) \
 	return TTRUE; \
 }
 
+#define TXUI_TYPEINFO(class_name) private: static constexpr const char* sm_sTypeInfo = #class_name; \
+                         public: virtual const char* GetTypeInfo() const { return sm_sTypeInfo; }
+
 #define TXUI_PROPTYPE_TO_READFLAG(propType) (1 << propType)
 #define TXUI_CHECK_READFLAG(flag, propType) (flag & TXUI_PROPTYPE_TO_READFLAG(propType))
 

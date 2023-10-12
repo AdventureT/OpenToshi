@@ -14,3 +14,9 @@ void AOptions::SoundThings(TBOOL unk, float a_fPitch, float a_fVolume)
 		float fVolume = 0.0f <= a_fVolume ? a_fVolume : m_Options->m_iVolume / 10.0f;
 	}
 }
+
+TFLOAT AOptions::GetPitch()
+{
+	TIMPLEMENT();
+	return 0.5F;
+}

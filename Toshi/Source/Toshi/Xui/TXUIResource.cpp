@@ -7,7 +7,9 @@
 #include "TXUIGroup.h"
 #include "TXUIBackButton.h"
 #include "TXUIText.h"
+#include "TXUITextPresenter.h"
 #include "TXUIImage.h"
+#include "TXUIImagePresenter.h"
 #include "TXUIFigure.h"
 #include "TXUINineGrid.h"
 #include "XURReader.h"
@@ -16,6 +18,7 @@
 #include "TXUISliderBar.h"
 #include "TXUICheckBox.h"
 #include "TXUIList.h"
+#include "TXUIVisual.h"
 
 namespace Toshi {
 
@@ -349,8 +352,7 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiVisual"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIVisualData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiImage"), -1) == 0)
 		{
@@ -370,13 +372,11 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiImagePresenter"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIImagePresenterData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiTextPresenter"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUITextPresenterData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiNineGrid"), -1) == 0)
 		{

@@ -22,8 +22,14 @@ jobs:
     - name: Premake
       run: premake5 vs2022 --arch=x86 --renderer=DX11
     
-    - name: Build
+    - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.1
     
     - name: Build OpenToshi for release
       run: msbuild './Toshi (DX11).sln' -property:Configuration=Release
+
+    - name: Publish Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Toshi Binaries
+        path: bin

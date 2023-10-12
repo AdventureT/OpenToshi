@@ -4,6 +4,14 @@
 
 namespace Toshi
 {
+
+	TBOOL TXUIButton::Create(TXUIResource& a_rRes, XURXUIElementData* a_pObjData, TBOOL a_bUnk)
+	{
+		TXUIControl::Create(a_rRes, a_pObjData, a_bUnk);
+		return TTRUE;
+	}
+
+
 	TBOOL XURXUIButtonData::IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType)
 	{
 		if (a_uiObjectIndex == 0) return TFALSE;

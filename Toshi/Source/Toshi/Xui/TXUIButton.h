@@ -3,6 +3,12 @@
 
 namespace Toshi
 {
+
+	class TXUIButton : public TXUIControl
+	{
+		TBOOL Create(TXUIResource& a_rRes, XURXUIElementData* a_pObjData, TBOOL a_bUnk);
+	};
+
 	class XURXUIButtonData : public XURXUIControlData
 	{
 	public:
