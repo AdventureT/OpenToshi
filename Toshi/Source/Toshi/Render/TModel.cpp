@@ -1,6 +1,8 @@
 #include "ToshiPCH.h"
 #include "TModel.h"
 #include "TModelManager.h"
+#include "TModelInstance.h"
+
 #include TOSHI_MULTIRENDER(TRender)
 
 namespace Toshi {
@@ -8,7 +10,7 @@ namespace Toshi {
 	TModel::TModel()
 	{
 		m_Flags = Flags::None;
-		m_Unk1 = 0;
+		m_iNumInstances = 0;
 		m_iLODCount = 0;
 		m_fUnknown = -1.0f;
 		m_pSkeleton = TNULL;
@@ -138,6 +140,28 @@ namespace Toshi {
 		m_Flags.Unset(Flags::TrbLoaded);
 		m_pCollisionData = TNULL;
 		m_pSkeleton = TNULL;
+	}
+
+	TModelInstance* TModel::CreateInstance()
+	{
+		TIMPLEMENT();
+		auto pInstance = new TModelInstance();
+
+		pInstance->m_pModel = this;
+
+		if (m_pSkeleton)
+		{
+			pInstance->m_pSkeletonInstance = m_pSkeleton->CreateInstance(TTRUE);
+
+			if (!pInstance->m_pSkeletonInstance)
+			{
+				delete pInstance;
+				return TNULL;
+			}
+		}
+
+		m_iNumInstances += 1;
+		return pInstance;
 	}
 
 	void TModel::CreateResource(const char* name)

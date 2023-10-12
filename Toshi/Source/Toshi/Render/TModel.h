@@ -2,8 +2,10 @@
 #include "TTMDBase.h"
 #include "TSkeleton.h"
 #include "TModelCollision.h"
+#include "TMesh.h"
 
 #include "Toshi/File/TTRB.h"
+#include "Toshi/Math/TSphere.h"
 #include "Toshi2/T2ResourceManager.h"
 #include "Toshi2/T2ModelPtr.h"
 #include "Toshi2/T2Flags.h"
@@ -12,28 +14,43 @@ class AModelLoader;
 
 namespace Toshi {
 
+	class TModelInstance;
+
+	class TModelLOD
+	{
+	public:
+		const TSphere& GetBoundingSphere()
+		{
+			return m_BoundingSphere;
+		}
+
+		TMesh* GetMesh(TUINT32 a_uiIndex)
+		{
+			TASSERT(a_uiIndex < m_uiMeshCount);
+			return m_pMeshes[a_uiIndex];
+		}
+
+		TMesh** GetMeshes()
+		{
+			return m_pMeshes;
+		}
+
+		TUINT32 GetMeshCount()
+		{
+			return m_uiMeshCount;
+		}
+
+	private:
+		TSphere m_BoundingSphere;
+		TUINT32 m_uiMeshCount;
+		TMesh** m_pMeshes;
+	};
+
 	class TModel : public T2Resource
 	{
 	public:
 		static constexpr int MAX_LOD_LEVEL = 5;
 
-		class TModelLOD
-		{
-		public:
-			struct Mesh { };
-
-		public:
-
-		private:
-			int m_Unk1;
-			int m_Unk2;
-			int m_Unk3;
-			int m_Unk4;
-			int m_iMeshCount;
-			Mesh* m_pMeshes;
-		};
-
-	public:
 		enum class Flags
 		{
 			None      = 0,
@@ -68,9 +85,24 @@ namespace Toshi {
 
 		void UnloadTRB(TBOOL bFreeTrb);
 
+		template <class T>
+		T* GetTRBSymbol(const char* a_szName)
+		{
+			return m_pTRB->CastSymbol<T>(
+				TranslateSymbolName(a_szName)
+			);
+		}
+
+		TModelLOD& GetLOD(TUINT32 a_uiIndex)
+		{
+			return m_LODLevels[a_uiIndex];
+		}
+
+		TModelInstance* CreateInstance();
+
 		const char* GetName() const           { return m_pName; }
 		TBOOL IsCreated() const               { return m_Flags.IsSet(Flags::Created); }
-        void SetDataHeader(void* pDataHeader) { m_pDataHeader = pDataHeader; }
+		void SetDataHeader(void* pDataHeader) { m_pDataHeader = pDataHeader; }
 
 	protected:
 		void CreateResource(const char* name);
@@ -90,15 +122,15 @@ namespace Toshi {
 
 	protected:
 		T2Flags<Flags> m_Flags;               // 0x04
-		int m_Unk1;                           // 0x08
-		int m_iLODCount;                      // 0x0C
-		float m_fUnknown;                     // 0x10
+		TINT m_iNumInstances;                 // 0x08
+		TINT m_iLODCount;                     // 0x0C
+		TFLOAT m_fUnknown;                    // 0x10
 		TSkeleton* m_pSkeleton;               // 0x14
 		TModelLOD m_LODLevels[MAX_LOD_LEVEL]; // 0x18
-		float m_fUnk2;                        // 0x90
-		float m_fUnk3;                        // 0x94
-		float m_fUnk4;                        // 0x98
-		float m_fUnk5;                        // 0x9C
+		TFLOAT m_fUnk2;                       // 0x90
+		TFLOAT m_fUnk3;                       // 0x94
+		TFLOAT m_fUnk4;                       // 0x98
+		TFLOAT m_fUnk5;                       // 0x9C
 		TModelCollision* m_pCollisionData;    // 0xA0
 		TTRB* m_pTRB;                         // 0xA4
 		TBOOL m_bFreeOnUnload;                // 0xA8
