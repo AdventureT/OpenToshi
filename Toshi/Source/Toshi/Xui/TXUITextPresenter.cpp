@@ -1,21 +1,8 @@
 #include "ToshiPCH.h"
 #include "TXUITextPresenter.h"
 #include "XURReader.h"
-#include "Toshi/Xui/TXUIText.h"
 
 TOSHI_NAMESPACE_USING
-
-XURXUITextPresenterData::XURXUITextPresenterData() : XURXUIElementData()
-{
-	m_TextColor = 0xFF000000;
-	m_DropShadowColor = 0x80000000;
-	m_PointSize = XURXUITextData::sm_uiDefaultFontSize;
-	m_Font = 0;
-	m_TextStyle = 0x100;
-	m_LineSpacingAdjust = 0;
-	m_DataAssociation = 0;
-	m_pClass = TClass::Find("TXUITextPresenter", TGetClass(TXUIElement));
-}
 
 TBOOL XURXUITextPresenterData::Load(TXUIResource& resource, uint8_t*& a_pData)
 {

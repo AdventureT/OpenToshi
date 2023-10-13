@@ -100,8 +100,9 @@ namespace Toshi
 
 	class XURXUIElementData : public XURXUIObjectData
 	{
+		TXUI_TYPEINFO(XURXUIElementData)
+
 	public:
-		static constexpr const char* sm_sTypeInfo = "XURXUIElementData";
 
 		friend XURXUIObjectData;
 
@@ -120,8 +121,6 @@ namespace Toshi
 		}
 
 		~XURXUIElementData() = default;
-
-		virtual const char* GetTypeInfo() const { return sm_sTypeInfo; }
 
 		TBOOL Load(TXUIResource& resource, uint8_t*& a_pData);
 

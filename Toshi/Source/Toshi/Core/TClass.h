@@ -1,6 +1,7 @@
 #pragma once
 
 #define TGetClass(X) X::GetClassStatic()
+#define TFindClass(X, Y) TClass::Find(#X, TGetClass(Y))
 
 namespace Toshi
 {

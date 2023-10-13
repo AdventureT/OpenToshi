@@ -18,7 +18,7 @@ public:
 
 	XURXUIVisualData() : XURXUIElementData()
 	{
-		m_pClass = TClass::Find("TXUIVisual", TGetClass(TXUIElement));
+		m_pClass = TFindClass(TXUIVisual, TXUIElement);
 	}
 
 	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;

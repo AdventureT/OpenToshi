@@ -6,7 +6,7 @@ namespace Toshi
 {
 	class XURXUIFillData : public XURXUIObjectData
 	{
-	public:
+
 		enum PropType_ : PropType
 		{
 			PropType_FillType,
@@ -22,6 +22,14 @@ namespace Toshi
 			PropType_Unknown2,
 			PropType_NUMOF,
 		};
+
+	public:
+
+		XURXUIFillData() : XURXUIObjectData()
+		{
+
+		}
+
 
 	public:
         virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
@@ -46,13 +54,20 @@ namespace Toshi
 
 	class XURXUIStrokeData : public XURXUIObjectData
 	{
-	public:
+
 		enum PropType_ : PropType
 		{
 			PropType_StrokeWidth,
 			PropType_StrokeColor,
 			PropType_NUMOF,
 		};
+
+	public:
+
+		XURXUIStrokeData() : XURXUIObjectData()
+		{
+
+		}
 
 	public:
         virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
@@ -70,8 +85,6 @@ namespace Toshi
 
 	class XURXUIGradientData : public XURXUIObjectData
 	{
-	public:
-		static constexpr const char* sm_sTypeInfo = "XURXUIGradientData";
 
 		enum PropType_ : PropType
 		{
@@ -81,6 +94,14 @@ namespace Toshi
 			PropType_FillGradientStopColor,
 			PropType_NUMOF,
 		};
+
+	public:
+
+		XURXUIGradientData() : XURXUIObjectData()
+		{
+
+		}
+
 
 	public:
         virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
@@ -98,10 +119,16 @@ namespace Toshi
 		/* 3 */ XUIEPTColor* m_StopColors;
 	};
 
+	class TXUIFigure :
+		public TGenericClassDerived<TXUIFigure, TXUIElement, "TXUIFigure", TMAKEVERSION(1, 0), TFALSE>
+	{
+
+	};
+
 	class XURXUIFigureData : public XURXUIElementData
 	{
-	public:
-		static constexpr const char* sm_sTypeInfo = "XURXUIFigureData";
+
+		TXUI_TYPEINFO(XURXUIFigureData)
 
 		enum PropType_ : PropType
 		{
@@ -113,13 +140,20 @@ namespace Toshi
 		};
 
 	public:
+
+		XURXUIFigureData() : XURXUIElementData()
+		{
+			m_pClass = TFindClass(TXUIFigure, TXUIElement);
+		}
+
+
+	public:
 		virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, PropType propType) override;
 		virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, PropType propType) override;
 		virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, PropType propType) override;
 		virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
 		virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
 		virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
-		virtual const char* GetTypeInfo() const override { return sm_sTypeInfo; }
         virtual TBOOL ValidateTimelineSubProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
         virtual uint32_t GetTimelineSubPropSize(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
         virtual TBOOL IsFloatSubPropType(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
@@ -130,10 +164,5 @@ namespace Toshi
 		XURXUIFillData m_Fill;
 		XUIEPTBool m_Closed;
 		void* m_Points;
-	};
-
-	class TXUIFigure
-	{
-		
 	};
 }

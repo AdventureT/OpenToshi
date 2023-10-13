@@ -4,17 +4,6 @@
 
 namespace Toshi
 {
-	XURXUISceneData::XURXUISceneData()
-	{
-		m_DefaultFocus = 0;
-		m_TransFrom = 0;
-		m_TransTo = 0;
-		m_TransBackFrom = 0;
-		m_TransBackTo = 0;
-		m_InterruptTransitions = 0;
-		m_IgnorePresses = TFALSE;
-	}
-
 	TBOOL XURXUISceneData::IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType)
 	{
 		if (a_uiObjectIndex == 0) return TFALSE;

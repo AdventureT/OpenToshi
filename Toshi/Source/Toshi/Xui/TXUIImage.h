@@ -2,42 +2,43 @@
 #include "TXUIElement.h"
 #include "Toshi2/T2GUI/T2GUIElement.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_BEGIN
+
+class TXUIImage :
+	public TGenericClassDerived<TXUIImage, TXUIElement, "TXUIImage", TMAKEVERSION(1, 0), TFALSE>
 {
-	class TXUIImage :
-		public TGenericClassDerived<TXUIImage, TXUIElement, "TXUIImage", TMAKEVERSION(1, 0), TFALSE>
+};
+
+class XURXUIImageData : public XURXUIElementData
+{
+	TXUI_TYPEINFO(XURXUIImageData)
+
+	enum PropType_ : PropType
 	{
+		PropType_SizeMode,
+		PropType_ImagePath,
+		PropType_BrushFlags,
+		PropType_NUMOF,
 	};
 
-	class XURXUIImageData : public XURXUIElementData
+public:
+
+	XURXUIImageData() : XURXUIElementData()
 	{
-		TXUI_TYPEINFO(XURXUIImageData)
+		m_pClass = TFindClass(TXUIImage, TXUIElement);
+	}
 
-		enum PropType_ : PropType
-		{
-			PropType_SizeMode,
-			PropType_ImagePath,
-			PropType_BrushFlags,
-			PropType_NUMOF,
-		};
+	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
+	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
+	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
+	virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType) override;
+	virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
+	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
 
-	public:
+private:
+	/* 0 */ XUIEPTUnsigned m_SizeMode;
+	/* 1 */ XUIEPTString m_ImagePath;
+	/* 2 */ XUIEPTUnsigned m_BrushFlags;
+};
 
-		XURXUIImageData() : XURXUIElementData()
-		{
-			m_pClass = TClass::Find("TXUIImage", TGetClass(TXUIElement));
-		}
-
-		virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
-		virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
-		virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
-		virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType) override;
-		virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
-		virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
-
-	private:
-		/* 0 */ XUIEPTUnsigned m_SizeMode;
-		/* 1 */ XUIEPTString m_ImagePath;
-		/* 2 */ XUIEPTUnsigned m_BrushFlags;
-	};
-}
+TOSHI_NAMESPACE_END

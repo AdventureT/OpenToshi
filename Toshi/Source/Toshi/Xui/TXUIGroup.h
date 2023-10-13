@@ -2,28 +2,36 @@
 #include <Toshi/Xui/TXUIResource.h>
 #include "TXUIElement.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_BEGIN
+
+class TXUIGroup :
+	public TGenericClassDerived<TXUIGroup, TXUIElement, "TXUIGroup", TMAKEVERSION(1, 0), TFALSE>
 {
-	class TXUIGroup
+};
+
+class XURXUIGroupData : public XURXUIElementData
+{
+
+	TXUI_TYPEINFO(XURXUIGroupData)
+
+public:
+
+	XURXUIGroupData() : XURXUIElementData()
 	{
-	};
+		m_pClass = TFindClass(TXUIGroup, TXUIElement);
+	}
 
-	class XURXUIGroupData : public XURXUIElementData
-	{
-		static constexpr const char* sm_sTypeInfo = "XURXUIGroupData";
+public:
+	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType);
 
-	public:
-		virtual const char* GetTypeInfo() const { return sm_sTypeInfo; }
+	virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType);
 
-		virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType);
+	virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType);
 
-		virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType);
+	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType);
+	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
 
-		virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType);
+	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData);
+};
 
-		virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType);
-		virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
-
-		virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData);
-	};
-}
+TOSHI_NAMESPACE_END

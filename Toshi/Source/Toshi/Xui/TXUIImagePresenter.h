@@ -26,7 +26,7 @@ public:
 
 	XURXUIImagePresenterData() : XURXUIElementData()
 	{
-		m_pClass = TClass::Find("TXUIImagePresenter", TGetClass(TXUIElement));
+		m_pClass = TFindClass(TXUIImagePresenter, TXUIElement);
 	}
 
 	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;

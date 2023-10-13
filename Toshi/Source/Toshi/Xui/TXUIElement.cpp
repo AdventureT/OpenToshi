@@ -47,17 +47,17 @@ namespace Toshi
 			uint8_t opcode = reader.ReadUInt8();
 
 			m_Children[i]->Load(resource, a_pData);
-
-			if (opcode & 2)
+			
+			if (HASFLAG(opcode & 2))
 			{
 				m_Children[i]->LoadChildren(resource, a_pData);
 			}
 
-			if (opcode & 4)
+			if (HASFLAG(opcode & 4))
 			{
 				m_Children[i]->LoadNamedFrames(resource, a_pData);
 
-				if (opcode & 2)
+				if (HASFLAG(opcode & 2))
 					m_Children[i]->LoadTimelines(resource, a_pData);
 			}
 		}
