@@ -7,7 +7,7 @@ TTransformObject::TTransformObject()
 {
 	m_EulerOrder[0] = 2;
 	m_EulerOrder[1] = 1;
-	m_EulerOrder[0] = 0;
+	m_EulerOrder[2] = 0;
 
 	m_bChanged = TTRUE;
 	m_eMode = Mode::Matrix;

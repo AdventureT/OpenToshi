@@ -38,7 +38,7 @@ TBOOL AImGuiRenderer::CreateMainViewport()
 	m_pViewport->SetY(0.0f);
 	m_pViewport->SetWidth((float)pDisplayParams->Width);
 	m_pViewport->SetHeight((float)pDisplayParams->Height);
-	m_pViewport->SetMinZ(0.2f);
+	m_pViewport->SetMinZ(-1.0f);
 	m_pViewport->SetMaxZ(1.0f);
 	m_pViewport->AllowBackgroundClear(TTRUE);
 	m_pViewport->AllowDepthClear(TTRUE);
@@ -55,9 +55,9 @@ TBOOL AImGuiRenderer::CreateImGui()
 	auto pRender = Toshi::TRENDER::Interface();
 
 	static float s_Vertices[] = {
-		-0.5f, -0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.0f, 0.5f, 0.5f,
+		-0.5f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f,
+		0.0f, -0.5f, 0.0f,
 	};
 
 	static uint16_t s_Indices[] = { 0, 1, 2 };
@@ -76,11 +76,12 @@ TBOOL AImGuiRenderer::CreateImGui()
 		layout(location = 0) in vec3 a_Position;\n\
 		\
 		uniform mat4 u_Projection;\n\
-		uniform vec3 u_Transform;\n\
+		uniform mat4 u_WorldView;\n\
+		uniform mat4 u_ModelView;\n\
 		\
 		void main()\n\
 		{\n\
-			gl_Position = u_Projection * (vec4(a_Position + u_Transform, 1.0));\n\
+			gl_Position = u_Projection * u_ModelView * u_WorldView * (vec4(a_Position, 1.0));\n\
 		}"
 	);
 
@@ -101,11 +102,9 @@ TBOOL AImGuiRenderer::CreateImGui()
 	m_ShaderProgram = Toshi::TRenderSDL::CreateShaderProgram(vertexShader, fragmentShader);
 	
 	m_ShaderProgram.Use();
-	m_ShaderProgram.SetUniform("u_Color", Toshi::TVector4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_ShaderProgram.SetUniform("u_Transform", Toshi::TVector3(0.0f, 0.0f, -2.0f));
 
 	m_pCameraObject = new Toshi::TCameraObject();
-	m_pCameraObject->GetTransformObject().SetTranslate(Toshi::TVector3(0, 0.0, 0.0f));
+	m_pCameraObject->GetTransformObject().SetTranslate(Toshi::TVector3(0.0f, 0.0f, 0.0f));
 #endif
 
 	return AImGui::CreateSingleton() != TNULL;
@@ -121,17 +120,25 @@ void AImGuiRenderer::Update(float a_fDeltaTime)
 	m_pViewport->Begin();
 
 #ifdef TOSHI_RENDERER_OPENGL
+	static float s_TotalTime = 0.0f;
+	m_pCameraObject->SetFOV(Toshi::TMath::DegToRad(90.0f));
 	m_pCameraObject->Render();
 	m_ShaderProgram.Use();
 
 	auto pContext = TSTATICCAST(Toshi::TRenderContextSDL*, pRender->GetCurrentRenderContext());
-	Toshi::TMatrix44 viewProjection = pContext->GetProjectionMatrix();
-	Toshi::TMatrix44 worldView = pContext->GetWorldViewMatrix();
-	viewProjection.Multiply(worldView);
-	m_ShaderProgram.SetUniform("u_Projection", viewProjection);
+
+	Toshi::TMatrix44 modelView;
+	modelView.Identity();
+	modelView.SetTranslation(Toshi::TVector3(0.0f, 1.0f, 4.0f));
+
+	m_ShaderProgram.SetUniform("u_Color", Toshi::TVector4(Toshi::TMath::Sin(s_TotalTime + 0.69), Toshi::TMath::Cos(s_TotalTime), 1.0f, 1.0f));
+	m_ShaderProgram.SetUniform("u_ModelView", modelView);
+	m_ShaderProgram.SetUniform("u_WorldView", pContext->GetWorldViewMatrix());
+	m_ShaderProgram.SetUniform("u_Projection", pContext->GetProjectionMatrix());
 
 	m_VertexArray.Bind();
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, TNULL);
+	s_TotalTime += a_fDeltaTime;
 #endif
 
 	// Draw UI

@@ -29,7 +29,6 @@ group "Engine"
 
 group "Toshi Tools"
 	include "Tools/ToshiResourceViewer"
-	include "Tools/BYardLevelCompiler"
 	include "Tools/ttc"
 	include "Tools/TTEX_Rev_To_Win"
 	
