@@ -11,7 +11,7 @@ class TXUIImage :
 
 class XURXUIImageData : public XURXUIElementData
 {
-	TXUI_TYPEINFO(XURXUIImageData)
+	TXUI_TYPEINFO(XUI_CLASS_IMAGE, XURXUIElementData)
 
 	enum PropType_ : PropType
 	{

@@ -10,8 +10,7 @@ class TXUILabel :
 
 class XURXUILabelData : public XURXUIControlData
 {
-
-	TXUI_TYPEINFO(XURXUILabelData)
+	TXUI_TYPEINFO(XUI_CLASS_LABEL, XURXUIControlData)
 
 public:
 

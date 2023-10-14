@@ -13,8 +13,7 @@ class TXUITextPresenter :
 
 class XURXUITextPresenterData : public XURXUIElementData
 {
-
-	TXUI_TYPEINFO(XURXUITextPresenterData)
+	TXUI_TYPEINFO(XUI_CLASS_TEXT_PRESENTER, XURXUIElementData)
 
 	enum PropType_ : PropType
 	{

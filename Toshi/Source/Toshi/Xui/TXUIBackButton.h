@@ -11,8 +11,7 @@ class TXUIBackButton :
 
 class XURXUIBackButtonData : public XURXUIButtonData
 {
-
-	TXUI_TYPEINFO(XURXUIBackButtonData)
+	TXUI_TYPEINFO(XUI_CLASS_BACKBUTTON, XURXUIButtonData)
 
 public:
 

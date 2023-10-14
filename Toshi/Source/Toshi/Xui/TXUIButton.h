@@ -11,10 +11,9 @@ class TXUIButton :
 
 class XURXUIButtonData : public XURXUIControlData
 {
+	TXUI_TYPEINFO(XUI_CLASS_BUTTON, XURXUIControlData)
 
-	TXUI_TYPEINFO(XURXUIButtonData)
-
-		enum PropType_ : PropType
+	enum PropType_ : PropType
 	{
 		PropType_PressKey,
 		PropType_NUMOF

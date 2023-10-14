@@ -11,8 +11,7 @@ class TXUINineGrid :
 
 class XURXUINineGridData : public XURXUIElementData
 {
-
-	TXUI_TYPEINFO(XURXUINineGridData)
+	TXUI_TYPEINFO(XUI_CLASS_NINE_GRID, XURXUIElementData)
 
 	enum PropType_ : PropType
 	{

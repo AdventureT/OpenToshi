@@ -61,9 +61,9 @@ public:
 
 	~TXUIResource();
 
-	const wchar_t* GetString(uint16_t index)
+	const wchar_t* GetString(uint16_t a_uiType)
 	{
-		return m_asStringTable[index];
+		return m_asStringTable[a_uiType];
 	}
 
 	float GetZRotation(int a_iIndex = 0)
@@ -90,7 +90,7 @@ public:
 	void Load(TBOOL loadStringTables, const char* filenameXUIB, const char* fileNameStringTable, TBOOL loadTrb, void* unk3);
 
 	TBOOL Load(uint8_t* buffer);
-	TBOOL ReadDataSection(uint8_t* buffer, uint32_t size);
+	TBOOL ReadDataSection(uint8_t* a_pData, uint32_t size);
 	TBOOL ReadStringSection(uint8_t* buffer, uint32_t size);
 	TBOOL ReadCustSection(uint8_t* buffer, uint32_t size);
 	TBOOL ReadQuatSection(uint8_t* buffer, uint32_t size);
@@ -101,7 +101,7 @@ public:
 
 	TXUIStringTable& LookupStringTable();
 
-	static XURXUIObjectData* CreateObjectData(TXUIResource& a_rResource, uint16_t index);
+	static XURXUIObjectData* CreateObjectData(TXUIResource& a_rResource, uint16_t a_uiType);
 	static XURXUIObjectData* CreateObjectData(TXUIResource& a_rResource, const wchar_t* objectName);
 
 private:

@@ -12,7 +12,7 @@ class TXUIImagePresenter :
 
 class XURXUIImagePresenterData : public XURXUIElementData
 {
-	TXUI_TYPEINFO(XURXUIImagePresenterData)
+	TXUI_TYPEINFO(XUI_CLASS_IMAGE_PRESENTER, XURXUIElementData)
 
 	enum PropType_ : PropType
 	{

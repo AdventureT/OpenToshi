@@ -10,8 +10,7 @@ class TXUIList :
 
 class XURXUIListData : public XURXUIControlData
 {
-
-	TXUI_TYPEINFO(XURXUIListData)
+	TXUI_TYPEINFO(XUI_CLASS_LIST, XURXUIControlData)
 
 	enum PropType_ : PropType
 	{

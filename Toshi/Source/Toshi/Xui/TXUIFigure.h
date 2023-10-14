@@ -127,8 +127,7 @@ namespace Toshi
 
 	class XURXUIFigureData : public XURXUIElementData
 	{
-
-		TXUI_TYPEINFO(XURXUIFigureData)
+		TXUI_TYPEINFO(XUI_CLASS_FIGURE, XURXUIElementData)
 
 		enum PropType_ : PropType
 		{

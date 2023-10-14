@@ -3,6 +3,7 @@
 #include "Toshi/Xui/TXUI.h"
 #include "Toshi/Xui/TXUIListItem.h"
 #include "XURReader.h"
+#include <Toshi/Xui/TXUIVisual.h>
 
 namespace Toshi
 {
@@ -40,10 +41,10 @@ namespace Toshi
 
 		for (size_t i = 0; i < m_NumChildren; i++)
 		{
-			uint16_t objectIndex = reader.ReadUInt16();
+			uint16_t uiType = reader.ReadUInt16();
 
-			m_Children[i] = TXUIResource::CreateObjectData(resource, objectIndex);
-			m_Children[i]->m_uiTypeIndex = objectIndex;
+			m_Children[i] = TXUIResource::CreateObjectData(resource, uiType);
+			m_Children[i]->m_uiTypeIndex = uiType;
 			uint8_t opcode = reader.ReadUInt8();
 
 			m_Children[i]->Load(resource, a_pData);
@@ -53,12 +54,9 @@ namespace Toshi
 				m_Children[i]->LoadChildren(resource, a_pData);
 			}
 
-			if (HASFLAG(opcode & 4))
+			if (HASFLAG(opcode & 4) && m_Children[i]->LoadNamedFrames(resource, a_pData) && HASFLAG(opcode & 2))
 			{
-				m_Children[i]->LoadNamedFrames(resource, a_pData);
-
-				if (HASFLAG(opcode & 2))
-					m_Children[i]->LoadTimelines(resource, a_pData);
+				m_Children[i]->LoadTimelines(resource, a_pData);
 			}
 		}
 	}

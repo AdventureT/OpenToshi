@@ -10,8 +10,7 @@ class TXUISliderBar :
 
 class XURXUISliderBarData : public XURXUIControlData
 {
-
-	TXUI_TYPEINFO(XURXUISliderBarData)
+	TXUI_TYPEINFO(XUI_CLASS_SLIDER, XURXUIControlData)
 
 	enum PropType_ : PropType
 	{

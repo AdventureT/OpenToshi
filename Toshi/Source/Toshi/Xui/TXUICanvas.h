@@ -12,8 +12,7 @@ public:
 
 class XURXUICanvasData : public XURXUIElementData
 {
-
-	TXUI_TYPEINFO(XURXUICanvasData)
+	TXUI_TYPEINFO(XUI_CLASS_CANVAS, XURXUIElementData)
 
 public:
 

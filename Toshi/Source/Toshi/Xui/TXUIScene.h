@@ -10,8 +10,7 @@ class TXUIScene :
 
 class XURXUISceneData : public XURXUIControlData
 {
-
-	TXUI_TYPEINFO(XURXUISceneData)
+	TXUI_TYPEINFO(XUI_CLASS_SCENE, XURXUIControlData)
 
 	enum PropType_ : PropType
 	{

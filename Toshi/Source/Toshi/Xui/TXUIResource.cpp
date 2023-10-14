@@ -165,26 +165,31 @@ namespace Toshi {
 		return TTRUE;
 	}
 
-	TBOOL TXUIResource::ReadDataSection(uint8_t* buffer, uint32_t size)
+	TBOOL TXUIResource::ReadDataSection(uint8_t* a_pData, uint32_t size)
 	{
-		XURReader reader(buffer);
+		XURReader reader(a_pData);
 
-		uint16_t rootNameId = reader.ReadUInt16();
+		uint8_t* pValidateEnd = a_pData + size;
+		uint16_t uiType = reader.ReadUInt16();
+
+		TASSERT(0 == TStringManager::String16Compare(GetString(uiType), _TS16("XuiCanvas")), "First Element is not XuiCanvas!");
+		m_pRoot = CreateObjectData(*this, uiType);
+		
 		uint8_t opcode = reader.ReadUInt8();
+		
+		m_pRoot->Load(*this, a_pData);
 
-		TASSERT(0 == TStringManager::String16Compare(GetString(rootNameId), _TS16("XuiCanvas")), "First Element is not XuiCanvas!");
-		m_pRoot = CreateObjectData(*this, rootNameId);
-		m_pRoot->Load(*this, buffer);
-
-		if ((opcode & 2) != 0)
+		if (HASFLAG(opcode & 2))
 		{
-			m_pRoot->LoadChildren(*this, buffer);
+			m_pRoot->LoadChildren(*this, a_pData);
 		}
 
-		if ((opcode & 4) != 0 && m_pRoot->LoadNamedFrames(*this, buffer) && (opcode & 2) != 0)
+		if (HASFLAG(opcode & 4) && m_pRoot->LoadNamedFrames(*this, a_pData) && HASFLAG(opcode & 2))
 		{
-			m_pRoot->LoadTimelines(*this, buffer);
+			m_pRoot->LoadTimelines(*this, a_pData);
 		}
+
+		TASSERT(pValidateEnd == a_pData);
 
 		return TTRUE;
 	}
@@ -326,10 +331,10 @@ namespace Toshi {
 		// TODO: insert return statement here
 	}
 
-	XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, uint16_t index)
+	XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, uint16_t a_uiType)
 	{
-		if (index == 0) return TNULL;
-		return CreateObjectData(a_rResource, a_rResource.m_asStringTable[index]);
+		if (a_uiType == 0) return TNULL;
+		return CreateObjectData(a_rResource, a_rResource.GetString(a_uiType));
 	}
 
 	XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, const wchar_t* objectName)

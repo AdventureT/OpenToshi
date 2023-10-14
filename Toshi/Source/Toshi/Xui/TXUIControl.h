@@ -10,8 +10,7 @@ class TXUIControl :
 
 class XURXUIControlData : public XURXUIElementData
 {
-
-	TXUI_TYPEINFO(XURXUIControlData)
+	TXUI_TYPEINFO(XUI_CLASS_CONTROL, XURXUIElementData)
 
 	enum PropType_ : PropType
 	{

@@ -10,8 +10,7 @@ class TXUICheckBox :
 
 class XURXUICheckBoxData : public XURXUIControlData
 {
-
-	TXUI_TYPEINFO(XURXUICheckBoxData)
+	TXUI_TYPEINFO(XUI_CLASS_CHECKBOX, XURXUIControlData)
 
 	enum PropType_ : PropType
 	{

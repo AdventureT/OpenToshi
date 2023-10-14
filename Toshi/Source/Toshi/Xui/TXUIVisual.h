@@ -12,7 +12,7 @@ class TXUIVisual :
 
 class XURXUIVisualData : public XURXUIElementData
 {
-	TXUI_TYPEINFO(XURXUIVisualData)
+	TXUI_TYPEINFO(XUI_CLASS_VISUAL, XURXUIElementData)
 
 public:
 

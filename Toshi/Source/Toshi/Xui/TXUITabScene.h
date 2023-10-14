@@ -10,8 +10,7 @@ class TXUITabScene :
 
 class XURXUITabSceneData : public XURXUISceneData
 {
-
-	TXUI_TYPEINFO(XURXUITabSceneData)
+	TXUI_TYPEINFO(XUI_CLASS_TABSCENE, XURXUISceneData)
 
 	enum PropType_ : PropType
 	{

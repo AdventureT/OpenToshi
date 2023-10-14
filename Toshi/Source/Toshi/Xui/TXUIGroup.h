@@ -11,8 +11,7 @@ class TXUIGroup :
 
 class XURXUIGroupData : public XURXUIElementData
 {
-
-	TXUI_TYPEINFO(XURXUIGroupData)
+	TXUI_TYPEINFO(XUI_CLASS_GROUP, XURXUIElementData)
 
 public:
 
