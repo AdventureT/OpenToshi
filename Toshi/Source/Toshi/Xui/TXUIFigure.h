@@ -4,6 +4,9 @@
 
 namespace Toshi
 {
+
+        class XURXUIGradientData;
+
 	class XURXUIFillData : public XURXUIObjectData
 	{
 
