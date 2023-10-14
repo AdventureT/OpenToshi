@@ -28,6 +28,17 @@ class TXUIResource
 
 	struct XURHeader
 	{
+		XURHeader()
+		{
+			m_apSections = TNULL;
+			m_uiFileID = 0;
+			m_uiVersion = 0;
+			m_uiXuiVersion = 0;
+			m_usBinSize = 0;
+			m_uiFlags = 0;
+			m_usNumSections = 0;
+		}
+
 		Section* m_apSections;      // 0x00
 		uint32_t m_uiFileID;        // 0x04
 		uint32_t m_uiVersion;       // 0x08
@@ -40,13 +51,6 @@ class TXUIResource
 public:
 	TXUIResource()
 	{
-		m_oHeader.m_apSections = TNULL;
-		m_oHeader.m_uiFileID = 0;
-		m_oHeader.m_uiVersion = 0;
-		m_oHeader.m_uiXuiVersion = 0;
-		m_oHeader.m_usBinSize = 0;
-		m_oHeader.m_uiFlags = 0;
-		m_oHeader.m_usNumSections = 0;
 		m_pMemoryHeap = TNULL;
 		m_asStringTable = TNULL;
 		m_avVectors = TNULL;

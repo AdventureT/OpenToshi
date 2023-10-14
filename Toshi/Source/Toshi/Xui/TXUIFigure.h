@@ -41,9 +41,13 @@ namespace Toshi
         virtual TBOOL IsColourPropType(uint32_t propType);
 
 	protected:
+
+		
+
 		/* 0 */ XUIEPTUnsigned m_FillType;
 		/* 1 */ XUIEPTColor m_FillColor;
 		/* 2 */ XUIEPTString m_FillTextureFileName;
+		/* 3 */ XURXUIGradientData* m_pGradientData;
 		/* 4 */ XUIEPTVector m_FillTranslation;
 		/* 5 */ XUIEPTVector m_FillScale;
 		/* 6 */ XUIEPTFloat m_FillRotation;
