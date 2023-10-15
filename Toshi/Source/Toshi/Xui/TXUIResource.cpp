@@ -15,9 +15,11 @@
 #include "XURReader.h"
 #include "TXUILabel.h"
 #include "TXUITabScene.h"
+#include "TXUIScrollEnd.h"
 #include "TXUISliderBar.h"
 #include "TXUICheckBox.h"
 #include "TXUIList.h"
+#include "TXUIListItem.h"
 #include "TXUIVisual.h"
 
 namespace Toshi {
@@ -454,8 +456,7 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiScrollEnd"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIScrollEndData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiCaret"), -1) == 0)
 		{
@@ -464,8 +465,7 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiListItem"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIListItemData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiHtmlPresenter"), -1) == 0)
 		{

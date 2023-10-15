@@ -24,7 +24,7 @@ namespace Toshi
 
 	TBOOL XURXUIBackButtonData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
 	{
-		name++;
+		a_uiObjectIndex++;
 		return XURXUIButtonData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 	}
 
@@ -36,7 +36,7 @@ namespace Toshi
 
 	TBOOL XURXUIBackButtonData::Load(TXUIResource& resource, uint8_t*& a_pData)
 	{
-		auto res = XURXUIButtonData::Load(resource, a_pData);
+		TBOOL res = XURXUIButtonData::Load(resource, a_pData);
 		a_pData++;
 
 		return res;

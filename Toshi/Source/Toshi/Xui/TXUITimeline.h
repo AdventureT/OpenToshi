@@ -38,17 +38,18 @@ struct XURXUIKeyframeData
 class XURXUINamedFrameData
 {
 public:
-	uint32_t m_unk;
-	uint16_t m_unk2;
-	uint16_t m_unk3;
-	uint8_t m_unk4;
+	// Order not correct!
+	uint32_t m_Name;
+	uint16_t m_Time;
+	uint16_t m_Command;
+	uint8_t m_CommandParams;
 
 	XURXUINamedFrameData()
 	{
-		m_unk = 0;
-		m_unk2 = 0;
-		m_unk3 = 0;
-		m_unk4 = 0;
+		m_Name = 0;
+		m_Time = 0;
+		m_Command = 0;
+		m_CommandParams = 0;
 	}
 };
 

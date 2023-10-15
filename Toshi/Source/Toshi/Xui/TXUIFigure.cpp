@@ -1,6 +1,7 @@
 #include "ToshiPCH.h"
 #include "TXUIFigure.h"
 #include "XURReader.h"
+#include <Toshi/Xui/TXUI.h>
 
 namespace Toshi
 {
@@ -56,8 +57,7 @@ namespace Toshi
             
             if (reader.ShouldReadThisProp(PropType_Gradient))
             {
-                
-                TTODO("XURXUIGradientData");
+                m_Gradient.Load(resource, a_pData);
             }
 
             reader.ReadProperty<XUI_EPT_VECTOR>(PropType_FillTranslation, m_FillTranslation);
@@ -66,16 +66,8 @@ namespace Toshi
             reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapX, m_FillWrapX);
             reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapY, m_FillWrapY);
 
-            if (reader.ShouldReadThisProp(PropType_FillBrushFlags))
-            {
-                // there's nothing here in globs and de blob
-            }
-
-            if (reader.ShouldReadThisProp(PropType_Unknown2))
-            {
-                // there's nothing here in globs and de blob
-                // m_FillRotation = *a_pData++;
-            }
+            reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillBrushFlags, m_FillBrushFlags);
+            reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_Unknown, m_Unknown);
         }
 
         return TTRUE;
@@ -141,7 +133,7 @@ namespace Toshi
 
     uint32_t XURXUIGradientData::GetTimelinePropSize(uint32_t propType)
     {
-        return propType == 0 ? 1 : 4;
+        return propType == PropType_FillGradientRadial ? 1 : 4;
     }
 
     TBOOL XURXUIGradientData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
@@ -174,18 +166,18 @@ namespace Toshi
             if (reader.ShouldReadThisProp(PropType_FillGradientStopPos))
             {
                 XUIEPTUInt8 num = reader.ReadEPTUInt8();
-                m_Stops = new XUIEPTFloat[num];
+                m_StopPos = new (TXUI::MemoryBlock()) XUIEPTFloat[num];
 
                 for (size_t i = 0; i < num; i++)
                 {
-                    m_Stops[i] = reader.ReadEPTFloat();
+                    m_StopPos[i] = reader.ReadEPTFloat();
                 }
             }
 
             if (reader.ShouldReadThisProp(PropType_FillGradientStopColor))
             {
                 XUIEPTUInt8 num = reader.ReadEPTUInt8();
-                m_StopColors = new XUIEPTColor[num];
+                m_StopColors = new (TXUI::MemoryBlock()) XUIEPTColor[num];
 
                 for (size_t i = 0; i < num; i++)
                 {
@@ -275,6 +267,7 @@ namespace Toshi
         
             if (hasPoints)
             {
+                auto pCustData = resource.GetCust(points);
                 TTODO("Load points");
             }
         }

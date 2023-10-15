@@ -74,10 +74,11 @@ namespace Toshi
 
 			for (size_t i = 0; i < m_NumNamedFrames; i++)
 			{
-				m_pNamedFrames[i].m_unk2 = reader.ReadUInt16();
-				m_pNamedFrames[i].m_unk = reader.ReadUInt16From32();
-				m_pNamedFrames[i].m_unk4 = reader.ReadUInt8();
-				m_pNamedFrames[i].m_unk3 = reader.ReadUInt16();
+				// Order not correct!
+				m_pNamedFrames[i].m_Time = reader.ReadUInt16();
+				m_pNamedFrames[i].m_Name = reader.ReadUInt16From32();
+				m_pNamedFrames[i].m_Command = reader.ReadUInt8();
+				m_pNamedFrames[i].m_CommandParams = reader.ReadUInt16();
 			}
 		}
 

@@ -1,35 +1,33 @@
 #pragma once
-#include "TXUICheckBox.h"
+#include "TXUIControl.h"
 
 TOSHI_NAMESPACE_BEGIN
 
-class TXUIListItem :
-	public TGenericClassDerived<TXUIListItem, TXUICheckBox, "TXUIListItem", TMAKEVERSION(1, 0), TFALSE>
+class TXUIScrollEnd :
+	public TGenericClassDerived<TXUIScrollEnd, TXUIControl, "TXUIScrollEnd", TMAKEVERSION(1, 0), TFALSE>
 {
 };
 
-class XURXUIListItemData : public XURXUICheckBoxData
+class XURXUIScrollEndData : public XURXUIControlData
 {
-	TXUI_TYPEINFO(XUI_CLASS_LISTITEM, XURXUICheckBoxData)
+	TXUI_TYPEINFO(XUI_CLASS_SCROLLEND, XURXUIControlData)
 
 	enum PropType_ : PropType
 	{
-		PropType_Layout,
-		PropType_Checkable,
-		PropType_SelectedSize,
-		PropType_KeepSizeUnfocused,
-		PropType_InterItemSpacing,
+		PropType_Direction,
 		PropType_NUMOF,
 	};
 
 public:
 
-	XURXUIListItemData() : XURXUICheckBoxData()
+	XURXUIScrollEndData() : XURXUIControlData()
 	{
-		m_pClass = TFindClass(TXUIListItem, TXUIControl);
+		m_uiDirection = 0;
+		m_pClass = TFindClass(TXUIScrollEnd, TXUIControl);
 	}
 
 public:
+
 	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
 	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
 	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
@@ -38,11 +36,7 @@ public:
 	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
 
 private:
-	/* 0 */ XUIEPTUnsigned m_uiLayout;
-	/* 1 */ XUIEPTBool m_bCheckable;
-	/* 2 */ XUIEPTUnsigned m_uiSelectedSize;
-	/* 3 */ XUIEPTBool m_bKeepSizeUnfocused;
-	/* 4 */ XUIEPTVector m_vInterItemSpacing;
+	/* 0 */ XUIEPTUnsigned m_uiDirection;
 };
 
 TOSHI_NAMESPACE_END

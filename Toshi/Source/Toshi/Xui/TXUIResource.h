@@ -82,6 +82,12 @@ public:
 		return (a_iIndex == -1) ? &TVector2::VEC_ZERO : &m_avVectors[a_iIndex];
 	}
 
+	const uint8_t* GetCust(uint32_t a_uiOffset) const
+	{
+		TASSERT(a_uiOffset < m_uiCustDataSize);
+		return m_pCustData + a_uiOffset;
+	}
+
 	TBOOL ReadHeader(uint8_t* buffer);
 
 	// Toshi::TXUIResource::Load(const char*, const char*, TBOOL, Toshi::TTRB*)
