@@ -53,6 +53,11 @@ TXUI::TXUI()
 	TTODO("TXUIShapeCache, TGenericListener");
 }
 
+TBOOL TXUI::CreateScene(TXUIResource* a_pResource, uint32_t a_uiUnk)
+{
+	return TBOOL();
+}
+
 TXUIResource* TXUI::FindResource(const char* a_sName)
 {
 	TASSERT(T2String8::IsLowerCase(a_sName));

@@ -36,6 +36,8 @@ class TXUI : public TSingleton<TXUI>
 public:
 	TXUI();
 
+	TBOOL CreateScene(TXUIResource* a_pResource, uint32_t a_uiUnk);
+
 	void AddResource(TXUIResourceTRB* a_pResourceTrb);
 	void RemoveResource(TXUIResourceTRB* a_pResourceTrb);
 	void SetDefaultFont(const char* a_pData);

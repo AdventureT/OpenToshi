@@ -333,6 +333,44 @@ namespace Toshi {
 		// TODO: insert return statement here
 	}
 
+	TBOOL TXUIResource::CreateScene(uint32_t a_uiIndex)
+	{
+		XURXUIObjectData* scene = FindScene(a_uiIndex);
+		if (!scene) 
+		{
+			scene = FindScene(a_uiIndex);
+			if (!scene) return TFALSE;
+		}
+		return CreateScene(GetString(scene->m_Index));
+	}
+
+	TBOOL TXUIResource::CreateScene(const wchar_t* a_wcName)
+	{
+		TIMPLEMENT();
+		return TFALSE;
+	}
+
+	XURXUIObjectData* TXUIResource::FindScene(uint32_t a_uiIndex)
+	{
+		if (a_uiIndex < m_pRoot->m_NumChildren)
+		{
+			return m_pRoot->m_Children[a_uiIndex]->m_pClass->IsA(TGetClass(TXUIScene)) ? m_pRoot->m_Children[a_uiIndex] : TNULL;
+		}
+		return TNULL;
+	}
+
+	XURXUIObjectData* TXUIResource::FindFirstScene(uint32_t a_uiIndex)
+	{
+		for (uint8_t i = 0; i < m_pRoot->m_NumChildren; i++)
+		{
+			if (m_pRoot->m_Children[a_uiIndex]->m_pClass->IsA(TGetClass(TXUIScene))) 
+			{
+				return m_pRoot->m_Children[a_uiIndex];
+			}
+		}
+		return TNULL;
+	}
+
 	XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, uint16_t a_uiType)
 	{
 		if (a_uiType == 0) return TNULL;

@@ -136,7 +136,7 @@ namespace Toshi
 		return TNULL;
 	}
 
-	TBOOL TClass::IsA(TClass* cmpClass)
+	TBOOL TClass::IsA(const TClass* cmpClass) const
 	{
 		if (cmpClass->m_LastAttached == TNULL)
 		{
@@ -144,7 +144,7 @@ namespace Toshi
 		}
 		else
 		{
-			TClass* pClass = this;
+			const TClass* pClass = this;
 
 			while (pClass != TNULL)
 			{
