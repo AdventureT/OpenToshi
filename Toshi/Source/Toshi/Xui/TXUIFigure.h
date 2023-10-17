@@ -47,7 +47,7 @@ protected:
 
 class XURXUIFillData : public XURXUIObjectData
 {
-
+	friend class XURXUIFigureData;
 
 	enum PropType_ : PropType
 	{

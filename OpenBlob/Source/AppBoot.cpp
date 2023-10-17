@@ -92,7 +92,8 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 		FMOD::System* system = Toshi::TSound::GetSingleton()->GetSystem();
 		system->setFileSystem(NULL, NULL, NULL, NULL, NULL, NULL, 0);
 
-		AXUIState::SetSkin1("commonskin.trb", "commonskin.xur");
+		// Doens't Load
+		//AXUIState::SetSkin1("commonskin.trb", "commonskin.xur");
 		AXUIState::SetSkin2("frontendskin.trb", "frontendskin.xur");
 
 		txui->m_pAudio = new AXUIFMODExAudio();

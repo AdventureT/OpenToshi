@@ -17,7 +17,7 @@ namespace Toshi
 
     uint32_t XURXUIFillData::GetTimelinePropSize(uint32_t propType)
     {
-        return propType != 2 ? 4 : 2;
+        return propType != PropType_FillTextureFileName ? 4 : 2;
     }
 
     TBOOL XURXUIFillData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
@@ -42,8 +42,6 @@ namespace Toshi
 
     TBOOL XURXUIFillData::Load(TXUIResource& resource, uint8_t*& a_pData)
     {
-        // TODO:!!!!! NOT FINISHED !!!!!!
-
         XURXUIObjectData::Load(resource, a_pData);
         
         if (*a_pData++ != 0)
@@ -77,12 +75,12 @@ namespace Toshi
 
     TBOOL XURXUIStrokeData::IsColourPropType(uint32_t propType)
     {
-        return propType == 1;
+        return propType == PropType_StrokeColor;
     }
 
     TBOOL XURXUIStrokeData::IsFloatPropType(uint32_t propType)
     {
-        return propType == 0;
+        return propType == PropType_StrokeWidth;
     }
 
     uint32_t XURXUIStrokeData::GetTimelinePropSize(uint32_t propType)
@@ -100,7 +98,7 @@ namespace Toshi
 
     TBOOL XURXUIStrokeData::ValidateTimelineProp(uint32_t param_2)
     {
-        return param_2 < 2;
+        return param_2 < PropType_NUMOF;
     }
 
     TBOOL XURXUIStrokeData::Load(TXUIResource& resource, uint8_t*& a_pData)
@@ -154,6 +152,7 @@ namespace Toshi
     TBOOL XURXUIGradientData::Load(TXUIResource& resource, uint8_t*& a_pData)
     {
         XURXUIObjectData::Load(resource, a_pData);
+        XUIEPTUInt8 num;
 
         if (*a_pData++ != 0)
         {
@@ -165,10 +164,10 @@ namespace Toshi
 
             if (reader.ShouldReadThisProp(PropType_FillGradientStopPos))
             {
-                XUIEPTUInt8 num = reader.ReadEPTUInt8();
+                num = reader.ReadEPTUInt8();
                 m_StopPos = new (TXUI::MemoryBlock()) XUIEPTFloat[num];
 
-                for (size_t i = 0; i < num; i++)
+                for (XUIEPTUInt8 i = 0; i < num; i++)
                 {
                     m_StopPos[i] = reader.ReadEPTFloat();
                 }
@@ -176,10 +175,10 @@ namespace Toshi
 
             if (reader.ShouldReadThisProp(PropType_FillGradientStopColor))
             {
-                XUIEPTUInt8 num = reader.ReadEPTUInt8();
+                num = reader.ReadEPTUInt8();
                 m_StopColors = new (TXUI::MemoryBlock()) XUIEPTColor[num];
 
-                for (size_t i = 0; i < num; i++)
+                for (XUIEPTUInt8 i = 0; i < num; i++)
                 {
                     m_StopColors[i] = reader.ReadEPTColor();
                 }
@@ -280,7 +279,7 @@ namespace Toshi
         if (a_uiObjectIndex == 0)
             return m_Stroke.ValidateTimelineProp(a_uiPropIndex);
         else if (a_uiObjectIndex == 3)
-            return m_Fill.ValidateTimelineProp(a_uiPropIndex);
+            return m_Fill.m_Gradient.ValidateTimelineProp(a_uiPropIndex);
         else
             return m_Fill.ValidateTimelineProp(a_uiPropIndex);
     }
@@ -290,7 +289,7 @@ namespace Toshi
         if (a_uiObjectIndex == 0)
             return m_Stroke.GetTimelinePropSize(a_uiPropIndex);
         else if (a_uiObjectIndex == 3)
-            return m_Fill.GetTimelinePropSize(a_uiPropIndex);
+            return m_Fill.m_Gradient.GetTimelinePropSize(a_uiPropIndex);
         else
             return m_Fill.GetTimelinePropSize(a_uiPropIndex);
     }
@@ -300,7 +299,7 @@ namespace Toshi
         if (a_uiObjectIndex == 0)
             return m_Stroke.IsFloatPropType(a_uiPropIndex);
         else if (a_uiObjectIndex == 3)
-            return m_Fill.IsFloatPropType(a_uiPropIndex);
+            return m_Fill.m_Gradient.IsFloatPropType(a_uiPropIndex);
         else
             return m_Fill.IsFloatPropType(a_uiPropIndex);
     }
@@ -310,7 +309,7 @@ namespace Toshi
         if (a_uiObjectIndex == 0)
             return m_Stroke.IsColourPropType(a_uiPropIndex);
         else if (a_uiObjectIndex == 3)
-            return m_Fill.IsColourPropType(a_uiPropIndex);
+            return m_Fill.m_Gradient.IsColourPropType(a_uiPropIndex);
         else
             return m_Fill.IsColourPropType(a_uiPropIndex);
     }
