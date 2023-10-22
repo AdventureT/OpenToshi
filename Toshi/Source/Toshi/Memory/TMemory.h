@@ -154,7 +154,8 @@ namespace Toshi
 
 inline static void* TMalloc(size_t size)
 {
-    return Toshi::TMemory::s_Context.s_cbMalloc(size);
+    // Catch2 does TMalloc before initializing TMemory
+    return Toshi::TMemory::s_Context.s_cbMalloc ? Toshi::TMemory::s_Context.s_cbMalloc(size) : malloc(size);
 }
 
 inline static void* TCalloc(size_t nitems, size_t size)
@@ -174,7 +175,9 @@ inline static void* TMemalign(size_t alignment, size_t size)
 
 inline static void TFree(void* mem)
 {
-    Toshi::TMemory::s_Context.s_cbFree(mem);
+    // Catch2 does TFree before initializing TMemory
+    if (Toshi::TMemory::s_Context.s_cbFree) Toshi::TMemory::s_Context.s_cbFree(mem);
+    else free(mem);
 }
 
 inline void* __CRTDECL operator new(size_t size, Toshi::TMemoryHeap* heap)

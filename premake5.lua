@@ -31,6 +31,7 @@ group "Toshi Tools"
 	include "Tools/ToshiResourceViewer"
 	include "Tools/ttc"
 	include "Tools/TTEX_Rev_To_Win"
+	include "Tools/UnitTests"
 	
 group "Third-Party"
 	include "Toshi/Vendor/libogg"

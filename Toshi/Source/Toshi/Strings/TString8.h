@@ -55,8 +55,8 @@ namespace Toshi
 		TString8 Mid(uint32_t param_1, uint32_t param_2) const;
 		TString8 Right(int param_1) const { return Mid(param_1, Length() - param_1); }
 
-		TString8& MakeUpper() { _strupr_s(m_pBuffer, m_iStrLen); return *this; }
-		TString8& MakeLower() { _strlwr_s(m_pBuffer, m_iStrLen); return *this; }
+		TString8& MakeUpper() { _strupr_s(m_pBuffer, Length()); return *this; }
+		TString8& MakeLower() { _strlwr_s(m_pBuffer, Length()); return *this; }
 
 		uint32_t Length() const { return m_iStrLen; }
 		uint8_t ExcessLength() const { return m_iExcessLen; }
@@ -64,7 +64,7 @@ namespace Toshi
 		TBOOL IsAllLowerCase() const;
 		TBOOL IsAllUpperCase() const;
 		TBOOL IsIndexValid(uint32_t index) const { return index >= 0 && index <= Length(); }
-		TBOOL IsEmpty() const { return m_iStrLen == 0; }
+		TBOOL IsEmpty() const { return Length() == 0; }
 		TBOOL IsUnicode() const { return TFALSE; } // Who would have known?
 
 	public:
@@ -74,7 +74,7 @@ namespace Toshi
 		char& operator[](int index) { return m_pBuffer[index]; }
 		const char& operator[](int index) const { return *GetString(index); }
 		operator const char* () const { return m_pBuffer; }
-		TBOOL operator!() { return m_iStrLen == 0; }
+		TBOOL operator!() { return IsEmpty(); }
 		TBOOL operator==(const char* cstr) const { return Compare(cstr, -1) == 0; }
 		TBOOL operator==(const TString8& str) const { return Compare(str.m_pBuffer, -1) == 0; }
 		TBOOL operator!=(const char* cstr) const { return Compare(cstr, -1) != 0; }
