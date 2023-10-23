@@ -56,6 +56,7 @@ namespace Toshi
 	{
 		if (m_Initialize)
 		{
+			TASSERT(TFALSE == m_Initialized);
 			m_Initialize();
 			m_Initialized = TTRUE;
 		}
@@ -120,10 +121,11 @@ namespace Toshi
 		return TNULL;
 	}
 
-	const TClass* TClass::Find(const char* name, const TClass* parent)
+	const TClass* TClass::Find(const char* a_pcClassName, const TClass* parent)
 	{
+		TASSERT(a_pcClassName[1] != 0);
 		if (parent == TNULL) parent = &TObject::s_Class;
-		return FindRecurse(name, parent, TFALSE);
+		return FindRecurse(a_pcClassName, parent, TFALSE);
 	}
 
 	TObject* TClass::CreateObject()

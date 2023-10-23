@@ -36,7 +36,7 @@ class TXUI : public TSingleton<TXUI>
 public:
 	TXUI();
 
-	TBOOL CreateScene(TXUIResource* a_pResource, uint32_t a_uiUnk);
+	TBOOL CreateScene(TXUIResource* a_pResource, uint32_t a_uiIndex);
 
 	void AddResource(TXUIResourceTRB* a_pResourceTrb);
 	void RemoveResource(TXUIResourceTRB* a_pResourceTrb);

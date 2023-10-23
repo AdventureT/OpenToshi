@@ -53,9 +53,10 @@ TXUI::TXUI()
 	TTODO("TXUIShapeCache, TGenericListener");
 }
 
-TBOOL TXUI::CreateScene(TXUIResource* a_pResource, uint32_t a_uiUnk)
+TBOOL TXUI::CreateScene(TXUIResource* a_pResource, uint32_t a_uiIndex)
 {
-	return TBOOL();
+	if (!a_pResource->CreateScene(a_uiIndex)) return TFALSE;
+	return TTRUE;
 }
 
 TXUIResource* TXUI::FindResource(const char* a_sName)
