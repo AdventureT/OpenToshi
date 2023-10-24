@@ -28,6 +28,9 @@ jobs:
     - name: Build OpenToshi for release
       run: msbuild './Toshi (DX11).sln' -property:Configuration=Release
 
+    - name: Run UnitTests
+      run: ./bin/UnitTests/UnitTests.exe
+
     - name: Publish Artifact
       uses: actions/upload-artifact@v2
       with:
