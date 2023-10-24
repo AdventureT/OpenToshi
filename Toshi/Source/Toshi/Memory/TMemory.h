@@ -2,9 +2,11 @@
 #include "Toshi/Core/Core.h"
 #include "Toshi2/Thread/T2Mutex.h"
 
+#include TOSHI_MULTIPLATFORM(TMemoryContext)
+
 #define TMEMORY_NEW(TYPE, HEAP, ...) \
-	((HEAP != TNULL) ? new (HEAP) TYPE(__VA_ARGS__) : \
-	new TYPE(__VA_ARGS__))
+    ((HEAP != TNULL) ? new (HEAP) TYPE(__VA_ARGS__) : \
+    new TYPE(__VA_ARGS__))
 
 namespace Toshi
 {
@@ -15,26 +17,6 @@ namespace Toshi
     {
         TMemoryHeapFlags_UseMutex = BITFIELD(0),
         TMemoryHeapFlags_AllocAsPile = BITFIELD(2),
-    };
-
-    struct TMemoryContext
-    {
-        typedef void* (*t_Malloc)(size_t size);
-        typedef void* (*t_Calloc)(size_t nitems, size_t size);
-        typedef void* (*t_Realloc)(void* ptr, size_t size);
-        typedef void  (*t_Idk)(void* ptr, size_t size);
-        typedef void* (*t_Memalign)(size_t alignment, size_t size);
-        typedef void  (*t_Free)(void* ptr);
-
-        t_Malloc s_cbMalloc;
-        t_Calloc s_cbCalloc;
-        t_Realloc s_cbRealloc;
-        t_Idk s_cbIdk;           // this one is unused and I don't know what it is
-        t_Memalign s_cbMemalign;
-        t_Free s_cbFree;
-
-        void* s_Sysheap;
-        void* s_Heap;
     };
 
     class TMemory

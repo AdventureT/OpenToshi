@@ -18,6 +18,20 @@ if (TStringManager::String8Compare(propName1, propName2, -1) == 0) \
 	return TTRUE; \
 }
 
+#define TXUI_TYPEINFO_INIT(class_name) \
+						 protected: struct TXUITypeInfo \
+                         { \
+							const wchar_t* m_wsClassName; \
+	                        const TXUITypeInfo* m_pParent; \
+                         }; \
+                         private: static inline const TXUITypeInfo sm_sTypeInfo = { class_name, TNULL }; \
+                         public: static const TXUITypeInfo* GetTypeInfoStatic() { return &sm_sTypeInfo; } \
+                         public: virtual const TXUITypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } 
+
+#define TXUI_TYPEINFO(class_name, parent) private: static inline const TXUITypeInfo sm_sTypeInfo = { class_name, parent::GetTypeInfoStatic() }; \
+                         public: static const TXUITypeInfo* GetTypeInfoStatic() { return &sm_sTypeInfo; } \
+                         public: virtual const TXUITypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } 
+
 #define TXUI_PROPTYPE_TO_READFLAG(propType) (1 << propType)
 #define TXUI_CHECK_READFLAG(flag, propType) (flag & TXUI_PROPTYPE_TO_READFLAG(propType))
 
@@ -97,8 +111,9 @@ namespace Toshi
 
 	class XURXUIElementData : public XURXUIObjectData
 	{
+		TXUI_TYPEINFO_INIT(XUI_CLASS_ELEMENT);
+
 	public:
-		static constexpr const char* sm_sTypeInfo = "XURXUIElementData";
 
 		friend XURXUIObjectData;
 
@@ -117,8 +132,6 @@ namespace Toshi
 		}
 
 		~XURXUIElementData() = default;
-
-		virtual const char* GetTypeInfo() const { return sm_sTypeInfo; }
 
 		TBOOL Load(TXUIResource& resource, uint8_t*& a_pData);
 

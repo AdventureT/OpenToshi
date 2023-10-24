@@ -1,6 +1,7 @@
 #pragma once
 
 #define TGetClass(X) X::GetClassStatic()
+#define TFindClass(X, Y) TClass::Find(#X, TGetClass(Y))
 
 namespace Toshi
 {
@@ -42,7 +43,7 @@ namespace Toshi
 		void RecurseTree2(t_RecurceTreeCheck fCheck, t_RecurceTreeBaseBeginCb fBaseBegin, t_RecurceTreeBaseEndCb fBaseEnd, void* custom);
 		class TObject* CreateObject();
 
-		TBOOL IsA(TClass* pClass);
+		TBOOL IsA(const TClass* pClass) const;
 		TBOOL IsExactly(TClass* toCompare) const { return this == toCompare; }
 		TBOOL IsInitialized() const { return m_Initialized; }
 		TClass* GetParent() { return static_cast<TClass*>(m_Parent); }

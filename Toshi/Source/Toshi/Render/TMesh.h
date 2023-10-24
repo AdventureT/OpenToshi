@@ -17,6 +17,13 @@ namespace Toshi
 			Validated = BITFIELD(1),
 		};
 
+		struct TLockBuffer
+		{
+			int Unknown;             // 0x00
+			void* pVertexBufferData; // 0x08
+			void* pIndexBufferData;  // 0x2C
+		};
+
 	public:
 		TMesh()
 		{
@@ -83,12 +90,6 @@ namespace Toshi
 		TBOOL IsCreated() const
 		{
 			return m_State.IsSet(State::Created);
-		}
-
-	protected:
-		~TMesh()
-		{
-
 		}
 
 	protected:

@@ -1,27 +1,36 @@
 #pragma once
 #include "Toshi/Xui/TXUIButton.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_BEGIN
+
+class TXUIBackButton :
+	public TGenericClassDerived<TXUIBackButton, TXUIButton, "TXUIBackButton", TMAKEVERSION(1, 0), TFALSE>
 {
-	class XURXUIBackButtonData : public XURXUIButtonData
+
+};
+
+class XURXUIBackButtonData : public XURXUIButtonData
+{
+	TXUI_TYPEINFO(XUI_CLASS_BACKBUTTON, XURXUIButtonData)
+
+public:
+
+	XURXUIBackButtonData() : XURXUIButtonData()
 	{
-	public:
-		static constexpr const char* sm_sTypeInfo = "XURXUIBackButtonData";
+		m_pClass = TFindClass(TXUIBackButton, TXUIButton);
+	}
 
-	public:
-		virtual const char* GetTypeInfo() const { return sm_sTypeInfo; }
+public:
+	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType);
 
-		virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType);
+	virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType);
 
-		virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType);
+	virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType);
 
-		virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType);
+	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType);
+	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
 
-		virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType);
-		virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
+	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData);
+};
 
-		virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData);
-	};
-}
-
-
+TOSHI_NAMESPACE_END

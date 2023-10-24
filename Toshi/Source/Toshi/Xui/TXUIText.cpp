@@ -2,19 +2,6 @@
 #include "TXUIText.h"
 #include "XURReader.h"
 
-Toshi::XURXUITextData::XURXUITextData() : Toshi::XURXUIElementData()
-{
-	m_Text = 0;
-	m_TextColor = 0xFF000000;
-	m_DropShadowColor = 0x80000000;
-	m_PointSize = sm_uiDefaultFontSize;
-	m_Font = 0;
-	m_TextStyle = 0x110;
-	m_LineSpacingAdjust = 0;
-	// this + 0x20 = TXUITEXT
-	// TClass::Find("TXUIText",(TClass *)&TXUIElement::m_sClass);
-}
-
 TBOOL Toshi::XURXUITextData::IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType)
 {
 	if (a_uiObjectIndex != 0)

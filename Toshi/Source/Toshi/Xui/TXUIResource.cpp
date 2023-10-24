@@ -7,15 +7,20 @@
 #include "TXUIGroup.h"
 #include "TXUIBackButton.h"
 #include "TXUIText.h"
+#include "TXUITextPresenter.h"
 #include "TXUIImage.h"
+#include "TXUIImagePresenter.h"
 #include "TXUIFigure.h"
 #include "TXUINineGrid.h"
 #include "XURReader.h"
 #include "TXUILabel.h"
 #include "TXUITabScene.h"
+#include "TXUIScrollEnd.h"
 #include "TXUISliderBar.h"
 #include "TXUICheckBox.h"
 #include "TXUIList.h"
+#include "TXUIListItem.h"
+#include "TXUIVisual.h"
 
 namespace Toshi {
 
@@ -162,26 +167,31 @@ namespace Toshi {
 		return TTRUE;
 	}
 
-	TBOOL TXUIResource::ReadDataSection(uint8_t* buffer, uint32_t size)
+	TBOOL TXUIResource::ReadDataSection(uint8_t* a_pData, uint32_t size)
 	{
-		XURReader reader(buffer);
+		XURReader reader(a_pData);
 
-		uint16_t rootNameId = reader.ReadUInt16();
+		uint8_t* pValidateEnd = a_pData + size;
+		uint16_t uiType = reader.ReadUInt16();
+
+		TASSERT(0 == TStringManager::String16Compare(GetString(uiType), _TS16("XuiCanvas")), "First Element is not XuiCanvas!");
+		m_pRoot = CreateObjectData(*this, uiType);
+		
 		uint8_t opcode = reader.ReadUInt8();
+		
+		m_pRoot->Load(*this, a_pData);
 
-		TASSERT(0 == TStringManager::String16Compare(GetString(rootNameId), _TS16("XuiCanvas")), "First Element is not XuiCanvas!");
-		m_pRoot = CreateObjectData(*this, rootNameId);
-		m_pRoot->Load(*this, buffer);
-
-		if ((opcode & 2) != 0)
+		if (HASFLAG(opcode & 2))
 		{
-			m_pRoot->LoadChildren(*this, buffer);
+			m_pRoot->LoadChildren(*this, a_pData);
 		}
 
-		if ((opcode & 4) != 0 && m_pRoot->LoadNamedFrames(*this, buffer) && (opcode & 2) != 0)
+		if (HASFLAG(opcode & 4) && m_pRoot->LoadNamedFrames(*this, a_pData) && HASFLAG(opcode & 2))
 		{
-			m_pRoot->LoadTimelines(*this, buffer);
+			m_pRoot->LoadTimelines(*this, a_pData);
 		}
+
+		TASSERT(pValidateEnd == a_pData);
 
 		return TTRUE;
 	}
@@ -323,10 +333,48 @@ namespace Toshi {
 		// TODO: insert return statement here
 	}
 
-	XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, uint16_t index)
+	TBOOL TXUIResource::CreateScene(uint32_t a_uiIndex)
 	{
-		if (index == 0) return TNULL;
-		return CreateObjectData(a_rResource, a_rResource.m_asStringTable[index]);
+		XURXUIObjectData* scene = FindScene(a_uiIndex);
+		if (!scene) 
+		{
+			scene = FindScene(a_uiIndex);
+			if (!scene) return TFALSE;
+		}
+		return CreateScene(GetString(scene->m_Index));
+	}
+
+	TBOOL TXUIResource::CreateScene(const wchar_t* a_wcName)
+	{
+		TIMPLEMENT();
+		return TFALSE;
+	}
+
+	XURXUIObjectData* TXUIResource::FindScene(uint32_t a_uiIndex)
+	{
+		if (a_uiIndex < m_pRoot->m_NumChildren)
+		{
+			return m_pRoot->m_Children[a_uiIndex]->m_pClass->IsA(TGetClass(TXUIScene)) ? m_pRoot->m_Children[a_uiIndex] : TNULL;
+		}
+		return TNULL;
+	}
+
+	XURXUIObjectData* TXUIResource::FindFirstScene(uint32_t a_uiIndex)
+	{
+		for (uint8_t i = 0; i < m_pRoot->m_NumChildren; i++)
+		{
+			if (m_pRoot->m_Children[a_uiIndex]->m_pClass->IsA(TGetClass(TXUIScene))) 
+			{
+				return m_pRoot->m_Children[a_uiIndex];
+			}
+		}
+		return TNULL;
+	}
+
+	XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, uint16_t a_uiType)
+	{
+		if (a_uiType == 0) return TNULL;
+		return CreateObjectData(a_rResource, a_rResource.GetString(a_uiType));
 	}
 
 	XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, const wchar_t* objectName)
@@ -349,8 +397,7 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiVisual"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIVisualData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiImage"), -1) == 0)
 		{
@@ -370,13 +417,11 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiImagePresenter"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIImagePresenterData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiTextPresenter"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUITextPresenterData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiNineGrid"), -1) == 0)
 		{
@@ -449,8 +494,7 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiScrollEnd"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIScrollEndData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiCaret"), -1) == 0)
 		{
@@ -459,8 +503,7 @@ namespace Toshi {
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiListItem"), -1) == 0)
 		{
-			TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-			return TNULL;
+			return new (TXUI::MemoryBlock()) XURXUIListItemData();
 		}
 		else if (TStringManager::String16Compare(objectName, _TS16("XuiHtmlPresenter"), -1) == 0)
 		{

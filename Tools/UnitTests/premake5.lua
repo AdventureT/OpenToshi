@@ -1,20 +1,18 @@
-project "BYard Level Compiler"
+project "UnitTests"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
 	characterset "ASCII"
-	
-	pchheader "pch.h"
-	pchsource "Source/pch.cpp"
+	staticruntime "on"
 
 	links
 	{
-		TOSHI_PROJECT_NAME
+		TOSHI_PROJECT_NAME,
 	}
 
 	files
 	{
 		"Source/**.h",
+		"Source/**.hpp",
 		"Source/**.cpp",
 	}
 
@@ -22,7 +20,8 @@ project "BYard Level Compiler"
 	{
 		"Source",
 		"%{wks.location}/Toshi/Source",
-		"%{IncludeDir.spdlog}"
+		"%{wks.location}/Shared/Source",
+		"%{IncludeDir.spdlog}",
 	}
 	
 	defines
@@ -39,13 +38,13 @@ project "BYard Level Compiler"
 			"TOSHI_CONSOLE",
 			"TOSHI_SKU_WINDOWS"
 		}
-	
+
 	filter "options:renderer=DX11"
 		defines
 		{
 			"TOSHI_RENDERER_DX11"
 		}
-		
+
 	filter "configurations:Debug"
 		kind "ConsoleApp"
 		runtime "Debug"
@@ -63,3 +62,4 @@ project "BYard Level Compiler"
 		runtime "Release"
 		defines "TOSHI_DIST"
 		optimize "On"
+		

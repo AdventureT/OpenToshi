@@ -4,18 +4,6 @@
 
 namespace Toshi {
 
-	XURXUISliderBarData::XURXUISliderBarData()
-	{
-		m_iRangeMin = 0;
-		m_iRangeMax = 100;
-		m_iValue = 0;
-		m_iStep = 1;
-		m_iAccelInc = 0;
-		m_iAccelTime = 0;
-		m_bVertical = TFALSE;
-		m_pClass = TClass::Find("TXUISliderBar", TGetClass(TXUIControl));
-	}
-
 	TBOOL XURXUISliderBarData::Load(TXUIResource& resource, uint8_t*& a_pData)
 	{
 		XURXUIControlData::Load(resource, a_pData);

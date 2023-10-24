@@ -71,7 +71,7 @@ namespace Toshi
 		};
 
 	public:
-		TRegMaterial() : TNode()
+		TRegMaterial()
 		{
 			m_State = 0;
 			m_pOrderTable = TNULL;

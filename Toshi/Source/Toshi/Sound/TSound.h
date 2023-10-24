@@ -67,8 +67,8 @@ namespace Toshi
 			return m_bInitialised;
 		}
 	
+		static TBOOL ErrorCheck(FMOD_RESULT error);
 	protected:	
-		TBOOL ErrorCheck(FMOD_RESULT error);
 		
 		TBOOL InitMem(void* poolmem, int poollen);
 		

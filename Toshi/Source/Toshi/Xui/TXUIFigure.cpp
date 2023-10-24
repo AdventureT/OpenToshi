@@ -1,6 +1,7 @@
 #include "ToshiPCH.h"
 #include "TXUIFigure.h"
 #include "XURReader.h"
+#include <Toshi/Xui/TXUI.h>
 
 namespace Toshi
 {
@@ -16,7 +17,7 @@ namespace Toshi
 
     uint32_t XURXUIFillData::GetTimelinePropSize(uint32_t propType)
     {
-        return propType != 2 ? 4 : 2;
+        return propType != PropType_FillTextureFileName ? 4 : 2;
     }
 
     TBOOL XURXUIFillData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
@@ -41,8 +42,6 @@ namespace Toshi
 
     TBOOL XURXUIFillData::Load(TXUIResource& resource, uint8_t*& a_pData)
     {
-        // TODO:!!!!! NOT FINISHED !!!!!!
-
         XURXUIObjectData::Load(resource, a_pData);
         
         if (*a_pData++ != 0)
@@ -56,7 +55,7 @@ namespace Toshi
             
             if (reader.ShouldReadThisProp(PropType_Gradient))
             {
-                TTODO("XURXUIGradientData");
+                m_Gradient.Load(resource, a_pData);
             }
 
             reader.ReadProperty<XUI_EPT_VECTOR>(PropType_FillTranslation, m_FillTranslation);
@@ -65,16 +64,8 @@ namespace Toshi
             reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapX, m_FillWrapX);
             reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapY, m_FillWrapY);
 
-            if (reader.ShouldReadThisProp(PropType_FillBrushFlags))
-            {
-                // there's nothing here in globs and de blob
-            }
-
-            if (reader.ShouldReadThisProp(PropType_Unknown2))
-            {
-                // there's nothing here in globs and de blob
-                // m_FillRotation = *a_pData++;
-            }
+            reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillBrushFlags, m_FillBrushFlags);
+            reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_Unknown, m_Unknown);
         }
 
         return TTRUE;
@@ -84,12 +75,12 @@ namespace Toshi
 
     TBOOL XURXUIStrokeData::IsColourPropType(uint32_t propType)
     {
-        return propType == 1;
+        return propType == PropType_StrokeColor;
     }
 
     TBOOL XURXUIStrokeData::IsFloatPropType(uint32_t propType)
     {
-        return propType == 0;
+        return propType == PropType_StrokeWidth;
     }
 
     uint32_t XURXUIStrokeData::GetTimelinePropSize(uint32_t propType)
@@ -107,7 +98,7 @@ namespace Toshi
 
     TBOOL XURXUIStrokeData::ValidateTimelineProp(uint32_t param_2)
     {
-        return param_2 < 2;
+        return param_2 < PropType_NUMOF;
     }
 
     TBOOL XURXUIStrokeData::Load(TXUIResource& resource, uint8_t*& a_pData)
@@ -140,7 +131,7 @@ namespace Toshi
 
     uint32_t XURXUIGradientData::GetTimelinePropSize(uint32_t propType)
     {
-        return propType == 0 ? 1 : 4;
+        return propType == PropType_FillGradientRadial ? 1 : 4;
     }
 
     TBOOL XURXUIGradientData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
@@ -161,6 +152,7 @@ namespace Toshi
     TBOOL XURXUIGradientData::Load(TXUIResource& resource, uint8_t*& a_pData)
     {
         XURXUIObjectData::Load(resource, a_pData);
+        XUIEPTUInt8 num;
 
         if (*a_pData++ != 0)
         {
@@ -172,21 +164,21 @@ namespace Toshi
 
             if (reader.ShouldReadThisProp(PropType_FillGradientStopPos))
             {
-                XUIEPTUInt8 num = reader.ReadEPTUInt8();
-                m_Stops = new XUIEPTFloat[num];
+                num = reader.ReadEPTUInt8();
+                m_StopPos = new (TXUI::MemoryBlock()) XUIEPTFloat[num];
 
-                for (size_t i = 0; i < num; i++)
+                for (XUIEPTUInt8 i = 0; i < num; i++)
                 {
-                    m_Stops[i] = reader.ReadEPTFloat();
+                    m_StopPos[i] = reader.ReadEPTFloat();
                 }
             }
 
             if (reader.ShouldReadThisProp(PropType_FillGradientStopColor))
             {
-                XUIEPTUInt8 num = reader.ReadEPTUInt8();
-                m_StopColors = new XUIEPTColor[num];
+                num = reader.ReadEPTUInt8();
+                m_StopColors = new (TXUI::MemoryBlock()) XUIEPTColor[num];
 
-                for (size_t i = 0; i < num; i++)
+                for (XUIEPTUInt8 i = 0; i < num; i++)
                 {
                     m_StopColors[i] = reader.ReadEPTColor();
                 }
@@ -274,6 +266,7 @@ namespace Toshi
         
             if (hasPoints)
             {
+                auto pCustData = resource.GetCust(points);
                 TTODO("Load points");
             }
         }
@@ -286,7 +279,7 @@ namespace Toshi
         if (a_uiObjectIndex == 0)
             return m_Stroke.ValidateTimelineProp(a_uiPropIndex);
         else if (a_uiObjectIndex == 3)
-            return m_Fill.ValidateTimelineProp(a_uiPropIndex);
+            return m_Fill.m_Gradient.ValidateTimelineProp(a_uiPropIndex);
         else
             return m_Fill.ValidateTimelineProp(a_uiPropIndex);
     }
@@ -296,7 +289,7 @@ namespace Toshi
         if (a_uiObjectIndex == 0)
             return m_Stroke.GetTimelinePropSize(a_uiPropIndex);
         else if (a_uiObjectIndex == 3)
-            return m_Fill.GetTimelinePropSize(a_uiPropIndex);
+            return m_Fill.m_Gradient.GetTimelinePropSize(a_uiPropIndex);
         else
             return m_Fill.GetTimelinePropSize(a_uiPropIndex);
     }
@@ -306,7 +299,7 @@ namespace Toshi
         if (a_uiObjectIndex == 0)
             return m_Stroke.IsFloatPropType(a_uiPropIndex);
         else if (a_uiObjectIndex == 3)
-            return m_Fill.IsFloatPropType(a_uiPropIndex);
+            return m_Fill.m_Gradient.IsFloatPropType(a_uiPropIndex);
         else
             return m_Fill.IsFloatPropType(a_uiPropIndex);
     }
@@ -316,7 +309,7 @@ namespace Toshi
         if (a_uiObjectIndex == 0)
             return m_Stroke.IsColourPropType(a_uiPropIndex);
         else if (a_uiObjectIndex == 3)
-            return m_Fill.IsColourPropType(a_uiPropIndex);
+            return m_Fill.m_Gradient.IsColourPropType(a_uiPropIndex);
         else
             return m_Fill.IsColourPropType(a_uiPropIndex);
     }

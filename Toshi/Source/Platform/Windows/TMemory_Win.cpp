@@ -95,8 +95,8 @@ typedef unsigned int flag_t;           /* The type of various bit flag sets */
 
 #define chunksize(p)        ((p)->head & ~(FLAG_BITS))
 
-namespace Toshi
-{
+namespace Toshi {
+
     void TMemory::Shutdown()
     {
         DestroyHeap(s_GlobalHeap);
@@ -137,35 +137,12 @@ namespace Toshi
         // Check if we should use default memory management methods
         if (m_Flags & Flags_NativeMethods)
         {
-            TMemory::s_Context.s_cbMalloc = [](size_t size) -> void*
-            {
-                return malloc(size);
-            };
-
-            TMemory::s_Context.s_cbCalloc = [](size_t nitems, size_t size) -> void*
-            {
-                return calloc(nitems, size);
-            };
-
-            TMemory::s_Context.s_cbRealloc = [](void* ptr, size_t size) -> void*
-            {
-                return realloc(ptr, size);
-            };
-
-            TMemory::s_Context.s_cbMemalign = [](size_t alignment, size_t size) -> void*
-            {
-                return malloc(size);
-            };
-
-            TMemory::s_Context.s_cbFree = [](void* ptr) -> void
-            {
-                free(ptr);
-            };
-
-            TMemory::s_Context.s_cbIdk = [](void* ptr, size_t size) -> void
-            {
-
-            };
+			TMemory::s_Context.s_cbMalloc = TMemoryContext::MallocNative;
+			TMemory::s_Context.s_cbCalloc = TMemoryContext::CallocNative;
+			TMemory::s_Context.s_cbRealloc = TMemoryContext::ReallocNative;
+			TMemory::s_Context.s_cbMemalign = TMemoryContext::MemalignNative;
+			TMemory::s_Context.s_cbFree = TMemoryContext::FreeNative;
+			TMemory::s_Context.s_cbIdk = TMemoryContext::IdkNative;
 
             return Error_Ok;
         }

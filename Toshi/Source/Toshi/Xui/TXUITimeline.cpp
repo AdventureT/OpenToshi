@@ -2,6 +2,7 @@
 #include "TXUITimeline.h"
 #include "XURReader.h"
 #include "TXUIFigure.h"
+#include <Toshi/Xui/TXUI.h>
 
 namespace Toshi
 {
@@ -30,7 +31,7 @@ namespace Toshi
 
 		m_iControlledChildStringID = reader.ReadEPTString();
 		m_uiNumTimelineProps = reader.ReadEPTUShort32();
-		m_aTimelineProps = new TimelineProp[m_uiNumTimelineProps];
+		m_aTimelineProps = new (TXUI::MemoryBlock()) TimelineProp[m_uiNumTimelineProps];
 
 		m_pControlledChild = m_pOwnerData->FindChildElementData(m_iControlledChildStringID);
 
@@ -86,7 +87,7 @@ namespace Toshi
 		TASSERT(m_uiNumKeyframes < 1000);
 
 		m_aKeyframeData.Create(m_uiNumKeyframes);
-		m_aTimelineValues = new XURXUIKeyframeData::Value[m_uiNumTimelineProps * m_uiNumKeyframes];
+		m_aTimelineValues = new (TXUI::MemoryBlock()) XURXUIKeyframeData::Value[m_uiNumTimelineProps * m_uiNumKeyframes];
 
 		for (XUIEPTUShort32 i = 0; i < m_uiNumKeyframes; i++)
 		{
