@@ -29,8 +29,7 @@ jobs:
       run: msbuild './Toshi (DX11).sln' -property:Configuration=Release
 
     - name: Run UnitTests
-      shell: bash
-      run: ./bin/UnitTests/UnitTests.exe
+      run: .\bin\Release_Windows_x86\UnitTests\UnitTests.exe
 
     - name: Publish Artifact
       uses: actions/upload-artifact@v2
