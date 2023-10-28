@@ -26,7 +26,8 @@ Clone the repository with the following commands:
 Then compile the generated solution and that's it
 
 ## Thirdparty libraries
+- [catch2](https://github.com/catchorg/Catch2)
+- [fmod](https://fmod.com/)
 - [premake](https://github.com/premake/premake-core)
 - [spdlog](https://github.com/gabime/spdlog)
-- [fmod](https://fmod.com/)
 - Fork of [theoraplay](https://github.com/InfiniteC0re/theoraplay)
