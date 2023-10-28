@@ -127,7 +127,7 @@ namespace Toshi
 
 	LRESULT CALLBACK TMSWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		TMSWindow* window = reinterpret_cast<TMSWindow*>(GetWindowLongA(hWnd, GWL_USERDATA));
+		TMSWindow* window = reinterpret_cast<TMSWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 		if (s_fnWndProcHandler != TNULL)
 		{
@@ -281,7 +281,7 @@ namespace Toshi
 		switch (uMsg)
 		{
 		case WM_CREATE:
-			SetWindowLongA(hWnd, GWL_USERDATA, lParam);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
 
 			DEV_BROADCAST_DEVICEINTERFACE NotificationFilter;
 

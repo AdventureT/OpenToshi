@@ -1309,7 +1309,7 @@ namespace Toshi
 		m_CurrentDepth.m_First.Parts.DepthFunc = comparisonFunc;
 	}
 
-	void TRenderDX11::DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, size_t iIndexCount, void* pIndexData, DXGI_FORMAT eFormat, void* pVertexData, size_t iStrideSize, size_t iStrides)
+	void TRenderDX11::DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT iIndexCount, void* pIndexData, DXGI_FORMAT eFormat, void* pVertexData, UINT iStrideSize, UINT iStrides)
 	{
 		int iIndexSize =
 			(eFormat == DXGI_FORMAT_R32_UINT) ? 4 :
@@ -1318,7 +1318,7 @@ namespace Toshi
 		TASSERT(iIndexSize != 0);
 
 		// Index buffer
-		size_t iIndexBufferSize = iIndexSize * iIndexCount;
+		UINT iIndexBufferSize = iIndexSize * iIndexCount;
 
 		if ((m_iImmediateIndexCurrentOffset + iIndexBufferSize) <= IMMEDIATE_INDEX_BUFFER_SIZE)
 		{
@@ -1333,7 +1333,7 @@ namespace Toshi
 		m_pDeviceContext->Unmap(m_MainIndexBuffer, 0);
 
 		// Vertex buffer
-		size_t iVertexBufferSize = iStrideSize * iStrides;
+		UINT iVertexBufferSize = iStrideSize * iStrides;
 
 		if ((m_iImmediateVertexCurrentOffset + iVertexBufferSize) <= IMMEDIATE_VERTEX_BUFFER_SIZE)
 		{
@@ -1380,7 +1380,7 @@ namespace Toshi
 	void TRenderDX11::CopyDataToTexture(ID3D11ShaderResourceView* pSRTex, UINT dataSize, void* src, UINT rowSize)
 	{
 		UINT uVar1;
-		size_t* copySize;
+		UINT* copySize;
 		char* _Src;
 		UINT leftSize;
 		D3D11_MAPPED_SUBRESOURCE dstPos;

@@ -405,7 +405,7 @@ namespace Toshi
 		void SetAlphaUpdate(TBOOL update);
 		void SetColorUpdate(TBOOL update);
 		void SetZMode(TBOOL depthEnable, D3D11_COMPARISON_FUNC comparisonFunc, D3D11_DEPTH_WRITE_MASK depthWriteMask);
-		void DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, size_t iIndexCount, void* pIndexData, DXGI_FORMAT eFormat, void* pVertexData, size_t iStrideSize, size_t iStrides);
+		void DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT iIndexCount, void* pIndexData, DXGI_FORMAT eFormat, void* pVertexData, UINT iStrideSize, UINT iStrides);
 		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT indexCount, ID3D11Buffer* pIndexBuffer, UINT indexBufferOffset, DXGI_FORMAT indexBufferFormat, ID3D11Buffer* pVertexBuffer, UINT pStrides, UINT pOffsets);
 		void DrawNonIndexed(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology, ID3D11Buffer* pVertexBuffer, UINT vertexCount, UINT strides, UINT startVertex, UINT offsets);
 		void CopyDataToTexture(ID3D11ShaderResourceView* pSRTex, UINT dataSize, void* src, UINT textureSize);
@@ -481,9 +481,9 @@ namespace Toshi
 		ID3D11Buffer* m_PixelBuffers[NUMBUFFERS];         // 0x7C0
 		size_t m_PixelBufferIndex;                        // 0x800
 		ID3D11Buffer* m_MainVertexBuffer;                 // 0x804
-		size_t m_iImmediateVertexCurrentOffset;           // 0x808
+		UINT m_iImmediateVertexCurrentOffset;             // 0x808
 		ID3D11Buffer* m_MainIndexBuffer;                  // 0x80C
-		size_t m_iImmediateIndexCurrentOffset;            // 0x810
+		UINT m_iImmediateIndexCurrentOffset;              // 0x810
 		TPriList<TOrderTable> m_OrderTables;              // 0x814
 		DepthPair m_CurrentDepth;                         // 0x820
 		DepthPair m_PreviousDepth;                        // 0x830

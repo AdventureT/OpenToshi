@@ -12,7 +12,7 @@ const char* g_szAssertFilename;
 size_t g_uiAssertLineNumber;
 const char* g_szAssertExpression;
 
-BOOL CALLBACK AssertionDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK AssertionDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
 	{
