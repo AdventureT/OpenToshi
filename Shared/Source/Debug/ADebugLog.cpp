@@ -52,7 +52,7 @@ void ADebugLog::Write(const char* a_szFormat, ...)
 	
 	va_list args;
 	va_start(args, a_szFormat);
-	Toshi::T2String8::FormatV(s_FmtStr, DEBUGLOG_FMTSTR_BUFLEN, a_szFormat, &args);
+	Toshi::T2String8::FormatV(s_FmtStr, DEBUGLOG_FMTSTR_BUFLEN, a_szFormat, args);
 	s_FmtStr[DEBUGLOG_FMTSTR_BUFLEN - 1] = '\0';
 	va_end(args);
 

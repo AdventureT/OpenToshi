@@ -27,7 +27,7 @@ namespace Toshi
 		TBOOL AllocBuffer(uint32_t size, TBOOL freeMemory = TTRUE);
 
 		static TString8 Format(const char* a_pcFormat, ...);
-		TString8& VFormat(const char* a_pcFormat, char* a_pcArgs);
+		TString8& VFormat(const char* a_pcFormat, va_list a_pcArgs);
 
 		void UndoForceSetData() { Reset(); }
 		void ForceSetData(char* a_cString, int a_ilength);
