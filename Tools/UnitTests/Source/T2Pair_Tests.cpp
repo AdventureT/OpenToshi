@@ -3,14 +3,9 @@
 
 TOSHI_NAMESPACE_USING
 
-TEST_CASE("GetFirst()", "[T2Pair]")
+TEST_CASE("GetFirst and GetSecond", "[T2Pair]")
 {
-	auto pair = T2Pair<int, float>(1, 1.0f);
+	T2Pair<int, float> pair = T2Pair<int, float>(1, 1.0f);
 	REQUIRE(pair.GetFirst() == 1);
-}
-
-TEST_CASE("GetSecond()", "[T2Pair]")
-{
-	auto pair = T2Pair<int, float>(1, 1.0f);
 	REQUIRE(pair.GetSecond() == 1.0f);
 }

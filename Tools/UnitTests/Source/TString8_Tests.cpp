@@ -12,3 +12,16 @@ TEST_CASE("String compare", "[TString8]")
 	REQUIRE(str[3] == 't');
 	REQUIRE_FALSE(str.IsIndexValid(5));
 }
+
+TEST_CASE("String concatination", "[TString8]")
+{
+	TString8 str("Test");
+	str.Concat(" 123");
+	REQUIRE(str == "Test 123");
+}
+
+TEST_CASE("String formatting", "[TString8]")
+{
+	TString8 test = TString8::Format("%s %d %i", "Hello", 123, 321);
+	REQUIRE(test == "Hello 123 321");
+}
