@@ -1,5 +1,7 @@
 #include "ToshiPCH.h"
 #include "TLogFile.h"
+#include <DbgHelp.h>
+#include TOSHI_MULTIPLATFORM(TNativeFile)
 
 namespace Toshi
 {
@@ -24,8 +26,11 @@ namespace Toshi
 			return Error::AlreadyCreated;
 		}
 
-		TIMPLEMENT_D("uVar1 = FUN_008289A0(fileName);");
-		TIMPLEMENT_D("FUN_00828A40(uVar1);");
+		TString8 drive;
+		TString8 dir;
+
+		char* path = TNativeFile::SplitPath(fileName, drive, dir);
+		TNativeFile::DirExists(path);
 
 		TFile::FileMode fileMode = writeExisting ?
 			TFile::FileMode_NoBuffer | TFile::FileMode_Write :
@@ -105,6 +110,8 @@ namespace Toshi
 			}
 		}
 	}
+
+
 
 	void TLogFile::Log(Type type, const char* str1, const char* str2, const char* format, ...)
 	{

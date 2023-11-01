@@ -23,7 +23,7 @@ class XURXUIGradientData : public XURXUIObjectData
 
 public:
 
-	XURXUIGradientData() : XURXUIObjectData()
+	XURXUIGradientData()
 	{
 
 	}
@@ -67,7 +67,7 @@ class XURXUIFillData : public XURXUIObjectData
 
 public:
 
-	XURXUIFillData() : XURXUIObjectData()
+	XURXUIFillData()
 	{
 		
 	}
@@ -111,7 +111,7 @@ class XURXUIStrokeData : public XURXUIObjectData
 
 public:
 
-	XURXUIStrokeData() : XURXUIObjectData()
+	XURXUIStrokeData()
 	{
 
 	}

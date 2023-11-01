@@ -20,7 +20,7 @@ class XURXUICheckBoxData : public XURXUIControlData
 
 public:
 
-	XURXUICheckBoxData() : XURXUIControlData()
+	XURXUICheckBoxData()
 	{
 		m_pClass = TFindClass(TXUICheckBox, TXUIControl);
 	}

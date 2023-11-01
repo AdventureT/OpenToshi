@@ -18,7 +18,8 @@ project (TOSHI_PROJECT_NAME)
 		"dxguid.lib",
 		"dxgi.lib",
 		"winmm.lib",
-		"dinput8.lib"
+		"dinput8.lib",
+		"dbghelp.lib"
 	}
 
 	includedirs

@@ -29,7 +29,7 @@ class XURXUITextData : public XURXUIElementData
 public:
 	static constexpr uint32_t sm_uiDefaultFontSize = 14;
 
-	XURXUITextData() : XURXUIElementData()
+	XURXUITextData()
 	{
 		m_Text = 0;
 		m_TextColor = 0xFF000000;

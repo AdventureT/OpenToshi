@@ -24,7 +24,7 @@ class XURXUIImagePresenterData : public XURXUIElementData
 
 public:
 
-	XURXUIImagePresenterData() : XURXUIElementData()
+	XURXUIImagePresenterData()
 	{
 		m_pClass = TFindClass(TXUIImagePresenter, TXUIElement);
 	}

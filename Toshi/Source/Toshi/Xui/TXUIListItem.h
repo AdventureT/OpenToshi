@@ -24,7 +24,7 @@ class XURXUIListItemData : public XURXUICheckBoxData
 
 public:
 
-	XURXUIListItemData() : XURXUICheckBoxData()
+	XURXUIListItemData()
 	{
 		m_pClass = TFindClass(TXUIListItem, TXUIControl);
 	}

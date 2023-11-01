@@ -26,7 +26,7 @@ class XURXUINineGridData : public XURXUIElementData
 
 public:
 
-	XURXUINineGridData() : XURXUIElementData()
+	XURXUINineGridData()
 	{
 		m_pClass = TFindClass(TXUINineGrid, TXUIElement);
 	}

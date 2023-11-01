@@ -20,7 +20,7 @@ class XURXUIListData : public XURXUIControlData
 
 public:
 
-	XURXUIListData() : XURXUIControlData()
+	XURXUIListData()
 	{
 		m_pClass = TFindClass(TXUIList, TXUIControl);
 	}

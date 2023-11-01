@@ -14,7 +14,7 @@ class XURXUILabelData : public XURXUIControlData
 
 public:
 
-	XURXUILabelData() : XURXUIControlData()
+	XURXUILabelData()
 	{
 		m_pClass = TFindClass(TXUILabel, TXUIControl);
 	}

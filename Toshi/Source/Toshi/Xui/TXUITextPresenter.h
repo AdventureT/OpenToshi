@@ -29,7 +29,7 @@ class XURXUITextPresenterData : public XURXUIElementData
 
 public:
 
-	XURXUITextPresenterData() : XURXUIElementData()
+	XURXUITextPresenterData()
 	{
 		m_TextColor = 0xFF000000;
 		m_DropShadowColor = 0x80000000;

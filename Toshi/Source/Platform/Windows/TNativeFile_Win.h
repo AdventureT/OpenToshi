@@ -31,6 +31,9 @@ namespace Toshi
         int FlushWriteBuffer();
         int ReadUnbuffered(LPVOID dst, size_t size);
 
+        static char* SplitPath(const TString8& a_rsFullPath, TString8& a_rsDrive, TString8& a_rsDir);
+        static TBOOL DirExists(char* a_pcStr);
+
     protected:
         TNativeFile(TNativeFileSystem* pFS);
 

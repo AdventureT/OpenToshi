@@ -25,7 +25,7 @@ class XURXUITabSceneData : public XURXUISceneData
 
 public:
 
-	XURXUITabSceneData() : XURXUISceneData()
+	XURXUITabSceneData()
 	{
 		m_pClass = TFindClass(TXUITabScene, TXUIScene);
 	}

@@ -15,7 +15,7 @@ class XURXUIGroupData : public XURXUIElementData
 
 public:
 
-	XURXUIGroupData() : XURXUIElementData()
+	XURXUIGroupData()
 	{
 		m_pClass = TFindClass(TXUIGroup, TXUIElement);
 	}

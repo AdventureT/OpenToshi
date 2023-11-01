@@ -15,7 +15,7 @@ class XURXUIBackButtonData : public XURXUIButtonData
 
 public:
 
-	XURXUIBackButtonData() : XURXUIButtonData()
+	XURXUIBackButtonData()
 	{
 		m_pClass = TFindClass(TXUIBackButton, TXUIButton);
 	}

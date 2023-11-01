@@ -23,7 +23,7 @@ class XURXUIImageData : public XURXUIElementData
 
 public:
 
-	XURXUIImageData() : XURXUIElementData()
+	XURXUIImageData()
 	{
 		m_pClass = TFindClass(TXUIImage, TXUIElement);
 	}

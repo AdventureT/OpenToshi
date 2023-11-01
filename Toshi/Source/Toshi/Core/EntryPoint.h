@@ -38,7 +38,7 @@ return TMain(__argc, __argv);
 #define TOSHI_TMEMORY_SIZE 64 * 1024 * 1024
 #endif
 
-static const char* GetOSName(OSVERSIONINFOEX& osVersionInfo)
+static const char* GetOSName(OSVERSIONINFOEXW& osVersionInfo)
 {
 	TBOOL isWorkstation = osVersionInfo.wProductType == VER_NT_WORKSTATION;
 
@@ -80,7 +80,7 @@ TOSHI_ENTRY
 	Toshi::TUtil::ToshiCreate(0, 0, memorySettings);
 	Toshi::TUtil::Log("Build Version %s", "0.28");
 
-	OSVERSIONINFOEX osVersionInfo = { };
+	OSVERSIONINFOEXW osVersionInfo = { };
 	osVersionInfo.dwOSVersionInfoSize = sizeof(osVersionInfo);
 
 	const char* osName = "unknown";
@@ -88,7 +88,7 @@ TOSHI_ENTRY
 
 	if (ntdll != NULL)
 	{
-		typedef void (WINAPI* t_RtlGetVersion) (OSVERSIONINFOEX*);
+		typedef void (WINAPI* t_RtlGetVersion) (OSVERSIONINFOEXW*);
 		auto RtlGetVersion = reinterpret_cast<t_RtlGetVersion>(GetProcAddress(ntdll, "RtlGetVersion"));
 		
 		if (RtlGetVersion != NULL)

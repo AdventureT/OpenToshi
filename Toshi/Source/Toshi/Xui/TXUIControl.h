@@ -30,7 +30,7 @@ class XURXUIControlData : public XURXUIElementData
 
 public:
 
-	XURXUIControlData() : XURXUIElementData()
+	XURXUIControlData()
 	{
 		m_pClass = TFindClass(TXUIControl, TXUIElement);
 	}

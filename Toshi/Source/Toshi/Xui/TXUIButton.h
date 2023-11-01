@@ -21,7 +21,7 @@ class XURXUIButtonData : public XURXUIControlData
 
 public:
 
-	XURXUIButtonData() : XURXUIControlData()
+	XURXUIButtonData()
 	{
 		m_pClass = TFindClass(TXUIButton, TXUIControl);
 	}

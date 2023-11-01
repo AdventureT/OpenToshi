@@ -20,7 +20,7 @@ class XURXUIScrollEndData : public XURXUIControlData
 
 public:
 
-	XURXUIScrollEndData() : XURXUIControlData()
+	XURXUIScrollEndData()
 	{
 		m_uiDirection = 0;
 		m_pClass = TFindClass(TXUIScrollEnd, TXUIControl);

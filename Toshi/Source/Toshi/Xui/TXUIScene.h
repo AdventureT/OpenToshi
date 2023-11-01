@@ -26,7 +26,7 @@ class XURXUISceneData : public XURXUIControlData
 
 public:
 
-	XURXUISceneData() : XURXUIControlData()
+	XURXUISceneData()
 	{
 		m_DefaultFocus = 0;
 		m_TransFrom = 0;

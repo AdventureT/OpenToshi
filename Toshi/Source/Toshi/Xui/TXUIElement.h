@@ -118,7 +118,7 @@ namespace Toshi
 		friend XURXUIObjectData;
 
 	public:
-		XURXUIElementData() : XURXUIObjectData()
+		XURXUIElementData()
 		{
 			m_Width = T2GUIElement::PackFloat(60.0f);
 			m_Height = T2GUIElement::PackFloat(30.0f);

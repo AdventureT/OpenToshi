@@ -16,7 +16,7 @@ class XURXUIVisualData : public XURXUIElementData
 
 public:
 
-	XURXUIVisualData() : XURXUIElementData()
+	XURXUIVisualData()
 	{
 		m_pClass = TFindClass(TXUIVisual, TXUIElement);
 	}
