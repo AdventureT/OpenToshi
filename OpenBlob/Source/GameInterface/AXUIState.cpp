@@ -6,6 +6,19 @@
 
 TOSHI_NAMESPACE_USING
 
+AXUIState::AXUIState(Asset& a_rAssets)
+{
+	TXUI* txui = TXUI::GetSingleton();
+	if (a_rAssets.m_iUnk5 == 0) {
+		TASSERT(TNULL != a_rAssets.m_sResourceName);
+		TXUIResource* res = txui->FindResource(a_rAssets.m_sResourceName);
+		if (a_rAssets.m_sAssetName == TNULL) {
+			txui->CreateScene(res, 0);
+		} else {
+
+		}
+	}
+}
 
 void AXUIState::SetSkin1(const char* a_szTRBFileName, const char* a_szXURFileName)
 {

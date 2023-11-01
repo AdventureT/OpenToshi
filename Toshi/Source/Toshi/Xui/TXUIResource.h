@@ -9,6 +9,7 @@
 TOSHI_NAMESPACE_BEGIN
 
 class XURXUIObjectData;
+class XURXUISceneData;
 
 class TXUIResource
 {
@@ -114,6 +115,7 @@ public:
 	TBOOL CreateScene(uint32_t a_uiIndex);
 	TBOOL CreateScene(const wchar_t* a_wcName);
 	XURXUIObjectData* FindScene(uint32_t a_uiIndex);
+	XURXUISceneData* FindScene(const wchar_t* a_wcName);
 	XURXUIObjectData* FindFirstScene(uint32_t a_uiIndex);
 
 	static XURXUIObjectData* CreateObjectData(TXUIResource& a_rResource, uint16_t a_uiType);
