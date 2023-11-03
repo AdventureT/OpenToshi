@@ -4,8 +4,7 @@
 
 constexpr uint32_t BUFFSIZE = 128;
 
-class AXUIState :
-	public Toshi::TGenericClassDerived<AXUIState, AGameState, "ATestState", TMAKEVERSION(1, 0), TTRUE>
+TOBJECT(AXUIState, AGameState, TTRUE)
 {
 
 	inline static char s_AssetLoadQueue[BUFFSIZE] = {};

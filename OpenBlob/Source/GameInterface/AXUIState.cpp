@@ -3,9 +3,7 @@
 #include "Toshi/Xui/TXUI.h"
 #include "Locale/ALocaleManager.h"
 
-
 TOSHI_NAMESPACE_USING
-
 
 void AXUIState::SetSkin1(const char* a_szTRBFileName, const char* a_szXURFileName)
 {
@@ -34,4 +32,3 @@ void AXUIState::SetSkin2(const char* a_szTRBFileName, const char* a_szXURFileNam
 	TStringManager::String8Copy(s_AssetLoadQueue + iLen + 1, a_szTRBFileName, BUFFSIZE - iLen + 1);
 	TXUI::GetSingleton()->SetSkin2(s_AssetLoadQueue, a_szXURFileName);
 }
-

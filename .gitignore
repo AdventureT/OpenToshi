@@ -367,3 +367,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 *.lib
+*.zip
