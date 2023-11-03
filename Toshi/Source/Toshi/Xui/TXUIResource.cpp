@@ -346,9 +346,7 @@ namespace Toshi {
 
 	TBOOL TXUIResource::CreateScene(const wchar_t* a_wcName)
 	{
-		XURXUISceneData* scene = FindScene(a_wcName);
-		if (!scene) return TFALSE;
-
+		TIMPLEMENT();
 		return TFALSE;
 	}
 
@@ -357,20 +355,6 @@ namespace Toshi {
 		if (a_uiIndex < m_pRoot->m_NumChildren)
 		{
 			return m_pRoot->m_Children[a_uiIndex]->m_pClass->IsA(TGetClass(TXUIScene)) ? m_pRoot->m_Children[a_uiIndex] : TNULL;
-		}
-		return TNULL;
-	}
-
-	XURXUISceneData* TXUIResource::FindScene(const wchar_t* a_wcName)
-	{
-		for (uint8_t i = 0; i < m_pRoot->m_NumChildren; i++)
-		{
-			XURXUIObjectData* child = m_pRoot->m_Children[i];
-			if (child->m_pClass->IsExactly(TGetClass(TXUIScene))
-				&& TStringManager::String16Compare(GetString(child->m_Index), a_wcName) == 0)
-			{
-				return TSTATICCAST(XURXUISceneData*, child);
-			}
 		}
 		return TNULL;
 	}

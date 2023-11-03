@@ -290,7 +290,12 @@ namespace Toshi
         {
             for (int i = 0; i < m_pHeader->m_i32SectionCount; i++)
             {
-                DestroySection(i);
+                auto sec = GetSectionInfo(i);
+
+                if (sec->m_Data != TNULL)
+                {
+                    m_MemDeallocator(AllocType_Unk1, sec->m_Data, sec->m_Unk1, sec->m_Unk2, m_MemUserData);
+                }
             }
 
             m_MemDeallocator(AllocType_Unk0, m_pHeader, 0, 0, m_MemUserData);
@@ -304,33 +309,7 @@ namespace Toshi
     {
         if (allocator != TNULL)
         {
-            TASSERT(TNULL != deallocator);
-            /*s_cbDefAllocator = allocator;
-            s_cbDefDeallocator = deallocator;
-            s_pDefAllocatorUserData = allocatorUserData;*/
-            return;
-        }
-        TASSERT(deallocator == TNULL);
-        /*s_cbDefAllocator = [](TTRB::AllocType alloctype, size_t size, short unk1, size_t unk2, void* userData)
-        {
-            return TMemalign(size, unk1);
-        };
-        s_cbDefDeallocator = [](TTRB::AllocType alloctype, void* ptr, short unk1, size_t unk2, void* userData)
-        {
-            TFree(ptr);
-        };
-        s_pDefAllocatorUserData = TNULL;*/
-    }
-
-    void TTRB::DestroySection(int index)
-    {
-        TASSERT(index >= 0);
-        TASSERT(index < m_pHeader->m_i32SectionCount);
-        SecInfo* pSecInfo = GetSectionInfo(index);
-        TASSERT(TNULL != pSecInfo);
-        if (pSecInfo->m_Data) {
-            m_MemDeallocator(AllocType_Unk1, pSecInfo->m_Data, pSecInfo->m_Unk1, pSecInfo->m_Unk2, m_MemUserData);
-            pSecInfo->m_Data = TNULL;
+            TASSERT(deallocator != TNULL);
         }
     }
 }

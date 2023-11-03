@@ -129,8 +129,6 @@ namespace Toshi
 			return GetSectionInfoList() + index;
 		}
 
-		void DestroySection(int index);
-
 		TTRBSymbol* GetSymbol(int index) const
 		{
 			if (m_SYMB == TNULL)
