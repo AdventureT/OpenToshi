@@ -5,7 +5,6 @@
 #define TOSHI_TMEMORY_FLAGS Toshi::TMemory::Flags_NativeMethods
 
 // This file includes the entrypoint so set all the settings before including it
-
 #include "Toshi.h"
 
 #include <catch2/catch_session.hpp>

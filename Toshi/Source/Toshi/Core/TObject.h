@@ -5,11 +5,7 @@
 #include "Toshi/Memory/TMemory.h"
 #include "Toshi/Utils/TLog.h"
 
-#define TOBJECT(class_name, parent, instantiable) class class_name : \
-	public Toshi::TGenericClassDerived<class_name, parent, #class_name, TMAKEVERSION(1, 0), instantiable>
-
 namespace Toshi {
-
 
 	class TALIGNAS(4) TObject
 	{
