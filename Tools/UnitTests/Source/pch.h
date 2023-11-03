@@ -11,6 +11,7 @@
 #include <utility>
 
 /* Toshi Header Files */
+#undef TOSHI_DEBUG
 
 #include <Toshi/Typedefs.h>
 #include "Toshi/Core/STL.h"

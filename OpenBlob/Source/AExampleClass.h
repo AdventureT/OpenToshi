@@ -14,8 +14,7 @@
 // this is an example of registering and using TClass objects
 //-----------------------------------------------------------
 
-class AExampleClass :
-	public Toshi::TGenericClassDerived<AExampleClass, Toshi::TObject, "AExampleClass", TMAKEVERSION(1, 0), TFALSE>
+TOBJECT(AExampleClass, Toshi::TObject, TFALSE)
 {
 public:
 	AExampleClass();
