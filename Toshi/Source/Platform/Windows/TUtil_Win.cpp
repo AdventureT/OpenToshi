@@ -29,7 +29,7 @@ namespace Toshi
 
 			BOOL found = FindNextFileA(hFind, &ffd);
 
-			if (!found)
+			if (found == FALSE)
 			{
 				FindClose(hFind);
 				do

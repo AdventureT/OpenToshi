@@ -66,7 +66,7 @@ namespace Toshi
 
 	TRenderAdapter::Mode::Device* TD3DAdapter::Mode::GetDevice(int device)
 	{
-		TASSERT(device > 0 && device < NUMSUPPORTEDDEVICES);
+		TASSERT(device >= 0 && device < NUMSUPPORTEDDEVICES);
 		return &m_Devices[device];
 	}
 
@@ -239,19 +239,20 @@ namespace Toshi
 		UINT refreshRateNum = m_SwapChainDesc.BufferDesc.RefreshRate.Numerator;
 		UINT refreshRateDenom = m_SwapChainDesc.BufferDesc.RefreshRate.Denominator;
 		double refreshRate = (double)refreshRateNum / refreshRateDenom;
-
-		TOSHI_CORE_TRACE(L"CurrentDisplay: {0}", mode->GetDisplayName());
+		char displayName[TD3DAdapter::Mode::DISPLAYNAMESIZE + 1];
+		TStringManager::StringUnicodeToChar(displayName, mode->GetDisplayName(), -1);
+		TUtil::Log("CurrentDisplay: %s", displayName);
 		pSelectedMode = mode->GetDescription();
-		TOSHI_CORE_TRACE("CurrentDisplayMode = {0} x {1} ({2:.4f} Hz) = [{3} / {4}]", pSelectedMode->Width, pSelectedMode->Height, refreshRate, refreshRateNum, refreshRateDenom);
+		TUtil::Log("CurrentDisplayMode = %d x %d (%.4f Hz) = [%d / %d]", pSelectedMode->Width, pSelectedMode->Height, refreshRate, refreshRateNum, refreshRateDenom);
 		
 		if (m_DisplayParams.IsFullscreen)
 		{
-			TOSHI_CORE_TRACE("Set Fullscreen {0} x {1} ({2:.4f} Hz) = [{3} / {4}]", m_DisplayParams.Width, m_DisplayParams.Height, refreshRate, refreshRateNum, refreshRateDenom);
+			TUtil::Log("Set Fullscreen %d x %d (:.4f Hz) = [%d / %d]", m_DisplayParams.Width, m_DisplayParams.Height, refreshRate, refreshRateNum, refreshRateDenom);
 			m_Window.SetFullscreen();
 		}
 		else
 		{
-			TOSHI_CORE_TRACE("Set Windowed {0} x {1}", m_DisplayParams.Width, m_DisplayParams.Height);
+			TUtil::Log("Set Windowed %d x %d", m_DisplayParams.Width, m_DisplayParams.Height);
 			m_Window.SetWindowed();
 		}
 
@@ -371,7 +372,7 @@ namespace Toshi
 
 			if (SUCCEEDED(hRes2))
 			{
-				TOSHI_CORE_TRACE("Creating Main RT {0} x {1}", m_DisplayParams.Width, m_DisplayParams.Height);
+				TUtil::Log("Creating Main RT %d x %d", m_DisplayParams.Width, m_DisplayParams.Height);
 
 				{
 					// Texture 1
@@ -1756,6 +1757,8 @@ namespace Toshi
 
 				char adapter[128];
 				TStringManager::StringUnicodeToChar(adapter, adapterDesc->Description, -1);
+				d3dAdapter->SetDescription(adapter);
+
 				TUtil::Log("Adapter: %s", adapter);
 				TUtil::LogUp();
 				TUtil::Log("Vendor: %d, Device: %d Revision: %d", adapterDesc->VendorId, adapterDesc->DeviceId, adapterDesc->Revision);
@@ -1770,6 +1773,8 @@ namespace Toshi
 				dxgiAdapter->Release();
 				enumResult = pFactory->EnumAdapters(++adapterIndex, &dxgiAdapter);
 			}
+
+			if (pFactory) pFactory->Release();
 		}
 	}
 
