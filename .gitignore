@@ -366,5 +366,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-*.lib
-*.zip
+Tools/Vendor/Catch2/lib/*/*.lib
