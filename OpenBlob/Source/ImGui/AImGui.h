@@ -1,7 +1,7 @@
 #ifdef TOSHI_DEBUG
 
 #pragma once
-#include "imgui.h"
+#include "ImGui/imgui.h"
 
 #define AIMGUI_FORMAT(FORMAT, ...) ImGui::Text(FORMAT, __VA_ARGS__)
 #define AIMGUI_STRING(FIELDNAME) ImGui::Text(#FIELDNAME": %s", FIELDNAME)
