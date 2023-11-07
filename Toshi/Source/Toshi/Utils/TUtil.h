@@ -67,14 +67,12 @@ namespace Toshi
 
 		static void LogDown()
 		{
-			TUtil* util = Toshi::TUtil::GetSingletonSafe();
-			util->m_pLogFile2->Down();
+			GetLog()->Down();
 		}
 
 		static void LogUp()
 		{
-			TUtil* util = Toshi::TUtil::GetSingletonSafe();
-			util->m_pLogFile2->Up();
+			GetLog()->Up();
 		}
 
 	private:

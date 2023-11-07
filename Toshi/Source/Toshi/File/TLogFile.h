@@ -90,14 +90,14 @@ namespace Toshi
 		}
 
 	private:
-		TFile* m_pFile;                 // 0x00
-		int m_iTotalLogCount;           // 0x04
-		TBOOL m_bIsSimpleMode;           // 0x08
-		TBOOL m_bAllowIndentation;       // 0x09
-		char m_LevelString[cLevelMax];  // 0x0A
-		uint32_t m_curLevel;            // 0x2C
-		int m_typeCounts[Type_NUMOF];   // 0x30
-		int* m_unk2;                    // 0x34
-		int m_unk3;                     // 0x38
+		TFile* m_pFile;                      // 0x00
+		int m_iTotalLogCount;                // 0x04
+		TBOOL m_bIsSimpleMode;               // 0x08
+		TBOOL m_bAllowIndentation;           // 0x09
+		char m_LevelString[cLevelMax];       // 0x0A
+		uint32_t m_curLevel;                 // 0x2C
+		int m_typeCounts[Type_NUMOF];        // 0x30
+		int* m_unk2;                         // 0x34
+		int m_unk3;                          // 0x38
 	};
 }

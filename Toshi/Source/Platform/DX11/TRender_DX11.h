@@ -96,6 +96,7 @@ namespace Toshi
 
 		void UpdateAdapterInfo()
 		{
+			m_AdapterLuid = m_AdapterDesc.AdapterLuid;
 			m_VendorId = m_AdapterDesc.VendorId;
 			m_DeviceId = m_AdapterDesc.DeviceId;
 			m_SubSysId = m_AdapterDesc.SubSysId;
@@ -117,13 +118,22 @@ namespace Toshi
 			return &m_Mode;
 		}
 
+		const char* GetDescription()
+		{
+			return m_Description;
+		}
+
+		void SetDescription(const char a_pcDescription[128])
+		{
+			TStringManager::String8Copy(m_Description, a_pcDescription, sizeof(m_Description));
+		}
+
 	private:
 		DXGI_ADAPTER_DESC m_AdapterDesc; // 0x20
-		void* m_Unk1;                    // 0x138
-		void* m_Unk2;                    // 0x13C
-		void* m_Unk3;                    // 0x140
 		Mode m_Mode;                     // 0x144
 		size_t m_AdapterIndex;           // 0x228
+		char m_Description[128];         // 0x42B
+		LUID m_AdapterLuid;              // 0x62C
 		UINT m_VendorId;                 // 0x634
 		UINT m_DeviceId;                 // 0x638
 		UINT m_SubSysId;                 // 0x63C

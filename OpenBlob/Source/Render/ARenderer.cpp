@@ -18,6 +18,9 @@
 #include <Platform/DX11/TRender_DX11.h>
 #include <Platform/DX11/TRenderContext_DX11.h>
 #include <Platform/DX11/TPrimShader_DX11.h>
+#ifdef TOSHI_SKU_WINDOWS
+#include "ADisplayMode_Win.h"
+#endif
 
 using namespace Toshi;
 
@@ -140,8 +143,9 @@ TBOOL ARenderer::CreateTRender()
     renderer->Create();
 
     TRender::DisplayParams displayParams;
-
-    renderer->BuildAdapterDatabase();
+#ifdef TOSHI_SKU_WINDOWS
+    ADisplayMode_Win::Initialise();
+#endif
     auto adapterList = renderer->GetAdapterList();
     
     auto adapter = adapterList->Head()->As<TD3DAdapter>();
