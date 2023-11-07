@@ -94,11 +94,11 @@ namespace Toshi
 		WNDCLASSA wndClass = { };
 		wndClass.hIcon = LoadIconA(m_ModuleHandle, MAKEINTRESOURCEA(IDI_APPLICATION));
 		wndClass.hInstance = m_ModuleHandle;
-		wndClass.lpfnWndProc = (WNDPROC)WndProc;
+		wndClass.lpfnWndProc = WndProc;
 		wndClass.lpszClassName = className;
 		wndClass.style = CS_VREDRAW | CS_HREDRAW;
 		wndClass.cbWndExtra = 4;
-		wndClass.hCursor = LoadCursor(NULL, IDC_ARROW); 
+		wndClass.hCursor = LoadCursorA(NULL, IDC_ARROW); 
 		wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 		RegisterClassA(&wndClass);
 
