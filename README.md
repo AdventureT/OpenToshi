@@ -1,4 +1,4 @@
-# OpenToshi
+# OpenToshi [![Toshi](https://github.com/AdventureT/OpenToshi/actions/workflows/ci.yaml/badge.svg)](https://github.com/AdventureT/OpenToshi/actions/workflows/ci.yaml)
 Decompilation of the Toshi engine and Toshi games like de blob.
 
 # **SUPPORT THE DEVELOPERS OF THE TOSHI ENGINE**
