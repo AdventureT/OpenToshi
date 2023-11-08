@@ -3,9 +3,9 @@
 #ifdef TOSHI_DEBUG
 
 #include "AImGui.h"
-#include "imgui.h"
-#include "imgui_impl_dx11.h"
-#include "imgui_impl_win32.h"
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_dx11.h"
+#include "ImGui/imgui_impl_win32.h"
 
 #include "Cameras/ACameraManager.h"
 #include "GameInterface/AGameStateController.h"

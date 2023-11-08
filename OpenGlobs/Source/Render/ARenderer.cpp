@@ -3,7 +3,6 @@
 #include "AppBoot.h"
 #include "Render/AXYZViewportManager.h"
 #include "Movie/AMoviePlayer.h"
-#include "A2GUI/A2GUIRenderer_DX11.h"
 #include "GameInterface/AFrontEndMovieState.h"
 #include "Cameras/ACameraManager.h"
 #include "ImGui/AImGui.h"
@@ -15,6 +14,8 @@
 #include <Toshi/Shaders/SysShader/TSysShaderHAL.h>
 #include <Toshi2/T2GUI/T2GUI.h>
 #include <Toshi/Render/TOrderTable.h>
+
+#include TOSHI_MULTIRENDER(A2GUI/A2GUIRenderer)
 
 using namespace Toshi;
 
