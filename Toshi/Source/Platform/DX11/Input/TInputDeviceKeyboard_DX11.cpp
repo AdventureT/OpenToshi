@@ -77,7 +77,7 @@ namespace Toshi {
 		return TFALSE;
 	}
 
-	int TInputDXDeviceKeyboard::ProcessEvents(TEmitter<TInputInterface, TInputInterface::InputEvent>& emitter, float deltaTime)
+	int TInputDXDeviceKeyboard::ProcessEvents(EventEmitter& emitter, float deltaTime)
 	{
 		if (m_bIsUpdating)
 		{

@@ -23,7 +23,7 @@ namespace Toshi {
 		virtual void Release() override;
 		virtual void Update(float deltaTime) override;
 		virtual TBOOL Flush() override;
-		virtual int ProcessEvents(TEmitter<TInputInterface, TInputInterface::InputEvent>& emitter, float deltaTime) override;
+		virtual int ProcessEvents(EventEmitter& emitter, float deltaTime) override;
 		virtual int GetButtonCount() const override;
 		virtual TBOOL IsDown(int doodad) const override;
 		virtual TBOOL IsEnabled() const override;

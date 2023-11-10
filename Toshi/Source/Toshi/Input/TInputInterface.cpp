@@ -55,7 +55,7 @@ namespace Toshi
 		TBOOL bRet = TTRUE;
 		for (auto it = m_DeviceList.Begin(); it != m_DeviceList.End(); ++it)
 		{
-			bRet = it->Acquire();
+			bRet &= it->Acquire();
 		}
 		return bRet;
 	}
@@ -65,7 +65,7 @@ namespace Toshi
 		TBOOL bRet = TTRUE;
 		for (auto it = m_DeviceList.Begin(); it != m_DeviceList.End(); ++it)
 		{
-			bRet = it->Unacquire();
+			bRet &= it->Unacquire();
 		}
 		return bRet;
 	}
@@ -75,7 +75,7 @@ namespace Toshi
 		TBOOL bRet = TTRUE;
 		for (auto it = m_DeviceList.Begin(); it != m_DeviceList.End(); ++it)
 		{
-			bRet = it->Flush();
+			bRet &= it->Flush();
 		}
 		return bRet;
 	}

@@ -124,6 +124,9 @@ namespace Toshi {
 		static constexpr int INPUT_DEVICE_MOUSE_BUTTONS = 3;
 		static constexpr int INPUT_DEVICE_MOUSE_WHEEL = 4;
 
+		using EventEmitter = TEmitter<TInputInterface, TInputInterface::InputEvent>;
+		using Doodad = TINT;
+
 		struct DoodadProperties
 		{
 			int m_iUnk;
@@ -132,7 +135,9 @@ namespace Toshi {
 
 		struct RepeatInfo
 		{
-			int m_iDoodad;
+			Doodad iDoodad;
+			TFLOAT fLeftTime;
+			TFLOAT fRepeatTime;
 		};
 
 	public:
@@ -152,13 +157,13 @@ namespace Toshi {
 		virtual void Release() = 0;
 		virtual void Update(float deltaTime) = 0;
 		virtual TBOOL Flush() { return TTRUE; }
-		virtual int ProcessEvents(TEmitter<TInputInterface, TInputInterface::InputEvent>& emitter, float deltaTime) = 0;
+		virtual int ProcessEvents(EventEmitter& emitter, float deltaTime) = 0;
 		virtual int GetButtonCount() const = 0;
 		virtual int GetAxisCount() const = 0;
 		virtual TBOOL GetDoodadProperties(int doodad, DoodadProperties& doodadProps) const = 0;
-		virtual TBOOL StartRepeat(int param_1, float param_2, float param_3);
-		virtual TBOOL StopRepeat(int param_1);
-		virtual TBOOL StopAllRepeats();
+		virtual TBOOL StartRepeat(Doodad a_iDoodad, TFLOAT a_fFirstRepeatTime, TFLOAT a_fRepeatTime);
+		virtual void StopRepeat(Doodad a_iDoodad);
+		virtual void StopAllRepeats();
 		virtual TBOOL IsForceFeedbackDevice() { return TFALSE; }
 		virtual Platform GetPlatform() const = 0;
 		virtual const char* GetButtonFromDoodad(int a_iDoodad) const = 0;
@@ -166,7 +171,7 @@ namespace Toshi {
 		virtual int GetAxisInt(int doodad, int axis) const = 0;
 		virtual float GetAxisFloat(int doodad, int axis) const = 0;
 		virtual TBOOL IsEnabled() const = 0;
-		virtual void ThrowRepeatEvent(TEmitter<TInputInterface, TInputInterface::InputEvent>& emitter, RepeatInfo* repeatInfo, float deltaTime);
+		virtual void ThrowRepeatEvent(EventEmitter& emitter, RepeatInfo* repeatInfo, TFLOAT deltaTime);
 
 		TBOOL IsAcquired() const
 		{
@@ -189,7 +194,7 @@ namespace Toshi {
 		}
 
 	protected:
-		int ProcessRepeats(TEmitter<TInputInterface, TInputInterface::InputEvent>& emitter, float flt);
+		TINT ProcessRepeats(EventEmitter& a_rEmitter, TFLOAT a_fDeltaTime);
 
 	public:
 		static TInputDevice** GetRegisteredDevices()
@@ -209,12 +214,12 @@ namespace Toshi {
 		inline static size_t s_uiDeviceCount;
 
 	protected:
-		size_t m_uiDeviceIndex;             // 0x14
-		TArray<void*>::Storage m_Repeats;   // 0x18 FIXME: replace void* with some structure whose size is 0xC
-		TArray<void*>::Storage m_Array2;    // 0x28 FIXME: replace void* with some structure whose size is 0x4
-		TBOOL m_bUnknown;                   // 0x38
-		TBOOL m_bIsAcquired;                // 0x39 de blob 0x35 JPOG
-		TInputInterface* m_pInputInterface; // 0x3C
+		size_t m_uiDeviceIndex;                // 0x14
+		TArray<RepeatInfo>::Storage m_Repeats; // 0x18 FIXME: replace void* with some structure whose size is 0xC
+		TArray<void*>::Storage m_Array2;       // 0x28 FIXME: replace void* with some structure whose size is 0x4
+		TBOOL m_bUnknown;                      // 0x38
+		TBOOL m_bIsAcquired;                   // 0x39 de blob 0x35 JPOG
+		TInputInterface* m_pInputInterface;    // 0x3C
 	};
 
 }
