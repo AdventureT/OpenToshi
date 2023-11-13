@@ -53,6 +53,8 @@ namespace Toshi
 		TUINT32 GetVersion() const { return m_Version; }
 		TUINT16 GetVersionMajor() const { return m_Version >> 16; }
 		TUINT16 GetVersionMinor() const { return m_Version & 0xFFFF; }
+		TUINT32 GetMaxSizeOfDerivedClasses();
+		TUINT32 GetMaxAlignmentOfDerivedClasses();
 
 		// todo: move this function away from this class
 		static TBOOL TryInitialize(TClass* tClass);
