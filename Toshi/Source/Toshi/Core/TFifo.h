@@ -50,8 +50,8 @@ namespace Toshi
 			TGenericFifo::Destroy();
 		}
 
-		~TFifo(const TFifo&) = delete;
-		~TFifo(const TFifo&&) = delete;
+		TFifo(const TFifo&) = delete;
+		TFifo(TFifo&&) = delete;
 
 		TBOOL Push(T* element, Flags flags = TGenericFifo::Flags_None)
 		{
