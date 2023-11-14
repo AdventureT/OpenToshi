@@ -28,7 +28,7 @@ namespace Toshi
 		TFileStream()
 		{
 			/**
-			 * Author: InfiniteC0re
+			 * By InfiniteC0re
 			 * Took me two hours to find reason of crashes when using TFileStream.
 			 * Don't initialise objects in constructor like this:
 			 * m_Jobs = TFifo<TFileStreamJob*, 32>();
