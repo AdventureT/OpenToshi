@@ -23,28 +23,28 @@ namespace Toshi
 
 		enum class Pivot : uint8_t
 		{
-			TopRight,
-			TopCenter,
-			TopLeft,
-			MiddleRight,
-			MiddleCenter,
-			MiddleLeft,
-			BottomRight,
+			BottomLeft,
 			BottomCenter,
-			BottomLeft
+			BottomRight,
+			MiddleLeft,
+			MiddleCenter,
+			MiddleRight,
+			TopLeft,
+			TopCenter,
+			TopRight
 		};
 
 		enum class Anchor : uint8_t
 		{
-			TopRight,
-			TopCenter,
-			TopLeft,
-			MiddleRight,
-			MiddleCenter,
-			MiddleLeft,
-			BottomRight,
+			BottomLeft,
 			BottomCenter,
-			BottomLeft
+			BottomRight,
+			MiddleLeft,
+			MiddleCenter,
+			MiddleRight,
+			TopLeft,
+			TopCenter,
+			TopRight
 		};
 
 		typedef uint8_t FLAGS;
@@ -104,7 +104,7 @@ namespace Toshi
 			m_Children.PushFront(pElement);
 		}
 
-		void SetTransform(float x, float y, float angle = 90.0f / 180.0f * TMath::PI)
+		void SetTransform(float x, float y, float angle = 0.0f)
 		{
 			m_Transform.Reset();
 			m_Transform.GetPos().x = 0;

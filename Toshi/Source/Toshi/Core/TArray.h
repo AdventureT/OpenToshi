@@ -29,10 +29,34 @@ namespace Toshi {
 				}
 			}
 
-			void Bind(TArray& a_oArray) const
+			~Storage()
 			{
-				a_oArray->m_poArray = this;
-				a_oArray->m_iIndex = (m_iNumElements == 0) ? -1 : 0;
+				if (m_pData)
+				{
+					TFree(m_pData);
+				}
+			}
+
+			void Clear()
+			{
+				if (m_iNumAllocElements < 0)
+				{
+					if (m_pData)
+					{
+						TFree(m_pData);
+						m_pData = TNULL;
+					}
+
+					m_iNumAllocElements = 0;
+				}
+
+				m_iNumElements = 0;
+			}
+
+			void Bind(TArray& a_oArray)
+			{
+				a_oArray.m_poArray = this;
+				a_oArray.m_iIndex = (m_iNumElements == 0) ? -1 : 0;
 			}
 
 			int GetNumElements() const
@@ -59,6 +83,12 @@ namespace Toshi {
 			{
 				GrowBy(1);
 				(*this)[m_iNumElements++] = element;
+			}
+
+			T& Pop()
+			{
+				TASSERT(m_iNumElements >= 1);
+				return m_pData[--m_iNumElements];
 			}
 
 			T& operator[](int a_iIndex)

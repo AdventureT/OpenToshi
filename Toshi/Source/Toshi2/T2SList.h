@@ -40,6 +40,11 @@ namespace Toshi {
 		};
 
 	public:
+		~T2SList()
+		{
+			Clear();
+		}
+
 		T* Begin()
 		{
 			return m_oRoot.GetNext();

@@ -114,7 +114,7 @@ namespace Toshi {
 		return TFALSE;
 	}
 
-	int TInputDXDeviceMouse::ProcessEvents(TEmitter<TInputInterface, TInputInterface::InputEvent>& emitter, float deltaTime)
+	int TInputDXDeviceMouse::ProcessEvents(EventEmitter& emitter, float deltaTime)
 	{
 		DIDEVICEOBJECTDATA dod[32];
 		DWORD dwItems = 32;

@@ -27,7 +27,17 @@ namespace Toshi
 	public:
 		TFileStream()
 		{
-			m_Jobs = TFifo<TFileStreamJob*, 32>();
+			/**
+			 * By InfiniteC0re
+			 * Took me two hours to find reason of crashes when using TFileStream.
+			 * Don't initialise objects in constructor like this:
+			 * m_Jobs = TFifo<TFileStreamJob*, 32>();
+			 * 
+			 * Members that have default constructors are initialised automatically.
+			 * What the line does is constructs a new object on stack and calls copy
+			 * constructor on the object that is a member of class, so you just create
+			 * object twice.
+			 */
 		}
 
 		virtual ~TFileStream() = default;
