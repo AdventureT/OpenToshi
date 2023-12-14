@@ -260,11 +260,11 @@ namespace Toshi
 				TNode* curNode = m_Root.m_Next;
 				while (curNode != &m_Root && curNode->m_iPriority <= priority)
 				{
-					curNode = curNode->m_Next;
+					curNode = curNode->m_Next->m_Next;
 				}
 				node->m_Next = curNode;
-				node->m_Prev = curNode->m_Prev;
-				curNode->m_Prev = node;
+				node->m_Prev = curNode->m_Next->m_Prev;
+				curNode->m_Next->m_Prev = node;
 				node->m_Prev->m_Next = node;
 			}
 			else
