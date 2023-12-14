@@ -432,7 +432,7 @@ namespace Toshi
 		if (m_RBuffer != TNULL)
 		{
 			uint32_t curBufferPos = m_Position / BUFFER_SIZE * BUFFER_SIZE;
-			if ((curBufferPos == m_PrevBufferPos) && (m_Position - curBufferPos <= m_LastBufferSize - 1))
+			if ((curBufferPos == m_PrevBufferPos) && (m_Position - curBufferPos <= m_LastBufferSize - 2))
 			{
 				wchar_t c = *TREINTERPRETCAST(wchar_t*, &m_RBuffer[m_Position - curBufferPos]);
 				m_Position += sizeof(c);
@@ -441,7 +441,7 @@ namespace Toshi
 		}
 
 		wchar_t result;
-		if (Read(&result, sizeof(result)) != sizeof(result))
+		if (Read(&result, sizeof(result)) != 2)
 			return L'\xFFFF';
 
 		return result;
