@@ -35,8 +35,8 @@ void A2GUIBackground::SetupBackground()
 {
 	auto gui = T2GUI::GetSingleton();
 	
-	SetAnchor(Anchor::TopRight);
-	SetPivot(Pivot::TopRight);
+	SetAnchor(Anchor::BottomLeft);
+	SetPivot(Pivot::BottomLeft);
 
 	float width, height;
 	gui->GetRootElement()->GetDimensions(width, height);
@@ -77,7 +77,7 @@ void A2GUIBackground::SetupBackground()
 			pTile = new T2GUIPolygon;
 
 			pTile->Create(4);
-			pTile->SetAnchor(Anchor::TopRight);
+			pTile->SetAnchor(Anchor::BottomLeft);
 			pTile->SetPivot(Pivot::MiddleCenter);
 			
 			T2String8::Format(tgaName, "%s_%d.tga", m_pFileName, iTile + 1);

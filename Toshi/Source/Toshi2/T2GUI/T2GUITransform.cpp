@@ -7,12 +7,15 @@ namespace Toshi
 	{
 		float fCos;
 		float fSin;
-
 		TMath::SinCos(angle, fSin, fCos);
-		m_Rot[0].SetX(m_Rot[1].GetX() * fSin + m_Rot[0].GetX() * fCos);
-		m_Rot[0].SetY(m_Rot[1].GetY() * fSin + m_Rot[0].GetY() * fCos);
-		m_Rot[1].SetX(-m_Rot[0].GetX() * fSin + m_Rot[1].GetX() * fCos);
-		m_Rot[1].SetY(-m_Rot[0].GetY() * fSin + m_Rot[1].GetY() * fCos);
+
+		TFLOAT f0X = m_Rot[0].GetX();
+		TFLOAT f0Y = m_Rot[0].GetY();
+
+		m_Rot[0].SetX(m_Rot[0].GetX() * fCos + m_Rot[1].GetX() * fSin);
+		m_Rot[0].SetY(m_Rot[0].GetY() * fCos + m_Rot[1].GetY() * fSin);
+		m_Rot[1].SetX(-f0X * fSin + m_Rot[1].GetX() * fCos);
+		m_Rot[1].SetY(-f0Y * fSin + m_Rot[1].GetY() * fCos);
 	}
 
 	void T2GUITransform::GetInverse(T2GUITransform& outTransform)

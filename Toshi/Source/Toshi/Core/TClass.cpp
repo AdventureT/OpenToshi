@@ -162,6 +162,48 @@ namespace Toshi
 		return TFALSE;
 	}
 		
+	TUINT32 TClass::GetMaxSizeOfDerivedClasses()
+	{
+		auto GetMaxSizeOfClass = [](TClass* a_pClass, void* a_pSize) -> TBOOL
+		{
+			if (*(TUINT32*)a_pSize < a_pClass->m_Size)
+			{
+				*(TUINT32*)a_pSize = a_pClass->m_Size;
+			}
+
+			return TTRUE;
+		};
+
+		TUINT32 uiClassSize = 0;
+		if (GetMaxSizeOfClass(this, &uiClassSize))
+		{
+			RecurseTree2(GetMaxSizeOfClass, TNULL, TNULL, &uiClassSize);
+		}
+
+		return uiClassSize;
+	}
+
+	TUINT32 TClass::GetMaxAlignmentOfDerivedClasses()
+	{
+		auto GetMaxAlignmentOfClass = [](TClass* a_pClass, void* a_pAlignment) -> TBOOL
+		{
+			if (*(TUINT32*)a_pAlignment < a_pClass->m_Alignment)
+			{
+				*(TUINT32*)a_pAlignment = a_pClass->m_Alignment;
+			}
+
+			return TTRUE;
+		};
+
+		TUINT32 uiAlignment = 0;
+		if (GetMaxAlignmentOfClass(this, &uiAlignment))
+		{
+			RecurseTree2(GetMaxAlignmentOfClass, TNULL, TNULL, &uiAlignment);
+		}
+
+		return uiAlignment;
+	}
+
 	TBOOL TClass::TryInitialize(TClass* tClass)
 	{
 		if (!tClass->IsInitialized())

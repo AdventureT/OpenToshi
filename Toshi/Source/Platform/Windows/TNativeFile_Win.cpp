@@ -202,6 +202,7 @@ namespace Toshi
 
     char* TNativeFile::SplitPath(const TString8& a_rsFullPath, TString8& a_rsDrive, TString8& a_rsDir)
     {
+        // Move this from TNativeFile to TLogFile?
         char s[_MAX_PATH];
         char drive[_MAX_DRIVE];
         char dir[_MAX_DIR];
@@ -216,6 +217,7 @@ namespace Toshi
 
     TBOOL TNativeFile::DirExists(char* a_pcStr)
     {
+        // Move this from TNativeFile to TLogFile?
         int iLen = T2String8::Length(a_pcStr);
         if (iLen == 0) return TFALSE;
 
@@ -224,20 +226,31 @@ namespace Toshi
 
         T2String8::Copy(buffer, a_pcStr);
         iLen = T2String8::Length(buffer);
-        int i = 0;
-        for (; i < iLen; i++)
+
+        for (int i = 0; i < iLen; i++)
         {
-            if (buffer[i] == '/') buffer[i] == '\\';
+            if (buffer[i] == '/') buffer[i] = '\\';
         }
+
         BOOL dirExists = MakeSureDirectoryPathExists(buffer);
-        if (!dirExists)
+
+        if (dirExists == FALSE)
         {
-            LPSTR msgBuffer;
-            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), msgBuffer, 0, NULL);
+            LPSTR msgBuffer; // Is this valid? Compiler gives warnings and Ghidra uses &a_pcStr as an argument
+            FormatMessage(
+                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER, 
+                NULL,
+                GetLastError(),
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                msgBuffer,
+                0,
+                NULL
+            );
             LocalFree(msgBuffer);
         }
+
         delete buffer;
-        return dirExists;
+        return dirExists == TRUE;
     }
 
     size_t TNativeFile::Read(void* dst, size_t size)
@@ -418,16 +431,16 @@ namespace Toshi
             }
         }
 
-		char result;
-		if (Read(&result, sizeof(result)) != sizeof(result))
-			return -1;
+        char result;
+        if (Read(&result, sizeof(result)) != sizeof(result))
+            return -1;
 
         return result;
     }
 
-	wchar_t TNativeFile::GetWChar()
-	{
-		FlushWriteBuffer();
+    wchar_t TNativeFile::GetWChar()
+    {
+        FlushWriteBuffer();
 
 		if (m_RBuffer != TNULL)
 		{
@@ -440,14 +453,14 @@ namespace Toshi
 			}
 		}
 
-		wchar_t result;
-		if (Read(&result, sizeof(result)) != sizeof(result))
-			return L'\xFFFF';
+        wchar_t result;
+        if (Read(&result, sizeof(result)) != sizeof(result))
+            return L'\xFFFF';
 
-		return result;
-	}
+        return result;
+    }
 
-	int TNativeFile::CPrintf(const char* format, ...)
+    int TNativeFile::CPrintf(const char* format, ...)
     {
         va_list args; 
         va_start(args, format);

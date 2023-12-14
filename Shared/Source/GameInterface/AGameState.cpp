@@ -132,8 +132,8 @@ void AGameState::SetupLoadIcon()
 	sm_pLoadIconRect->SetColour(-1);
 	sm_pLoadIconMat = Toshi::T2GUI::GetSingleton()->CreateMaterial("loadicon.tga");
 	sm_pLoadIconRect->SetMaterial(sm_pLoadIconMat);
-	sm_pLoadIconRect->SetAnchor(Toshi::T2GUIElement::Anchor::BottomRight);
-	sm_pLoadIconRect->SetPivot(Toshi::T2GUIElement::Pivot::BottomRight);
+	sm_pLoadIconRect->SetAnchor(Toshi::T2GUIElement::Anchor::TopLeft);
+	sm_pLoadIconRect->SetPivot(Toshi::T2GUIElement::Pivot::TopLeft);
 }
 
 void AGameState::DestroyLoadIcon()

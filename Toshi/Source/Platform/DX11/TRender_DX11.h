@@ -321,6 +321,50 @@ namespace Toshi
 		TRenderDX11();
 		~TRenderDX11() = default;
 
+		virtual TBOOL CreateDisplay(DisplayParams* params) override;
+		virtual TBOOL DestroyDisplay() override { return TTRUE; }
+		virtual void Update(float deltaTime) override;
+		virtual void BeginScene() override;
+		virtual void EndScene() override;
+		virtual void* GetCurrentDevice() override { return TNULL; }
+		virtual DisplayParams* GetCurrentDisplayParams() override { return &m_DisplayParams; }
+		virtual TBOOL Create() override { return Create("de Blob"); }
+
+		virtual TBOOL RecreateDisplay(DisplayParams* pDisplayParams);
+		virtual void ShowDeviceError();
+		virtual void ShowDisplayError();
+
+		void CreateVSPS();
+		TBOOL Create(LPCSTR a_name);
+		HRESULT CreatePixelShader(const void* pShaderBytecode, SIZE_T BytecodeLength, ID3D11PixelShader** ppPixelShader);
+		HRESULT CreateVertexShader(const void* pShaderBytecode, SIZE_T BytecodeLength, ID3D11VertexShader** ppVertexShader);
+		ID3D11ShaderResourceView* CreateTexture(UINT width, UINT height, DXGI_FORMAT format, const void* srcData, uint8_t flags, D3D11_USAGE usage, uint32_t cpuAccessFlags, uint32_t sampleDescCount);
+		ID3D11RenderTargetView* CreateRenderTargetView(ID3D11ShaderResourceView* pShaderResourceView);
+		ID3D11SamplerState* CreateSamplerStateAutoAnisotropy(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressU, D3D11_TEXTURE_ADDRESS_MODE addressV, D3D11_TEXTURE_ADDRESS_MODE addressW, FLOAT mipLODBias, uint32_t borderColor, FLOAT minLOD, FLOAT maxLOD);
+		ID3D11SamplerState* CreateSamplerState(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressU, D3D11_TEXTURE_ADDRESS_MODE addressV, D3D11_TEXTURE_ADDRESS_MODE addressW, FLOAT mipLODBias, uint32_t borderColor, FLOAT minLOD, FLOAT maxLOD, UINT maxAnisotropy);
+		ID3D11Buffer* CreateBuffer(UINT flags, UINT dataSize, void* data, D3D11_USAGE usage, UINT cpuAccessFlags);
+
+		void SetVec4InVSBuffer(BufferOffset index, const void* src, int count = 1);
+		void SetVec4InPSBuffer(BufferOffset index, const void* src, int count = 1);
+
+		void SetDstAlpha(float alpha);
+		void SetBlendMode(TBOOL blendEnabled, D3D11_BLEND_OP blendOp, D3D11_BLEND srcBlendAlpha, D3D11_BLEND destBlendAlpha);
+		void SetAlphaUpdate(TBOOL update);
+		void SetColorUpdate(TBOOL update);
+		void SetZMode(TBOOL depthEnable, D3D11_COMPARISON_FUNC comparisonFunc, D3D11_DEPTH_WRITE_MASK depthWriteMask);
+		void DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT iIndexCount, void* pIndexData, DXGI_FORMAT eFormat, void* pVertexData, UINT iStrideSize, UINT iStrides);
+		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT indexCount, ID3D11Buffer* pIndexBuffer, UINT indexBufferOffset, DXGI_FORMAT indexBufferFormat, ID3D11Buffer* pVertexBuffer, UINT pStrides, UINT pOffsets);
+		void DrawNonIndexed(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology, ID3D11Buffer* pVertexBuffer, UINT vertexCount, UINT strides, UINT startVertex, UINT offsets);
+		void CopyDataToTexture(ID3D11ShaderResourceView* pSRTex, UINT dataSize, void* src, UINT textureSize);
+		void SetSamplerState(UINT startSlot, int samplerId, BOOL SetForPS);
+		void WaitForEndOfRender();
+		void ResolveSubresource();
+		void UpdateRenderStates();
+		void FlushConstantBuffers();
+
+		// Flushes all the order tables and renders the scene
+		void FlushShaders();
+
 		TMSWindow* GetWindow()
 		{
 			return &m_Window;
@@ -351,45 +395,6 @@ namespace Toshi
 			m_CurrentDepth.m_First.Raw = depthState.Raw;
 		}
 
-		static TRenderDX11* Interface()
-		{
-			return static_cast<TRenderDX11*>(TRender::GetSingleton());
-		}
-		
-	public:
-		virtual TBOOL CreateDisplay(DisplayParams* params) override;
-		virtual TBOOL DestroyDisplay() override { return TTRUE; }
-		virtual void Update(float deltaTime) override;
-		virtual void BeginScene() override;
-		virtual void EndScene() override;
-		virtual void* GetCurrentDevice() override { return TNULL; }
-		virtual DisplayParams* GetCurrentDisplayParams() override { return &m_DisplayParams; }
-		virtual TBOOL Create() override { return Create("de Blob"); }
-		
-		virtual TBOOL RecreateDisplay(DisplayParams* pDisplayParams);
-		virtual void ShowDeviceError();
-		virtual void ShowDisplayError();
-
-		static TBOOL IsColorEqual(const FLOAT a_Vec41[4], const FLOAT a_Vec42[4]);
-		static int GetTextureRowPitch(DXGI_FORMAT format, int width);
-		static int GetTextureDepthPitch(DXGI_FORMAT format, int width, int height);
-		static const char* GetFeatureLevel(D3D_FEATURE_LEVEL a_featureLevel);
-		static ID3DBlob* CompileShader(const char* srcData, LPCSTR pEntrypoint, LPCSTR pTarget, const D3D_SHADER_MACRO* pDefines);
-		static ID3DBlob* CompileShaderFromFile(const char* filepath, LPCSTR pEntrypoint, LPCSTR pTarget, const D3D_SHADER_MACRO* pDefines);
-
-		void CreateVSPS();
-		TBOOL Create(LPCSTR a_name);
-		HRESULT CreatePixelShader(const void* pShaderBytecode, SIZE_T BytecodeLength, ID3D11PixelShader** ppPixelShader);
-		HRESULT CreateVertexShader(const void* pShaderBytecode, SIZE_T BytecodeLength, ID3D11VertexShader** ppVertexShader);
-		ID3D11ShaderResourceView* CreateTexture(UINT width, UINT height, DXGI_FORMAT format, const void* srcData, uint8_t flags, D3D11_USAGE usage, uint32_t cpuAccessFlags, uint32_t sampleDescCount);
-		ID3D11RenderTargetView* CreateRenderTargetView(ID3D11ShaderResourceView* pShaderResourceView);
-		ID3D11SamplerState* CreateSamplerStateAutoAnisotropy(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressU, D3D11_TEXTURE_ADDRESS_MODE addressV, D3D11_TEXTURE_ADDRESS_MODE addressW, FLOAT mipLODBias, uint32_t borderColor, FLOAT minLOD, FLOAT maxLOD);
-		ID3D11SamplerState* CreateSamplerState(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressU, D3D11_TEXTURE_ADDRESS_MODE addressV, D3D11_TEXTURE_ADDRESS_MODE addressW, FLOAT mipLODBias, uint32_t borderColor, FLOAT minLOD, FLOAT maxLOD, UINT maxAnisotropy);
-		ID3D11Buffer* CreateBuffer(UINT flags, UINT dataSize, void* data, D3D11_USAGE usage, UINT cpuAccessFlags);
-
-		void SetVec4InVSBuffer(BufferOffset index, const void* src, int count = 1);
-		void SetVec4InPSBuffer(BufferOffset index, const void* src, int count = 1);
-		
 		void SetValueInVSBuffer(BufferOffset a_iIndex, const TMatrix44& a_rMatrix)
 		{
 			SetVec4InVSBuffer(a_iIndex, &a_rMatrix, 4);
@@ -410,26 +415,6 @@ namespace Toshi
 			SetVec4InPSBuffer(a_iIndex, &a_rVector, 1);
 		}
 
-		void SetDstAlpha(float alpha);
-		void SetBlendMode(TBOOL blendEnabled, D3D11_BLEND_OP blendOp, D3D11_BLEND srcBlendAlpha, D3D11_BLEND destBlendAlpha);
-		void SetAlphaUpdate(TBOOL update);
-		void SetColorUpdate(TBOOL update);
-		void SetZMode(TBOOL depthEnable, D3D11_COMPARISON_FUNC comparisonFunc, D3D11_DEPTH_WRITE_MASK depthWriteMask);
-		void DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT iIndexCount, void* pIndexData, DXGI_FORMAT eFormat, void* pVertexData, UINT iStrideSize, UINT iStrides);
-		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT indexCount, ID3D11Buffer* pIndexBuffer, UINT indexBufferOffset, DXGI_FORMAT indexBufferFormat, ID3D11Buffer* pVertexBuffer, UINT pStrides, UINT pOffsets);
-		void DrawNonIndexed(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology, ID3D11Buffer* pVertexBuffer, UINT vertexCount, UINT strides, UINT startVertex, UINT offsets);
-		void CopyDataToTexture(ID3D11ShaderResourceView* pSRTex, UINT dataSize, void* src, UINT textureSize);
-		void SetSamplerState(UINT startSlot, int samplerId, BOOL SetForPS);
-		void WaitForEndOfRender();
-
-		// Flushes all the order tables and renders the scene
-		void FlushShaders();
-
-		void ResolveSubresource();
-
-		void UpdateRenderStates();
-		void FlushConstantBuffers();
-
 		void ApplyFXAA()
 		{
 			m_pFXAA->Render(
@@ -437,11 +422,22 @@ namespace Toshi
 			);
 		}
 
+	public:
+		static TBOOL IsColorEqual(const FLOAT a_Vec41[4], const FLOAT a_Vec42[4]);
+		static int GetTextureRowPitch(DXGI_FORMAT format, int width);
+		static int GetTextureDepthPitch(DXGI_FORMAT format, int width, int height);
+		static const char* GetFeatureLevel(D3D_FEATURE_LEVEL a_featureLevel);
+		static ID3DBlob* CompileShader(const char* srcData, LPCSTR pEntrypoint, LPCSTR pTarget, const D3D_SHADER_MACRO* pDefines);
+		static ID3DBlob* CompileShaderFromFile(const char* filepath, LPCSTR pEntrypoint, LPCSTR pTarget, const D3D_SHADER_MACRO* pDefines);
 		static void RenderOverlay(float posX, float posY, float width, float height, ID3D11ShaderResourceView* pShaderResourceView, ID3D11PixelShader* pPixelShader, const TVector4* uvVec);
-	
+		
+		static TRenderDX11* Interface()
+		{
+			return TSTATICCAST(TRenderDX11*, TRender::GetSingleton());
+		}
+
 	private:
 		void BuildAdapterDatabase();
-
 		void Initialize();
 
 	public:

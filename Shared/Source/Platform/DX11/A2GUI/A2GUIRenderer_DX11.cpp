@@ -276,7 +276,7 @@ void A2GUIRenderer::RenderLine(float x1, float y1, float x2, float y2)
 	pVertex = pPrimShader->GetCurrentVertex();
 	pVertex->UV = TVector2::VEC_ZERO;
 	pVertex->Color = m_ui32Colour;
-	pVertex->Position = { x1, y2, 0.0f };
+	pVertex->Position = { x2, y2, 0.0f };
 	pPrimShader->AddVert();
 
 	pPrimShader->StopRendering();
