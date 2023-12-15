@@ -333,21 +333,21 @@ namespace Toshi {
 		// TODO: insert return statement here
 	}
 
-	TBOOL TXUIResource::CreateScene(uint32_t a_uiIndex)
+	TXUIScene* TXUIResource::CreateScene(uint32_t a_uiIndex)
 	{
 		XURXUIObjectData* scene = FindScene(a_uiIndex);
 		if (!scene) 
 		{
 			scene = FindScene(a_uiIndex);
-			if (!scene) return TFALSE;
+			if (!scene) return TNULL;
 		}
 		return CreateScene(GetString(scene->m_Index));
 	}
 
-	TBOOL TXUIResource::CreateScene(const wchar_t* a_wcName)
+	TXUIScene* TXUIResource::CreateScene(const wchar_t* a_wcName)
 	{
 		TIMPLEMENT();
-		return TFALSE;
+		return TNULL;
 	}
 
 	XURXUIObjectData* TXUIResource::FindScene(uint32_t a_uiIndex)

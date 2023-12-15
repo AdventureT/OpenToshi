@@ -41,16 +41,17 @@ public:
 	static inline const char* scm_sDefaultLevelPropertiesFileName = "Levels";
 
 public:
+	void* m_pSoundMempool;                        // 0x2C
 	ARenderer* m_Renderer;                        // 0x34
 	AGameStateController* m_pGameStateController; // 0x38
-	TBOOL m_bRenderWorld;                          // 0x48
+	TBOOL m_bRenderWorld;                         // 0x48
 	uint32_t m_Width;                             // 0x58
 	uint32_t m_Height;                            // 0x5C
-	TBOOL m_bUseDefaultHeightWidth;                // 0x60
-	TBOOL m_bIsFullscreen;                         // 0x61
-	TBOOL m_bUnk2;                                 // 0x60
-	TBOOL m_bLoadModelViewState;                   // 0x63
-	TBOOL m_bUnk3;                                 // 0x64
-	TBOOL m_bUnk4;                                 // 0x65
+	TBOOL m_bUseDefaultHeightWidth;               // 0x60
+	TBOOL m_bIsFullscreen;                        // 0x61
+	TBOOL m_bUnk2;                                // 0x60
+	TBOOL m_bLoadModelViewState;                  // 0x63
+	TBOOL m_bUnk3;                                // 0x64
+	TBOOL m_bUnk4;                                // 0x65
 	const char* m_szLevelPropertiesFileName;      // 0x68
 };

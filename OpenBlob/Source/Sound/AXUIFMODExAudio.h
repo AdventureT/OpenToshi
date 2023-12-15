@@ -20,7 +20,7 @@ public:
 	virtual void Stop(FMOD::Channel* a_pChannel) { if (a_pChannel) a_pChannel->stop(); }
 	virtual void SetVolume(FMOD::Channel* a_pChannel, TFLOAT a_fVolume) { if (a_pChannel) a_pChannel->setVolume(AOptions::GetSingleton()->GetPitch() * a_fVolume); }
 
-	int m_iNumSubSounds;            // 0x4
+	int m_iNumSubSounds;   // 0x4
 	FMOD::Sound* m_pSound; // 0x8
 };
 

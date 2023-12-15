@@ -49,6 +49,7 @@ private:
     void StopMovieIfPlaying();
 
     void StartMovie(Asset assetId);
+    void StartBlobFrontendMenu();
 
 private:
     A2GUIBackground m_Background; // 0x02C

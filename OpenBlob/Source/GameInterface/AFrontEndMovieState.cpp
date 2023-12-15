@@ -12,6 +12,8 @@
 #include TOSHI_MULTIRENDER(Movie/ADX11MoviePlayer)
 #endif // TOSHI_DEBUG
 #include "Input/AInputHelper.h"
+#include "Toshi/Xui/TXUI.h"
+#include "XUI/Frontend/ABlobFrontEnd.h"
 
 AGameState::UpdateResult AFrontEndMovieState::OnUpdate(float deltaTime)
 {
@@ -98,6 +100,7 @@ AGameState::UpdateResult AFrontEndMovieState::OnUpdate(float deltaTime)
             StopMovieIfPlaying();
             m_bSkip = TFALSE;
             TIMPLEMENT_D("Start Rendering Frontend menu");
+            StartBlobFrontendMenu();
         }
         break;
     }
@@ -210,6 +213,26 @@ void AFrontEndMovieState::StartMovie(Asset assetId)
     m_bSkip = TFALSE;
     m_Background.SetVisible(TFALSE);
     pPlayer->PlayMovie(s_Assets[assetId], 0, 0);
+}
+
+void AFrontEndMovieState::StartBlobFrontendMenu()
+{
+    TIMPLEMENT();
+#if 0
+    AGameStateController* pGameStateController = AGameStateController::GetSingleton();
+    Toshi::TXUI* pXui = Toshi::TXUI::GetSingleton();
+
+    if (AApplication::g_oTheApp.m_bUnk3) {
+        pGameStateController->ResetStack();
+        return;
+    }
+    else if (AApplication::g_oTheApp.m_bUnk4) {
+        return;
+    }
+    pGameStateController->ResetStack();
+    Toshi::TXUIScene* pFrontend = pXui->CreateScene(pXui->FindResource("frontend.xur"), 0);
+    TASSERT(pFrontend->IsA(TGetClass(ABlobFrontEnd)));
+#endif
 }
 
 #ifdef TOSHI_DEBUG

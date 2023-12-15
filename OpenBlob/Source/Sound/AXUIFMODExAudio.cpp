@@ -14,7 +14,7 @@ TBOOL AXUIFMODExAudio::Create(char* a_szSoundName)
 		if (!TSound::ErrorCheck(eResult))
 		{
 			eResult = m_pSound->getNumSubSounds(&m_iNumSubSounds);
-			return TSound::ErrorCheck(eResult);
+			return !TSound::ErrorCheck(eResult);
 		}
 	}
 	return TFALSE;

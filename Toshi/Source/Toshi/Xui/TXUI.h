@@ -3,6 +3,7 @@
 #include "TXUIRenderer.h"
 #include "TXUICanvas.h"
 #include "TXUIAudio.h"
+#include "TXUIScene.h"
 #include "Toshi/Utils/TSingleton.h"
 #include "Toshi2/T2GUI/T2GUIContext.h"
 #include "Toshi/File/TTRB.h"
@@ -36,7 +37,7 @@ class TXUI : public TSingleton<TXUI>
 public:
 	TXUI();
 
-	TBOOL CreateScene(TXUIResource* a_pResource, uint32_t a_uiIndex);
+	TXUIScene* CreateScene(TXUIResource* a_pResource, uint32_t a_uiIndex);
 
 	void AddResource(TXUIResourceTRB* a_pResourceTrb);
 	void RemoveResource(TXUIResourceTRB* a_pResourceTrb);

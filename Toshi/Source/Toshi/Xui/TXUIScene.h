@@ -6,6 +6,11 @@ TOSHI_NAMESPACE_BEGIN
 class TXUIScene :
 	public TGenericClassDerived<TXUIScene, TXUIControl, "TXUIScene", TMAKEVERSION(1, 0), TFALSE>
 {
+public:
+	TXUIScene()
+	{
+
+	}
 };
 
 class XURXUISceneData : public XURXUIControlData

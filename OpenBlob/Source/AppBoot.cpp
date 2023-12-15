@@ -83,8 +83,8 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 		Toshi::TXUI::ms_pXUITRBMemoryBlock = AMemory::GetPool(AMemory::POOL_XUI);
 		auto txui = Toshi::TXUI::CreateSingleton();
 
-		size_t poolSize = 128 * 1024 * 1024;
-		void* mempool = malloc(poolSize);
+		const size_t poolSize = 128 * 1024 * 1024;
+		void* mempool = Toshi::TMemory::GetGlobalHeap()->Memalign(0x20, poolSize);
 
 		TBOOL bResult = Toshi::TSound::CreateSingleton()->Create(mempool, poolSize, -1, -1, Toshi::TSound::SpeakerType_7POINT1);
 		TASSERT(TTRUE == bResult);
@@ -93,10 +93,14 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 		system->setFileSystem(NULL, NULL, NULL, NULL, NULL, NULL, 0);
 
 		// Doens't Load
+		
+		Toshi::TMemoryHeap* oldHeap = AXUIState::SetFontMemBlock(AMemory::GetPool(AMemory::POOL_XUI));
+
 		//AXUIState::SetSkin1("commonskin.trb", "commonskin.xur");
 		AXUIState::SetSkin2("frontendskin.trb", "frontendskin.xur");
 
 		txui->m_pAudio = new AXUIFMODExAudio();
+		AXUIState::SetFontMemBlock(oldHeap);
 
 		//Toshi::TInputInterface::CreateSingleton();
 
