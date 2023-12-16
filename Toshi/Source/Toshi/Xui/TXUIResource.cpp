@@ -359,6 +359,18 @@ namespace Toshi {
 		return TNULL;
 	}
 
+	XURXUIObjectData* TXUIResource::FindScene(const wchar_t* a_wcName)
+	{
+		for (int i = 0; i < m_pRoot->m_NumChildren; i++) {
+			if (m_pRoot->m_Children[i]->m_pClass->IsExactly(TGetClass(TXUIScene))) {
+				if (TStringManager::String16Compare(m_asStringTable[m_pRoot->m_Children[i]->m_Index], a_wcName) == 0) {
+					return m_pRoot->m_Children[i];
+				}
+			}
+		}
+		return TNULL;
+	}
+
 	XURXUIObjectData* TXUIResource::FindFirstScene(uint32_t a_uiIndex)
 	{
 		for (uint8_t i = 0; i < m_pRoot->m_NumChildren; i++)
