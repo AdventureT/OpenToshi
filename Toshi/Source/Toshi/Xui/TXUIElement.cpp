@@ -256,8 +256,11 @@ TXUIElement::TXUIElement()
 
 TBOOL TXUIElement::SkipRender()
 {
-	TIMPLEMENT();
-	return TFALSE;
+	// Skip Rendering since Scale is 0.0f and/or Opacity is 0.0f which you can't see
+	if (GetFlags_Opacity() == 0.0f || m_vScale.GetX() == 0.0f || m_vScale.GetY() == 0.0f) {
+		return TTRUE;
+	}
+	return T2GUIElement::SkipRender();
 }
 
 TBOOL TXUIElement::IsPaused() const
@@ -363,7 +366,7 @@ TBOOL TXUIElement::Create(TXUIResource& a_rResource, XURXUIElementData* a_pEleme
 		CreateChildren(a_rResource, a_pElementData);
 	}
 
-	if (GetClass() == TGetClass(TXUICanvas))
+	if (GetClass()->IsExactly(TGetClass(TXUICanvas)))
 	{
 		a_rResource.PopID();
 	}

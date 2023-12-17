@@ -212,10 +212,24 @@ namespace Toshi
 		public T2GUIElement
 	{
 	public:
+
+		static constexpr float FLOAT_QUALITY = 127;
+		static constexpr float FLOAT_SCALE = 1 / FLOAT_QUALITY;
+
 		using XUIState = uint32_t;
 
 		enum XUIState_ : XUIState
 		{
+			XUIState_ANCHOR_NONE         = BITFIELD(0),
+			XUIState_ANCHOR_LEFT         = BITFIELD(1),
+			XUIState_ANCHOR_TOP          = BITFIELD(2),
+			XUIState_ANCHOR_RIGHT        = BITFIELD(3),
+			XUIState_ANCHOR_BOTTOM       = BITFIELD(4),
+			XUIState_ANCHOR_HCENTER      = BITFIELD(5),
+			XUIState_ANCHOR_VCENTER      = BITFIELD(6),
+			XUIState_ANCHOR_XSCALE       = BITFIELD(7),
+			XUIState_ANCHOR_YSCALE       = BITFIELD(8),
+
 			XUIState_PAUSED              = BITFIELD(9),
 			XUIState_NOTIMELINERECURSION = BITFIELD(10),
 			XUIState_CLIPCHILDREN        = BITFIELD(16),
@@ -229,10 +243,31 @@ namespace Toshi
 	public:
 		TXUIElement();
 
+		static TFLOAT UnpackFloat(Float value)
+		{
+			return value * FLOAT_SCALE;
+		}
+
+		static Float PackFloat(float value)
+		{
+			return static_cast<Float>(value * FLOAT_QUALITY);
+		}
+
+		TFLOAT GetFlags_Opacity()
+		{
+			return UnpackFloat(m_eXUIState >> 0x19);
+		}
+
 		virtual TBOOL SkipRender() override;
 		virtual TBOOL IsPaused() const override;
 		virtual void SetHeight(float height) override;
 		virtual void SetWidth(float width) override;
+
+		virtual void SetXUIAnchoring(uint32_t a_flags, uint32_t a_mask = 0x3F)
+		{
+			TASSERT((a_flags & a_mask) == a_flags);
+			m_eXUIState = m_eXUIState & (~a_mask) | a_flags;
+		}
 
 		TBOOL Create(TXUIResource& a_rResource, XURXUIElementData* a_pElementData, TBOOL hasChildren);
 		void CreateChildren(TXUIResource& a_rResource, XURXUIElementData* a_pElementData);
