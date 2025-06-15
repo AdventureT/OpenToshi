@@ -1,13 +1,12 @@
 #pragma once
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TModelCollision
-	{
-	public:
+class TModelCollision
+{
+public:
+private:
+	TINT m_iNumCollisionModels;
+};
 
-	private:
-		int m_iNumCollisionModels;
-	};
-
-}
+TOSHI_NAMESPACE_END

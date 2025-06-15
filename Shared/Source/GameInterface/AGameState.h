@@ -4,19 +4,18 @@
 #include <Toshi2/T2DList.h>
 #include <Toshi2/T2GUI/T2GUIRectangle.h>
 
-class AGameState :
-	public Toshi::TGenericClassDerived<AGameState, Toshi::TObject, "AGameState", TMAKEVERSION(1, 0), TTRUE>,
-	public Toshi::T2DList<AGameState>::Node
+class AGameState : public Toshi::TGenericClassDerived<AGameState, Toshi::TObject, "AGameState", TMAKEVERSION(1, 0), TTRUE>
+    , public Toshi::T2DList<AGameState>::Node
 {
 public:
-	using State = uint8_t;
+	using State = TUINT8;
 	enum State_ : State
 	{
-		State_Null = 0,
+		State_Null      = 0,
 		State_Activated = BITFIELD(0),
-		State_Inserted = BITFIELD(1),
+		State_Inserted  = BITFIELD(1),
 		State_Suspended = BITFIELD(2),
-		State_Unk4 = BITFIELD(3),
+		State_Unk4      = BITFIELD(3),
 	};
 
 	using UpdateResult = uint32_t;
@@ -30,19 +29,19 @@ public:
 	AGameState();
 	virtual ~AGameState();
 
-	virtual void Unk1();
-	virtual TBOOL Unk2();
-	virtual void Unk3(void*, void*);
+	virtual void         Unk1();
+	virtual TBOOL        Unk2();
+	virtual void         Unk3(void*, void*);
 	virtual UpdateResult OnUpdate(float deltaTime);
-	virtual void OnInsertion();
-	virtual void OnRemoval();
-	virtual void OnSuspend();
-	virtual void OnResume(AGameState* pOldState);
-	virtual void OnActivate();
-	virtual void OnDeactivate();
-	virtual TBOOL CanActivateConsoleState();
-	virtual TBOOL CheckForControllerRemoval();
-	virtual TBOOL PauseOnControllerReinserted();
+	virtual void         OnInsertion();
+	virtual void         OnRemoval();
+	virtual void         OnSuspend();
+	virtual void         OnResume(AGameState* pOldState);
+	virtual void         OnActivate();
+	virtual void         OnDeactivate();
+	virtual TBOOL        CanActivateConsoleState();
+	virtual TBOOL        CheckForControllerRemoval();
+	virtual TBOOL        PauseOnControllerReinserted();
 
 #ifdef TOSHI_DEBUG
 	virtual void DEBUG_RenderImGui();
@@ -129,15 +128,14 @@ public:
 
 	TBOOL HandleMenuRequestToChangeState(uint32_t menuType)
 	{
-
 	}
 
 
 	static inline Toshi::T2GUIRectangle* sm_pLoadIconRect = TNULL;
-	static inline Toshi::T2GUIMaterial* sm_pLoadIconMat = TNULL;
+	static inline Toshi::T2GUIMaterial*  sm_pLoadIconMat  = TNULL;
 
 private:
-	Toshi::T2DList<AGameState> m_GameStates; // 0x0C
-	AInputHelperSimple m_InputHelperSimple;  // 0x14
-	State m_State;                           // 0x28
+	Toshi::T2DList<AGameState> m_GameStates;        // 0x0C
+	AInputHelperSimple         m_InputHelperSimple; // 0x14
+	State                      m_State;             // 0x28
 };

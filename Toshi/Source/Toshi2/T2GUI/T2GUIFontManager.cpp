@@ -3,17 +3,16 @@
 
 TBOOL Toshi::T2GUIFontDef2::Init()
 {
-    FindFontRef(m_font);
-    return TFALSE;
+	FindFontRef(m_font);
+	return TFALSE;
 }
 
-int* Toshi::FindFontRef(const char* a_font)
+TINT* Toshi::FindFontRef(const TCHAR* a_font)
 {
-    return TNULL;
+	return TNULL;
 }
 
-int* Toshi::FindFreeFontRef()
+TINT* Toshi::FindFreeFontRef()
 {
-    return TNULL;
+	return TNULL;
 }
-

@@ -4,9 +4,9 @@
 class AFreeCamera : public ACamera
 {
 public:
-	AFreeCamera() : ACamera(CT_FREE)
+	AFreeCamera()
+	    : ACamera(CT_FREE)
 	{
-
 	}
 
 	void PushRight(float fVal)
@@ -35,4 +35,3 @@ public:
 private:
 	float m_fFreeCamSpeed; // 0x104
 };
-

@@ -4,7 +4,7 @@
 ADebugLog::ADebugLog(const char* a_szBaseName, const char* a_szExtension, int a_iBufferCapacity)
 {
 	m_iBufUsedSize = 0;
-	m_iBufSize = a_iBufferCapacity;
+	m_iBufSize     = a_iBufferCapacity;
 
 	if (m_iBufSize <= 0)
 		m_iBufSize = 16384;
@@ -18,7 +18,7 @@ ADebugLog::ADebugLog(const char* a_szBaseName, const char* a_szExtension, int a_
 	Toshi::TStringManager::String8Copy(m_szBaseName, a_szBaseName);
 
 	auto iSecondaryNameLen = Toshi::TStringManager::String8Length(a_szExtension);
-	m_szExtension = TREINTERPRETCAST(char*, TMemalign(16, iSecondaryNameLen + 1));
+	m_szExtension          = TREINTERPRETCAST(char*, TMemalign(16, iSecondaryNameLen + 1));
 	Toshi::TStringManager::String8Copy(m_szExtension, a_szExtension);
 
 	m_pBuffer = TREINTERPRETCAST(char*, TMemalign(4, m_iBufSize));
@@ -36,10 +36,10 @@ void ADebugLog::CreateFile()
 {
 	char szBuffer[256];
 	Toshi::TStringManager::String8Format(szBuffer, sizeof(szBuffer), "%s.%s", m_szBaseName, m_szExtension);
-	
+
 	auto pFile = Toshi::TFile::Create(
-		szBuffer,
-		Toshi::TFile::FileMode_CreateNew | Toshi::TFile::FileMode_Write | Toshi::TFile::FileMode_NoBuffer
+	    szBuffer,
+	    Toshi::TFile::FileMode_CreateNew | Toshi::TFile::FileMode_Write | Toshi::TFile::FileMode_NoBuffer
 	);
 
 	TASSERT(pFile != TNULL);
@@ -49,7 +49,7 @@ void ADebugLog::CreateFile()
 void ADebugLog::Write(const char* a_szFormat, ...)
 {
 	static char s_FmtStr[DEBUGLOG_FMTSTR_BUFLEN];
-	
+
 	va_list args;
 	va_start(args, a_szFormat);
 	Toshi::T2String8::FormatV(s_FmtStr, DEBUGLOG_FMTSTR_BUFLEN, a_szFormat, args);
@@ -79,12 +79,12 @@ void ADebugLog::Flush()
 		m_iBufUsedSize = 0;
 
 		auto pFile = Toshi::TFile::Create(
-			szBuffer,
-			Toshi::TFile::FileMode_CreateNew | Toshi::TFile::FileMode_Write | Toshi::TFile::FileMode_NoBuffer
+		    szBuffer,
+		    Toshi::TFile::FileMode_CreateNew | Toshi::TFile::FileMode_Write | Toshi::TFile::FileMode_NoBuffer
 		);
 
 		TASSERT(pFile != TNULL);
-		
+
 		if (pFile)
 		{
 			pFile->Write(m_pBuffer, iWriteSize);

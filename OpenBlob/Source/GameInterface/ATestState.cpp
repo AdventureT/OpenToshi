@@ -6,7 +6,7 @@
 #include <Toshi2/T2GUI/T2GUI.h>
 #include <Toshi2/T2Map.h>
 
-AGameState::UpdateResult ATestState::OnUpdate(float deltaTime)
+AGameState::UpdateResult ATestState::OnUpdate(TFLOAT deltaTime)
 {
 	return UpdateResult_OK;
 }
@@ -23,7 +23,7 @@ void ATestState::OnInsertion()
 
 void ATestState::OnActivate()
 {
-	auto pGUI = Toshi::T2GUI::GetSingletonSafe();
+	auto pGUI         = Toshi::T2GUI::GetSingletonSafe();
 	auto pGUIRenderer = pGUI->GetRenderer();
 	auto pRootElement = pGUI->GetRootElement();
 
@@ -95,7 +95,7 @@ void ATestState::OnActivate()
 void ATestState::OnDeactivate()
 {
 	for (auto it = m_Elements.Begin(); it != m_Elements.End(); it++)
-		delete* it;
+		delete *it;
 
 	m_Elements.Clear();
 	m_Menu.Unlink();
@@ -105,6 +105,6 @@ void ATestState::OnDeactivate()
 void ATestState::DEBUG_RenderImGui()
 {
 	auto& position = ATestModel::GetSingletonSafe()->GetPosition();
-	ImGui::DragFloat3("Test model position", (float*)&position, 0.1f, -50.0f, 50.0f, "%.4f", 1);
+	ImGui::DragFloat3("Test model position", (TFLOAT*)&position, 0.1f, -50.0f, 50.0f, "%.4f", 1);
 }
 #endif // TOSHI_DEBUG

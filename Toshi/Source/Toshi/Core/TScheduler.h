@@ -4,221 +4,196 @@
 #include "TSystem.h"
 #include "TTask.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+class TTask;
+
+class TScheduler : public TGenericClassDerived<TScheduler, TObject, "TScheduler", TMAKEVERSION(1, 0), TFALSE>
 {
-	class TTask;
+public:
+	TScheduler();
 
-	class TScheduler :
-		public TGenericClassDerived<TScheduler, TObject, "TScheduler", TMAKEVERSION(1, 0), TFALSE>
+	virtual ~TScheduler() override { DestroyAllTasks(); }
+
+	// Creates task from TClass and binds it to this scheduler
+	TTask* CreateTask(TClass* pClass, TTask* pParent = TNULL);
+
+	// Updates tasks
+	void Update()
 	{
-	public:
-		TScheduler();
+		TFLOAT deltaTime = TSystemManager::GetSingletonSafe()->GetTimer()->GetDelta();
+		m_FrameCount += 1;
+		m_TotalTime += deltaTime;
+		m_DeltaTime = deltaTime;
 
-		virtual ~TScheduler() override
+		// Control delta time
+		if (deltaTime >= 0.0f)
 		{
-			DestroyAllTasks();
+			if (deltaTime >= m_MaxDeltaTime)
+			{
+				deltaTime = m_MaxDeltaTime;
+			}
+		}
+		else
+		{
+			deltaTime = 0.0f;
 		}
 
-		// Creates task from TClass and binds it to this scheduler
-		TTask* CreateTask(TClass* pClass, TTask* pParent = TNULL);
-		
-		// Updates tasks
-		void Update()
+		if (m_UseDebugDeltaTime)
 		{
-			float deltaTime = TSystemManager::GetSingletonSafe()->GetTimer()->GetDelta();
-			m_FrameCount += 1;
-			m_TotalTime += deltaTime;
-			m_DeltaTime = deltaTime;
+			// Constant delta time
+			m_DeltaTime = m_DebugDeltaTime;
+		}
 
-			// Control delta time
-			if (deltaTime >= 0.0f)
-			{
-				if (deltaTime >= m_MaxDeltaTime)
-				{
-					deltaTime = m_MaxDeltaTime;
-				}
-			}
-			else
-			{
-				deltaTime = 0.0f;
-			}
+		if (m_UseDebugDeltaTimeMult)
+		{
+			// Delta time multiplicator
+			m_DeltaTime *= m_DebugDeltaTimeMult;
+		}
 
-			if (m_UseDebugDeltaTime)
-			{
-				// Constant delta time
-				m_DeltaTime = m_DebugDeltaTime;
-			}
+		m_Timer.Update();
+		DestroyDyingTasks(m_TaskTree.AttachedToRoot());
+		UpdateActiveTasks(m_TaskTree.AttachedToRoot());
+		m_Timer.Update();
 
-			if (m_UseDebugDeltaTimeMult)
-			{
-				// Delta time multiplicator
-				m_DeltaTime *= m_DebugDeltaTimeMult;
-			}
-
-			m_Timer.Update();
-			DestroyDyingTasks(m_TaskTree.AttachedToRoot());
-			UpdateActiveTasks(m_TaskTree.AttachedToRoot());
-			m_Timer.Update();
-
-			deltaTime = m_Timer.GetDelta();
-			m_TasksUpdateTime = deltaTime;
+		deltaTime         = m_Timer.GetDelta();
+		m_TasksUpdateTime = deltaTime;
 
 #ifdef TOSHI_SKU_WINDOWS
-			if (m_UseFixedMaxFps && deltaTime < m_FixedMaxFps)
-			{
-				Sleep(static_cast<DWORD>((m_FixedMaxFps - deltaTime) * 1000));
-			}
+		if (m_UseFixedMaxFps && deltaTime < m_FixedMaxFps)
+		{
+			Sleep(static_cast<DWORD>((m_FixedMaxFps - deltaTime) * 1000));
+		}
 #endif
+	}
+
+	TBOOL IsFixedMaxFps() const { return m_UseFixedMaxFps; }
+
+	TFLOAT GetDebugDeltaTime() const { return m_DebugDeltaTime; }
+
+	void SetFixedMaxFps(TBOOL useFixedMaxFps, TFLOAT fixedMaxFps = 60.0f)
+	{
+		m_UseFixedMaxFps = useFixedMaxFps;
+		m_FixedMaxFps    = 1 / fixedMaxFps;
+	}
+
+	void SetDebugDeltaTimeMult(TBOOL useDebugDeltaTimeMult, TFLOAT debugDeltaTimeMult = 1.0f)
+	{
+		m_UseDebugDeltaTimeMult = useDebugDeltaTimeMult;
+		m_DebugDeltaTimeMult    = debugDeltaTimeMult;
+	}
+
+	void SetDebugDeltaTime(TBOOL useDebugDeltaTime, TFLOAT debugDeltaTime = 0.0f)
+	{
+		m_UseDebugDeltaTime = useDebugDeltaTime;
+		m_DebugDeltaTime    = debugDeltaTime;
+	}
+
+	void SetDebugPause(TBOOL pause)
+	{
+		if (pause)
+		{
+			m_DebugDeltaTime = 0.0f;
 		}
 
-		TBOOL IsFixedMaxFps() const
-		{
-			return m_UseFixedMaxFps;
-		}
+		m_UseDebugDeltaTime = pause;
+	}
 
-		float GetDebugDeltaTime() const
-		{
-			return m_DebugDeltaTime;
-		}
+	void SetDebugSlowTime(TBOOL slowTime) { m_MaxDeltaTime = slowTime ? s_DebugSlowMaxTimeDeltaAllowed : s_MaxTimeDeltaAllowed; }
 
-		void SetFixedMaxFps(TBOOL useFixedMaxFps, float fixedMaxFps = 60.0f)
-		{
-			m_UseFixedMaxFps = useFixedMaxFps;
-			m_FixedMaxFps = 1 / fixedMaxFps;
-		}
+	TFLOAT GetCurrentDeltaTime() const { return m_DeltaTime; }
 
-		void SetDebugDeltaTimeMult(TBOOL useDebugDeltaTimeMult, float debugDeltaTimeMult = 1.0f)
-		{
-			m_UseDebugDeltaTimeMult = useDebugDeltaTimeMult;
-			m_DebugDeltaTimeMult = debugDeltaTimeMult;
-		}
+	TFLOAT GetTotalTime() const { return m_TotalTime; }
 
-		void SetDebugDeltaTime(TBOOL useDebugDeltaTime, float debugDeltaTime = 0.0f)
-		{
-			m_UseDebugDeltaTime = useDebugDeltaTime;
-			m_DebugDeltaTime = debugDeltaTime;
-		}
+	TUINT32 GetFrameCount() const { return m_FrameCount; }
 
-		void SetDebugPause(TBOOL pause)
+	TNodeTree<TTask>* GetTree() { return &m_TaskTree; }
+
+	void DeleteTask(TTask* task)
+	{
+		task->OnPreDestroy();
+		DeleteTaskRecurse(task->Attached());
+		DeleteTaskAtomic(task);
+	}
+
+	void DestroyTask(TTask* task)
+	{
+		TASSERT(task->IsDying());
+		task->OnPreDestroy();
+
+		DeleteTaskRecurse(task->Attached());
+		DeleteTaskAtomic(task->Attached());
+	}
+
+private:
+	static void DestroyTaskRecurse(TTask* task)
+	{
+		TTask* currentTask = task;
+
+		while (currentTask != TNULL && currentTask != task)
 		{
-			if (pause)
+			currentTask->GetFlags() |= TTask::State_Dying;
+
+			if (currentTask->Attached() != TNULL)
 			{
-				m_DebugDeltaTime = 0.0f;
+				DestroyTaskRecurse(currentTask);
 			}
 
-			m_UseDebugDeltaTime = pause;
+			currentTask = currentTask->Next();
 		}
+	}
 
-		void SetDebugSlowTime(TBOOL slowTime)
-		{
-			m_MaxDeltaTime = slowTime ? s_DebugSlowMaxTimeDeltaAllowed : s_MaxTimeDeltaAllowed;
-		}
+	void DeleteTaskAtomic(TTask* task);
 
-		float GetCurrentDeltaTime() const
+	void DeleteTaskRecurse(TTask* task)
+	{
+		if (task != TNULL)
 		{
-			return m_DeltaTime;
-		}
+			TTask* currentTask = task->Prev();
 
-		float GetTotalTime() const
-		{
-			return m_TotalTime;
-		}
-		
-		uint32_t GetFrameCount() const
-		{
-			return m_FrameCount;
-		}
-		
-		TNodeTree<TTask>* GetTree()
-		{
-			return &m_TaskTree;
-		}
-
-		void DeleteTask(TTask* task)
-		{
-			task->OnPreDestroy();
-			DeleteTaskRecurse(task->Attached());
-			DeleteTaskAtomic(task);
-		}
-
-		void DestroyTask(TTask* task)
-		{
-			TASSERT(task->IsDying());
-			task->OnPreDestroy();
-
-			DeleteTaskRecurse(task->Attached());
-			DeleteTaskAtomic(task->Attached());
-		}
-
-	private:
-		static void DestroyTaskRecurse(TTask* task)
-		{
-			TTask* currentTask = task;
-
-			while (currentTask != TNULL && currentTask != task)
+			while (currentTask != TNULL)
 			{
-				currentTask->GetFlags() |= TTask::State_Dying;
-				
-				if (currentTask->Attached() != TNULL)
-				{
-					DestroyTaskRecurse(currentTask);
-				}
-
-				currentTask = currentTask->Next();
+				TTask* nextTask = (currentTask->Prev() != task) ? currentTask->Prev() : TNULL;
+				DeleteTaskAtomic(currentTask);
+				currentTask = nextTask;
 			}
 		}
+	}
 
-		void DeleteTaskAtomic(TTask* task);
-
-		void DeleteTaskRecurse(TTask* task)
+	void DestroyAllTasks()
+	{
+		if (m_TaskTree.AttachedToRoot() != TNULL)
 		{
-			if (task != TNULL)
-			{
-				TTask* currentTask = task->Prev();
-
-				while (currentTask != TNULL)
-				{
-					TTask* nextTask = (currentTask->Prev() != task) ? currentTask->Prev() : TNULL;
-					DeleteTaskAtomic(currentTask);
-					currentTask = nextTask;
-				}
-			}
+			DestroyTaskRecurse(m_TaskTree.AttachedToRoot());
+			DestroyDyingTasks(m_TaskTree.AttachedToRoot());
 		}
+	}
 
-		void DestroyAllTasks()
-		{
-			if (m_TaskTree.AttachedToRoot() != TNULL)
-			{
-				DestroyTaskRecurse(m_TaskTree.AttachedToRoot());
-				DestroyDyingTasks(m_TaskTree.AttachedToRoot());
-			}
-		}
+	// Destroys all the dying tasks from the first one to the last one
+	void DestroyDyingTasks(TTask* task);
 
-		// Destroys all the dying tasks from the first one to the last one
-		void DestroyDyingTasks(TTask* task);
+	// Updates all the active tasks from the last one to the first one
+	void UpdateActiveTasks(TTask* task);
 
-		// Updates all the active tasks from the last one to the first one
-		void UpdateActiveTasks(TTask* task);
+private:
+	static TFLOAT s_DebugSlowMaxTimeDeltaAllowed;
+	static TFLOAT s_MaxTimeDeltaAllowed;
 
-	private:
-		static float s_DebugSlowMaxTimeDeltaAllowed;
-		static float s_MaxTimeDeltaAllowed;
-			
-	private:
-		uint32_t m_Unk1;              // 0x04
-		TNodeTree<TTask> m_TaskTree;  // 0x08
-		float m_DeltaTime;            // 0x20
-		float m_TasksUpdateTime;      // 0x24
-		float m_TotalTime;            // 0x28
-		float m_MaxDeltaTime;         // 0x2C
-		uint32_t m_FrameCount;        // 0x30
-		uint32_t m_Unk2;              // 0x34
-		THPTimer m_Timer;             // 0x38
-		TBOOL m_UseDebugDeltaTime;     // 0x60
-		float m_DebugDeltaTime;       // 0x64
-		TBOOL m_UseDebugDeltaTimeMult; // 0x6D
-		float m_DebugDeltaTimeMult;   // 0x70
-		TBOOL m_UseFixedMaxFps;        // 0x74
-		float m_FixedMaxFps;          // 0x78
-	};
-}
+private:
+	TUINT32          m_Unk1;                  // 0x04
+	TNodeTree<TTask> m_TaskTree;              // 0x08
+	TFLOAT           m_DeltaTime;             // 0x20
+	TFLOAT           m_TasksUpdateTime;       // 0x24
+	TFLOAT           m_TotalTime;             // 0x28
+	TFLOAT           m_MaxDeltaTime;          // 0x2C
+	TUINT32          m_FrameCount;            // 0x30
+	TUINT32          m_Unk2;                  // 0x34
+	THPTimer         m_Timer;                 // 0x38
+	TBOOL            m_UseDebugDeltaTime;     // 0x60
+	TFLOAT           m_DebugDeltaTime;        // 0x64
+	TBOOL            m_UseDebugDeltaTimeMult; // 0x6D
+	TFLOAT           m_DebugDeltaTimeMult;    // 0x70
+	TBOOL            m_UseFixedMaxFps;        // 0x74
+	TFLOAT           m_FixedMaxFps;           // 0x78
+};
+
+TOSHI_NAMESPACE_END

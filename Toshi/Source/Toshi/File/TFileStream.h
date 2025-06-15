@@ -3,31 +3,32 @@
 #include "Toshi/Thread/TThread.h"
 #include "Toshi/File/TTRB.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TFileStreamJob
 {
-	class TFileStreamJob
+public:
+	friend class TFileStream;
+
+public:
+	TFileStreamJob(TSemaphore* semaphore)
+	    : m_pSemaphore(semaphore), m_bIsProcessed(TFALSE) {}
+
+	virtual ~TFileStreamJob() = default;
+
+	virtual void Process() = 0;
+
+protected:
+	TSemaphore* m_pSemaphore;
+	TBOOL       m_bIsProcessed;
+};
+
+class TFileStream : public TThread
+{
+public:
+	TFileStream()
 	{
-	public:
-		friend class TFileStream;
-
-	public:
-		TFileStreamJob(TSemaphore* semaphore) : m_pSemaphore(semaphore), m_bIsProcessed(TFALSE) { }
-
-		virtual ~TFileStreamJob() = default;
-
-		virtual void Process() = 0;
-
-	protected:
-		TSemaphore* m_pSemaphore;
-		TBOOL m_bIsProcessed;
-	};
-
-	class TFileStream : public TThread
-	{
-	public:
-		TFileStream()
-		{
-			/**
+		/**
 			 * By InfiniteC0re
 			 * Took me two hours to find reason of crashes when using TFileStream.
 			 * Don't initialise objects in constructor like this:
@@ -38,43 +39,43 @@ namespace Toshi
 			 * constructor on the object that is a member of class, so you just create
 			 * object twice.
 			 */
-		}
+	}
 
-		virtual ~TFileStream() = default;
-		
-		// This method will be executed by the thread
-		virtual void Main() override;
+	virtual ~TFileStream() = default;
 
-		// Adds job to the FIFO
-		void AddStream(TFileStreamJob* job);
+	// This method will be executed by the thread
+	virtual void Main() override;
 
-	private:
-		TFifo<TFileStreamJob*, 32> m_Jobs;
-	};
+	// Adds job to the FIFO
+	void AddStream(TFileStreamJob* job);
 
-	class TTRBStreamJob : public TFileStreamJob
+private:
+	TFifo<TFileStreamJob*, 32> m_Jobs;
+};
+
+class TTRBStreamJob : public TFileStreamJob
+{
+public:
+	TTRBStreamJob()
+	    : TFileStreamJob(TNULL)
 	{
-	public:
-		TTRBStreamJob() : TFileStreamJob(TNULL)
-		{
-			m_trb = TNULL;
-			m_fileName = TNULL;
-		}
+		m_trb      = TNULL;
+		m_fileName = TNULL;
+	}
 
-		virtual ~TTRBStreamJob() = default;
+	virtual ~TTRBStreamJob() = default;
 
-		virtual void Process()
-		{
-			m_trb->Load(m_fileName);
-		}
+	virtual void Process() { m_trb->Load(m_fileName); }
 
-		void Init(TTRB* trb, const char* fileName)
-		{
-			m_trb = trb;
-			T2String8::Copy(m_fileName, fileName, -1);
-		}
-	public:
-		TTRB* m_trb;
-		char* m_fileName;
-	};
-}
+	void Init(TTRB* trb, const TCHAR* fileName)
+	{
+		m_trb = trb;
+		T2String8::Copy(m_fileName, fileName, -1);
+	}
+
+public:
+	TTRB*  m_trb;
+	TCHAR* m_fileName;
+};
+
+TOSHI_NAMESPACE_END

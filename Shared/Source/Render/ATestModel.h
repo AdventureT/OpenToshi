@@ -5,8 +5,7 @@
 #include <Toshi/Render/TMesh.h>
 #include <Toshi/File/TTRB.h>
 
-class ATestModel :
-	public Toshi::TSingleton<ATestModel>
+class ATestModel : public Toshi::TSingleton<ATestModel>
 {
 public:
 	ATestModel();
@@ -22,13 +21,13 @@ private:
 	void CreateTriangle();
 
 private:
-	Toshi::TTRB m_AssetTRB;
+	Toshi::TTRB          m_AssetTRB;
 	Toshi::TSysMaterial* m_pCubeMaterial;
 	Toshi::TSysMaterial* m_pPlaneMaterial;
 	Toshi::TSysMaterial* m_pTriangleMaterial;
-	Toshi::TMesh* m_pCube;
-	Toshi::TMesh* m_pPlane;
-	Toshi::TMesh* m_pTriangle;
-	Toshi::TVector4 m_Position;
-	float m_CubeRotation = 0.0f;
+	Toshi::TMesh*        m_pCube;
+	Toshi::TMesh*        m_pPlane;
+	Toshi::TMesh*        m_pTriangle;
+	Toshi::TVector4      m_Position;
+	float                m_CubeRotation = 0.0f;
 };

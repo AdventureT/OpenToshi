@@ -11,10 +11,10 @@
 #include <utility>
 
 /* Toshi Header Files */
-#include "Toshi/Typedefs.h"
+#include "Toshi/Core/Core.h"
 #include "Toshi/Memory/TMemory.h"
 #include "Toshi/Core/STL.h"
-#include "Toshi/Core/Core.h"
+#include "Toshi/Core/Endianness.h"
 #include "Toshi/Core/TObject.h"
 #include "Toshi/Math/Math.h"
 #include "Toshi/Utils/TLog.h"
@@ -29,5 +29,7 @@
 
 /* Platform specific headers */
 #ifdef TOSHI_SKU_WINDOWS
-	#include <Windows.h>
+#  include <d3d11.h>
+#  include <dinput.h>
+#  include <Windows.h>
 #endif

@@ -20,8 +20,8 @@ void AModelLoader::GetMaterial(TShader* pShader, const char* pName, TMaterial*& 
 {
 	TASSERT(TAssetInit::GetInitialisingTRB());
 
-	pOutMaterial = TNULL;
-	auto pShaderPrefix = pShader->GetShaderPrefix();
+	pOutMaterial             = TNULL;
+	auto pShaderPrefix       = pShader->GetShaderPrefix();
 	auto iShaderPrefixLength = TStringManager::String8Length(pShaderPrefix);
 
 	if (iShaderPrefixLength == 0)
@@ -31,7 +31,7 @@ void AModelLoader::GetMaterial(TShader* pShader, const char* pName, TMaterial*& 
 	sFullMatName += pName;
 
 	auto pCreatedMaterial = GetCreatedMaterial(sFullMatName, TAssetInit::GetInitialisingTRB());
-	
+
 	if (!pCreatedMaterial)
 	{
 		char matName[128];
@@ -39,25 +39,25 @@ void AModelLoader::GetMaterial(TShader* pShader, const char* pName, TMaterial*& 
 		T2String8::ToLowerCase(matName);
 
 		TMaterialManager* pMatManager = TMaterialManager::GetSingleton();
-		auto metaMat = pMatManager->FindMaterial(matName);
+		auto              metaMat     = pMatManager->FindMaterial(matName);
 		TASSERT(TNULL != metaMat);
 
-		TTexture* pMatTexture = metaMat->GetTexture(0);
-		TBOOL bValidFormat = pMatTexture->CheckFormat();
-		
+		TTexture* pMatTexture  = metaMat->GetTexture(0);
+		TBOOL     bValidFormat = pMatTexture->CheckFormat();
+
 		TTODO("Create ASkinMaterial if the shader if ASkinShader");
 
 		TASSERT(!ms_oFreeMaterials.IsEmpty());
 		auto pMatNode = ms_oFreeMaterials.PopFront();
 
-		pMatNode->m_pTRB = TAssetInit::GetInitialisingTRB();
-		pMatNode->m_pMaterial = pCreatedMaterial;
+		pMatNode->m_pTRB            = TAssetInit::GetInitialisingTRB();
+		pMatNode->m_pMaterial       = pCreatedMaterial;
 		pMatNode->m_iReferenceCount = 1;
 		T2String8::Copy(pMatNode->m_Name, sFullMatName, 64);
 
 		if (sFullMatName.Length() >= 31)
 			sFullMatName[31] = '\0';
-		
+
 		pCreatedMaterial->SetName(sFullMatName);
 		ms_oMaterialList.PushFront(pMatNode);
 
@@ -90,9 +90,9 @@ TMaterial* AModelLoader::GetCreatedMaterial(const TString8& name, TTRB* pTRB)
 TBOOL AModelLoader::LoadTRBCallback2(TModel* pModel, TTMDWin::TTRBWinHeader* pHeader)
 {
 	pModel->m_iLODCount = pHeader->m_iLODCount;
-	pModel->m_fUnknown = pHeader->m_fUnknown;
+	pModel->m_fUnknown  = pHeader->m_fUnknown;
 
-	for (size_t i = 0; i < pHeader->m_iLODCount; i++)
+	for (TINT i = 0; i < pHeader->m_iLODCount; i++)
 	{
 		auto& lod = pModel->m_LODLevels[i];
 

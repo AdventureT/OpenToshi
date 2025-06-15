@@ -3,10 +3,8 @@
 
 TOSHI_NAMESPACE_BEGIN
 
-class TXUITabScene :
-	public TGenericClassDerived<TXUITabScene, TXUIScene, "TXUITabScene", TMAKEVERSION(1, 0), TFALSE>
-{
-};
+class TXUITabScene : public TGenericClassDerived<TXUITabScene, TXUIScene, "TXUITabScene", TMAKEVERSION(1, 0), TFALSE>
+{};
 
 class XURXUITabSceneData : public XURXUISceneData
 {
@@ -24,26 +22,22 @@ class XURXUITabSceneData : public XURXUISceneData
 	};
 
 public:
-
-	XURXUITabSceneData()
-	{
-		m_pClass = TFindClass(TXUITabScene, TXUIScene);
-	}
+	XURXUITabSceneData() { m_pClass = TFindClass(TXUITabScene, TXUIScene); }
 
 public:
-	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
-	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
-	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
-	virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType) override;
-	virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
-	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
+	virtual TBOOL   Load(TXUIResource& resource, TUINT8*& a_pData) override;
+	virtual TBOOL   ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex) override;
+	virtual TBOOL   TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType) override;
+	virtual TUINT32 GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
+	virtual TBOOL   IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
+	virtual TBOOL   IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
 
 private:
 	XUIEPTUnsigned m_uiTabCount;
-	XUIEPTBool m_bWrap;
-	XUIEPTBool m_bUserInterrupt;
-	XUIEPTBool m_bVerticalTabs;
-	XUIEPTBool m_bNoAutoHide;
+	XUIEPTBool     m_bWrap;
+	XUIEPTBool     m_bUserInterrupt;
+	XUIEPTBool     m_bVerticalTabs;
+	XUIEPTBool     m_bNoAutoHide;
 	XUIEPTUnsigned m_uiDefaultTab;
 };
 

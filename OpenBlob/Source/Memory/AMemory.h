@@ -4,7 +4,7 @@
 class AMemory
 {
 public:
-	typedef uint32_t Pool;
+	typedef TUINT32 Pool;
 	enum POOL_ : Pool
 	{
 		POOL_FrequentAllocations,
@@ -14,9 +14,9 @@ public:
 
 	struct PoolDefinitionInfo
 	{
-		const char* Name;
-		Pool Type;
-		uint32_t Size;
+		const TCHAR* Name;
+		Pool         Type;
+		TUINT32      Size;
 	};
 
 public:
@@ -39,6 +39,6 @@ public:
 	}
 
 public:
-	static PoolDefinitionInfo ms_aPoolDefinitionInfo[POOL_NumOf];
+	static PoolDefinitionInfo  ms_aPoolDefinitionInfo[POOL_NumOf];
 	static Toshi::TMemoryHeap* ms_apMemoryBlocks[POOL_NumOf];
 };

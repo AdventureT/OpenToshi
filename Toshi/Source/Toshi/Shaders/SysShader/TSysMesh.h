@@ -2,43 +2,42 @@
 #include "Toshi/Core/TObject.h"
 #include "Toshi/Render/TMesh.h"
 
-namespace Toshi {
-	
-	class TResource;
+TOSHI_NAMESPACE_START
 
-	class TSysMesh : 
-		public TGenericClassDerived<TSysMesh, TMesh, "TSysMesh", TMAKEVERSION(1, 0), TFALSE>
+class TResource;
+
+class TSysMesh : public TGenericClassDerived<TSysMesh, TMesh, "TSysMesh", TMAKEVERSION(1, 0), TFALSE>
+{
+public:
+	typedef TUINT32 FLAGS;
+	enum FLAGS_ : FLAGS
 	{
-	public:
-		typedef uint32_t FLAGS;
-		enum FLAGS_ : FLAGS
-		{
-			FLAGS_NONE   = 0,
-			FLAGS_LOCKED = 0x8000
-		};
-
-	public:
-		TSysMesh();
-
-		virtual TBOOL Validate() override;
-		virtual void Invalidate() override;
-		virtual TBOOL Create(FLAGS uiFlags, uint16_t uiMaxVertices, uint16_t uiMaxIndices);
-		virtual TBOOL Lock(TLockBuffer* pLockBuffer);
-		virtual void Unlock(uint16_t uiNumVertices, uint16_t uiNumIndices);
-		virtual TResource* GetVertexPool() const;
-		virtual TResource* GetIndexPool() const;
-		virtual void SetZBias(int zBias) = 0;
-		virtual void SetAlphaRef() { }
-
-		TBOOL Allocate();
-		void Deallocate();
-
-	protected:
-		uint32_t m_uiFlags;
-		uint16_t m_uiMaxVertices;
-		uint16_t m_uiMaxIndices;
-		TResource* m_pVertexPool;
-		TResource* m_pIndexPool;
+		FLAGS_NONE   = 0,
+		FLAGS_LOCKED = 0x8000
 	};
 
-}
+public:
+	TSysMesh();
+
+	virtual TBOOL      Validate() override;
+	virtual void       Invalidate() override;
+	virtual TBOOL      Create(FLAGS uiFlags, TUINT16 uiMaxVertices, TUINT16 uiMaxIndices);
+	virtual TBOOL      Lock(TLockBuffer* pLockBuffer);
+	virtual void       Unlock(TUINT16 uiNumVertices, TUINT16 uiNumIndices);
+	virtual TResource* GetVertexPool() const;
+	virtual TResource* GetIndexPool() const;
+	virtual void       SetZBias(TINT zBias) = 0;
+	virtual void       SetAlphaRef() {}
+
+	TBOOL Allocate();
+	void  Deallocate();
+
+protected:
+	TUINT32    m_uiFlags;
+	TUINT16    m_uiMaxVertices;
+	TUINT16    m_uiMaxIndices;
+	TResource* m_pVertexPool;
+	TResource* m_pIndexPool;
+};
+
+TOSHI_NAMESPACE_END

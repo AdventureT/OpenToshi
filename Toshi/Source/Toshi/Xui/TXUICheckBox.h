@@ -3,10 +3,8 @@
 
 TOSHI_NAMESPACE_BEGIN
 
-class TXUICheckBox :
-	public TGenericClassDerived<TXUICheckBox, TXUIControl, "TXUICheckBox", TMAKEVERSION(1, 0), TFALSE>
-{
-};
+class TXUICheckBox : public TGenericClassDerived<TXUICheckBox, TXUIControl, "TXUICheckBox", TMAKEVERSION(1, 0), TFALSE>
+{};
 
 class XURXUICheckBoxData : public XURXUIControlData
 {
@@ -19,19 +17,15 @@ class XURXUICheckBoxData : public XURXUIControlData
 	};
 
 public:
-
-	XURXUICheckBoxData()
-	{
-		m_pClass = TFindClass(TXUICheckBox, TXUIControl);
-	}
+	XURXUICheckBoxData() { m_pClass = TFindClass(TXUICheckBox, TXUIControl); }
 
 public:
-	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
-	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
-	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
-	virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType) override;
-	virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
-	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
+	virtual TBOOL   Load(TXUIResource& resource, TUINT8*& a_pData) override;
+	virtual TBOOL   ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex) override;
+	virtual TBOOL   TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType) override;
+	virtual TUINT32 GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
+	virtual TBOOL   IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
+	virtual TBOOL   IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
 
 private:
 	XUIEPTUnsigned m_uiPressKey;

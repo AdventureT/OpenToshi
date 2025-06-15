@@ -1,947 +1,1131 @@
 #pragma once
+//-----------------------------------------------------------------------------
+// This plugin helps writing your own TRB (Toshi Relocatable Binary) files
+// using easy API that takes care of everything needed to make working TRB.
+// Also, supports BTEC compressing algorithm when reading or writing.
+// Note: does not work on x64 and was not tested on big endian systems!
+//-----------------------------------------------------------------------------
+
 #include <Toshi/File/TTSF.h>
+#include <Toshi/Strings/TString8.h>
+#include <Toshi2/T2String.h>
+#include <Toshi/Core/Endianness.h>
+#include <Toshi/Core/Core.h>
+
+// TODO: replace STL classes with native TOSHI classes
+#include <vector>
+#include <string>
 
 #ifndef __TOSHI_TTRB_H__
-#error Include TTRB.h to use this extension
+#  error Include TTRB.h to use this extension
 #endif
 
 #ifndef __TOSHI_PLUGIN_PTRB_H__
-#define __TOSHI_PLUGIN_PTRB_H__
+#  define __TOSHI_PLUGIN_PTRB_H__
 #endif
 
-namespace PTRB
+class PTRBHeader;
+class PTRBSections;
+class PTRBRelocations;
+class PTRBSymbols;
+
+class PTRBHeader
 {
-	class HDRX;
-	class SECT;
-	class RELC;
-	class SYMB;
+public:
+	PTRBHeader(TVersion version);
 
-	class HDRX
+	void SetVersion(TVersion version);
+	void SetSectionCount(TINT32 count);
+	void Write(Toshi::TTSFO& ttsfo, PTRBSections& sect, Endianess eEndianess);
+	void Read(Toshi::TTSFI& ttsfi, PTRBSections& sect, Endianess eEndianess);
+
+private:
+	Toshi::TTRB::Header m_Header;
+};
+
+class PTRBRelocations
+{
+public:
+	PTRBRelocations() = default;
+
+	void Write(Toshi::TTSFO& ttsfo, PTRBSections& sect, Endianess eEndianess);
+	void Read(Toshi::TTSFI& ttsfi, PTRBSections& sect, Endianess eEndianess);
+};
+
+class PTRBSections
+{
+public:
+	class MemoryStream
 	{
 	public:
-		HDRX(TVersion version);
+		friend PTRBSections;
+		friend PTRBSymbols;
+		friend PTRBRelocations;
 
-		void SetVersion(TVersion version);
-		void SetSectionCount(int32_t count);
-		void Write(Toshi::TTSFO& ttsfo, SECT& sect);
-		void Read(Toshi::TTSFI& ttsfi, SECT& sect);
+		static constexpr TUINT BUFFER_GROW_SIZE = 4096;
 
-	private:
-		Toshi::TTRB::Header m_Header;
-	};
-
-	class RELC
-	{
-	public:
-		RELC() = default;
-
-		void Write(Toshi::TTSFO& ttsfo, SECT& sect);
-		void Read(Toshi::TTSFI& ttsfi, SECT& sect);
-	};
-
-	class SECT
-	{
-	public:
-		class Stack
+		template <class T>
+		class Ptr
 		{
 		public:
-			friend class SECT;
-			friend class SYMB;
-			friend class RELC;
+			Ptr()
+			    : m_Stack(TNULL), m_Offset(0) {}
+			Ptr(PTRBSections::MemoryStream* stack, TUINT offset)
+			    : m_Stack(stack), m_Offset(offset) {}
+			Ptr(PTRBSections::MemoryStream* stack, T* ptr)
+			    : m_Stack(stack), m_Offset(stack->GetOffset(ptr)) {}
 
-			static constexpr size_t BUFFER_GROW_SIZE = 4096;
-
-			template <class T>
-			class Ptr
+			T* get()
 			{
-			public:
-				Ptr() : m_Stack(TNULL), m_Offset(0) { }
-				Ptr(SECT::Stack* stack, size_t offset) : m_Stack(stack), m_Offset(offset) { }
-				Ptr(SECT::Stack* stack, T* ptr) : m_Stack(stack), m_Offset(stack->GetOffset(ptr)) { }
-
-				T* get()
-				{
-					TASSERT(this->operator bool() == TTRUE, "Pointer is null");
-					return reinterpret_cast<T*>(m_Stack->GetBuffer() + m_Offset);
-				}
-
-				const T* get() const
-				{
-					TASSERT(this->operator bool() == TTRUE, "Pointer is null");
-					return reinterpret_cast<const T*>(m_Stack->GetBuffer() + m_Offset);
-				}
-
-				SECT::Stack* stack()
-				{
-					return m_Stack;
-				}
-
-				size_t offset() const
-				{
-					return m_Offset;
-				}
-
-				T& operator*()
-				{
-					TASSERT(this->operator bool() == TTRUE, "Pointer is null");
-					return *reinterpret_cast<T*>(m_Stack->GetBuffer() + m_Offset);
-				}
-
-				T* operator->()
-				{
-					TASSERT(this->operator bool() == TTRUE, "Pointer is null");
-					return reinterpret_cast<T*>(m_Stack->GetBuffer() + m_Offset);
-				}
-
-				template <typename N>
-				Ptr<T> operator+(const N& a_iValue)
-				{
-					return Ptr<T>{m_Stack, m_Offset + sizeof(T) * a_iValue};
-				}
-
-				template <typename N>
-				Ptr<T> operator-(const N& a_iValue)
-				{
-					return Ptr<T>{m_Stack, m_Offset - sizeof(T) * a_iValue};
-				}
-
-				operator bool() const
-				{
-					return m_Stack != TNULL;
-				}
-
-			private:
-				SECT::Stack* m_Stack;
-				size_t m_Offset;
-			};
-
-			struct RelcPtr
-			{
-				size_t Offset;
-				size_t DataPtr;
-				SECT::Stack* DataStack;
-			};
-
-		public:
-			Stack(uint32_t index)
-			{
-				m_Index = index;
-				m_Buffer = TNULL;
-				m_BufferPos = TNULL;
-				m_BufferSize = 0;
-				m_ExpectedSize = 0;
-				m_PtrList.reserve(32);
-				GrowBuffer(0);
+				TASSERT(this->operator TBOOL() == TTRUE, "Pointer is null");
+				return TREINTERPRETCAST(T*, m_Stack->GetBuffer() + m_Offset);
 			}
 
-			~Stack()
+			const T* get() const
 			{
-				if (m_Buffer != TNULL)
-				{
-					delete[] m_Buffer;
-				}
+				TASSERT(this->operator TBOOL() == TTRUE, "Pointer is null");
+				return TREINTERPRETCAST(const T*, m_Stack->GetBuffer() + m_Offset);
 			}
 
-			size_t Tell() { return GetUsedSize(); }
-
-			void Seek(size_t newPos)
+			PTRBSections::MemoryStream* stack()
 			{
-				TASSERT(newPos < m_BufferSize, "Trying to seek out of buffer");
-				m_BufferPos = m_Buffer + newPos;
+				return m_Stack;
 			}
 
-			void SetExpectedSize(uint32_t expectedSize) { m_ExpectedSize = expectedSize; }
-
-			uint32_t GetExpectedSize() const { return m_ExpectedSize; }
-
-			uint32_t GetIndex() const { return m_Index; }
-
-			size_t GetPointerCount() const { return m_PtrList.size(); }
-
-			char* GetBuffer() const { return m_Buffer; }
-
-			char* GetBufferPos() const { return m_BufferPos; }
-
-			size_t GetBufferSize() const { return m_BufferSize; }
-
-			size_t GetUsedSize() const { return (size_t)m_BufferPos - (size_t)m_Buffer; }
-
-			size_t GetOffset(const void* ptr) const
+			TUINT offset() const
 			{
-				TASSERT((size_t)ptr >= (size_t)m_Buffer && (size_t)ptr < (size_t)m_Buffer + m_BufferSize, "Pointer is out of buffer");
-				return (size_t)ptr - (size_t)m_Buffer;
+				return m_Offset;
 			}
 
-			template <class T>
-			void SetCrossPointer(T** outPtr, Ptr<T> ptr);
-
-			template <class T>
-			T* Write(size_t offset, const T& value)
+			T& operator*()
 			{
-				TASSERT(offset >= 0 && offset < m_BufferSize, "Offset is out of buffer");
-				*(T*)(&m_Buffer[offset]) = value;
-				return reinterpret_cast<T*>(&m_Buffer[offset]);
+				TASSERT(this->operator TBOOL() == TTRUE, "Pointer is null");
+				return *TREINTERPRETCAST(T*, m_Stack->GetBuffer() + m_Offset);
 			}
 
-			void Write(size_t offset, char* value, int size)
+			T* operator->()
 			{
-				TASSERT(offset >= 0 && offset < m_BufferSize, "Offset is out of buffer");
-				Toshi::TUtil::MemCopy(&m_Buffer[offset], value, size);
+				TASSERT(this->operator TBOOL() == TTRUE, "Pointer is null");
+				return TREINTERPRETCAST(T*, m_Stack->GetBuffer() + m_Offset);
 			}
 
-			template <class T>
-			Ptr<T> Alloc();
-
-			template <class T>
-			Ptr<T> Alloc(size_t count);
-
-			Ptr<char> AllocBytes(size_t Size);
-
-			template <class T>
-			void WritePointer(T** outPtr, const T* ptr);
-
-			template <class T>
-			void WritePointer(T** outPtr, const Ptr<T>& ptr);
-
-			template <class T>
-			Ptr<T> Alloc(T** outPtr, size_t count);
-
-			template <class T, size_t Count = 1>
-			Ptr<T> Alloc(T** outPtr);
-
-			void Link();
-			void Unlink();
-
-			std::vector<RelcPtr>::iterator begin() { return m_PtrList.begin(); }
-			std::vector<RelcPtr>::iterator end() { return m_PtrList.end(); }
-
-			void GrowBuffer(size_t requiredSize);
-
-		private:
-			void ResizeBuffer(size_t size);
-
-			void AddRelocationPtr(size_t offset, size_t dataPtr, Stack* pDataStack = TNULL)
+			template <typename N>
+			Ptr<T> operator+(const N& a_iValue)
 			{
-				m_PtrList.emplace_back(offset, dataPtr, pDataStack == TNULL ? this : pDataStack);
+				return Ptr<T>{ m_Stack, m_Offset + sizeof(T) * a_iValue };
 			}
 
-			uint32_t SetIndex(uint32_t index)
+			template <typename N>
+			Ptr<T> operator-(const N& a_iValue)
 			{
-				uint32_t oldIndex = m_Index;
-				m_Index = index;
-				return oldIndex;
+				return Ptr<T>{ m_Stack, m_Offset - sizeof(T) * a_iValue };
+			}
+
+			operator TBOOL() const
+			{
+				return m_Stack != TNULL;
 			}
 
 		private:
-			uint32_t m_Index;
-			char* m_Buffer;
-			char* m_BufferPos;
-			size_t m_BufferSize;
-			uint32_t m_ExpectedSize;
-			std::vector<RelcPtr> m_PtrList;
-			std::vector<Stack*> m_DependentStacks;
+			PTRBSections::MemoryStream* m_Stack;
+			TUINT                       m_Offset;
+		};
+
+		struct RelcPtr
+		{
+			TUINT                       Offset;
+			TUINT                       DataPtr;
+			PTRBSections::MemoryStream* DataStack;
 		};
 
 	public:
-		SECT() = default;
-
-		~SECT()
+		MemoryStream(TUINT32 index, Endianess eEndianess)
 		{
-			Reset();
+			m_Index        = index;
+			m_eEndianess   = eEndianess;
+			m_Buffer       = TNULL;
+			m_BufferPos    = TNULL;
+			m_BufferSize   = 0;
+			m_ExpectedSize = 0;
+			m_PtrList.reserve(32);
+			GrowBuffer(0);
 		}
 
-		void Reset()
+		MemoryStream(const MemoryStream& other)
 		{
-			for (auto stack : m_Stacks)
-				delete stack;
+			TASSERT(other.m_DependentStacks.size() == 0, "Cross pointers are not supported");
 
-			m_Stacks.clear();
+			m_Index        = other.m_Index;
+			m_eEndianess   = other.m_eEndianess;
+			m_Buffer       = TNULL;
+			m_BufferSize   = 0;
+			m_ExpectedSize = other.m_ExpectedSize;
+			Resize(other.m_BufferSize);
+			m_BufferPos = m_Buffer + other.GetUsedSize();
+			Toshi::TUtil::MemCopy(m_Buffer, other.m_Buffer, other.GetUsedSize());
+
+			m_PtrList.reserve(other.m_PtrList.size());
+			for (TUINT i = 0; i < other.m_PtrList.size(); i++)
+			{
+				m_PtrList.emplace_back(
+				    other.m_PtrList[i].Offset,
+				    other.m_PtrList[i].DataPtr,
+				    this // TODO: support cross pointers
+				);
+			}
 		}
 
-		size_t GetStackCount() const
+		~MemoryStream()
 		{
-			return m_Stacks.size();
+			if (m_Buffer != TNULL)
+			{
+				delete[] m_Buffer;
+			}
 		}
 
-		SECT::Stack* CreateStack();
-		bool DeleteStack(SYMB* pSymb, SECT::Stack* pStack);
+		TUINT Tell() { return GetUsedSize(); }
 
-		SECT::Stack* GetStack(size_t index);
+		void Seek(TUINT newPos)
+		{
+			TASSERT(newPos < m_BufferSize, "Trying to seek out of buffer");
+			m_BufferPos = m_Buffer + newPos;
+		}
 
-		void Write(Toshi::TTSFO& ttsfo, bool compress);
-		void Read(Toshi::TTSFI& ttsfi, bool compressed = false);
+		TUINT32 SetIndex(TUINT32 index)
+		{
+			TUINT32 oldIndex = m_Index;
+			m_Index          = index;
+			return oldIndex;
+		}
 
-		std::vector<SECT::Stack*>::iterator begin() { return m_Stacks.begin(); }
-		std::vector<SECT::Stack*>::iterator end() { return m_Stacks.end(); }
+		void SetExpectedSize(TUINT32 expectedSize) { m_ExpectedSize = expectedSize; }
+
+		TUINT32 GetExpectedSize() const { return m_ExpectedSize; }
+
+		TUINT32 GetIndex() const { return m_Index; }
+
+		TUINT GetPointerCount() const { return m_PtrList.size(); }
+
+		TCHAR* GetBuffer() const { return m_Buffer; }
+
+		TCHAR* GetBufferPos() const { return m_BufferPos; }
+
+		TUINT GetBufferSize() const { return m_BufferSize; }
+
+		TUINT GetUsedSize() const { return (TUINT)m_BufferPos - (TUINT)m_Buffer; }
+
+		TUINT GetOffset(const void* ptr) const
+		{
+			TASSERT((TUINT)ptr >= (TUINT)m_Buffer && (TUINT)ptr < (TUINT)m_Buffer + m_BufferSize, "Pointer is out of buffer");
+			return (TUINT)ptr - (TUINT)m_Buffer;
+		}
+
+		template <class T>
+		void SetCrossPointer(T** outPtr, Ptr<T> ptr);
+
+		template <class T>
+		T* Write(TUINT offset, const T& value)
+		{
+			TASSERT(offset >= 0 && offset < m_BufferSize, "Offset is out of buffer");
+			*(T*)(&m_Buffer[offset]) = value;
+			return TREINTERPRETCAST(T*, &m_Buffer[offset]);
+		}
+
+		void Write(TUINT offset, TCHAR* value, TINT size)
+		{
+			TASSERT(offset >= 0 && offset < m_BufferSize, "Offset is out of buffer");
+			Toshi::TUtil::MemCopy(&m_Buffer[offset], value, size);
+		}
+
+		template <class T>
+		Ptr<T> Alloc();
+
+		template <class T>
+		Ptr<T> Alloc(TUINT count);
+
+		Ptr<TCHAR> AllocBytes(TUINT Size);
+
+		template <class T>
+		void WritePointer(T** outPtr, const T* ptr);
+
+		template <class T>
+		void WritePointer(T** outPtr, const Ptr<T>& ptr);
+
+		template <class T>
+		Ptr<T> Alloc(T** outPtr, TUINT count);
+
+		template <class T, TUINT Count = 1>
+		Ptr<T> Alloc(T** outPtr);
+
+		void Link();
+		void Unlink();
+
+		std::vector<RelcPtr>::iterator begin() { return m_PtrList.begin(); }
+		std::vector<RelcPtr>::iterator end() { return m_PtrList.end(); }
+
+		void GrowBuffer(TUINT requiredSize);
 
 	private:
-		std::vector<SECT::Stack*> m_Stacks;
-	};
+		void Resize(TUINT size);
 
-	class SYMB
-	{
-	public:
-		SYMB()
+		void AddRelocationPtr(TUINT offset, TUINT dataPtr, MemoryStream* pDataStack = TNULL)
 		{
-			Reset();
+			m_PtrList.emplace_back(offset, dataPtr, pDataStack == TNULL ? this : pDataStack);
 		}
-
-		void Reset()
-		{
-			m_Symbols.clear();
-			m_SymbolNames.clear();
-			m_Symbols.reserve(5);
-			m_SymbolNames.reserve(5);
-		}
-
-		bool Is(size_t index, const char* name)
-		{
-			TASSERT(index >= 0 && index < m_Symbols.size());
-			auto hash = Toshi::TTRB::HashString(name);
-
-			if (m_Symbols[index].NameHash == hash)
-			{
-				if (m_SymbolNames[index] == name)
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		int FindIndex(SECT& sect, const char* name)
-		{
-			auto hash = Toshi::TTRB::HashString(name);
-
-			for (size_t i = 0; i < m_Symbols.size(); i++)
-			{
-				if (m_Symbols[i].NameHash == hash)
-				{
-					if (m_SymbolNames[i] == name)
-					{
-						return i;
-					}
-				}
-			}
-
-			return -1;
-		}
-
-		int FindIndex(SECT* sect, const char* name)
-		{
-			return FindIndex(*sect, name);
-		}
-
-		template <class T>
-		SECT::Stack::Ptr<T> Find(SECT& sect, const char* name)
-		{
-			int index = FindIndex(sect, name);
-
-			if (index != -1)
-			{
-				auto stack = sect.GetStack(m_Symbols[index].HDRX);
-				return { stack, m_Symbols[index].DataOffset };
-			}
-
-			return { TNULL, (size_t)0 };
-		}
-
-		template <class T>
-		SECT::Stack::Ptr<T> Find(SECT* sect, const char* name)
-		{
-			return Find<T>(*sect, name);
-		}
-
-		template <class T>
-		SECT::Stack::Ptr<T> GetByIndex(SECT& sect, int index)
-		{
-			TASSERT(index >= 0 && index < m_Symbols.size());
-
-			return {
-				sect.GetStack(m_Symbols[index].HDRX),
-				m_Symbols[index].DataOffset
-			};
-		}
-
-		template <class T>
-		SECT::Stack::Ptr<T> GetByIndex(SECT* sect, int index)
-		{
-			return GetByIndex<T>(*sect, index);
-		}
-
-		size_t GetCount()
-		{
-			return m_Symbols.size();
-		}
-
-		void Add(SECT::Stack* pStack, const char* name, void* ptr)
-		{
-			m_Symbols.emplace_back(pStack->GetIndex(), 0, 0, 0, pStack->GetOffset(ptr));
-			m_SymbolNames.push_back(name);
-		}
-
-		void UpdateSymbolsIndexes(SECT::Stack* pStack, uint32_t newIndex)
-		{
-			auto stackIndex = pStack->GetIndex();
-
-			for (size_t i = 0; i < m_Symbols.size(); i++)
-			{
-				if (m_Symbols[i].HDRX == stackIndex)
-				{
-					m_Symbols[i].HDRX = newIndex;
-				}
-			}
-
-			pStack->SetIndex(newIndex);
-		}
-
-		void Remove(size_t index)
-		{
-			TASSERT(index >= 0 && index < m_Symbols.size());
-
-			m_Symbols.erase(m_Symbols.begin() + index);
-			m_SymbolNames.erase(m_SymbolNames.begin() + index);
-		}
-
-		void RemoveAllWithStackIndex(int stackIndex)
-		{
-			for (size_t i = 0; i < m_Symbols.size();)
-			{
-				if (m_Symbols[i].HDRX == stackIndex)
-				{
-					Remove(i);
-				}
-				else
-				{
-					i++;
-				}
-			}
-		}
-
-		void Write(Toshi::TTSFO& ttsfo)
-		{
-			TASSERT(m_Symbols.size() == m_SymbolNames.size(), "");
-
-			uint32_t nameOffset = 0;
-			uint32_t symbolCount = m_Symbols.size();
-			ttsfo.Write(symbolCount);
-
-			for (size_t i = 0; i < m_Symbols.size(); i++)
-			{
-				m_Symbols[i].NameHash = Toshi::TTRB::HashString(m_SymbolNames[i].c_str());
-				m_Symbols[i].NameOffset = nameOffset;
-				nameOffset += m_SymbolNames[i].length() + 1;
-				ttsfo.Write(m_Symbols[i]);
-			}
-
-			for (auto& name : m_SymbolNames)
-			{
-				ttsfo.WriteRaw(name.c_str(), name.length());
-				ttsfo.Write((uint8_t)0);
-			}
-		}
-
-		void Read(Toshi::TTSFI& ttsfi, SECT& sect)
-		{
-			uint32_t symbolCount = 0;
-			ttsfi.Read(&symbolCount);
-
-			// Read symbols
-			size_t symbolsSize = sizeof(Toshi::TTRB::TTRBSymbol) * symbolCount;
-			m_Symbols.resize(symbolCount);
-			ttsfi.ReadRaw(m_Symbols.data(), symbolsSize);
-
-			// Read symbol names
-			size_t namesSize = ttsfi.GetCurrentHunk().Size - symbolsSize;
-			m_SymbolNames.reserve(symbolCount);
-			char* namesBuffer = new char[namesSize];
-			ttsfi.ReadRaw(namesBuffer, namesSize);
-
-			for (auto& symbol : m_Symbols)
-			{
-				const char* symbolName = &namesBuffer[symbol.NameOffset];
-				m_SymbolNames.push_back(symbolName);
-			}
-
-			delete[] namesBuffer;
-		}
-
-		std::vector<std::string>::iterator begin() { return m_SymbolNames.begin(); }
-		std::vector<std::string>::iterator end() { return m_SymbolNames.end(); }
 
 	private:
-		std::vector<Toshi::TTRB::TTRBSymbol> m_Symbols;
-		std::vector<std::string> m_SymbolNames;
+		TUINT32                    m_Index;
+		TCHAR*                     m_Buffer;
+		TCHAR*                     m_BufferPos;
+		TUINT                      m_BufferSize;
+		TUINT32                    m_ExpectedSize;
+		std::vector<RelcPtr>       m_PtrList;
+		std::vector<MemoryStream*> m_DependentStacks;
+		Endianess                  m_eEndianess;
 	};
 
-	class TRBF
+public:
+	PTRBSections(Endianess a_eEndianess = Endianess_Little)
+	    : m_eEndianess(a_eEndianess)
+	{}
+
+	~PTRBSections()
 	{
-	public:
-		static constexpr TVersion VERSION = { TMAKEVERSION(1, 1) };
+		Reset();
+	}
 
-	public:
-		TRBF() : m_HDRX(VERSION) { }
-		TRBF(const std::string& filepath) : m_HDRX(VERSION) { ReadFromFile(filepath); }
+	void Reset()
+	{
+		for (auto stack : m_Stacks)
+			delete stack;
 
-		void Reset()
+		m_Stacks.clear();
+		m_eEndianess = Endianess_Little;
+	}
+
+	TUINT GetStackCount() const
+	{
+		return m_Stacks.size();
+	}
+
+	TBOOL SetEndianess(Endianess a_eEndianess)
+	{
+		if (m_Stacks.size() == 0)
 		{
-			m_SECT.Reset();
-			m_SYMB.Reset();
+			m_eEndianess = a_eEndianess;
+			return TTRUE;
 		}
 
-		bool ReadFromFile(const std::string& filepath)
+		return TFALSE;
+	}
+
+	PTRBSections::MemoryStream* CreateStream();
+	PTRBSections::MemoryStream* CreateStream(const PTRBSections::MemoryStream* pStream);
+	TBOOL                       DeleteStack(PTRBSymbols* pSymb, PTRBSections::MemoryStream* pStream);
+
+	PTRBSections::MemoryStream* GetStack(TUINT index);
+
+	void Write(Toshi::TTSFO& ttsfo, TBOOL compress);
+	void Read(Toshi::TTSFI& ttsfi, TBOOL compressed = TFALSE, Endianess eEndianess = Endianess_Little);
+
+	std::vector<PTRBSections::MemoryStream*>::iterator begin() { return m_Stacks.begin(); }
+	std::vector<PTRBSections::MemoryStream*>::iterator end() { return m_Stacks.end(); }
+
+private:
+	std::vector<PTRBSections::MemoryStream*> m_Stacks;
+	Endianess                                m_eEndianess;
+};
+
+class PTRBSymbols
+{
+public:
+	PTRBSymbols()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		m_Symbols.clear();
+		m_SymbolNames.clear();
+		m_Symbols.reserve(5);
+		m_SymbolNames.reserve(5);
+	}
+
+	TBOOL Is(TUINT index, const TCHAR* name)
+	{
+		TASSERT(index >= 0 && index < m_Symbols.size());
+		auto hash = Toshi::TTRB::HashString(name);
+
+		if (m_Symbols[index].NameHash == hash)
 		{
-			Reset();
-
-			Toshi::TTSFI ttsfi;
-			auto pFile = Toshi::TFile::Create(filepath.c_str());
-
-			if (pFile && ttsfi.Open(pFile) == Toshi::TTRB::ERROR_OK)
+			if (m_SymbolNames[index] == name)
 			{
-				int32_t leftSize = ttsfi.GetCurrentHunk().Size - 4;
+				return TTRUE;
+			}
+		}
 
-				while (leftSize > sizeof(Toshi::TTSF::Hunk))
+		return TFALSE;
+	}
+
+	TINT FindIndex(PTRBSections& sect, const TCHAR* name)
+	{
+		auto hash = Toshi::TTRB::HashString(name);
+
+		for (TUINT i = 0; i < m_Symbols.size(); i++)
+		{
+			if (m_Symbols[i].NameHash == hash)
+			{
+				if (m_SymbolNames[i] == name)
 				{
-					if (ttsfi.ReadHunk() != Toshi::TTRB::ERROR_OK) break;
-					leftSize -= ttsfi.GetCurrentHunk().Size + sizeof(Toshi::TTSF::Hunk);
+					return i;
+				}
+			}
+		}
 
-					switch (ttsfi.GetCurrentHunk().Name)
-					{
-					case TMAKEFOUR("HDRX"):
-						m_HDRX.Read(ttsfi, m_SECT);
-						break;
-					case TMAKEFOUR("SECT"):
-						m_SECT.Read(ttsfi);
-						break;
-					case TMAKEFOUR("SECC"):
-						m_SECT.Read(ttsfi, true);
-						break;
-					case TMAKEFOUR("RELC"):
-						m_RELC.Read(ttsfi, m_SECT);
-						break;
-					case TMAKEFOUR("SYMB"):
-						m_SYMB.Read(ttsfi, m_SECT);
-						break;
-					}
+		return -1;
+	}
 
-					ttsfi.SkipHunk();
+	TINT FindIndex(PTRBSections* sect, const TCHAR* name)
+	{
+		return FindIndex(*sect, name);
+	}
+
+	template <class T>
+	PTRBSections::MemoryStream::Ptr<T> Get(PTRBSections& sect, TINT index)
+	{
+		if (index != -1 && (TINT)m_Symbols.size() > index)
+		{
+			auto stack = sect.GetStack(m_Symbols[index].HDRX);
+			return { stack, m_Symbols[index].DataOffset };
+		}
+
+		return { TNULL, (TUINT)0 };
+	}
+
+	template <class T>
+	PTRBSections::MemoryStream::Ptr<T> Find(PTRBSections& sect, const TCHAR* name)
+	{
+		TINT index = FindIndex(sect, name);
+
+		if (index != -1)
+		{
+			auto stack = sect.GetStack(m_Symbols[index].HDRX);
+			return { stack, m_Symbols[index].DataOffset };
+		}
+
+		return { TNULL, (TUINT)0 };
+	}
+
+	template <class T>
+	PTRBSections::MemoryStream::Ptr<T> Find(PTRBSections* sect, const TCHAR* name)
+	{
+		return Find<T>(*sect, name);
+	}
+
+	PTRBSections::MemoryStream* FindStack(PTRBSections& sect, const TCHAR* name)
+	{
+		TINT index = FindIndex(sect, name);
+
+		if (index != -1)
+		{
+			auto stack = sect.GetStack(m_Symbols[index].HDRX);
+			return stack;
+		}
+
+		return TNULL;
+	}
+
+	PTRBSections::MemoryStream* FindStack(PTRBSections* sect, const TCHAR* name)
+	{
+		return FindStack(*sect, name);
+	}
+
+	template <class T>
+	PTRBSections::MemoryStream::Ptr<T> GetByIndex(PTRBSections& sect, TUINT index)
+	{
+		TASSERT(index < m_Symbols.size());
+
+		return {
+			sect.GetStack(m_Symbols[index].HDRX),
+			m_Symbols[index].DataOffset
+		};
+	}
+
+	template <class T>
+	PTRBSections::MemoryStream::Ptr<T> GetByIndex(PTRBSections* sect, TUINT index)
+	{
+		return GetByIndex<T>(*sect, index);
+	}
+
+	PTRBSections::MemoryStream* GetStack(PTRBSections& sect, TUINT index)
+	{
+		TASSERT(index < m_Symbols.size());
+		return sect.GetStack(m_Symbols[index].HDRX);
+	}
+
+	PTRBSections::MemoryStream* GetStack(PTRBSections* sect, TUINT index)
+	{
+		return GetStack(*sect, index);
+	}
+
+	Toshi::T2StringView GetName(TUINT index)
+	{
+		return m_SymbolNames[index].GetString();
+	}
+
+	TUINT GetCount()
+	{
+		return m_Symbols.size();
+	}
+
+	void Add(PTRBSections::MemoryStream* pStream, const TCHAR* name, void* ptr)
+	{
+		m_Symbols.emplace_back(pStream->GetIndex(), 0, 0, 0, pStream->GetOffset(ptr));
+		m_SymbolNames.push_back(name);
+	}
+
+	void UpdateSymbolsIndexes(PTRBSections::MemoryStream* pStream, TUINT32 newIndex)
+	{
+		auto stackIndex = pStream->GetIndex();
+
+		for (TUINT i = 0; i < m_Symbols.size(); i++)
+		{
+			if (m_Symbols[i].HDRX == stackIndex)
+			{
+				m_Symbols[i].HDRX = newIndex;
+			}
+		}
+
+		pStream->SetIndex(newIndex);
+	}
+
+	void Remove(TUINT index)
+	{
+		TASSERT(index >= 0 && index < m_Symbols.size());
+
+		m_Symbols.erase(m_Symbols.begin() + index);
+		m_SymbolNames.erase(m_SymbolNames.begin() + index);
+	}
+
+	void RemoveAllWithStackIndex(TINT stackIndex)
+	{
+		for (TUINT i = 0; i < m_Symbols.size();)
+		{
+			if (m_Symbols[i].HDRX == stackIndex)
+			{
+				Remove(i);
+			}
+			else
+			{
+				i++;
+			}
+		}
+	}
+
+	void Write(Toshi::TTSFO& ttsfo, Endianess eEndianess)
+	{
+		TASSERT(m_Symbols.size() == m_SymbolNames.size(), "");
+
+		TUINT32 nameOffset  = 0;
+		TUINT32 symbolCount = m_Symbols.size();
+		ttsfo.Write(CONVERTENDIANESS(eEndianess, symbolCount));
+
+		for (TUINT i = 0; i < m_Symbols.size(); i++)
+		{
+			m_Symbols[i].NameHash   = Toshi::TTRB::HashString(m_SymbolNames[i]);
+			m_Symbols[i].NameOffset = nameOffset;
+			nameOffset += m_SymbolNames[i].Length() + 1;
+
+			Toshi::TTRB::TTRBSymbol oFixedSymbol;
+			oFixedSymbol.HDRX       = CONVERTENDIANESS(eEndianess, m_Symbols[i].HDRX);
+			oFixedSymbol.NameHash   = CONVERTENDIANESS(eEndianess, m_Symbols[i].NameHash);
+			oFixedSymbol.NameOffset = CONVERTENDIANESS(eEndianess, m_Symbols[i].NameOffset);
+			oFixedSymbol.Padding    = CONVERTENDIANESS(eEndianess, m_Symbols[i].Padding);
+			oFixedSymbol.DataOffset = CONVERTENDIANESS(eEndianess, m_Symbols[i].DataOffset);
+			ttsfo.Write(oFixedSymbol);
+		}
+
+		for (auto& name : m_SymbolNames)
+		{
+			ttsfo.WriteRaw(name, name.Length());
+			ttsfo.Write((TUINT8)0);
+		}
+	}
+
+	void Read(Toshi::TTSFI& ttsfi, PTRBSections& sect, Endianess eEndianess)
+	{
+		TUINT32 symbolCount = 0;
+		ttsfi.Read(&symbolCount);
+		symbolCount = CONVERTENDIANESS(eEndianess, symbolCount);
+
+		// Read symbols
+		TUINT symbolsSize = sizeof(Toshi::TTRB::TTRBSymbol) * symbolCount;
+		m_Symbols.resize(symbolCount);
+		ttsfi.ReadRaw(m_Symbols.data(), symbolsSize);
+
+		// Read symbol names
+		TUINT namesSize = ttsfi.GetCurrentHunk().Size - symbolsSize;
+		m_SymbolNames.reserve(symbolCount);
+		TCHAR* namesBuffer = new TCHAR[namesSize];
+		ttsfi.ReadRaw(namesBuffer, namesSize);
+
+		for (auto& symbol : m_Symbols)
+		{
+			symbol.HDRX       = CONVERTENDIANESS(eEndianess, symbol.HDRX);
+			symbol.NameHash   = CONVERTENDIANESS(eEndianess, symbol.NameHash);
+			symbol.NameOffset = CONVERTENDIANESS(eEndianess, symbol.NameOffset);
+			symbol.Padding    = CONVERTENDIANESS(eEndianess, symbol.Padding);
+			symbol.DataOffset = CONVERTENDIANESS(eEndianess, symbol.DataOffset);
+
+			const TCHAR* symbolName = &namesBuffer[symbol.NameOffset];
+			m_SymbolNames.push_back(symbolName);
+		}
+
+		delete[] namesBuffer;
+	}
+
+	std::vector<Toshi::TString8>::iterator begin() { return m_SymbolNames.begin(); }
+	std::vector<Toshi::TString8>::iterator end() { return m_SymbolNames.end(); }
+
+private:
+	std::vector<Toshi::TTRB::TTRBSymbol> m_Symbols;
+	std::vector<Toshi::TString8>         m_SymbolNames;
+};
+
+class PTRB
+{
+public:
+	static constexpr TVersion VERSION = { TVERSION(1, 1) };
+
+public:
+	PTRB(Endianess a_eEndianess = Endianess_Little)
+	    : m_HDRX(VERSION)
+	    , m_eEndianess(a_eEndianess)
+	{
+		m_SECT.SetEndianess(m_eEndianess);
+	}
+
+	PTRB(Toshi::T2StringView filepath)
+	    : m_HDRX(VERSION) { ReadFromFile(filepath); }
+
+	void Reset()
+	{
+		m_SECT.Reset();
+		m_SYMB.Reset();
+		m_SECT.SetEndianess(m_eEndianess);
+	}
+
+	TBOOL ReadFromFile(Toshi::T2StringView filepath)
+	{
+		Reset();
+
+		Toshi::TTSFI ttsfi;
+		auto         pFile = Toshi::TFile::Create(filepath.Get());
+
+		m_eEndianess = -1;
+		if (pFile && ttsfi.Open(pFile) == Toshi::TTRB::ERROR_OK)
+		{
+			m_eEndianess    = ttsfi.GetEndianess();
+			TINT32 leftSize = ttsfi.GetCurrentHunk().Size - 4;
+
+			m_SECT.SetEndianess(m_eEndianess);
+
+			while (leftSize > sizeof(Toshi::TTSF::Hunk))
+			{
+				if (ttsfi.ReadHunk() != Toshi::TTRB::ERROR_OK) break;
+				leftSize -= ttsfi.GetCurrentHunk().Size + sizeof(Toshi::TTSF::Hunk);
+
+				switch (ttsfi.GetCurrentHunk().Name)
+				{
+					case TFourCC("HDRX"):
+						m_HDRX.Read(ttsfi, m_SECT, m_eEndianess);
+						break;
+					case TFourCC("SECT"):
+						m_SECT.Read(ttsfi, TFALSE, m_eEndianess);
+						break;
+					case TFourCC("SECC"):
+						m_SECT.Read(ttsfi, TTRUE, m_eEndianess);
+						break;
+					case TFourCC("RELC"):
+						m_RELC.Read(ttsfi, m_SECT, m_eEndianess);
+						break;
+					case TFourCC("SYMB"):
+						m_SYMB.Read(ttsfi, m_SECT, m_eEndianess);
+						break;
 				}
 
-				ttsfi.Close(TFALSE);
-				pFile->Destroy();
-				return true;
+				ttsfi.SkipHunk();
 			}
 
-			if (pFile != TNULL)
-			{
-				ttsfi.Close(TFALSE);
-				pFile->Destroy();
-			}
-
-			return false;
+			ttsfi.Close(TFALSE);
+			pFile->Destroy();
+			return TTRUE;
 		}
 
-		void WriteToFile(const std::string& filepath, bool compress = false, Toshi::TTSF::Endianess endianess = Toshi::TTSF::Endianess_Little)
+		if (pFile != TNULL)
 		{
-			Toshi::TTSFO ttsfo;
+			ttsfi.Close(TFALSE);
+			pFile->Destroy();
+		}
+
+		return TFALSE;
+	}
+
+	TBOOL WriteToFile(Toshi::T2StringView filepath, TBOOL compress = TFALSE)
+	{
+		if (m_eEndianess != -1)
+		{
+			Toshi::TTSFO           ttsfo;
 			Toshi::TTSFO::HunkMark mark;
-			ttsfo.Create(filepath.c_str(), "TRBF", endianess);
+			ttsfo.Create(filepath, (m_eEndianess == Endianess_Big) ? "FBRT" : "TRBF", m_eEndianess);
 
 			// HDRX
 			ttsfo.OpenHunk(&mark, "HDRX");
 			m_HDRX.SetSectionCount(m_SECT.GetStackCount());
-			m_HDRX.Write(ttsfo, m_SECT);
+			m_HDRX.Write(ttsfo, m_SECT, m_eEndianess);
 			ttsfo.CloseHunk(&mark);
 
 			// SECT
+			if (compress)
+				Toshi::TCompress::ms_bIsBigEndian = (m_eEndianess == Endianess_Big);
+
 			ttsfo.OpenHunk(&mark, compress ? "SECC" : "SECT");
 			m_SECT.Write(ttsfo, compress);
 			ttsfo.CloseHunk(&mark);
 
 			// RELC
 			ttsfo.OpenHunk(&mark, "RELC");
-			m_RELC.Write(ttsfo, m_SECT);
+			m_RELC.Write(ttsfo, m_SECT, m_eEndianess);
 			ttsfo.CloseHunk(&mark);
 
 			// SYMB
 			ttsfo.OpenHunk(&mark, "SYMB");
-			m_SYMB.Write(ttsfo);
+			m_SYMB.Write(ttsfo, m_eEndianess);
 			ttsfo.CloseHunk(&mark);
 
 			ttsfo.Close();
+
+			return TTRUE;
 		}
 
-		SYMB* GetSYMB()
-		{
-			return &m_SYMB;
-		}
-
-		SECT* GetSECT()
-		{
-			return &m_SECT;
-		}
-
-	private:
-		HDRX m_HDRX;
-		SECT m_SECT;
-		RELC m_RELC;
-		SYMB m_SYMB;
-	};
-
-	inline HDRX::HDRX(TVersion version)
-	{
-		m_Header.m_ui32Version = version;
-		m_Header.m_i32SectionCount = 0;
+		return TFALSE;
 	}
 
-	inline void HDRX::SetVersion(TVersion version)
+	template <typename T>
+	T ConvertEndianess(T a_numValue)
 	{
-		m_Header.m_ui32Version = version;
+		return CONVERTENDIANESS(m_eEndianess, a_numValue);
 	}
 
-	inline void HDRX::SetSectionCount(int32_t count)
+	PTRBSymbols*  GetSymbols() { return &m_SYMB; }
+	PTRBSections* GetSections() { return &m_SECT; }
+	Endianess     GetEndianess() const { return m_eEndianess; }
+
+private:
+	PTRBHeader      m_HDRX;
+	PTRBSections    m_SECT;
+	PTRBRelocations m_RELC;
+	PTRBSymbols     m_SYMB;
+	Endianess       m_eEndianess;
+};
+
+inline PTRBHeader::PTRBHeader(TVersion version)
+{
+	m_Header.m_ui32Version     = version;
+	m_Header.m_i32SectionCount = 0;
+}
+
+inline void PTRBHeader::SetVersion(TVersion version)
+{
+	m_Header.m_ui32Version = version;
+}
+
+inline void PTRBHeader::SetSectionCount(TINT32 count)
+{
+	m_Header.m_i32SectionCount = count;
+}
+
+inline void PTRBHeader::Write(Toshi::TTSFO& ttsfo, PTRBSections& sect, Endianess eEndianess)
+{
+	Toshi::TTRB::Header oFixedHeader;
+	oFixedHeader.m_ui32Version     = CONVERTENDIANESS(eEndianess, m_Header.m_ui32Version.Value);
+	oFixedHeader.m_i32SectionCount = CONVERTENDIANESS(eEndianess, m_Header.m_i32SectionCount);
+
+	ttsfo.Write(oFixedHeader);
+
+	for (PTRBSections::MemoryStream* stack : sect)
 	{
-		m_Header.m_i32SectionCount = count;
+		Toshi::TTRB::SecInfo sectionInfo = {};
+		sectionInfo.m_Size               = CONVERTENDIANESS(eEndianess, TAlignNumUp(stack->GetUsedSize()));
+		ttsfo.Write(sectionInfo);
+	}
+}
+
+inline void PTRBHeader::Read(Toshi::TTSFI& ttsfi, PTRBSections& sect, Endianess eEndianess)
+{
+	ttsfi.Read(&m_Header);
+	m_Header.m_i32SectionCount = CONVERTENDIANESS(eEndianess, m_Header.m_i32SectionCount);
+	m_Header.m_ui32Version     = CONVERTENDIANESS(eEndianess, m_Header.m_ui32Version.Value);
+
+	for (TINT i = 0; i < m_Header.m_i32SectionCount; i++)
+	{
+		Toshi::TTRB::SecInfo sectionInfo;
+		ttsfi.Read(&sectionInfo);
+
+		sectionInfo.m_Data   = CONVERTENDIANESS(eEndianess, sectionInfo.m_Data);
+		sectionInfo.m_Size   = CONVERTENDIANESS(eEndianess, sectionInfo.m_Size);
+		sectionInfo.m_Unk1   = CONVERTENDIANESS(eEndianess, sectionInfo.m_Unk1);
+		sectionInfo.m_Unk2   = CONVERTENDIANESS(eEndianess, sectionInfo.m_Unk2);
+		sectionInfo.m_Unused = CONVERTENDIANESS(eEndianess, sectionInfo.m_Unused);
+
+		auto stack = sect.CreateStream();
+		stack->SetExpectedSize(sectionInfo.m_Size);
+	}
+}
+
+inline void PTRBRelocations::Write(Toshi::TTSFO& ttsfo, PTRBSections& sect, Endianess eEndianess)
+{
+	TUINT32 ptrCount = 0;
+	for (auto section : sect)
+	{
+		ptrCount += section->GetPointerCount();
 	}
 
-	inline void HDRX::Write(Toshi::TTSFO& ttsfo, SECT& sect)
+	ttsfo.Write(CONVERTENDIANESS(eEndianess, ptrCount));
+
+	for (TUINT i = 0; i < sect.GetStackCount(); i++)
 	{
-		ttsfo.Write(m_Header);
+		auto section = sect.GetStack(i);
 
-		for (SECT::Stack* stack : sect)
+		for (auto& ptr : *section)
 		{
-			Toshi::TTRB::SecInfo sectionInfo = {};
-			sectionInfo.m_Size = Toshi::TMath::AlignNumUp(stack->GetUsedSize());
-			ttsfo.Write(sectionInfo);
-		}
-	}
-
-	inline void HDRX::Read(Toshi::TTSFI& ttsfi, SECT& sect)
-	{
-		ttsfi.Read(&m_Header);
-
-		for (int i = 0; i < m_Header.m_i32SectionCount; i++)
-		{
-			Toshi::TTRB::SecInfo sectionInfo;
-			ttsfi.Read(&sectionInfo);
-
-			auto stack = sect.CreateStack();
-			stack->SetExpectedSize(sectionInfo.m_Size);
-		}
-	}
-
-	inline void RELC::Write(Toshi::TTSFO& ttsfo, SECT& sect)
-	{
-		uint32_t ptrCount = 0;
-		for (auto section : sect)
-		{
-			ptrCount += section->GetPointerCount();
-		}
-
-		ttsfo.Write(ptrCount);
-
-		for (size_t i = 0; i < sect.GetStackCount(); i++)
-		{
-			auto section = sect.GetStack(i);
-
-			for (auto& ptr : *section)
-			{
-				Toshi::TTRB::RELCEntry entry = {};
-				entry.HDRX1 = (short)i;
-				entry.HDRX2 = ptr.DataStack->GetIndex();
-				entry.Offset = ptr.Offset;
-				ttsfo.Write(entry);
-			}
-		}
-	}
-
-	inline void RELC::Read(Toshi::TTSFI& ttsfi, SECT& sect)
-	{
-		uint32_t ptrCount = 0;
-		ttsfi.Read(&ptrCount);
-
-		Toshi::TTRB::RELCEntry entry;
-		for (uint32_t i = 0; i < ptrCount; i++)
-		{
-			ttsfi.Read(&entry);
-			auto stack = sect.GetStack(entry.HDRX1);
-			auto dataStack = sect.GetStack(entry.HDRX2);
-			uint32_t dataPtr = *(uint32_t*)(&stack->GetBuffer()[entry.Offset]);
-			stack->AddRelocationPtr(entry.Offset, dataPtr, dataStack);
-		}
-
-		for (auto stack : sect)
-		{
-			stack->Link();
+			Toshi::TTRB::RELCEntry entry = {};
+			entry.HDRX1                  = CONVERTENDIANESS(eEndianess, (TINT16)i);
+			entry.HDRX2                  = CONVERTENDIANESS(eEndianess, (TINT16)ptr.DataStack->GetIndex());
+			entry.Offset                 = CONVERTENDIANESS(eEndianess, ptr.Offset);
+			ttsfo.Write(entry);
 		}
 	}
+}
 
-	template<class T>
-	inline void SECT::Stack::SetCrossPointer(T** outPtr, Ptr<T> ptr)
+inline void PTRBRelocations::Read(Toshi::TTSFI& ttsfi, PTRBSections& sect, Endianess eEndianess)
+{
+	TUINT32 ptrCount = 0;
+	ttsfi.Read(&ptrCount);
+
+	ptrCount = CONVERTENDIANESS(eEndianess, ptrCount);
+
+	Toshi::TTRB::RELCEntry entry;
+	for (TUINT32 i = 0; i < ptrCount; i++)
 	{
-		TASSERT((size_t)outPtr >= (size_t)m_Buffer && (size_t)outPtr < (size_t)m_Buffer + (size_t)m_BufferSize, "Out pointer is out of buffer");
-		TASSERT(TNULL != ptr.stack());
-		TASSERT(this != ptr.stack());
+		ttsfi.Read(&entry);
+		entry.HDRX1  = CONVERTENDIANESS(eEndianess, entry.HDRX1);
+		entry.HDRX2  = CONVERTENDIANESS(eEndianess, entry.HDRX2);
+		entry.Offset = CONVERTENDIANESS(eEndianess, entry.Offset);
 
-		size_t outPtrOffset = GetOffset(outPtr);
-		Write<T*>(outPtrOffset, ptr.get());
+		auto    stack     = sect.GetStack(entry.HDRX1);
+		auto    dataStack = sect.GetStack(entry.HDRX2);
+		TUINT32 dataPtr   = *(TUINT32*)(&stack->GetBuffer()[entry.Offset]);
+		stack->AddRelocationPtr(entry.Offset, dataPtr, dataStack);
+	}
 
-		AddRelocationPtr(outPtrOffset, ptr.offset(), ptr.stack());
+	for (auto stack : sect)
+	{
+		stack->Link();
+	}
+}
 
-		// Set current stack as dependent from ptr.stack()
-		auto crossStack = ptr.stack();
-		auto it = std::find(crossStack->m_DependentStacks.begin(), crossStack->m_DependentStacks.end(), this);
+template <class T>
+inline void PTRBSections::MemoryStream::SetCrossPointer(T** outPtr, Ptr<T> ptr)
+{
+	TASSERT((TUINT)outPtr >= (TUINT)m_Buffer && (TUINT)outPtr < (TUINT)m_Buffer + (TUINT)m_BufferSize, "Out pointer is out of buffer");
+	TASSERT(TNULL != ptr.stack());
+	TASSERT(this != ptr.stack());
 
-		if (it == crossStack->m_DependentStacks.end())
+	TUINT outPtrOffset = GetOffset(outPtr);
+	Write<T*>(outPtrOffset, ptr.get());
+
+	AddRelocationPtr(outPtrOffset, ptr.offset(), ptr.stack());
+
+	// Set current stack as dependent from ptr.stack()
+	auto crossStack = ptr.stack();
+	auto it         = std::find(crossStack->m_DependentStacks.begin(), crossStack->m_DependentStacks.end(), this);
+
+	if (it == crossStack->m_DependentStacks.end())
+	{
+		// Add this stack
+		crossStack->m_DependentStacks.push_back(this);
+	}
+}
+
+template <class T>
+inline PTRBSections::MemoryStream::Ptr<T> PTRBSections::MemoryStream::Alloc()
+{
+	m_BufferPos = TREINTERPRETCAST(TCHAR*, TAlignPointerUp(m_BufferPos));
+
+	constexpr TUINT TSize = sizeof(T);
+	GrowBuffer(GetUsedSize() + TSize);
+
+	T* allocated = TREINTERPRETCAST(T*, m_BufferPos);
+	m_BufferPos += TSize;
+
+	return { this, allocated };
+}
+
+template <class T>
+inline PTRBSections::MemoryStream::Ptr<T> PTRBSections::MemoryStream::Alloc(TUINT count)
+{
+	m_BufferPos = TREINTERPRETCAST(TCHAR*, TAlignPointerUp(m_BufferPos));
+
+	const TUINT TSize = sizeof(T) * count;
+	GrowBuffer(GetUsedSize() + TSize);
+
+	T* allocated = TREINTERPRETCAST(T*, m_BufferPos);
+	m_BufferPos += TSize;
+
+	return { this, allocated };
+}
+
+template <class T>
+inline PTRBSections::MemoryStream::Ptr<T> PTRBSections::MemoryStream::Alloc(T** outPtr, TUINT count)
+{
+	TASSERT((TUINT)outPtr >= (TUINT)m_Buffer && (TUINT)outPtr < (TUINT)m_Buffer + (TUINT)m_BufferSize, "Out pointer is out of buffer");
+	m_BufferPos = TREINTERPRETCAST(TCHAR*, TAlignPointerUp(m_BufferPos));
+
+	const TUINT TSize        = sizeof(T) * count;
+	TUINT       outPtrOffset = GetOffset(outPtr);
+	GrowBuffer(GetUsedSize() + TSize);
+
+	T* allocated = TREINTERPRETCAST(T*, m_BufferPos);
+	m_BufferPos += TSize;
+
+	Write<T*>(outPtrOffset, allocated);
+	AddRelocationPtr(outPtrOffset, CONVERTENDIANESS(m_eEndianess, GetOffset(allocated)));
+
+	return { this, allocated };
+}
+
+template <class T, TUINT Count>
+inline PTRBSections::MemoryStream::Ptr<T> PTRBSections::MemoryStream::Alloc(T** outPtr)
+{
+	TASSERT((TUINT)outPtr >= (TUINT)m_Buffer && (TUINT)outPtr < (TUINT)m_Buffer + (TUINT)m_BufferSize, "Out pointer is out of buffer");
+	m_BufferPos = TREINTERPRETCAST(TCHAR*, TAlignPointerUp(m_BufferPos));
+
+	constexpr TUINT TSize        = sizeof(T) * Count;
+	TUINT           outPtrOffset = GetOffset(outPtr);
+	GrowBuffer(GetUsedSize() + TSize);
+
+	T* allocated = TREINTERPRETCAST(T*, m_BufferPos);
+	m_BufferPos += TSize;
+
+	Write<T*>(outPtrOffset, allocated);
+	AddRelocationPtr(outPtrOffset, CONVERTENDIANESS(m_eEndianess, GetOffset(allocated)));
+
+	return { this, allocated };
+}
+
+template <class T>
+inline void PTRBSections::MemoryStream::WritePointer(T** outPtr, const T* ptr)
+{
+	TASSERT((TUINT)outPtr >= (TUINT)m_Buffer && (TUINT)outPtr < (TUINT)m_Buffer + (TUINT)m_BufferSize, "Out pointer is out of buffer");
+	TASSERT((TUINT)ptr >= (TUINT)m_Buffer && (TUINT)ptr < (TUINT)m_Buffer + (TUINT)m_BufferSize, "Pointer is out of buffer");
+
+	TUINT outPtrOffset = GetOffset(outPtr);
+	Write<TUINT32>(outPtrOffset, TREINTERPRETCAST(TUINT32, ptr));
+	AddRelocationPtr(outPtrOffset, CONVERTENDIANESS(m_eEndianess, GetOffset(ptr)));
+}
+
+template <class T>
+inline void PTRBSections::MemoryStream::WritePointer(T** outPtr, const PTRBSections::MemoryStream::Ptr<T>& ptr)
+{
+	TASSERT((TUINT)outPtr >= (TUINT)m_Buffer && (TUINT)outPtr < (TUINT)m_Buffer + (TUINT)m_BufferSize, "Out pointer is out of buffer");
+
+	TUINT outPtrOffset = GetOffset(outPtr);
+	Write<TUINT32>(outPtrOffset, TREINTERPRETCAST(TUINT32, ptr.get()));
+	AddRelocationPtr(outPtrOffset, CONVERTENDIANESS(m_eEndianess, ptr.offset()));
+}
+
+inline PTRBSections::MemoryStream::Ptr<TCHAR> PTRBSections::MemoryStream::AllocBytes(TUINT Size)
+{
+	GrowBuffer(GetUsedSize() + Size);
+
+	TCHAR* allocated = reinterpret_cast<TCHAR*>(m_BufferPos);
+	m_BufferPos += Size;
+
+	return { this, allocated };
+}
+
+inline void PTRBSections::MemoryStream::Link()
+{
+	for (auto& ptr : m_PtrList)
+	{
+		Write<void*>(ptr.Offset, ptr.DataStack->GetBuffer() + CONVERTENDIANESS(m_eEndianess, ptr.DataPtr));
+	}
+}
+
+inline void PTRBSections::MemoryStream::Unlink()
+{
+	for (auto& ptr : m_PtrList)
+	{
+		Write<void*>(ptr.Offset, (void*)ptr.DataPtr);
+	}
+}
+
+inline void PTRBSections::MemoryStream::GrowBuffer(TUINT requiredSize)
+{
+	TUINT newSize = ((requiredSize / BUFFER_GROW_SIZE) + 1) * BUFFER_GROW_SIZE;
+
+	if (newSize != m_BufferSize)
+	{
+		Resize(newSize);
+	}
+}
+
+inline void PTRBSections::MemoryStream::Resize(TUINT size)
+{
+	TASSERT(size > 0, "Size should be positive");
+	//TASSERT(size != m_BufferSize, "Size is the same");
+	//TASSERT(size > m_BufferSize, "Buffer can't shrink");
+
+	TCHAR* oldBuffer = m_Buffer;
+	TUINT  usedSize  = GetUsedSize();
+	m_Buffer         = new TCHAR[size];
+	m_BufferSize     = size;
+
+	Toshi::TUtil::MemClear(m_Buffer, size);
+
+	if (oldBuffer != TNULL)
+	{
+		Toshi::TUtil::MemCopy(m_Buffer, oldBuffer, usedSize);
+		m_BufferPos = m_Buffer + usedSize;
+		delete[] oldBuffer;
+	}
+	else
+	{
+		m_BufferPos = m_Buffer;
+	}
+
+	Link();
+}
+
+inline PTRBSections::MemoryStream* PTRBSections::CreateStream()
+{
+	PTRBSections::MemoryStream* stack = new PTRBSections::MemoryStream(m_Stacks.size(), m_eEndianess);
+	m_Stacks.push_back(stack);
+	return stack;
+}
+
+inline PTRBSections::MemoryStream* PTRBSections::CreateStream(const PTRBSections::MemoryStream* pStream)
+{
+	PTRBSections::MemoryStream* stack = new PTRBSections::MemoryStream(*pStream);
+	stack->SetIndex(m_Stacks.size());
+	m_Stacks.push_back(stack);
+	return stack;
+}
+
+inline TBOOL PTRBSections::DeleteStack(PTRBSymbols* pSymb, PTRBSections::MemoryStream* pStream)
+{
+	auto result = std::find(m_Stacks.begin(), m_Stacks.end(), pStream);
+
+	if (result != m_Stacks.end())
+	{
+		pSymb->RemoveAllWithStackIndex(pStream->GetIndex());
+
+		m_Stacks.erase(result);
+		delete pStream;
+
+		// Update indexes
+		TUINT32 index = 0;
+		for (auto it = m_Stacks.begin(); it != m_Stacks.end(); it++)
 		{
-			// Add this stack
-			crossStack->m_DependentStacks.push_back(this);
+			auto stack = *it;
+			pSymb->UpdateSymbolsIndexes(stack, index++);
 		}
+
+		return TTRUE;
 	}
-
-	template<class T>
-	inline SECT::Stack::Ptr<T> SECT::Stack::Alloc()
+	else
 	{
-		m_BufferPos = TREINTERPRETCAST(char*, Toshi::TMath::AlignPointer(m_BufferPos));
-
-		constexpr size_t TSize = sizeof(T);
-		GrowBuffer(GetUsedSize() + TSize);
-
-		T* allocated = reinterpret_cast<T*>(m_BufferPos);
-		m_BufferPos += TSize;
-
-		return { this, allocated };
+		return TFALSE;
 	}
+}
 
-	template<class T>
-	inline SECT::Stack::Ptr<T> SECT::Stack::Alloc(size_t count)
+inline PTRBSections::MemoryStream* PTRBSections::GetStack(TUINT index)
+{
+	TASSERT(index >= 0 && index < GetStackCount(), "Index is out of bounds");
+	return m_Stacks[index];
+}
+
+inline void PTRBSections::Write(Toshi::TTSFO& ttsfo, TBOOL compress)
+{
+	TUINT ready = 0;
+	TUINT count = m_Stacks.size();
+
+	if (compress)
 	{
-		m_BufferPos = TREINTERPRETCAST(char*, Toshi::TMath::AlignPointer(m_BufferPos));
-
-		const size_t TSize = sizeof(T) * count;
-		GrowBuffer(GetUsedSize() + TSize);
-
-		T* allocated = reinterpret_cast<T*>(m_BufferPos);
-		m_BufferPos += TSize;
-
-		return { this, allocated };
-	}
-
-	template<class T>
-	inline SECT::Stack::Ptr<T> SECT::Stack::Alloc(T** outPtr, size_t count)
-	{
-		TASSERT((size_t)outPtr >= (size_t)m_Buffer && (size_t)outPtr < (size_t)m_Buffer + (size_t)m_BufferSize, "Out pointer is out of buffer");
-		m_BufferPos = TREINTERPRETCAST(char*, Toshi::TMath::AlignPointer(m_BufferPos));
-
-		const size_t TSize = sizeof(T) * count;
-		size_t outPtrOffset = GetOffset(outPtr);
-		GrowBuffer(GetUsedSize() + TSize);
-
-		T* allocated = reinterpret_cast<T*>(m_BufferPos);
-		m_BufferPos += TSize;
-
-		Write<T*>(outPtrOffset, allocated);
-		AddRelocationPtr(outPtrOffset, GetOffset(allocated));
-
-		return { this, allocated };
-	}
-
-	template<class T, size_t Count>
-	inline SECT::Stack::Ptr<T> SECT::Stack::Alloc(T** outPtr)
-	{
-		TASSERT((size_t)outPtr >= (size_t)m_Buffer && (size_t)outPtr < (size_t)m_Buffer + (size_t)m_BufferSize, "Out pointer is out of buffer");
-		m_BufferPos = TREINTERPRETCAST(char*, Toshi::TMath::AlignPointer(m_BufferPos));
-
-		constexpr size_t TSize = sizeof(T) * Count;
-		size_t outPtrOffset = GetOffset(outPtr);
-		GrowBuffer(GetUsedSize() + TSize);
-
-		T* allocated = reinterpret_cast<T*>(m_BufferPos);
-		m_BufferPos += TSize;
-
-		Write<T*>(outPtrOffset, allocated);
-		AddRelocationPtr(outPtrOffset, GetOffset(allocated));
-
-		return { this, allocated };
-	}
-
-	template<class T>
-	inline void SECT::Stack::WritePointer(T** outPtr, const T* ptr)
-	{
-		TASSERT((size_t)outPtr >= (size_t)m_Buffer && (size_t)outPtr < (size_t)m_Buffer + (size_t)m_BufferSize, "Out pointer is out of buffer");
-		TASSERT((size_t)ptr >= (size_t)m_Buffer && (size_t)ptr < (size_t)m_Buffer + (size_t)m_BufferSize, "Pointer is out of buffer");
-
-		size_t outPtrOffset = GetOffset(outPtr);
-		Write<uint32_t>(outPtrOffset, TREINTERPRETCAST(uint32_t, ptr));
-		AddRelocationPtr(outPtrOffset, GetOffset(ptr));
-	}
-
-	template<class T>
-	inline void SECT::Stack::WritePointer(T** outPtr, const SECT::Stack::Ptr<T>& ptr)
-	{
-		TASSERT((size_t)outPtr >= (size_t)m_Buffer && (size_t)outPtr < (size_t)m_Buffer + (size_t)m_BufferSize, "Out pointer is out of buffer");
-
-		size_t outPtrOffset = GetOffset(outPtr);
-		Write<uint32_t>(outPtrOffset, TREINTERPRETCAST(uint32_t, ptr.get()));
-		AddRelocationPtr(outPtrOffset, ptr.offset());
-	}
-
-	inline SECT::Stack::Ptr<char> SECT::Stack::AllocBytes(size_t Size)
-	{
-		GrowBuffer(GetUsedSize() + Size);
-
-		char* allocated = reinterpret_cast<char*>(m_BufferPos);
-		m_BufferPos += Size;
-
-		return { this, allocated };
-	}
-
-	inline void SECT::Stack::Link()
-	{
-		for (auto& ptr : m_PtrList)
+		if (count > 1)
 		{
-			Write<void*>(ptr.Offset, ptr.DataStack->GetBuffer() + ptr.DataPtr);
-		}
-	}
-
-	inline void SECT::Stack::Unlink()
-	{
-		for (auto& ptr : m_PtrList)
-		{
-			Write<void*>(ptr.Offset, (void*)ptr.DataPtr);
-		}
-	}
-
-	inline void SECT::Stack::GrowBuffer(size_t requiredSize)
-	{
-		size_t newSize = ((requiredSize / BUFFER_GROW_SIZE) + 1) * BUFFER_GROW_SIZE;
-
-		if (newSize != m_BufferSize)
-		{
-			ResizeBuffer(newSize);
-		}
-	}
-
-	inline void SECT::Stack::ResizeBuffer(size_t size)
-	{
-		TASSERT(size > 0, "Size should be positive");
-		//TASSERT(size != m_BufferSize, "Size is the same");
-		//TASSERT(size > m_BufferSize, "Buffer can't shrink");
-
-		char* oldBuffer = m_Buffer;
-		size_t usedSize = GetUsedSize();
-		m_Buffer = new char[size];
-		m_BufferSize = size;
-
-		Toshi::TUtil::MemClear(m_Buffer, size);
-
-		if (oldBuffer != TNULL)
-		{
-			Toshi::TUtil::MemCopy(m_Buffer, oldBuffer, usedSize);
-			m_BufferPos = m_Buffer + usedSize;
-			delete[] oldBuffer;
+			TOSHI_TRACE("Compressing progress: 0%\n");
 		}
 		else
 		{
-			m_BufferPos = m_Buffer;
-		}
-
-		Link();
-	}
-
-	inline SECT::Stack* SECT::CreateStack()
-	{
-		SECT::Stack* stack = new SECT::Stack(m_Stacks.size());
-		m_Stacks.push_back(stack);
-		return stack;
-	}
-
-	inline bool SECT::DeleteStack(SYMB* pSymb, SECT::Stack* pStack)
-	{
-		auto result = std::find(m_Stacks.begin(), m_Stacks.end(), pStack);
-
-		if (result != m_Stacks.end())
-		{
-			pSymb->RemoveAllWithStackIndex(pStack->GetIndex());
-
-			m_Stacks.erase(result);
-			delete pStack;
-
-			// Update indexes
-			uint32_t index = 0;
-			for (auto it = m_Stacks.begin(); it != m_Stacks.end(); it++)
-			{
-				auto stack = *it;
-				pSymb->UpdateSymbolsIndexes(stack, index++);
-			}
-
-			return true;
-		}
-		else
-		{
-			return false;
+			TOSHI_TRACE("Started BTEC compression...\n");
 		}
 	}
 
-	inline SECT::Stack* SECT::GetStack(size_t index)
+	for (auto stack : m_Stacks)
 	{
-		TASSERT(index >= 0 && index < GetStackCount(), "Index is out of bounds");
-		return m_Stacks[index];
-	}
-
-	inline void SECT::Write(Toshi::TTSFO& ttsfo, bool compress)
-	{
-		size_t ready = 0;
-		size_t count = m_Stacks.size();
+		stack->Unlink();
 
 		if (compress)
 		{
-			TOSHI_CORE_TRACE("Compressing progress: 0%");
-		}
+			ttsfo.WriteCompressed(stack->GetBuffer(), stack->GetUsedSize());
+			ready += 1;
 
-		for (auto stack : m_Stacks)
-		{
-			stack->Unlink();
-
-			if (compress)
+			if (count > 1)
 			{
-				ttsfo.WriteCompressed(stack->GetBuffer(), stack->GetUsedSize());
-				ready += 1;
-				TOSHI_CORE_TRACE("Compressing progress: {0:.1f}%", (double)ready / count * 100);
+				TOSHI_TRACE("Compressing progress: %.1f\n", (double)ready / count * 100);
 			}
 			else
 			{
-				ttsfo.WriteRaw(stack->GetBuffer(), stack->GetUsedSize());
+				TOSHI_TRACE("BTEC compression completed...\n");
 			}
-
-			ttsfo.WriteAlignmentPad();
-			stack->Link();
 		}
-	}
-
-	inline void SECT::Read(Toshi::TTSFI& ttsfi, bool compressed)
-	{
-		for (auto stack : m_Stacks)
+		else
 		{
-			size_t expectedSize = stack->GetExpectedSize();
+			ttsfo.WriteRaw(stack->GetBuffer(), stack->GetUsedSize());
+		}
 
-			if (expectedSize > 0)
+		ttsfo.WriteAlignmentPad();
+		stack->Link();
+	}
+}
+
+inline void PTRBSections::Read(Toshi::TTSFI& ttsfi, TBOOL compressed, Endianess eEndianess)
+{
+	m_eEndianess = eEndianess;
+
+	for (auto stack : m_Stacks)
+	{
+		TUINT expectedSize = stack->GetExpectedSize();
+
+		if (expectedSize > 0)
+		{
+			stack->GrowBuffer(expectedSize);
+
+			if (compressed)
 			{
-				stack->GrowBuffer(expectedSize);
-
-				if (compressed)
-				{
-					ttsfi.ReadCompressed(stack->GetBuffer(), expectedSize);
-				}
-				else
-				{
-					ttsfi.ReadRaw(stack->GetBuffer(), expectedSize);
-				}
-
-				stack->Seek(expectedSize);
-				stack->SetExpectedSize(0);
+				Toshi::TCompress::ms_bIsBigEndian = (eEndianess == Endianess_Big);
+				ttsfi.ReadCompressed(stack->GetBuffer(), expectedSize);
 			}
+			else
+			{
+				ttsfi.ReadRaw(stack->GetBuffer(), expectedSize);
+			}
+
+			stack->Seek(expectedSize);
+			stack->SetExpectedSize(0);
 		}
 	}
 }

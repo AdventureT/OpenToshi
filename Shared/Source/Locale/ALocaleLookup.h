@@ -4,40 +4,40 @@
 
 namespace Toshi
 {
-	class ALocaleLookup : public TSingleton<ALocaleLookup>
+class ALocaleLookup : public TSingleton<ALocaleLookup>
+{
+public:
+	struct LocaleStrings
 	{
-	public:
-		struct LocaleStrings
-		{
-			T2Locale::LocaleId Count;
-			char** Strings;
-		};
+		T2Locale::LocaleId Count;
+		char**             Strings;
+	};
 
-	public:
-		ALocaleLookup(const char* filename)
-		{
-			m_Enum.Load(filename);
-			m_StringTable = m_Enum.CastSymbol<LocaleStrings>("LocaleStrings");
-		}
+public:
+	ALocaleLookup(const char* filename)
+	{
+		m_Enum.Load(filename);
+		m_StringTable = m_Enum.CastSymbol<LocaleStrings>("LocaleStrings");
+	}
 
-		T2Locale::LocaleId LookUp(const char* str)
+	T2Locale::LocaleId LookUp(const char* str)
+	{
+		if (str != TNULL && m_StringTable != TNULL)
 		{
-			if (str != TNULL && m_StringTable != TNULL)
+			for (T2Locale::LocaleId i = 0; i < m_StringTable->Count; i++)
 			{
-				for (T2Locale::LocaleId i = 0; i < m_StringTable->Count; i++)
+				if (strcmp(m_StringTable->Strings[i], str) == 0)
 				{
-					if (strcmp(m_StringTable->Strings[i], str) == 0)
-					{
-						return i;
-					}
+					return i;
 				}
 			}
-
-			return -1;
 		}
 
-	private:
-		LocaleStrings* m_StringTable;
-		Toshi::TTRB m_Enum;
-	};
-}
+		return -1;
+	}
+
+private:
+	LocaleStrings* m_StringTable;
+	Toshi::TTRB    m_Enum;
+};
+} // namespace Toshi

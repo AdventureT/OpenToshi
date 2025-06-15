@@ -14,7 +14,7 @@
 class ARenderer : public Toshi::TSingleton<ARenderer>
 {
 public:
-	using t_MainScene = void(*)(TFLOAT deltaTime, void* pCameraObject);
+	using t_MainScene = void (*)(TFLOAT deltaTime, void* pCameraObject);
 
 public:
 	ARenderer();
@@ -42,16 +42,16 @@ private:
 private:
 	static constexpr TINT MAX_VIEWPORTS_PER_FRAME = 4;
 
-	inline static Toshi::TTRB s_BootAssetsTRB;
+	inline static Toshi::TTRB     s_BootAssetsTRB;
 	inline static Toshi::THPTimer s_FrameTimer;
-	inline static TINT s_iCurrentCamera = 0;
+	inline static TINT            s_iCurrentCamera = 0;
 
 private:
-	Toshi::TViewport* m_pViewport;           // 0x0C
-	AXYZViewportManager* m_pViewportManager; // 0x10
-	TBOOL m_bRenderGUI;                      // 0x44
-	TBOOL m_bIsLoadingScreen;                // 0x46
-	TUINT32 m_BackgroundColor;               // 0x48
-	Toshi::T2GUIRectangle* m_pRectangle;     // 0x60
-	TFLOAT m_fFrameTime;                     // 0x64
+	Toshi::TViewport*      m_pViewport;        // 0x0C
+	AXYZViewportManager*   m_pViewportManager; // 0x10
+	TBOOL                  m_bRenderGUI;       // 0x44
+	TBOOL                  m_bIsLoadingScreen; // 0x46
+	TUINT32                m_BackgroundColor;  // 0x48
+	Toshi::T2GUIRectangle* m_pRectangle;       // 0x60
+	TFLOAT                 m_fFrameTime;       // 0x64
 };

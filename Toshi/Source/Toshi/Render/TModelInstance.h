@@ -2,27 +2,21 @@
 #include "TModel.h"
 #include "TSkeleton.h"
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TModelInstance
-	{
-	public:
-		friend TModel;
+class TModelInstance
+{
+public:
+	friend TModel;
 
-	public:
-		TModel* GetModel()
-		{
-			return m_pModel;
-		}
+public:
+	TModel* GetModel() { return m_pModel; }
 
-		TSkeletonInstance* GetSkeletonInstance()
-		{
-			return m_pSkeletonInstance;
-		}
+	TSkeletonInstance* GetSkeletonInstance() { return m_pSkeletonInstance; }
 
-	private:
-		TModel* m_pModel;
-		TSkeletonInstance* m_pSkeletonInstance;
-	};
+private:
+	TModel*            m_pModel;
+	TSkeletonInstance* m_pSkeletonInstance;
+};
 
-}
+TOSHI_NAMESPACE_END

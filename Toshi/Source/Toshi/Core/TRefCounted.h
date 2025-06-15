@@ -1,20 +1,19 @@
 #pragma once
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TRefCounted
 {
-	class TRefCounted
-	{
-		int m_iRefCount;
+	TINT m_iRefCount;
 
-	public:
-		TRefCounted() { m_iRefCount = 0; }
-		TRefCounted(TRefCounted const&) { m_iRefCount = 0; }
+public:
+	TRefCounted() { m_iRefCount = 0; }
+	TRefCounted(TRefCounted const&) { m_iRefCount = 0; }
 
-		inline int DecRefCount() { return m_iRefCount--; }
-		inline int GetRefCount() { return m_iRefCount; }
-		inline int IncRefCount() { return m_iRefCount++; }
-		inline TRefCounted& operator=(TRefCounted const&) { return *this; }
-	};
-}
+	inline TINT         DecRefCount() { return m_iRefCount--; }
+	inline TINT         GetRefCount() { return m_iRefCount; }
+	inline TINT         IncRefCount() { return m_iRefCount++; }
+	inline TRefCounted& operator=(TRefCounted const&) { return *this; }
+};
 
-
+TOSHI_NAMESPACE_END

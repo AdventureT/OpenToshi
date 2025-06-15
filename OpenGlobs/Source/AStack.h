@@ -48,12 +48,12 @@ public:
 		return m_iTop + 1;
 	}
 
-	T& operator[] (int index) const
+	T& operator[](int index) const
 	{
 		return &m_pStack[index];
 	}
 
 private:
 	int m_iTop = -1;
-	T m_pStack[C];
+	T   m_pStack[C];
 };

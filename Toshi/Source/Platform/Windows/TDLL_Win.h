@@ -1,38 +1,33 @@
 #pragma once
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TDLL
+class TDLL
+{
+public:
+	TDLL();
+	TDLL(const TDLL& other);
+
+	virtual ~TDLL();
+
+	TBOOL Load(const TString8& a_sFileName);
+	void  Unload();
+
+	void* GetAddress(const TString8& a_sSymbolName);
+
+	const TString8& GetFileName() const { return m_sFileName; }
+
+	HMODULE GetDLL() const { return m_pDLL; }
+
+	TDLL& operator=(const TDLL& other)
 	{
-	public:
-		TDLL();
-		TDLL(const TDLL& other);
+		m_sFileName = other.m_sFileName;
+		m_pDLL      = other.m_pDLL;
+	}
 
-		virtual ~TDLL();
+private:
+	TString8 m_sFileName;
+	HMODULE  m_pDLL;
+};
 
-		TBOOL Load(const TString8& a_sFileName);
-		void Unload();
-
-		void* GetAddress(const TString8& a_sSymbolName);
-
-		const TString8& GetFileName() const
-		{
-			return m_sFileName;
-		}
-
-		HMODULE GetDLL() const
-		{
-			return m_pDLL;
-		}
-
-		TDLL& operator=(const TDLL& other)
-		{
-			m_sFileName = other.m_sFileName;
-			m_pDLL = other.m_pDLL;
-		}
-
-	private:
-		TString8 m_sFileName;
-		HMODULE m_pDLL;
-	};
-}
+TOSHI_NAMESPACE_END

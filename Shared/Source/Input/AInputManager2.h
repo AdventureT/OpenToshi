@@ -5,8 +5,7 @@
 #include <Toshi/Core/Platform.h>
 #include <Toshi/Input/TInputInterface.h>
 
-class AInputManager2 :
-	public Toshi::TSingleton<AInputManager2>
+class AInputManager2 : public Toshi::TSingleton<AInputManager2>
 {
 public:
 	typedef uint32_t INPUTDEVICE;
@@ -31,7 +30,7 @@ public:
 
 	public:
 		Toshi::TInputDevice* m_pDevice = TNULL; // 0x0
-		int m_iId                      = 0;     // 0x4
+		int                  m_iId     = 0;     // 0x4
 	};
 
 public:
@@ -41,7 +40,7 @@ public:
 	void Update(float a_fDeltaTime);
 	void UpdateControllers();
 
-	TBOOL HasDeviceOfPlatform(Toshi::Platform a_ePlatform) const;
+	TBOOL HasDeviceOfPlatform(Platform a_ePlatform) const;
 
 	void AddInGameController(const AInputDeviceHandle& a_Handle);
 	void RemoveInGameController(const AInputDeviceHandle& a_Handle);
@@ -72,9 +71,9 @@ public:
 	}
 
 private:
-	AInputDeviceHandle m_aControllers[4];                         // 0x04
+	AInputDeviceHandle                     m_aControllers[4]; // 0x04
 	Toshi::T2Vector<AInputDeviceHandle, 2> m_pInputDeviceHandles;
-	AInputMap m_InputMap;                                         // 0x048
-	Toshi::TInputDevice* m_pSomeDevice;                           // 0x180
-	AStack<AInputMap::INPUTCONTEXT, 10> m_inputContextStack;      // 0x1A0
+	AInputMap                              m_InputMap;          // 0x048
+	Toshi::TInputDevice*                   m_pSomeDevice;       // 0x180
+	AStack<AInputMap::INPUTCONTEXT, 10>    m_inputContextStack; // 0x1A0
 };

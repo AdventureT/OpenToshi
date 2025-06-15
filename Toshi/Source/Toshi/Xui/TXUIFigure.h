@@ -4,7 +4,7 @@
 
 TOSHI_NAMESPACE_BEGIN
 
-static const uint32_t g_uiDefaultColour = TCOLOR(0xF, 0xF, 0x80); // Ultramarine
+static const TUINT32 g_uiDefaultColour = TCOLOR(0xF, 0xF, 0x80); // Ultramarine
 
 class XURXUIGradientData : public XURXUIObjectData
 {
@@ -22,27 +22,23 @@ class XURXUIGradientData : public XURXUIObjectData
 	};
 
 public:
-
-	XURXUIGradientData()
-	{
-
-	}
+	XURXUIGradientData() {}
 
 
 public:
-	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
-	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
+	virtual TBOOL TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType) override;
+	virtual TBOOL Load(TXUIResource& resource, TUINT8*& a_pData) override;
 
-	virtual TBOOL ValidateTimelineProp(uint32_t param_2);
-	virtual uint32_t GetTimelinePropSize(uint32_t propType);
-	virtual TBOOL IsFloatPropType(uint32_t propType);
-	virtual TBOOL IsColourPropType(uint32_t propType);
+	virtual TBOOL   ValidateTimelineProp(TUINT32 param_2);
+	virtual TUINT32 GetTimelinePropSize(TUINT32 propType);
+	virtual TBOOL   IsFloatPropType(TUINT32 propType);
+	virtual TBOOL   IsColourPropType(TUINT32 propType);
 
 protected:
-	/* 0 */ XUIEPTBool m_Radial;
+	/* 0 */ XUIEPTBool     m_Radial;
 	/* 1 */ XUIEPTUShort32 m_NumStops;
-	/* 2 */ XUIEPTFloat* m_StopPos;
-	/* 3 */ XUIEPTColor* m_StopColors;
+	/* 2 */ XUIEPTFloat*   m_StopPos;
+	/* 3 */ XUIEPTColor*   m_StopColors;
 };
 
 class XURXUIFillData : public XURXUIObjectData
@@ -66,37 +62,30 @@ class XURXUIFillData : public XURXUIObjectData
 	};
 
 public:
-
-	XURXUIFillData()
-	{
-		
-	}
+	XURXUIFillData() {}
 
 
 public:
-	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
-	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
+	virtual TBOOL TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType) override;
+	virtual TBOOL Load(TXUIResource& resource, TUINT8*& a_pData) override;
 
-	virtual TBOOL ValidateTimelineProp(uint32_t param_2);
-	virtual uint32_t GetTimelinePropSize(uint32_t propType);
-	virtual TBOOL IsFloatPropType(uint32_t propType);
-	virtual TBOOL IsColourPropType(uint32_t propType);
+	virtual TBOOL   ValidateTimelineProp(TUINT32 param_2);
+	virtual TUINT32 GetTimelinePropSize(TUINT32 propType);
+	virtual TBOOL   IsFloatPropType(TUINT32 propType);
+	virtual TBOOL   IsColourPropType(TUINT32 propType);
 
 protected:
-
-
-
-	/* 0 */ XUIEPTUnsigned m_FillType;
-	/* 1 */ XUIEPTColor m_FillColor;
-	/* 2 */ XUIEPTString m_FillTextureFileName;
+	/* 0 */ XUIEPTUnsigned     m_FillType;
+	/* 1 */ XUIEPTColor        m_FillColor;
+	/* 2 */ XUIEPTString       m_FillTextureFileName;
 	/* 3 */ XURXUIGradientData m_Gradient;
-	/* 4 */ XUIEPTVector m_FillTranslation;
-	/* 5 */ XUIEPTVector m_FillScale;
-	/* 6 */ XUIEPTFloat m_FillRotation;
-	/* 7 */ XUIEPTUnsigned m_FillWrapX;
-	/* 8 */ XUIEPTUnsigned m_FillWrapY;
-	/* 9 */ XUIEPTUnsigned m_FillBrushFlags;
-	/* 10 */ XUIEPTUnsigned m_Unknown;
+	/* 4 */ XUIEPTVector       m_FillTranslation;
+	/* 5 */ XUIEPTVector       m_FillScale;
+	/* 6 */ XUIEPTFloat        m_FillRotation;
+	/* 7 */ XUIEPTUnsigned     m_FillWrapX;
+	/* 8 */ XUIEPTUnsigned     m_FillWrapY;
+	/* 9 */ XUIEPTUnsigned     m_FillBrushFlags;
+	/* 10 */ XUIEPTUnsigned    m_Unknown;
 };
 
 class XURXUIStrokeData : public XURXUIObjectData
@@ -110,20 +99,16 @@ class XURXUIStrokeData : public XURXUIObjectData
 	};
 
 public:
-
-	XURXUIStrokeData()
-	{
-
-	}
+	XURXUIStrokeData() {}
 
 public:
-	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
-	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
+	virtual TBOOL TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType) override;
+	virtual TBOOL Load(TXUIResource& resource, TUINT8*& a_pData) override;
 
-	virtual TBOOL ValidateTimelineProp(uint32_t param_2);
-	virtual uint32_t GetTimelinePropSize(uint32_t propType);
-	virtual TBOOL IsFloatPropType(uint32_t propType);
-	virtual TBOOL IsColourPropType(uint32_t propType);
+	virtual TBOOL   ValidateTimelineProp(TUINT32 param_2);
+	virtual TUINT32 GetTimelinePropSize(TUINT32 propType);
+	virtual TBOOL   IsFloatPropType(TUINT32 propType);
+	virtual TBOOL   IsColourPropType(TUINT32 propType);
 
 protected:
 	/* 0 */ XUIEPTFloat m_StrokeWidth;
@@ -131,11 +116,8 @@ protected:
 };
 
 
-class TXUIFigure :
-	public TGenericClassDerived<TXUIFigure, TXUIElement, "TXUIFigure", TMAKEVERSION(1, 0), TFALSE>
-{
-
-};
+class TXUIFigure : public TGenericClassDerived<TXUIFigure, TXUIElement, "TXUIFigure", TMAKEVERSION(1, 0), TFALSE>
+{};
 
 class XURXUIFigureData : public XURXUIElementData
 {
@@ -163,30 +145,27 @@ class XURXUIFigureData : public XURXUIElementData
 	};
 
 public:
-
-	XURXUIFigureData() : XURXUIElementData()
-	{
-		m_pClass = TFindClass(TXUIFigure, TXUIElement);
-	}
+	XURXUIFigureData()
+	    : XURXUIElementData() { m_pClass = TFindClass(TXUIFigure, TXUIElement); }
 
 
 public:
-	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, PropType propType) override;
-	virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, PropType propType) override;
-	virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, PropType propType) override;
-	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
-	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
-	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
-	virtual TBOOL ValidateTimelineSubProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
-	virtual uint32_t GetTimelineSubPropSize(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
-	virtual TBOOL IsFloatSubPropType(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
-	virtual TBOOL IsColourSubPropType(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex);
+	virtual TBOOL   IsColourPropType(TUINT32 a_uiObjectIndex, PropType propType) override;
+	virtual TBOOL   IsFloatPropType(TUINT32 a_uiObjectIndex, PropType propType) override;
+	virtual TUINT32 GetTimelinePropSize(TUINT32 a_uiObjectIndex, PropType propType) override;
+	virtual TBOOL   TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType) override;
+	virtual TBOOL   ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex) override;
+	virtual TBOOL   Load(TXUIResource& resource, TUINT8*& a_pData) override;
+	virtual TBOOL   ValidateTimelineSubProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex);
+	virtual TUINT32 GetTimelineSubPropSize(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex);
+	virtual TBOOL   IsFloatSubPropType(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex);
+	virtual TBOOL   IsColourSubPropType(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex);
 
 private:
 	XURXUIStrokeData m_Stroke;
-	XURXUIFillData m_Fill;
-	XUIEPTBool m_Closed;
-	XUIFigurePoint* m_Points;
+	XURXUIFillData   m_Fill;
+	XUIEPTBool       m_Closed;
+	XUIFigurePoint*  m_Points;
 };
 
 TOSHI_NAMESPACE_END

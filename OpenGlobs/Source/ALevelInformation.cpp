@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "ALevelInformation.h"
 
-Toshi::THashTable::t_ItemCompareFunc ALevelInformation::LevelNameHashCompareFunc = [](void* unk, void* unk2, int unk3)
-{
+Toshi::THashTable::t_ItemCompareFunc ALevelInformation::LevelNameHashCompareFunc = [](void* unk, void* unk2, int unk3) {
 	return Toshi::TStringManager::String8Compare((char*)unk, (char*)unk2, -1) == 0;
 };
 
@@ -12,7 +11,7 @@ void ALevelInformation::Create(const char* a_trbName)
 	Close();
 	if (Load(a_trbName) == ERROR_OK)
 	{
-		m_pData = reinterpret_cast<uint8_t*>(GetSymbolAddress("LevelsMain"));
+		m_pData = reinterpret_cast<TUINT8*>(GetSymbolAddress("LevelsMain"));
 	}
 	MakeStringToIDHashTable();
 }

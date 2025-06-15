@@ -12,136 +12,117 @@
 
 class AModelLoader;
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TModelInstance;
+class TModelInstance;
 
-	class TModelLOD
+class TModelLOD
+{
+public:
+	const TSphere& GetBoundingSphere() { return m_BoundingSphere; }
+
+	TMesh* GetMesh(TUINT32 a_uiIndex)
 	{
-	public:
-		const TSphere& GetBoundingSphere()
-		{
-			return m_BoundingSphere;
-		}
+		TASSERT(a_uiIndex < m_uiMeshCount);
+		return m_pMeshes[a_uiIndex];
+	}
 
-		TMesh* GetMesh(TUINT32 a_uiIndex)
-		{
-			TASSERT(a_uiIndex < m_uiMeshCount);
-			return m_pMeshes[a_uiIndex];
-		}
+	TMesh** GetMeshes() { return m_pMeshes; }
 
-		TMesh** GetMeshes()
-		{
-			return m_pMeshes;
-		}
+	TUINT32 GetMeshCount() { return m_uiMeshCount; }
 
-		TUINT32 GetMeshCount()
-		{
-			return m_uiMeshCount;
-		}
+private:
+	TSphere m_BoundingSphere;
+	TUINT32 m_uiMeshCount;
+	TMesh** m_pMeshes;
+};
 
-	private:
-		TSphere m_BoundingSphere;
-		TUINT32 m_uiMeshCount;
-		TMesh** m_pMeshes;
+class TModel : public T2Resource
+{
+public:
+	static constexpr TINT MAX_LOD_LEVEL = 5;
+
+	enum class Flags
+	{
+		None      = 0,
+		Created   = BITFIELD(0),
+		TrbLoaded = BITFIELD(1),
 	};
 
-	class TModel : public T2Resource
+	using t_TRBLoadCallback = TBOOL (*)(TTRB& pTRB, TModel* pModel);
+
+	friend class TModelManager;
+	friend class ::AModelLoader;
+
+public:
+	TModel();
+	~TModel();
+
+	void Create(const TCHAR* name, TBOOL bLoadImmediately);
+	void Delete();
+	void Unload();
+
+	void SetTRB(TTRB* pTRB, TBOOL bFreeOnUnload)
 	{
-	public:
-		static constexpr int MAX_LOD_LEVEL = 5;
+		m_pTRB          = pTRB;
+		m_bFreeOnUnload = bFreeOnUnload;
+	}
 
-		enum class Flags
-		{
-			None      = 0,
-			Created   = BITFIELD(0),
-			TrbLoaded = BITFIELD(1),
-		};
+	TBOOL LoadTRB();
+	TBOOL LoadTRB(TTRB* pTRB, TBOOL bFreeOnUnload);
 
-		using t_TRBLoadCallback = TBOOL(*)(TTRB& pTRB, TModel* pModel);
+	TBOOL LoadTRBFile(const TCHAR* filepath);
+	TBOOL LoadTRBFile(TFile* pFile);
 
-		friend class TModelManager;
-		friend class ::AModelLoader;
+	void UnloadTRB(TBOOL bFreeTrb);
 
-	public:
-		TModel();
-		~TModel();
+	template <class T> T* GetTRBSymbol(const TCHAR* a_szName) { return m_pTRB->CastSymbol<T>(TranslateSymbolName(a_szName)); }
 
-		void Create(const char* name, TBOOL bLoadImmediately);
-		void Delete();
-		void Unload();
-		
-		void SetTRB(TTRB* pTRB, TBOOL bFreeOnUnload)
-		{
-			m_pTRB = pTRB;
-			m_bFreeOnUnload = bFreeOnUnload;
-		}
-		
-		TBOOL LoadTRB();
-		TBOOL LoadTRB(TTRB* pTRB, TBOOL bFreeOnUnload);
+	TModelLOD& GetLOD(TUINT32 a_uiIndex) { return m_LODLevels[a_uiIndex]; }
 
-		TBOOL LoadTRBFile(const char* filepath);
-		TBOOL LoadTRBFile(TFile* pFile);
+	TModelInstance* CreateInstance();
 
-		void UnloadTRB(TBOOL bFreeTrb);
+	const TCHAR* GetName() const { return m_pName; }
+	TBOOL        IsCreated() const { return m_Flags.IsSet(Flags::Created); }
+	void         SetDataHeader(void* pDataHeader) { m_pDataHeader = pDataHeader; }
 
-		template <class T>
-		T* GetTRBSymbol(const char* a_szName)
-		{
-			return m_pTRB->CastSymbol<T>(
-				TranslateSymbolName(a_szName)
-			);
-		}
+protected:
+	void CreateResource(const TCHAR* name);
 
-		TModelLOD& GetLOD(TUINT32 a_uiIndex)
-		{
-			return m_LODLevels[a_uiIndex];
-		}
+	void CreateSkeleton(TTMDBase::SkeletonHeader* pSkeletonHeader, TSkeleton* pSkeleton, TBOOL bLoadAnimations);
+	void CreateCollision(TModelCollision* pModelCollision);
 
-		TModelInstance* CreateInstance();
+public:
+	static void*        ResourceCallback(void* pData, TTRB* pTRB, TBOOL flag);
+	static const TCHAR* TranslateSymbolName(const TCHAR* symbolName);
 
-		const char* GetName() const           { return m_pName; }
-		TBOOL IsCreated() const               { return m_Flags.IsSet(Flags::Created); }
-		void SetDataHeader(void* pDataHeader) { m_pDataHeader = pDataHeader; }
+	static void SetTRBLoadCallback(t_TRBLoadCallback fnCallback) { sm_pTRBLoadCallback = fnCallback; }
 
-	protected:
-		void CreateResource(const char* name);
+protected:
+	inline static const TCHAR*      sm_SymbolNamePrefix = TNULL;
+	inline static t_TRBLoadCallback sm_pTRBLoadCallback;
 
-		void CreateSkeleton(TTMDBase::SkeletonHeader* pSkeletonHeader, TSkeleton* pSkeleton, TBOOL bLoadAnimations);
-		void CreateCollision(TModelCollision* pModelCollision);
+protected:
+	T2Flags<Flags>   m_Flags;                    // 0x04
+	TINT             m_iNumInstances;            // 0x08
+	TINT             m_iLODCount;                // 0x0C
+	TFLOAT           m_fUnknown;                 // 0x10
+	TSkeleton*       m_pSkeleton;                // 0x14
+	TModelLOD        m_LODLevels[MAX_LOD_LEVEL]; // 0x18
+	TFLOAT           m_fUnk2;                    // 0x90
+	TFLOAT           m_fUnk3;                    // 0x94
+	TFLOAT           m_fUnk4;                    // 0x98
+	TFLOAT           m_fUnk5;                    // 0x9C
+	TModelCollision* m_pCollisionData;           // 0xA0
+	TTRB*            m_pTRB;                     // 0xA4
+	TBOOL            m_bFreeOnUnload;            // 0xA8
+	const TCHAR*     m_pName;                    // 0xAC
+	T2ModelPtr       m_NextModelResource;        // 0xB0
+	T2ModelPtr       m_PrevModelResource;        // 0xB4
+	void*            m_pDataHeader;              // 0xBC
+};
 
-	public:
-		static void* ResourceCallback(void* pData, TTRB* pTRB, TBOOL flag);
-		static const char* TranslateSymbolName(const char* symbolName);
-
-		static void SetTRBLoadCallback(t_TRBLoadCallback fnCallback) { sm_pTRBLoadCallback = fnCallback; }
-
-	protected:
-		inline static const char* sm_SymbolNamePrefix = TNULL;
-		inline static t_TRBLoadCallback sm_pTRBLoadCallback;
-
-	protected:
-		T2Flags<Flags> m_Flags;               // 0x04
-		TINT m_iNumInstances;                 // 0x08
-		TINT m_iLODCount;                     // 0x0C
-		TFLOAT m_fUnknown;                    // 0x10
-		TSkeleton* m_pSkeleton;               // 0x14
-		TModelLOD m_LODLevels[MAX_LOD_LEVEL]; // 0x18
-		TFLOAT m_fUnk2;                       // 0x90
-		TFLOAT m_fUnk3;                       // 0x94
-		TFLOAT m_fUnk4;                       // 0x98
-		TFLOAT m_fUnk5;                       // 0x9C
-		TModelCollision* m_pCollisionData;    // 0xA0
-		TTRB* m_pTRB;                         // 0xA4
-		TBOOL m_bFreeOnUnload;                // 0xA8
-		const char* m_pName;                  // 0xAC
-		T2ModelPtr m_NextModelResource;       // 0xB0
-		T2ModelPtr m_PrevModelResource;       // 0xB4
-		void* m_pDataHeader;                  // 0xBC
-	};
-
-	DEFINE_T2FLAGS(TModel::Flags);
-
+DEFINE_T2FLAGS(TModel::Flags);
 }
 
 /*
@@ -150,29 +131,28 @@ namespace Toshi {
 #include "Toshi2/T2ResourceManager.h"
 */
 /*
-namespace Toshi
-{
+TOSHI_NAMESPACE_START
 
 	class TModelLOD
 	{
-		int m_iMeshCount; // 0x10
+		TINT m_iMeshCount; // 0x10
 	public:
-		inline int GetMeshCount() { return m_iMeshCount; }
+		inline TINT GetMeshCount() { return m_iMeshCount; }
 	};
 
 	class TModel
 	{
-		unsigned int m_Flags; // 0x4
-		//int m_instanceCount; // 0x8
-		int m_iLODCount; // 0xC
+		TUINT m_Flags; // 0x4
+		//TINT m_instanceCount; // 0x8
+		TINT m_iLODCount; // 0xC
 		TSkeleton* m_pSkeleton; // 0x14
-		//int* m_pUVHashOffset; // 0x18
+		//TINT* m_pUVHashOffset; // 0x18
 		TModelLOD* m_modelLODs; // 0x18
 		TTRB* m_pTRB; // 0xA4
-		const char* m_modelName; // 0xDC NT08, 0xAC Deblob
+		const TCHAR* m_modelName; // 0xDC NT08, 0xAC Deblob
 
-		static char* sm_SymbolNamePrefix;
-		static char s_TranslatedSymbol[0x200];
+		static TCHAR* sm_SymbolNamePrefix;
+		static TCHAR s_TranslatedSymbol[0x200];
 
 		struct TTMDBase
 		{
@@ -184,9 +164,9 @@ namespace Toshi
 
 		struct Header
 		{
-			uint32_t m_magic;
-			uint32_t m_version;
-			uint32_t m_remainingBytes;
+			TUINT32 m_magic;
+			TUINT32 m_version;
+			TUINT32 m_remainingBytes;
 		};
 
 		struct Header2
@@ -194,23 +174,25 @@ namespace Toshi
 
 		};
 
-		TBOOL Create(const char* name, TBOOL a_bLoadImmediately);
-		void CreateResource(const char* name);
+		TBOOL Create(const TCHAR* name, TBOOL a_bLoadImmediately);
+		void CreateResource(const TCHAR* name);
 
 		inline TBOOL IsCreated() { return (m_Flags & 1) != 0; }
 
-		inline TModelLOD& GetLOD(int index) { return m_modelLODs[index]; }
-		inline int GetLODCount() { return m_iLODCount; }
+		inline TModelLOD& GetLOD(TINT index) { return m_modelLODs[index]; }
+		inline TINT GetLODCount() { return m_iLODCount; 
+TOSHI_NAMESPACE_END
 
 
 
 	protected:
-		TBOOL LoadTMD(const char*); // JPOG only i think not sure though
-		TBOOL LoadTRBTMD(const char*);
+		TBOOL LoadTMD(const TCHAR*); // JPOG only i think not sure though
+		TBOOL LoadTRBTMD(const TCHAR*);
 		TBOOL LoadTrb();
-		const char* TranslateSymbolName(const char* a_symbolName);
+		const TCHAR* TranslateSymbolName(const TCHAR* a_symbolName);
 	};
 	
-}
+
+TOSHI_NAMESPACE_END
 
 */

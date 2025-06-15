@@ -22,7 +22,7 @@ void AMemory::CreatePool(Pool type)
 	auto& poolDefinition = ms_aPoolDefinitionInfo[type];
 	TASSERT(IsPoolCreated(poolDefinition.Type) == TFALSE);
 
-	void* pMem = TMalloc(poolDefinition.Size);
+	void* pMem                             = TMalloc(poolDefinition.Size);
 	ms_apMemoryBlocks[poolDefinition.Type] = Toshi::TMemory::CreateHeapInPlace(pMem, poolDefinition.Size, Toshi::TMemoryHeapFlags_UseMutex, poolDefinition.Name);
 }
 

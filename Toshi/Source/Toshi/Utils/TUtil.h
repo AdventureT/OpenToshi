@@ -3,89 +3,68 @@
 #include "Toshi/File/TLogFile.h"
 #include "Toshi/Core/TEvent.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TUtil : public TSingleton<TUtil>
 {
-	class TUtil : public TSingleton<TUtil>
+public:
+	static TBOOL ToshiCreate(TINT argc, TCHAR** argv, TMemory& memorySettings);
+
+	static void ToshiDestroy()
 	{
-	public:
-		static TBOOL ToshiCreate(int argc, char** argv, TMemory& memorySettings);
-		
-		static void ToshiDestroy()
-		{
-			ToshiDestroySubsystems();
-			ToshiDestroyMemory();
-		}
+		ToshiDestroySubsystems();
+		ToshiDestroyMemory();
+	}
 
-		static void Create()
-		{
-			TUtil::CreateSingleton();
-			TUtil::GetSingletonSafe()->LogInitialise();
-			TUtil::CRCInitialise();
-		}
+	static void Create()
+	{
+		TUtil::CreateSingleton();
+		TUtil::GetSingletonSafe()->LogInitialise();
+		TUtil::CRCInitialise();
+	}
 
-		static void ToshiDestroySubsystems()
-		{
-			TLog::Destroy();
-			// ....
-		}
+	static void ToshiDestroySubsystems()
+	{
+		TLog::Destroy();
+		// ....
+	}
 
-		static void ToshiDestroyMemory()
-		{
-			TMemory::Shutdown();
-		}
-		
-		static const char* GetTime();
-		static void TrimLog(const char* fileExtension, size_t trimTo);
-		//static uint64_t GetUnixSeconds(uint64_t* pOut = TNULL);
-		static void MemSet(void* ptr, size_t value, size_t size);
-		
-		static void* MemCopy(void* dst, const void* src, size_t size)
-		{
-			return memcpy(dst, src, size);
-		}
+	static void ToshiDestroyMemory() { TMemory::Shutdown(); }
 
-		static void MemClear(void* ptr, size_t size)
-		{
-			memset(ptr, 0, size);
-		}
+	static const TCHAR* GetTime();
+	static void         TrimLog(const TCHAR* fileExtension, size_t trimTo);
+	//static uint64_t GetUnixSeconds(uint64_t* pOut = TNULL);
+	static void MemSet(void* ptr, size_t value, size_t size);
 
-		static int MemCompare(void* ptr1, void* ptr2, int size)
-		{
-			return memcmp(ptr1, ptr2, size);
-		}
+	static void* MemCopy(void* dst, const void* src, size_t size) { return memcpy(dst, src, size); }
 
-		static void LogInitialise();
-		static void Log(const char* format, ...);
-		static void Log(TLogFile::Type logtype, const char* format, ...);
-		static void LogConsole(const char* format, ...);
-		static void LogSet(TLogFile* a_logFile);
+	static void MemClear(void* ptr, size_t size) { memset(ptr, 0, size); }
 
-		static TLogFile* GetLog()
-		{
-			return Toshi::TUtil::GetSingleton()->m_pLogFile2;
-		}
+	static TINT MemCompare(void* ptr1, void* ptr2, TINT size) { return memcmp(ptr1, ptr2, size); }
 
-		static void LogDown()
-		{
-			GetLog()->Down();
-		}
+	static void LogInitialise();
+	static void Log(const TCHAR* format, ...);
+	static void Log(TLogFile::Type logtype, const TCHAR* format, ...);
+	static void LogConsole(const TCHAR* format, ...);
+	static void LogSet(TLogFile* a_logFile);
 
-		static void LogUp()
-		{
-			GetLog()->Up();
-		}
+	static TLogFile* GetLog() { return Toshi::TUtil::GetSingleton()->m_pLogFile2; }
 
-	private:
-		TLogFile* m_pLogFile1;
-		TLogFile* m_pLogFile2;
-		TEmitter<TLogFile> m_Emitter;
-		
-	public:
+	static void LogDown() { GetLog()->Down(); }
+
+	static void LogUp() { GetLog()->Up(); }
+
+private:
+	TLogFile*          m_pLogFile1;
+	TLogFile*          m_pLogFile2;
+	TEmitter<TLogFile> m_Emitter;
+
+public:
 #pragma region CRC
 
-		// Source: https://lentz.com.au/blog/tag/crc-table-generator
+// Source: https://lentz.com.au/blog/tag/crc-table-generator
 
-		/*
+/*
 			LICENCE
 
 			This package may be freely distributed provided the files remain together,
@@ -103,25 +82,24 @@ namespace Toshi
 			this licence and disclaimer.
 		*/
 
-		/* ------------------------------------------------------------------------- */
-		/* CRC-32 CCITT                                                              */
-		/* ------------------------------------------------------------------------- */
-		#define CRC32POLY      (0xEDB88320L)    /* Generator polynomial number       */
-		#define CRC32POST(crc) (~(crc))         /* CRC Postconditioning before xmit  */
+/* ------------------------------------------------------------------------- */
+/* CRC-32 CCITT                                                              */
+/* ------------------------------------------------------------------------- */
+#define CRC32POLY      (0xEDB88320L) /* Generator polynomial number       */
+#define CRC32POST(crc) (~(crc))      /* CRC Postconditioning before xmit  */
 
-		#define crc32upd(crctab,crc,c) \
-					  ((crctab)[((int) (crc) ^ (c)) & 0xff] ^ ((crc) >> 8))
+#define crc32upd(crctab, crc, c) ((crctab)[((TINT)(crc) ^ (c)) & 0xff] ^ ((crc) >> 8))
 
-		#define CRC_TABSIZE (256)               /* Normal 256-entry table            */
+#define CRC_TABSIZE (256) /* Normal 256-entry table            */
 
-		//=============================================================================
+	//=============================================================================
 
-		inline static uint32_t s_aiCRC32LUT[CRC_TABSIZE] = {};
+	inline static TUINT32 s_aiCRC32LUT[CRC_TABSIZE] = {};
 
-		static void CRCInitialise();
-		static uint32_t CRC32(unsigned char* buffer, uint32_t len);
+	static void    CRCInitialise();
+	static TUINT32 CRC32(TUINT8* buffer, TUINT32 len);
 
 #pragma endregion
+};
 
-	};
-}
+TOSHI_NAMESPACE_END

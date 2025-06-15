@@ -1,7 +1,7 @@
 #pragma once
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TPostProcess;
+class TPostProcess;
 
-}
+TOSHI_NAMESPACE_END

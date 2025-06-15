@@ -6,7 +6,7 @@ void ACurrentLevelInformation::Create(DataBlock a_type)
 {
 	auto assetStreaming = AAssetStreaming::GetSingleton();
 
-	char* szFilename = Toshi::TStringManager::GetTempString8();
+	TCHAR* szFilename = Toshi::TStringManager::GetTempString8();
 
 	for (size_t i = 0; i < DataBlockCount; i++)
 	{
@@ -23,14 +23,14 @@ void ACurrentLevelInformation::Create(DataBlock a_type)
 
 		TASSERT(!m_streamingJobs[i]);
 		TASSERT(!m_datablocks[i]);
-		m_datablocks[i] = new Toshi::TTRB();
-		m_streamingJobs[i] = TSTATICCAST(ATRBLoaderJob*, assetStreaming->CancelAllWaitingTerrainJobs());
+		m_datablocks[i]    = new Toshi::TTRB();
+		m_streamingJobs[i] = TSTATICCAST(ATRBLoaderJob, assetStreaming->CancelAllWaitingTerrainJobs());
 		m_streamingJobs[i]->Init(m_datablocks[i], szFilename);
 		assetStreaming->AddMainThreadJob2(m_streamingJobs[i]);
 	}
 }
 
-const char* ACurrentLevelInformation::GetDataBlockFilename(DataBlock a_type)
+const TCHAR* ACurrentLevelInformation::GetDataBlockFilename(DataBlock a_type)
 {
 	TASSERT(a_type >= 0 && a_type < DataBlockCount);
 	return sm_dataBlockFilenames[a_type].second;

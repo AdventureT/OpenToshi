@@ -13,134 +13,131 @@ class TXUIScene;
 
 class TXUIResource
 {
-	static const uint32_t IDXUR =       TMAKEFOUR("XUIB");
-	static const uint32_t IDXURSTRING = TMAKEFOUR("STRN");
-	static const uint32_t IDXURVEC =    TMAKEFOUR("VECT");
-	static const uint32_t IDXURQUAT =   TMAKEFOUR("QUAT");
-	static const uint32_t IDXURCUST =   TMAKEFOUR("CUST");
-	static const uint32_t IDXURDATA =   TMAKEFOUR("DATA");
+	static const TUINT32 IDXUR       = TFourCC("XUIB");
+	static const TUINT32 IDXURSTRING = TFourCC("STRN");
+	static const TUINT32 IDXURVEC    = TFourCC("VECT");
+	static const TUINT32 IDXURQUAT   = TFourCC("QUAT");
+	static const TUINT32 IDXURCUST   = TFourCC("CUST");
+	static const TUINT32 IDXURDATA   = TFourCC("DATA");
 
 	struct Section
 	{
-		uint32_t m_uiSectionID;     // 0x0
-		uint32_t m_uiOffset;        // 0x4
-		uint32_t m_uiSize;          // 0x8
+		TUINT32 m_uiSectionID; // 0x0
+		TUINT32 m_uiOffset;    // 0x4
+		TUINT32 m_uiSize;      // 0x8
 	};
 
 	struct XURHeader
 	{
 		XURHeader()
 		{
-			m_apSections = TNULL;
-			m_uiFileID = 0;
-			m_uiVersion = 0;
-			m_uiXuiVersion = 0;
-			m_usBinSize = 0;
-			m_uiFlags = 0;
+			m_apSections    = TNULL;
+			m_uiFileID      = 0;
+			m_uiVersion     = 0;
+			m_uiXuiVersion  = 0;
+			m_usBinSize     = 0;
+			m_uiFlags       = 0;
 			m_usNumSections = 0;
 		}
 
-		Section* m_apSections;      // 0x00
-		uint32_t m_uiFileID;        // 0x04
-		uint32_t m_uiVersion;       // 0x08
-		uint32_t m_uiXuiVersion;    // 0x0C
-		uint32_t m_usBinSize;       // 0x10
-		uint16_t m_uiFlags;         // 0x12
-		uint16_t m_usNumSections;   // 0x14
+		Section* m_apSections;    // 0x00
+		TUINT32  m_uiFileID;      // 0x04
+		TUINT32  m_uiVersion;     // 0x08
+		TUINT32  m_uiXuiVersion;  // 0x0C
+		TUINT32  m_usBinSize;     // 0x10
+		TUINT16  m_uiFlags;       // 0x12
+		TUINT16  m_usNumSections; // 0x14
 	};
 
 public:
 	TXUIResource()
 	{
-		m_pMemoryHeap = TNULL;
+		m_pMemoryHeap   = TNULL;
 		m_asStringTable = TNULL;
-		m_avVectors = TNULL;
-		m_aqZRotTable = TNULL;
-		m_pCustData = TNULL;
-		m_pRoot = TNULL;
+		m_avVectors     = TNULL;
+		m_aqZRotTable   = TNULL;
+		m_pCustData     = TNULL;
+		m_pRoot         = TNULL;
 		m_uiStringCount = 0;
 		m_uiVectorCount = 0;
-		m_uiQuatCount = 0;
-		m_pStringTable = 0;
+		m_uiQuatCount   = 0;
+		m_pStringTable  = 0;
 	}
 
 	~TXUIResource();
 
-	const wchar_t* GetString(uint16_t a_uiType)
-	{
-		return m_asStringTable[a_uiType];
-	}
+	const TWCHAR* GetString(TUINT16 a_uiType) { return m_asStringTable[a_uiType]; }
 
-	float GetZRotation(int a_iIndex = 0)
+	TFLOAT GetZRotation(TINT a_iIndex = 0)
 	{
 		TASSERT(a_iIndex >= -1);
 		return (a_iIndex == -1) ? 0 : m_aqZRotTable[a_iIndex];
 	}
 
-	const TVector2* GetVector(int a_iIndex = 0)
+	const TVector2* GetVector(TINT a_iIndex = 0)
 	{
 		TASSERT(a_iIndex >= -1);
 		return (a_iIndex == -1) ? &TVector2::VEC_ZERO : &m_avVectors[a_iIndex];
 	}
 
-	const uint8_t* GetCust(uint32_t a_uiOffset) const
+	const TUINT8* GetCust(TUINT32 a_uiOffset) const
 	{
 		TASSERT(a_uiOffset < m_uiCustDataSize);
 		return m_pCustData + a_uiOffset;
 	}
 
-	TBOOL ReadHeader(uint8_t* buffer);
+	TBOOL ReadHeader(TUINT8* buffer);
 
-	// Toshi::TXUIResource::Load(const char*, const char*, TBOOL, Toshi::TTRB*)
+	// Toshi::TXUIResource::Load(const TCHAR*, const TCHAR*, TBOOL, Toshi::TTRB*)
 
 	// loadStringTables = when TTRUE load .xus/.trb files (StringTables)
 	// filename = f.e Data/XUI/%s.trb or Data/XUI/%s.xur
 	// fileNameStringTable = f.e %s/StringTables/%s/%s.xus or %s/StringTables/%s/%s.trb
 	// loadTrb = when TTRUE load .xur/.trb files (XUIB)
 	// unk3 = probably a function
-	void Load(TBOOL loadStringTables, const char* filenameXUIB, const char* fileNameStringTable, TBOOL loadTrb, void* unk3);
+	void Load(TBOOL loadStringTables, const TCHAR* filenameXUIB, const TCHAR* fileNameStringTable, TBOOL loadTrb, void* unk3);
 
-	TBOOL Load(uint8_t* buffer);
-	TBOOL ReadDataSection(uint8_t* a_pData, uint32_t size);
-	TBOOL ReadStringSection(uint8_t* buffer, uint32_t size);
-	TBOOL ReadCustSection(uint8_t* buffer, uint32_t size);
-	TBOOL ReadQuatSection(uint8_t* buffer, uint32_t size);
-	int GetStringTableSize(uint8_t* pPtr, uint32_t size);
+	TBOOL Load(TUINT8* buffer);
+	TBOOL ReadDataSection(TUINT8* a_pData, TUINT32 size);
+	TBOOL ReadStringSection(TUINT8* buffer, TUINT32 size);
+	TBOOL ReadCustSection(TUINT8* buffer, TUINT32 size);
+	TBOOL ReadQuatSection(TUINT8* buffer, TUINT32 size);
+	TINT  GetStringTableSize(TUINT8* pPtr, TUINT32 size);
 
-	void PushID(const wchar_t* a_wsID);
+	void PushID(const TWCHAR* a_wsID);
 	void PopID();
 
 	TXUIStringTable& LookupStringTable();
 
-	TXUIScene* CreateScene(uint32_t a_uiIndex);
-	TXUIScene* CreateScene(const wchar_t* a_wcName);
-	XURXUIObjectData* FindScene(uint32_t a_uiIndex);
-	XURXUIObjectData* FindScene(const wchar_t* a_wcName);
-	XURXUIObjectData* FindFirstScene(uint32_t a_uiIndex);
+	TXUIScene*        CreateScene(TUINT32 a_uiIndex);
+	TXUIScene*        CreateScene(const TWCHAR* a_wcName);
+	XURXUIObjectData* FindScene(TUINT32 a_uiIndex);
+	XURXUIObjectData* FindScene(const TWCHAR* a_wcName);
+	XURXUIObjectData* FindFirstScene(TUINT32 a_uiIndex);
 
-	static XURXUIObjectData* CreateObjectData(TXUIResource& a_rResource, uint16_t a_uiType);
-	static XURXUIObjectData* CreateObjectData(TXUIResource& a_rResource, const wchar_t* objectName);
+	static XURXUIObjectData* CreateObjectData(TXUIResource& a_rResource, TUINT16 a_uiType);
+	static XURXUIObjectData* CreateObjectData(TXUIResource& a_rResource, const TWCHAR* objectName);
 
 private:
 	void Destroy();
 
 private:
-	XURHeader m_oHeader;                             // 0x00
-	TMemoryHeap* m_pMemoryHeap;                      // 0x18
-	wchar_t** m_asStringTable;                       // 0x1C
-	TVector2* m_avVectors;                           // 0x20
-	float* m_aqZRotTable;                            // 0x24
-	uint8_t* m_pCustData;                            // 0x28
-	XURXUIObjectData* m_pRoot;                       // 0x2C
-	uint32_t m_uiStringCount;                        // 0x30
-	uint32_t m_uiVectorCount;                        // 0x34
-	uint32_t m_uiQuatCount;                          // 0x38
-	uint32_t m_uiCustDataSize;                       // 0x3C
-	TXUIStringTable* m_pStringTable;                 // 0x40
-	TString16 m_ID;                                  // 0x44
-	TStack<const wchar_t*, 32> m_oIDComparisonStack; // 0x50
+	XURHeader                 m_oHeader;            // 0x00
+	TMemoryHeap*              m_pMemoryHeap;        // 0x18
+	TWCHAR**                  m_asStringTable;      // 0x1C
+	TVector2*                 m_avVectors;          // 0x20
+	TFLOAT*                   m_aqZRotTable;        // 0x24
+	TUINT8*                   m_pCustData;          // 0x28
+	XURXUIObjectData*         m_pRoot;              // 0x2C
+	TUINT32                   m_uiStringCount;      // 0x30
+	TUINT32                   m_uiVectorCount;      // 0x34
+	TUINT32                   m_uiQuatCount;        // 0x38
+	TUINT32                   m_uiCustDataSize;     // 0x3C
+	TXUIStringTable*          m_pStringTable;       // 0x40
+	TString16                 m_ID;                 // 0x44
+	TStack<const TWCHAR*, 32> m_oIDComparisonStack; // 0x50
 public:
-	static inline int s_iUIDCount = 0;
+	static inline TINT  s_iUIDCount     = 0;
 	static inline TBOOL s_bGenerateUIDs = TFALSE;
 };
 

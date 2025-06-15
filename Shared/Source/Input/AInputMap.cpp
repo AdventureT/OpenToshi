@@ -6,15 +6,36 @@ using namespace Toshi;
 
 #define BIND_MAP
 #define BIND_VECTOR oBinds
-#define BIND_ACTION3(MAP, ACTION, KEY1)             { BIND_VECTOR.PushBack(1); BIND_VECTOR.PushBack(KEY1); MAP.Insert(ACTION, BIND_VECTOR); BIND_VECTOR.Clear(); }
-#define BIND_ACTION4(MAP, ACTION, KEY1, KEY2)       { BIND_VECTOR.PushBack(2); BIND_VECTOR.PushBack(KEY1); BIND_VECTOR.PushBack(KEY2); MAP.Insert(ACTION, BIND_VECTOR); BIND_VECTOR.Clear(); }
-#define BIND_ACTION5(MAP, ACTION, KEY1, KEY2, KEY3) { BIND_VECTOR.PushBack(3); BIND_VECTOR.PushBack(KEY1); BIND_VECTOR.PushBack(KEY2); BIND_VECTOR.PushBack(KEY3); MAP.Insert(ACTION, BIND_VECTOR); BIND_VECTOR.Clear(); }
+#define BIND_ACTION3(MAP, ACTION, KEY1)  \
+	{                                    \
+		BIND_VECTOR.PushBack(1);         \
+		BIND_VECTOR.PushBack(KEY1);      \
+		MAP.Insert(ACTION, BIND_VECTOR); \
+		BIND_VECTOR.Clear();             \
+	}
+#define BIND_ACTION4(MAP, ACTION, KEY1, KEY2) \
+	{                                         \
+		BIND_VECTOR.PushBack(2);              \
+		BIND_VECTOR.PushBack(KEY1);           \
+		BIND_VECTOR.PushBack(KEY2);           \
+		MAP.Insert(ACTION, BIND_VECTOR);      \
+		BIND_VECTOR.Clear();                  \
+	}
+#define BIND_ACTION5(MAP, ACTION, KEY1, KEY2, KEY3) \
+	{                                               \
+		BIND_VECTOR.PushBack(3);                    \
+		BIND_VECTOR.PushBack(KEY1);                 \
+		BIND_VECTOR.PushBack(KEY2);                 \
+		BIND_VECTOR.PushBack(KEY3);                 \
+		MAP.Insert(ACTION, BIND_VECTOR);            \
+		BIND_VECTOR.Clear();                        \
+	}
 #define BIND_ACTION(...) CALL_OVERLOAD(BIND_ACTION, __VA_ARGS__)
 
 void AInputMap::InitialiseButtonMap()
 {
 	BindVector oBinds;
-	
+
 	// ActionButtonMap1
 	BIND_ACTION(m_ActionButtonMap1, ACTIONBUTTON_0, TInputDeviceKeyboard::KEY_ESCAPE, 0x10009);
 	BIND_ACTION(m_ActionButtonMap1, ACTIONBUTTON_1, TInputDeviceKeyboard::KEY_SPACE, 0x1000b);
@@ -198,28 +219,29 @@ void AInputMap::NamePadDoodads()
 
 AInputMap::ButtonMap* AInputMap::GetButtonMap(INPUTCONTEXT m_eInputContext)
 {
-	switch (m_eInputContext) {
-	case AInputMap::INPUTCONTEXT_UNK:
-		return &m_ActionButtonMap1;
-	case AInputMap::INPUTCONTEXT_UNK2:
-		return &m_ActionButtonMap2;
-	case AInputMap::INPUTCONTEXT_UNK3:
-		return &m_ActionButtonMap3;
-	case AInputMap::INPUTCONTEXT_UNK4:
-		return &m_ActionButtonMap4;
-	case AInputMap::INPUTCONTEXT_UNK5:
-		return &m_ActionButtonMap5;
-	case AInputMap::INPUTCONTEXT_UNK6:
-		return &m_ActionButtonMap6;
-	case AInputMap::INPUTCONTEXT_UNK7:
-		return &m_ActionButtonMap7;
-	case AInputMap::INPUTCONTEXT_UNK8:
-		return &m_ActionButtonMap8;
-	case AInputMap::INPUTCONTEXT_UNK9:
-		return &m_ActionButtonMap9;
-	case AInputMap::INPUTCONTEXT_UNK10:
-		return &m_ActionButtonMap10;
-	default:
-		return TNULL;
+	switch (m_eInputContext)
+	{
+		case AInputMap::INPUTCONTEXT_UNK:
+			return &m_ActionButtonMap1;
+		case AInputMap::INPUTCONTEXT_UNK2:
+			return &m_ActionButtonMap2;
+		case AInputMap::INPUTCONTEXT_UNK3:
+			return &m_ActionButtonMap3;
+		case AInputMap::INPUTCONTEXT_UNK4:
+			return &m_ActionButtonMap4;
+		case AInputMap::INPUTCONTEXT_UNK5:
+			return &m_ActionButtonMap5;
+		case AInputMap::INPUTCONTEXT_UNK6:
+			return &m_ActionButtonMap6;
+		case AInputMap::INPUTCONTEXT_UNK7:
+			return &m_ActionButtonMap7;
+		case AInputMap::INPUTCONTEXT_UNK8:
+			return &m_ActionButtonMap8;
+		case AInputMap::INPUTCONTEXT_UNK9:
+			return &m_ActionButtonMap9;
+		case AInputMap::INPUTCONTEXT_UNK10:
+			return &m_ActionButtonMap10;
+		default:
+			return TNULL;
 	}
 }

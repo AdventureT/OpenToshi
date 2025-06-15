@@ -3,17 +3,20 @@
 #include "Locale/ALocaleManager.h"
 
 #include <Toshi/Input/TInputDeviceController.h>
-#include TOSHI_MULTIRENDER(Input/TInputInterface)
+
+#ifdef TOSHI_RENDERER_DX11
+#  include "Platform/DX11/Input/TInputInterface_DX11.h"
+#endif // TOSHI_RENDERER_DX11
 
 using namespace Toshi;
 
-AInputManager2::AInputManager2() : 
-	m_aControllers()
+AInputManager2::AInputManager2()
+    : m_aControllers()
 {
 	TUtil::MemClear(m_aControllers, sizeof(m_aControllers));
 
-	auto pInputInterface = new TInputDXInterface();
-	TBOOL result = pInputInterface->Initialise();
+	auto  pInputInterface = new TInputDXInterface();
+	TBOOL result          = pInputInterface->Initialise();
 
 	TASSERT(result == TTRUE);
 
@@ -24,8 +27,8 @@ AInputManager2::AInputManager2() :
 		UpdateControllers();
 
 		if (!HasDeviceOfPlatform(Platform::Unk2) &&
-			!HasDeviceOfPlatform(Platform::Unk3) &&
-			!HasDeviceOfPlatform(Platform::Wii))
+		    !HasDeviceOfPlatform(Platform::Unk3) &&
+		    !HasDeviceOfPlatform(Platform::Wii))
 		{
 			ALocaleManager::SetPlatform(Platform::PC);
 			TTODO("Do something with platform settings");
@@ -60,8 +63,8 @@ void AInputManager2::Update(float a_fDeltaTime)
 	UpdateControllers();
 
 	if (!HasDeviceOfPlatform(Platform::Unk2) &&
-		!HasDeviceOfPlatform(Platform::Unk3) &&
-		!HasDeviceOfPlatform(Platform::Wii))
+	    !HasDeviceOfPlatform(Platform::Unk3) &&
+	    !HasDeviceOfPlatform(Platform::Wii))
 	{
 		ALocaleManager::SetPlatform(Platform::PC);
 		TTODO("Do something with platform settings");
@@ -98,7 +101,7 @@ AInputManager2::AInputDeviceHandle AInputManager2::GetControllerHandle(INPUTDEVI
 
 void AInputManager2::UpdateControllers()
 {
-	size_t iDeviceId = 0;
+	size_t iDeviceId          = 0;
 	size_t iDeviceSearchIndex = 0;
 
 	auto pInputInterface = TInputInterface::GetSingleton();
@@ -106,15 +109,15 @@ void AInputManager2::UpdateControllers()
 	for (size_t i = 0; i < INPUTDEVICE_Count; i++)
 	{
 		m_aControllers[i].m_pDevice = TNULL;
-		m_aControllers[i].m_iId = 0;
+		m_aControllers[i].m_iId     = 0;
 
 		auto pController = pInputInterface->GetDeviceByIndex<TInputDeviceController>(iDeviceSearchIndex);
-		
+
 		while (pController)
 		{
 			if (pController->IsEnabled())
 			{
-				m_aControllers[i].m_iId = iDeviceId++;
+				m_aControllers[i].m_iId     = iDeviceId++;
 				m_aControllers[i].m_pDevice = pController;
 				break;
 			}
@@ -127,7 +130,7 @@ void AInputManager2::UpdateControllers()
 	}
 }
 
-TBOOL AInputManager2::HasDeviceOfPlatform(Toshi::Platform a_ePlatform) const
+TBOOL AInputManager2::HasDeviceOfPlatform(Platform a_ePlatform) const
 {
 	auto pRegisteredDevices = TInputDevice::GetRegisteredDevices();
 

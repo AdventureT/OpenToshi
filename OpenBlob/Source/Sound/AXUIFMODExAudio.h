@@ -9,18 +9,23 @@ public:
 	AXUIFMODExAudio()
 	{
 		m_iNumSubSounds = 0;
-		m_pSound = TNULL;
+		m_pSound        = TNULL;
 	}
 
-	virtual TBOOL Create(char* a_szSoundName);
-	virtual TBOOL Release();
-	virtual FMOD::Sound* GetSubSound(char* a_pSubSoundName);
-	virtual TBOOL PlaySound(FMOD::Sound* a_pSound, TFLOAT a_fVolume, FMOD::Channel* a_pChannel);
+	virtual TBOOL        Create(TCHAR* a_szSoundName);
+	virtual TBOOL        Release();
+	virtual FMOD::Sound* GetSubSound(TCHAR* a_pSubSoundName);
+	virtual TBOOL        PlaySound(FMOD::Sound* a_pSound, TFLOAT a_fVolume, FMOD::Channel* a_pChannel);
 
-	virtual void Stop(FMOD::Channel* a_pChannel) { if (a_pChannel) a_pChannel->stop(); }
-	virtual void SetVolume(FMOD::Channel* a_pChannel, TFLOAT a_fVolume) { if (a_pChannel) a_pChannel->setVolume(AOptions::GetSingleton()->GetPitch() * a_fVolume); }
+	virtual void Stop(FMOD::Channel* a_pChannel)
+	{
+		if (a_pChannel) a_pChannel->stop();
+	}
+	virtual void SetVolume(FMOD::Channel* a_pChannel, TFLOAT a_fVolume)
+	{
+		if (a_pChannel) a_pChannel->setVolume(AOptions::GetSingleton()->GetPitch() * a_fVolume);
+	}
 
-	int m_iNumSubSounds;   // 0x4
-	FMOD::Sound* m_pSound; // 0x8
+	TINT         m_iNumSubSounds; // 0x4
+	FMOD::Sound* m_pSound;        // 0x8
 };
-

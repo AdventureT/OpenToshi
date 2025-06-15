@@ -11,54 +11,58 @@
 #include "Options/AOptions.h"
 #include "ARandom.h"
 
-#include TOSHI_MULTIRENDER(Movie/ADX11MoviePlayer)
+#ifdef TOSHI_RENDERER_DX11
+#  include "Platform/DX11/Movie/ADX11MoviePlayer_DX11.h"
+#elif defined(TOSHI_RENDERER_OPENGL) // TOSHI_RENDERER_DX11
+#  include "Platform/SDL/Movie/ASDLMoviePlayer_SDL.h"
+#endif // TOSHI_RENDERER_OPENGL
 
 #include <Toshi2/T2GUI/T2GUI.h>
 #include <Toshi2/T2GUI/T2GUIRectangle.h>
 
 using namespace Toshi;
 
-AGameState::UpdateResult AAppInitState::OnUpdate(float deltaTime)
+AGameState::UpdateResult AAppInitState::OnUpdate(TFLOAT deltaTime)
 {
-    TIMPLEMENT();
+	TIMPLEMENT();
 
-    if (AAssetStreaming::GetSingleton()->HasActiveJobs())
-    {
-        ARenderer::GetSingleton()->SetBackgroundColour(0, 0, 0);
-        return AGameState::OnUpdate(deltaTime);
-    }
+	if (AAssetStreaming::GetSingleton()->HasActiveJobs())
+	{
+		ARenderer::GetSingleton()->SetBackgroundColour(0, 0, 0);
+		return AGameState::OnUpdate(deltaTime);
+	}
 
-    TString8 str;
-    str = str.Format("data/%s.trb", AApplication::g_oTheApp.GetLevelInformationFileName());
+	TString8 str;
+	str = str.Format("data/%s.trb", AApplication::g_oTheApp.GetLevelInformationFileName());
 
-    ALevelInformation* levelInformation = ALevelInformation::CreateSingleton();
-    levelInformation->Create(str);
+	ALevelInformation* levelInformation = ALevelInformation::CreateSingleton();
+	levelInformation->Create(str);
 
-    AOptions::CreateSingleton();
-    ARandom::CreateSingleton();
+	AOptions::CreateSingleton();
+	ARandom::CreateSingleton();
 	AModelLoader::CreateSingleton();
-    ADX11MoviePlayer::CreateSingleton<ADX11MoviePlayer>()->OnCreate();
+	ADX11MoviePlayer::CreateSingleton<ADX11MoviePlayer>()->OnCreate();
 
-    return UpdateResult_Remove;
+	return UpdateResult_Remove;
 }
 
 void AAppInitState::OnInsertion()
 {
-    TIMPLEMENT();
-    AGameState::OnInsertion();
+	TIMPLEMENT();
+	AGameState::OnInsertion();
 }
 
 void AAppInitState::OnRemoval()
 {
-    AGameState::OnRemoval();
+	AGameState::OnRemoval();
 
-    if (AApplication::g_oTheApp.ShouldLoadModelViewState())
-    {
-        TIMPLEMENT_D("AModelViewState");
-    }
-    else
-    {
-        AGameStateController::GetSingletonSafe()->PushState(new AFrontEndMovieState);
-        TIMPLEMENT_D("The game");
-    }
+	if (AApplication::g_oTheApp.ShouldLoadModelViewState())
+	{
+		TIMPLEMENT_D("AModelViewState");
+	}
+	else
+	{
+		AGameStateController::GetSingletonSafe()->PushState(new AFrontEndMovieState);
+		TIMPLEMENT_D("The game");
+	}
 }

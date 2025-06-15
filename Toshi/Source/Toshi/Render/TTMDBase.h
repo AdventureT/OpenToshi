@@ -1,20 +1,21 @@
 #pragma once
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	namespace TTMDBase {
+namespace TTMDBase
+{
 
-		struct SkeletonHeader
-		{
-			const char* m_pTKLName;
-			int m_iTKeyCount;
-			int m_iQKeyCount;
-			int m_iSKeyCount;
-			int m_iTBaseIndex;
-			int m_iQBaseIndex;
-			int m_iSBaseIndex;
-		};
+struct SkeletonHeader
+{
+	const TCHAR* m_pTKLName;
+	TINT         m_iTKeyCount;
+	TINT         m_iQKeyCount;
+	TINT         m_iSKeyCount;
+	TINT         m_iTBaseIndex;
+	TINT         m_iQBaseIndex;
+	TINT         m_iSBaseIndex;
+};
 
-	}
+} // namespace TTMDBase
 
-}
+TOSHI_NAMESPACE_END

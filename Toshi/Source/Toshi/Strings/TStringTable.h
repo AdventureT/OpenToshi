@@ -1,26 +1,27 @@
 #pragma once
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TStringTable
 {
-	class TStringTable
+public:
+	TStringTable(const TCHAR* const* strings, TINT numStrings)
 	{
-	public:
-		TStringTable(const char* const* strings, int numStrings)
-		{
-			m_Strings = strings;
-			m_NumStrings = numStrings;
-		}
-		
-		const char* GetStringFromID(int id)
-		{
-			TASSERT(id >= 0 && id < m_NumStrings);
-			return m_Strings[id];
-		}
+		m_Strings    = strings;
+		m_NumStrings = numStrings;
+	}
 
-		int GetStringID(const char* string);
+	const TCHAR* GetStringFromID(TINT id)
+	{
+		TASSERT(id >= 0 && id < m_NumStrings);
+		return m_Strings[id];
+	}
 
-	private:
-		const char* const* m_Strings;
-		int m_NumStrings;
-	};
-}
+	TINT GetStringID(const TCHAR* string);
+
+private:
+	const TCHAR* const* m_Strings;
+	TINT                m_NumStrings;
+};
+
+TOSHI_NAMESPACE_END

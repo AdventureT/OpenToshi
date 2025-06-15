@@ -1,295 +1,251 @@
 #pragma once
 #include "Toshi/Typedefs.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+template <class T> class TNodeTree
 {
-	template <class T>
-	class TNodeTree
+public:
+	class TNode
 	{
 	public:
-		class TNode
+		friend TNodeTree;
+
+	protected:
+		TNode()
 		{
-		public:
-			friend TNodeTree;
-
-		protected:
-			TNode()
-			{
-				m_Tree = TNULL;
-				m_Next = this;
-				m_Prev = this;
-				m_Parent = TNULL;
-				m_Attached = TNULL;
-			}
-
-		public:
-			TBOOL IsLinked() const
-			{
-				return m_Tree != TNULL;
-			}
-
-			TBOOL IsChildOfDefaultRoot() const
-			{
-				TASSERT(IsLinked() == TTRUE);
-				return m_Parent == &Tree()->m_Root;
-			}
-
-			T* Parent() const
-			{
-				return m_Parent->Cast();
-			}
-
-			T* Next() const
-			{
-				return m_Next->Cast();
-			}
-
-			T* Prev() const
-			{
-				return m_Prev->Cast();
-			}
-
-			TNodeTree<T>* Tree() const
-			{
-				return m_Tree;
-			}
-
-			T* Attached() const
-			{
-				return m_Attached->Cast();
-			}
-
-			T* Cast()
-			{
-				return static_cast<T*>(this);
-			}
-
-		protected:
-			TNodeTree<T>* m_Tree;
-			TNode* m_Next;
-			TNode* m_Prev;
-			TNode* m_Parent;
-			TNode* m_Attached;
-		};
+			m_Tree     = TNULL;
+			m_Next     = this;
+			m_Prev     = this;
+			m_Parent   = TNULL;
+			m_Attached = TNULL;
+		}
 
 	public:
-		TNodeTree()
+		TBOOL IsLinked() const { return m_Tree != TNULL; }
+
+		TBOOL IsChildOfDefaultRoot() const
 		{
-			m_Count = 0;
+			TASSERT(IsLinked() == TTRUE);
+			return m_Parent == &Tree()->m_Root;
 		}
 
-		~TNodeTree()
-		{
-			DeleteAll();
-			TASSERT(IsLinked() == TFALSE);
-		}
+		T* Parent() const { return m_Parent->Cast(); }
 
-		/**
+		T* Next() const { return m_Next->Cast(); }
+
+		T* Prev() const { return m_Prev->Cast(); }
+
+		TNodeTree<T>* Tree() const { return m_Tree; }
+
+		T* Attached() const { return m_Attached->Cast(); }
+
+		T* Cast() { return static_cast<T*>(this); }
+
+	protected:
+		TNodeTree<T>* m_Tree;
+		TNode*        m_Next;
+		TNode*        m_Prev;
+		TNode*        m_Parent;
+		TNode*        m_Attached;
+	};
+
+public:
+	TNodeTree() { m_Count = 0; }
+
+	~TNodeTree()
+	{
+		DeleteAll();
+		TASSERT(IsLinked() == TFALSE);
+	}
+
+	/**
 		* Inserts node as a child of another node.
 		* 
 		* @param parentNode Pointer to the parent node.
 		* @param sourceNode Pointer to the node you want to insert.
 		*/
-		void Insert(TNode* parentNode, TNode* sourceNode)
+	void Insert(TNode* parentNode, TNode* sourceNode)
+	{
+		// Toshi::TNodeTree<Toshi::TResource>::Insert - 00691aa0
+		TASSERT(sourceNode->IsLinked() == TFALSE, "The source node shouldn't be linked");
+
+		// Remove the source node from the tree
+		Remove(*sourceNode, TFALSE);
+
+		// Get the first attached to parent node
+		TNode* firstAttached = parentNode->Attached();
+
+		if (firstAttached != TNULL)
 		{
-			// Toshi::TNodeTree<Toshi::TResource>::Insert - 00691aa0
-			TASSERT(sourceNode->IsLinked() == TFALSE, "The source node shouldn't be linked");
-			
-			// Remove the source node from the tree
-			Remove(*sourceNode, TFALSE);
+			// Attach node to other attached nodes
+			TNode* lastAttached = firstAttached->Prev();
 
-			// Get the first attached to parent node
-			TNode* firstAttached = parentNode->Attached();
+			lastAttached->m_Next  = sourceNode;
+			firstAttached->m_Prev = sourceNode;
 
-			if (firstAttached != TNULL)
-			{
-				// Attach node to other attached nodes
-				TNode* lastAttached = firstAttached->Prev();
-				
-				lastAttached->m_Next = sourceNode;
-				firstAttached->m_Prev = sourceNode;
-
-				sourceNode->m_Next = firstAttached;
-				sourceNode->m_Prev = lastAttached;
-			}
-			else
-			{
-				// Attach node as the first one
-				parentNode->m_Attached = sourceNode;
-			}
-
-			sourceNode->m_Tree = this;
-			sourceNode->m_Parent = parentNode;
-			m_Count += 1;
+			sourceNode->m_Next = firstAttached;
+			sourceNode->m_Prev = lastAttached;
+		}
+		else
+		{
+			// Attach node as the first one
+			parentNode->m_Attached = sourceNode;
 		}
 
-		/**
+		sourceNode->m_Tree   = this;
+		sourceNode->m_Parent = parentNode;
+		m_Count += 1;
+	}
+
+	/**
 		* Inserts node to the default tree.
 		*
 		* @param sourceNode Pointer to the node you want to insert.
 		*/
-		void InsertAtRoot(TNode* sourceNode)
-		{
-			Insert(GetRoot(), sourceNode);
-		}
+	void InsertAtRoot(TNode* sourceNode) { Insert(GetRoot(), sourceNode); }
 
-		/**
+	/**
 		 * Tries to remove sourceNode from the tree and inserts it to the parentNode or to the root
 		 */
-		void ReInsert(TNode* parentNode, TNode* sourceNode)
+	void ReInsert(TNode* parentNode, TNode* sourceNode)
+	{
+		Remove(sourceNode, TFALSE);
+
+		if (parentNode == TNULL)
 		{
-			Remove(sourceNode, TFALSE);
-
-			if (parentNode == TNULL)
+			if (this != TNULL)
 			{
-				if (this != TNULL)
-				{
-					InsertAtRoot(sourceNode);
-					return;
-				}
+				InsertAtRoot(sourceNode);
+				return;
 			}
-
-			Insert(parentNode, sourceNode);
 		}
 
-		TNode* Remove(TNode& node, TBOOL flag = TFALSE)
-		{
-			// Toshi::TNodeTree<Toshi::TResource>::Remove - 00691e70
-			TNodeTree<T>* nodeRoot = node.Tree();
-			TNode* nodeParent = node.Parent();
-			
-			if (nodeRoot != TNULL)
-			{
-				// Check if the node belongs to the current tree
-				if (nodeRoot != this)
-				{
-					return &node;
-				}
+		Insert(parentNode, sourceNode);
+	}
 
+	TNode* Remove(TNode& node, TBOOL flag = TFALSE)
+	{
+		// Toshi::TNodeTree<Toshi::TResource>::Remove - 00691e70
+		TNodeTree<T>* nodeRoot   = node.Tree();
+		TNode*        nodeParent = node.Parent();
+
+		if (nodeRoot != TNULL)
+		{
+			// Check if the node belongs to the current tree
+			if (nodeRoot != this)
+			{
+				return &node;
+			}
+
+			m_Count -= 1;
+		}
+
+		if (flag)
+		{
+			TNode* attachedNode = node.Attached();
+
+			while (attachedNode != TNULL)
+			{
+				TNodeTree<T>* nodeRoot = node.Tree();
+
+				Remove(*attachedNode, TFALSE);
+				Insert(node.Parent(), attachedNode);
+
+				attachedNode = node.Attached();
+				TIMPLEMENT_D("It seems to be unused and I hope it is. I don't know if it works and what it should do");
+			}
+		}
+
+		if (nodeParent != TNULL)
+		{
+			// If it's the first attached to the root node, set it to next or just remove
+			if (nodeParent->Attached() == &node)
+			{
+				nodeParent->m_Attached = (node.Next() != &node) ? node.Next() : TNULL;
+			}
+
+			node.m_Parent = TNULL;
+		}
+
+		node.m_Prev->m_Next = node.m_Next;
+		node.m_Next->m_Prev = node.m_Prev;
+		node.m_Next         = &node;
+		node.m_Prev         = &node;
+		node.m_Tree         = TNULL;
+		return &node;
+	}
+
+	TNode* Remove(TNode* node, TBOOL flag = TFALSE) { return Remove(*node, flag); }
+
+	void DeleteRecurse(TNode* node)
+	{
+		while (node != TNULL)
+		{
+			TNode* next = (node->Next() != node) ? node->Next() : TNULL;
+
+			if (node->Attached() != TNULL)
+			{
+				DeleteRecurse(node->Attached());
+			}
+
+			if (node->Tree() == this)
+			{
 				m_Count -= 1;
 			}
 
-			if (flag)
+			if (node->Tree() == TNULL || node->Tree() == this)
 			{
-				TNode* attachedNode = node.Attached();
+				TNode* nodeParent = node->Parent();
 
-				while (attachedNode != TNULL)
+				if (nodeParent != TNULL)
 				{
-					TNodeTree<T>* nodeRoot = node.Tree();
-
-					Remove(*attachedNode, TFALSE);
-					Insert(node.Parent(), attachedNode);
-
-					attachedNode = node.Attached();
-					TIMPLEMENT_D("It seems to be unused and I hope it is. I don't know if it works and what it should do");
-				}
-			}
-
-			if (nodeParent != TNULL)
-			{
-				// If it's the first attached to the root node, set it to next or just remove
-				if (nodeParent->Attached() == &node)
-				{
-					nodeParent->m_Attached = (node.Next() != &node) ? node.Next() : TNULL;
-				}
-
-				node.m_Parent = TNULL;
-			}
-
-			node.m_Prev->m_Next = node.m_Next;
-			node.m_Next->m_Prev = node.m_Prev;
-			node.m_Next = &node;
-			node.m_Prev = &node;
-			node.m_Tree = TNULL;
-			return &node;
-		}
-
-		TNode* Remove(TNode* node, TBOOL flag = TFALSE)
-		{
-			return Remove(*node, flag);
-		}
-
-		void DeleteRecurse(TNode* node)
-		{
-			while (node != TNULL)
-			{
-				TNode* next = (node->Next() != node) ? node->Next() : TNULL;
-
-				if (node->Attached() != TNULL)
-				{
-					DeleteRecurse(node->Attached());
-				}
-
-				if (node->Tree() == this)
-				{
-					m_Count -= 1;
-				}
-
-				if (node->Tree() == TNULL || node->Tree() == this)
-				{
-					TNode* nodeParent = node->Parent();
-
-					if (nodeParent != TNULL)
+					// If it's the first attached to the root node, set it to next or just remove
+					if (nodeParent->Attached() == node)
 					{
-						// If it's the first attached to the root node, set it to next or just remove
-						if (nodeParent->Attached() == node)
-						{
-							nodeParent->m_Attached = (node->Next() != node) ? node->Next() : TNULL;
-						}
-
-						node->m_Parent = TNULL;
+						nodeParent->m_Attached = (node->Next() != node) ? node->Next() : TNULL;
 					}
 
-					node->m_Prev->m_Parent = node->m_Next;
-					node->m_Next->m_Attached = node->m_Prev;
-					node->m_Next = node;
-					node->m_Prev = node;
-					node->m_Tree = TNULL;
+					node->m_Parent = TNULL;
 				}
 
-				delete node;
-				node = next;
-			}
-		}
-		
-		void DeleteAll()
-		{
-			TNode* node = GetRoot()->Attached();
-
-			while (node != TNULL)
-			{
-				Remove(node, TFALSE);
-				DeleteRecurse(node);
-				node = GetRoot()->Attached();
+				node->m_Prev->m_Parent   = node->m_Next;
+				node->m_Next->m_Attached = node->m_Prev;
+				node->m_Next             = node;
+				node->m_Prev             = node;
+				node->m_Tree             = TNULL;
 			}
 
-			TASSERT(Count() == 0);
+			delete node;
+			node = next;
 		}
+	}
 
-		TNode* GetRoot()
+	void DeleteAll()
+	{
+		TNode* node = GetRoot()->Attached();
+
+		while (node != TNULL)
 		{
-			return &m_Root;
+			Remove(node, TFALSE);
+			DeleteRecurse(node);
+			node = GetRoot()->Attached();
 		}
 
-		T* AttachedToRoot()
-		{
-			return m_Root.Attached();
-		}
+		TASSERT(Count() == 0);
+	}
 
-		size_t Count() const
-		{
-			return m_Count;
-		}
+	TNode* GetRoot() { return &m_Root; }
 
-		TBOOL IsLinked() const
-		{
-			return m_Root.IsLinked();
-		}
-		
-	protected:
-		TNode m_Root;   // 0x0
-		size_t m_Count; // 0x14
-	};
-}
+	T* AttachedToRoot() { return m_Root.Attached(); }
 
+	size_t Count() const { return m_Count; }
 
+	TBOOL IsLinked() const { return m_Root.IsLinked(); }
+
+protected:
+	TNode  m_Root;  // 0x0
+	size_t m_Count; // 0x14
+};
+
+TOSHI_NAMESPACE_END

@@ -4,10 +4,9 @@
 
 class ASoundInterface : public Toshi::TSingleton<ASoundInterface>
 {
-	void GetEventCategory(int index)
+	void GetEventCategory(TINT index)
 	{
-		auto sound = Toshi::TSound::GetSingleton();
+		auto sound  = Toshi::TSound::GetSingleton();
 		auto system = sound->GetSystem();
 	}
 };
-

@@ -13,9 +13,9 @@ ACameraManager::ACameraManager()
 		m_ppCameras[i] = TNULL;
 	}
 
-	m_bFlag = TFALSE;
+	m_bFlag          = TFALSE;
 	m_iCurrentCamera = -1;
-	m_iSomeCount = 0;
+	m_iSomeCount     = 0;
 
 	CreateCamera<AFreeCamera>();
 	TTODO("CreateCamera<AScriptedCamera>()");

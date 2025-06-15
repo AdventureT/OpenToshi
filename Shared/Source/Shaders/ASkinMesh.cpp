@@ -3,10 +3,10 @@
 
 ASkinMesh::ASkinMesh()
 {
-	m_uiFlags = 0;
-	m_uiMaxVertices = 0;
+	m_uiFlags        = 0;
+	m_uiMaxVertices  = 0;
 	m_uiNumSubMeshes = 0;
-	m_pVertexPool = TNULL;
+	m_pVertexPool    = TNULL;
 }
 
 TBOOL ASkinMesh::Validate()

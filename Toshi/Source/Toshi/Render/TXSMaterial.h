@@ -1,13 +1,14 @@
 #pragma once
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TXSMaterial
+class TXSMaterial
+{
+public:
+	typedef enum
 	{
-	public:
-		typedef enum {
 
-		} TextureType;
-	};
+	} TextureType;
+};
 
-}
+TOSHI_NAMESPACE_END

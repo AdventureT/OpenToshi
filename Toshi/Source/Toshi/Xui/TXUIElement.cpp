@@ -9,42 +9,39 @@ TOSHI_NAMESPACE_BEGIN
 
 XURXUIObjectData::~XURXUIObjectData()
 {
-	for (uint8_t i = 0; i < m_NumChildren; i++)
+	for (TUINT8 i = 0; i < m_NumChildren; i++)
 	{
-		if (m_Children[i] != TNULL)
-			delete m_Children[i];
+		if (m_Children[i] != TNULL) delete m_Children[i];
 	}
 
 	delete[] m_Children;
 
-	if (m_pNamedFrames)
-		delete[] m_pNamedFrames;
+	if (m_pNamedFrames) delete[] m_pNamedFrames;
 
-	if (m_TimelinesData)
-		delete[] m_TimelinesData;
+	if (m_TimelinesData) delete[] m_TimelinesData;
 }
 
-TBOOL XURXUIObjectData::Load(TXUIResource& resource, uint8_t*& a_pData)
+TBOOL XURXUIObjectData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);
 	m_Index = reader.ReadUInt16();
 	return TTRUE;
 }
 
-void XURXUIObjectData::LoadChildren(TXUIResource& resource, uint8_t*& a_pData)
+void XURXUIObjectData::LoadChildren(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);
 	m_NumChildren = reader.ReadUInt8From32();
-	m_Children = new (TXUI::MemoryBlock()) XURXUIObjectData * [m_NumChildren];
+	m_Children    = new (TXUI::MemoryBlock()) XURXUIObjectData*[m_NumChildren];
 	TASSERT(m_Children != TNULL);
 
 	for (size_t i = 0; i < m_NumChildren; i++)
 	{
-		uint16_t uiType = reader.ReadUInt16();
+		TUINT16 uiType = reader.ReadUInt16();
 
-		m_Children[i] = TXUIResource::CreateObjectData(resource, uiType);
+		m_Children[i]                = TXUIResource::CreateObjectData(resource, uiType);
 		m_Children[i]->m_uiTypeIndex = uiType;
-		uint8_t opcode = reader.ReadUInt8();
+		TUINT8 opcode                = reader.ReadUInt8();
 
 		m_Children[i]->Load(resource, a_pData);
 
@@ -60,7 +57,7 @@ void XURXUIObjectData::LoadChildren(TXUIResource& resource, uint8_t*& a_pData)
 	}
 }
 
-TBOOL XURXUIObjectData::LoadNamedFrames(TXUIResource& resource, uint8_t*& a_pData)
+TBOOL XURXUIObjectData::LoadNamedFrames(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);
 	m_NumNamedFrames = reader.ReadEPTUShort32();
@@ -74,9 +71,9 @@ TBOOL XURXUIObjectData::LoadNamedFrames(TXUIResource& resource, uint8_t*& a_pDat
 		for (size_t i = 0; i < m_NumNamedFrames; i++)
 		{
 			// Order not correct!
-			m_pNamedFrames[i].m_Time = reader.ReadUInt16();
-			m_pNamedFrames[i].m_Name = reader.ReadUInt16From32();
-			m_pNamedFrames[i].m_Command = reader.ReadUInt8();
+			m_pNamedFrames[i].m_Time          = reader.ReadUInt16();
+			m_pNamedFrames[i].m_Name          = reader.ReadUInt16From32();
+			m_pNamedFrames[i].m_Command       = reader.ReadUInt8();
 			m_pNamedFrames[i].m_CommandParams = reader.ReadUInt16();
 		}
 	}
@@ -84,7 +81,7 @@ TBOOL XURXUIObjectData::LoadNamedFrames(TXUIResource& resource, uint8_t*& a_pDat
 	return TTRUE;
 }
 
-void XURXUIObjectData::LoadTimelines(TXUIResource& resource, uint8_t*& a_pData)
+void XURXUIObjectData::LoadTimelines(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);
 	m_NumTimelines = reader.ReadUInt8From32();
@@ -102,11 +99,11 @@ void XURXUIObjectData::LoadTimelines(TXUIResource& resource, uint8_t*& a_pData)
 	}
 }
 
-XURXUIElementData* XURXUIObjectData::FindChildElementData(uint32_t a_iStringId)
+XURXUIElementData* XURXUIObjectData::FindChildElementData(TUINT32 a_iStringId)
 {
 	for (size_t i = 0; i < m_NumChildren; i++)
 	{
-		XURXUIElementData* pElementData = TSTATICCAST(XURXUIElementData*, m_Children[i]);
+		XURXUIElementData* pElementData = TSTATICCAST(XURXUIElementData, m_Children[i]);
 
 		if (pElementData->GetId() == a_iStringId)
 		{
@@ -117,7 +114,7 @@ XURXUIElementData* XURXUIObjectData::FindChildElementData(uint32_t a_iStringId)
 	return TNULL;
 }
 
-TBOOL XURXUIElementData::Load(TXUIResource& resource, uint8_t*& a_pData)
+TBOOL XURXUIElementData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIObjectData::Load(resource, a_pData);
 
@@ -126,25 +123,26 @@ TBOOL XURXUIElementData::Load(TXUIResource& resource, uint8_t*& a_pData)
 		XURReader reader(a_pData);
 		if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
 
-		XUIEPTFloat width, height, opacity;
+		XUIEPTFloat    width, height, opacity;
 		XUIEPTUShort32 anchor, blendMode;
-		XUIEPTBool show, disableTimelineRecursion, clipChildren, designTime;
+		XUIEPTBool     show, disableTimelineRecursion, clipChildren, designTime;
 		XUIEPTUnsigned colorWriteFlags;
 
-		TBOOL hasId = reader.ReadProperty<XUI_EPT_STRING>(PropType_Id, m_Id);
-		TBOOL hasWidth = reader.ReadProperty<XUI_EPT_FLOAT>(PropType_Width, width);
-		TBOOL hasHeight = reader.ReadProperty<XUI_EPT_FLOAT>(PropType_Height, height);
-		TBOOL hasPosition = reader.ReadProperty<XUI_EPT_VECTOR>(PropType_Position, m_Position);
-		TBOOL hasScale = reader.ReadProperty<XUI_EPT_VECTOR>(PropType_Scale, m_Scale);
-		TBOOL hasRotation = reader.ReadProperty<XUI_EPT_QUATERNION>(PropType_Rotation, m_Rotation);
-		TBOOL hasOpacity = reader.ReadProperty<XUI_EPT_FLOAT>(PropType_Opacity, opacity);
-		TBOOL hasAnchor = reader.ReadProperty<XUI_EPT_USHORT32>(PropType_Anchor, anchor);
-		TBOOL hasPivot = reader.ReadProperty<XUI_EPT_VECTOR>(PropType_Pivot, m_Pivot);
-		TBOOL hasShow = reader.ReadProperty<XUI_EPT_BOOL>(PropType_Show, show);
-		TBOOL hasBlendMode = reader.ReadProperty<XUI_EPT_USHORT32>(PropType_BlendMode, blendMode);
+		TBOOL hasId                       = reader.ReadProperty<XUI_EPT_STRING>(PropType_Id, m_Id);
+		TBOOL hasWidth                    = reader.ReadProperty<XUI_EPT_FLOAT>(PropType_Width, width);
+		TBOOL hasHeight                   = reader.ReadProperty<XUI_EPT_FLOAT>(PropType_Height, height);
+		TBOOL hasPosition                 = reader.ReadProperty<XUI_EPT_VECTOR>(PropType_Position, m_Position);
+		TBOOL hasScale                    = reader.ReadProperty<XUI_EPT_VECTOR>(PropType_Scale, m_Scale);
+		TBOOL hasRotation                 = reader.ReadProperty<XUI_EPT_QUATERNION>(PropType_Rotation, m_Rotation);
+		TBOOL hasOpacity                  = reader.ReadProperty<XUI_EPT_FLOAT>(PropType_Opacity, opacity);
+		TBOOL hasAnchor                   = reader.ReadProperty<XUI_EPT_USHORT32>(PropType_Anchor, anchor);
+		TBOOL hasPivot                    = reader.ReadProperty<XUI_EPT_VECTOR>(PropType_Pivot, m_Pivot);
+		TBOOL hasShow                     = reader.ReadProperty<XUI_EPT_BOOL>(PropType_Show, show);
+		TBOOL hasBlendMode                = reader.ReadProperty<XUI_EPT_USHORT32>(PropType_BlendMode, blendMode);
 		TBOOL hasDisableTimelineRecursion = reader.ReadProperty<XUI_EPT_BOOL>(PropType_DisableTimelineRecursion, disableTimelineRecursion);
-		TBOOL hasDesignTime = reader.ReadProperty<XUI_EPT_BOOL>(PropType_DesignTime, designTime);
-		TBOOL hasColorWriteFlags = reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_ColorWriteFlags, colorWriteFlags);;
+		TBOOL hasDesignTime               = reader.ReadProperty<XUI_EPT_BOOL>(PropType_DesignTime, designTime);
+		TBOOL hasColorWriteFlags          = reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_ColorWriteFlags, colorWriteFlags);
+		;
 		TBOOL hasClipChildren = reader.ReadProperty<XUI_EPT_BOOL>(PropType_ClipChildren, clipChildren);
 
 		if (hasWidth)
@@ -160,7 +158,7 @@ TBOOL XURXUIElementData::Load(TXUIResource& resource, uint8_t*& a_pData)
 		if (hasOpacity)
 		{
 			TASSERT(opacity >= 0.0f && opacity <= 1.0f);
-			m_Opacity = TSTATICCAST(uint8_t, opacity * 255);
+			m_Opacity = TUINT8(opacity * 255);
 		}
 
 		if (hasAnchor)
@@ -214,7 +212,7 @@ TBOOL XURXUIElementData::Load(TXUIResource& resource, uint8_t*& a_pData)
 	return TTRUE;
 }
 
-TBOOL XURXUIElementData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
+TBOOL XURXUIElementData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, Id, propType);
 	TXUI_TRANSLATE_TIMELINE_PROP(name, Width, propType);
@@ -234,7 +232,7 @@ TBOOL XURXUIElementData::TranslateTimelineProp(const char* name, uint32_t& a_uiO
 	return TFALSE;
 }
 
-TBOOL XURXUIElementData::ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
+TBOOL XURXUIElementData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	TASSERT(a_uiObjectIndex == 0);
 	return a_uiPropIndex < PropType_NUMOF;
@@ -248,7 +246,7 @@ TXUIElement::TXUIElement()
 	m_Flags |= FLAGS_XUIELEMENT;
 	m_vRotation = T2GUITransform::Rotation(0, 0);
 	m_vPosition = T2GUITransform::Rotation(0, 0);
-	m_vScale = T2GUITransform::Rotation(0, 0);
+	m_vScale    = T2GUITransform::Rotation(0, 0);
 	m_eXUIState = 0xc000;
 	m_eXUIState = m_eXUIState & 0xfe01ffff | 0x1fe0000;
 	m_eXUIState = m_eXUIState & 0x01ffffff | 0xfe000000;
@@ -257,7 +255,8 @@ TXUIElement::TXUIElement()
 TBOOL TXUIElement::SkipRender()
 {
 	// Skip Rendering since Scale is 0.0f and/or Opacity is 0.0f which you can't see
-	if (GetFlags_Opacity() == 0.0f || m_vScale.GetX() == 0.0f || m_vScale.GetY() == 0.0f) {
+	if (GetFlags_Opacity() == 0.0f || m_vScale.GetX() == 0.0f || m_vScale.GetY() == 0.0f)
+	{
 		return TTRUE;
 	}
 	return T2GUIElement::SkipRender();
@@ -268,7 +267,7 @@ TBOOL TXUIElement::IsPaused() const
 	return (m_eXUIState & XUIState_STATEMASK) == XUIState_PAUSED;
 }
 
-void TXUIElement::SetHeight(float height)
+void TXUIElement::SetHeight(TFLOAT height)
 {
 	TVector2 currentDimension;
 	GetDimensions(currentDimension.x, currentDimension.y);
@@ -285,7 +284,7 @@ void TXUIElement::SetHeight(float height)
 	}
 }
 
-void TXUIElement::SetWidth(float width)
+void TXUIElement::SetWidth(TFLOAT width)
 {
 	TVector2 currentDimension;
 	GetDimensions(currentDimension.x, currentDimension.y);
@@ -309,7 +308,7 @@ void TXUIElement::UpdateAnchoring(const TVector2& vec)
 
 TBOOL TXUIElement::IsVisible()
 {
-	if (HASFLAG(m_State & FLAGS_VISIBLE) && HASFLAG(m_State & (uint8_t)T2GUIElement::s_uiGlobalVisMask))
+	if (HASFLAG(m_State & FLAGS_VISIBLE) && HASFLAG(m_State & (TUINT8)T2GUIElement::s_uiGlobalVisMask))
 	{
 		return TFALSE;
 	}
@@ -336,7 +335,7 @@ TBOOL TXUIElement::Create(TXUIResource& a_rResource, XURXUIElementData* a_pEleme
 		}
 	}
 
-	m_Width = a_pElementData->GetWidth();
+	m_Width  = a_pElementData->GetWidth();
 	m_Height = a_pElementData->GetHeight();
 
 	if (a_pElementData->GetPosition() != -1)
@@ -376,17 +375,17 @@ TBOOL TXUIElement::Create(TXUIResource& a_rResource, XURXUIElementData* a_pEleme
 
 void TXUIElement::CreateChildren(TXUIResource& a_rResource, XURXUIElementData* a_pElementData)
 {
-	for (size_t i = 0; i < a_pElementData->m_NumChildren; i++)
+	for (TUINT16 i = 0; i < a_pElementData->m_NumChildren; i++)
 	{
 		auto child = a_pElementData->m_Children[i];
 		if (!child->m_pClass->IsA(TGetClass(TXUIListItem)))
 		{
 			if (child->m_pClass->IsA(TGetClass(TXUIControl)))
 			{
-				const wchar_t* str = a_rResource.GetString(i);
-				int iLen = TStringManager::String16Length(str);
+				const TWCHAR* str  = a_rResource.GetString(i);
+				TINT          iLen = TStringManager::String16Length(str);
 				TASSERT(iLen < 128);
-				char string[128];
+				TCHAR string[128];
 				TStringManager::StringUnicodeToChar(string, str, iLen);
 				const TClass* tClass = TClass::Find(string, TGetClass(TXUIControl));
 			}

@@ -1,22 +1,27 @@
 #include "ToshiPCH.h"
 #include "TLogFile.h"
+
+#ifdef TOSHI_SKU_WINDOWS
+#  include "Platform/Windows/TNativeFile_Win.h"
+#endif // TOSHI_SKU_WINDOWS
+
 #include <DbgHelp.h>
-#include TOSHI_MULTIPLATFORM(TNativeFile)
 
 TOSHI_NAMESPACE_BEGIN
 
-TLogFile::TLogFile() : m_LevelString(), m_typeCounts()
+TLogFile::TLogFile()
+    : m_LevelString(), m_typeCounts()
 {
-	m_pFile = TNULL;
-	m_iTotalLogCount = 0;
-	m_bIsSimpleMode = TFALSE;
+	m_pFile             = TNULL;
+	m_iTotalLogCount    = 0;
+	m_bIsSimpleMode     = TFALSE;
 	m_bAllowIndentation = TFALSE;
-	m_curLevel = 0;
-	m_unk2 = TNULL;
-	m_unk3 = 0;
+	m_curLevel          = 0;
+	m_unk2              = TNULL;
+	m_unk3              = 0;
 }
 
-TLogFile::Error TLogFile::Create(const char* fileName, const char* str2, TBOOL writeExisting)
+TLogFile::Error TLogFile::Create(const TCHAR* fileName, const TCHAR* str2, TBOOL writeExisting)
 {
 	TASSERT(TNULL == m_pFile);
 
@@ -28,12 +33,10 @@ TLogFile::Error TLogFile::Create(const char* fileName, const char* str2, TBOOL w
 	TString8 drive;
 	TString8 dir;
 
-	char* path = TNativeFile::SplitPath(fileName, drive, dir);
+	TCHAR* path = TNativeFile::SplitPath(fileName, drive, dir);
 	TNativeFile::DirExists(path);
 
-	TFile::FileMode fileMode = writeExisting ?
-		TFile::FileMode_NoBuffer | TFile::FileMode_Write :
-		TFile::FileMode_NoBuffer | TFile::FileMode_Write | TFile::FileMode_CreateNew;
+	TFile::FileMode fileMode = writeExisting ? TFile::FileMode_NoBuffer | TFile::FileMode_Write : TFile::FileMode_NoBuffer | TFile::FileMode_Write | TFile::FileMode_CreateNew;
 
 	m_pFile = TFile::Create(fileName, fileMode);
 
@@ -49,7 +52,7 @@ TLogFile::Error TLogFile::Create(const char* fileName, const char* str2, TBOOL w
 
 	m_iTotalLogCount = 0;
 	m_LevelString[0] = '\0';
-	m_curLevel = 0;
+	m_curLevel       = 0;
 
 	m_pFile->CPrintf("Log created [%s]:[%s]: %s\n", fileName, str2, TUtil::GetTime());
 	m_pFile->CPrintf("Compilation: %s\n", __TIMESTAMP__);
@@ -77,7 +80,7 @@ void TLogFile::Close()
 void TLogFile::RecalcLevel()
 {
 	m_curLevel = m_curLevel < cLevelMax - 1 ? m_curLevel : cLevelMax;
-	m_curLevel = TMath::Max<uint32_t>(m_curLevel, 0);
+	m_curLevel = TMath::Max<TUINT32>(m_curLevel, 0);
 
 	for (size_t i = 0; i < m_curLevel; i++)
 	{
@@ -87,14 +90,14 @@ void TLogFile::RecalcLevel()
 	m_LevelString[m_curLevel] = '\0';
 }
 
-void TLogFile::Print(const char* format, ...)
+void TLogFile::Print(const TCHAR* format, ...)
 {
 	if (m_pFile != TNULL)
 	{
 		va_list args;
 		va_start(args, format);
 
-		char str[1024];
+		TCHAR str[1024];
 		T2String8::FormatV(str, sizeof(str), format, args);
 
 		va_end(args);
@@ -112,7 +115,7 @@ void TLogFile::Print(const char* format, ...)
 
 
 
-void TLogFile::Log(Type type, const char* str1, const char* str2, const char* format, ...)
+void TLogFile::Log(Type type, const TCHAR* str1, const TCHAR* str2, const TCHAR* format, ...)
 {
 	if (m_pFile != TNULL)
 	{
@@ -125,7 +128,7 @@ void TLogFile::Log(Type type, const char* str1, const char* str2, const char* fo
 		}
 		else
 		{
-			char strTime[9];
+			TCHAR strTime[9];
 			_strtime(strTime);
 			m_pFile->CPrintf("%d [%s] [%s]: %s: %s: %s", m_iTotalLogCount, cTypeStrings[type], strTime, str1, str2 != TNULL ? str2 : "", m_bAllowIndentation ? m_LevelString : "");
 		}

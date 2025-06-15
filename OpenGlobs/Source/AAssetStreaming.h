@@ -17,9 +17,9 @@ public:
 
 public:
 	virtual JOBTYPE GetJobType() = 0;
-	virtual void Init(){};
-	virtual void BeginJob() = 0;
-	virtual TBOOL RunJob() = 0;
+	virtual void    Init(){};
+	virtual void    BeginJob() = 0;
+	virtual TBOOL   RunJob()   = 0;
 
 	virtual TBOOL CancelJob() { return TFALSE; };
 
@@ -35,7 +35,7 @@ public:
 
 protected:
 	Toshi::TTRBStreamJob m_StreamJob;
-	TBOOL m_IsRunning;
+	TBOOL                m_IsRunning;
 };
 
 class AAssetStreaming : public Toshi::TSingleton<AAssetStreaming>
@@ -51,7 +51,7 @@ public:
 
 	AMainThreadJob2* GetAvaiableJob()
 	{
-		auto job = m_FreeList.PopBack();
+		auto job         = m_FreeList.PopBack();
 		job->m_StreamJob = Toshi::TTRBStreamJob();
 		return job;
 	}
@@ -89,8 +89,8 @@ public:
 	}
 
 private:
-	Toshi::T2DList<AMainThreadJob2> m_Jobs;     // 0x0
-	AMainThreadJob2* m_pCurrentJob;             // 0x8
-	Toshi::TFileStream m_FileStream;            // 0x0C
-	Toshi::T2DList<AMainThreadJob2> m_FreeList; // 0xDC
+	Toshi::T2DList<AMainThreadJob2> m_Jobs;        // 0x0
+	AMainThreadJob2*                m_pCurrentJob; // 0x8
+	Toshi::TFileStream              m_FileStream;  // 0x0C
+	Toshi::T2DList<AMainThreadJob2> m_FreeList;    // 0xDC
 };

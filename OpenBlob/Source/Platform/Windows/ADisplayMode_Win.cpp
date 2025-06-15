@@ -1,13 +1,18 @@
 #include "pch.h"
 #include "ADisplayMode_Win.h"
-#include TOSHI_MULTIRENDER(TRender)
+
+#ifdef TOSHI_RENDERER_DX11
+#  include "Platform/DX11/TRender_DX11.h"
+#elif defined(TOSHI_RENDERER_OPENGL) // TOSHI_RENDERER_DX11
+#  include "Platform/SDL/TRender_SDL.h"
+#endif // TOSHI_RENDERER_OPENGL
 
 TOSHI_NAMESPACE_USING
 
 void ADisplayMode_Win::Initialise()
 {
-	TRender *pRenderer = TRender::GetSingleton();
-	auto pAdapterList = pRenderer->GetAdapterList();
+	TRender* pRenderer    = TRender::GetSingleton();
+	auto     pAdapterList = pRenderer->GetAdapterList();
 
 	TUtil::Log("Enum Display Modes");
 	TUtil::LogUp();
@@ -18,14 +23,14 @@ void ADisplayMode_Win::Initialise()
 		TUtil::Log("Adapter %s", d3dadapter->GetDescription());
 		TUtil::LogUp();
 
-		auto pModeList = d3dadapter->GetModeList();
-		bool firstMode = true;
+		auto  pModeList = d3dadapter->GetModeList();
+		TBOOL firstMode = true;
 		for (auto pMode = pModeList->Begin(); pMode != pModeList->End(); pMode++)
 		{
-			TD3DAdapter::Mode* mode = pMode->As<TD3DAdapter::Mode>();
-			uint32_t uiWidth = pMode->GetWidth();
-			uint32_t uiHeight = pMode->GetHeight();
-			
+			TD3DAdapter::Mode* mode     = pMode->As<TD3DAdapter::Mode>();
+			TUINT32            uiWidth  = pMode->GetWidth();
+			TUINT32            uiHeight = pMode->GetHeight();
+
 			TIMPLEMENT();
 			return;
 		}

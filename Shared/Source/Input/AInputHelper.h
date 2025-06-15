@@ -20,8 +20,8 @@ public:
 
 	struct ButtonInfo
 	{
-		int m_iDoodad;	            // 0x0
-		int m_iFlag;           // 0x4
+		int   m_iDoodad;        // 0x0
+		int   m_iFlag;          // 0x4
 		float m_iRepeatTime;    // 0x8
 		float m_iCurRepeatTime; // 0xC
 	};
@@ -52,7 +52,6 @@ public:
 
 	typedef Toshi::TComparator<int> ButtonMapComparator;
 
-	AInputMap::INPUTCONTEXT m_eInputContext;                                                  // 0x4
-	Toshi::T2Map<uint32_t, Toshi::T2Vector<ButtonInfo, 4>, ButtonMapComparator> m_oButtonMap; // 0x8
+	AInputMap::INPUTCONTEXT                                                     m_eInputContext; // 0x4
+	Toshi::T2Map<uint32_t, Toshi::T2Vector<ButtonInfo, 4>, ButtonMapComparator> m_oButtonMap;    // 0x8
 };
-
