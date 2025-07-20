@@ -1,0 +1,20 @@
+projects
+{
+    "de_Blob"
+    {
+        "functions"     "Tools/ProgressCalculation/functions.csv"
+        "ignore"        "Tools/ProgressCalculation/ignorelist.txt"
+        "svgtemplate"   "Tools/ProgressCalculation/template.svg"
+
+        "files"
+        {
+            "extension" ".cpp"
+            "extension" ".hpp"
+            "extension" ".c"
+            "extension" ".h"
+            "directory" "OpenBlob/Source"
+            "directory" "Toshi/Source"
+            "directory" "Shared/Source"
+        }
+    }
+}
