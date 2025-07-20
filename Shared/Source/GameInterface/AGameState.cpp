@@ -8,8 +8,8 @@
 
 #include <Toshi2/T2GUI/T2GUI.h>
 
-AGameState::AGameState() :
-	m_InputHelperSimple(1, Toshi::TInputInterface::GetSingleton()->GetDeviceByIndex<Toshi::TInputDeviceKeyboard>())
+AGameState::AGameState()
+    : m_InputHelperSimple(1, Toshi::TInputInterface::GetSingleton()->GetDeviceByIndex<Toshi::TInputDeviceKeyboard>())
 {
 	m_InputHelperSimple.AddDoodad(Toshi::TInputDeviceKeyboard::KEY_GRAVE);
 	m_State = State_Null;
@@ -22,7 +22,6 @@ AGameState::~AGameState()
 
 void AGameState::Unk1()
 {
-
 }
 
 TBOOL AGameState::Unk2()
@@ -32,7 +31,6 @@ TBOOL AGameState::Unk2()
 
 void AGameState::Unk3(void*, void*)
 {
-
 }
 
 AGameState::UpdateResult AGameState::OnUpdate(float deltaTime)
@@ -48,7 +46,7 @@ AGameState::UpdateResult AGameState::OnUpdate(float deltaTime)
 	{
 		state->OnUpdate(deltaTime);
 	}
-	
+
 	return UpdateResult_OK;
 }
 
@@ -120,7 +118,6 @@ TBOOL AGameState::PauseOnControllerReinserted()
 #ifdef TOSHI_DEBUG
 void AGameState::DEBUG_RenderImGui()
 {
-
 }
 #endif // TOSHI_DEBUG
 

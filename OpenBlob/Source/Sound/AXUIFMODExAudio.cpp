@@ -3,13 +3,13 @@
 
 TOSHI_NAMESPACE_USING
 
-TBOOL AXUIFMODExAudio::Create(char* a_szSoundName)
+TBOOL AXUIFMODExAudio::Create(TCHAR* a_szSoundName)
 {
 	auto sound = TSound::GetSingleton();
 
 	if (sound != TNULL && a_szSoundName != TNULL)
 	{
-		auto system = sound->GetSystem();
+		auto        system  = sound->GetSystem();
 		FMOD_RESULT eResult = system->createSound(a_szSoundName, FMOD_DEFAULT, NULL, &m_pSound);
 		if (!TSound::ErrorCheck(eResult))
 		{
@@ -35,19 +35,19 @@ TBOOL AXUIFMODExAudio::Release()
 	return TFALSE;
 }
 
-FMOD::Sound* AXUIFMODExAudio::GetSubSound(char* a_pSubSoundName)
+FMOD::Sound* AXUIFMODExAudio::GetSubSound(TCHAR* a_pSubSoundName)
 {
 	auto sound = TSound::GetSingleton();
 	if (sound == TNULL || m_pSound != TNULL) return TNULL;
 
-	for (size_t i = 0; i < m_iNumSubSounds; i++)
+	for (TINT i = 0; i < m_iNumSubSounds; i++)
 	{
 		FMOD::Sound* subSound;
-		char subSoundName[256];
+		TCHAR        subSoundName[256];
 
 		FMOD_RESULT eResult = m_pSound->getSubSound(i, &subSound);
 		if (TSound::ErrorCheck(eResult)) return TNULL;
-		
+
 		eResult = subSound->getName(subSoundName, sizeof(subSoundName));
 		TASSERT(!TSound::ErrorCheck(eResult), "Error retrieving subsound %d\n", i);
 

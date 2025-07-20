@@ -4,28 +4,28 @@
 
 TOSHI_NAMESPACE_USING
 
-TBOOL XURXUIImageData::IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType)
+TBOOL XURXUIImageData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::IsColourPropType(a_uiObjectIndex - 1, propType);
 }
 
-TBOOL XURXUIImageData::IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType)
+TBOOL XURXUIImageData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
-uint32_t XURXUIImageData::GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType)
+TUINT32 XURXUIImageData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return (propType != 1) * 2 + 2;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::GetTimelinePropSize(a_uiObjectIndex - 1, propType);
 }
 
-TBOOL XURXUIImageData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
+TBOOL XURXUIImageData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, SizeMode, propType);
 	TXUI_TRANSLATE_TIMELINE_PROP(name, ImagePath, propType);
@@ -35,14 +35,14 @@ TBOOL XURXUIImageData::TranslateTimelineProp(const char* name, uint32_t& a_uiObj
 	return XURXUIElementData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
-TBOOL XURXUIImageData::ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
+TBOOL XURXUIImageData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
-TBOOL XURXUIImageData::Load(TXUIResource& resource, uint8_t*& a_pData)
+TBOOL XURXUIImageData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIElementData::Load(resource, a_pData);
 

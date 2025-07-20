@@ -2,13 +2,14 @@
 #include "Toshi/File/TFile.h"
 #include "TCompress.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TCompress_Decompress
 {
-	class TCompress_Decompress
-	{
-	public:
-		static uintptr_t Decompress(TFile* file, TCompress::Header* header, char* buffer, uint32_t bufferSize);
-		static int8_t GetHeader(TFile* file, TCompress::Header& btecHeader);
-		static int GetCommand(TFile* file, TBOOL& hasOffset, uint32_t& size, int& offset);
-	};
-}
+public:
+	static uintptr_t Decompress(TFile* file, TCompress::Header* header, TCHAR* buffer, TUINT32 bufferSize);
+	static int8_t    GetHeader(TFile* file, TCompress::Header& btecHeader);
+	static TINT      GetCommand(TFile* file, TBOOL& hasOffset, TUINT32& size, TINT& offset);
+};
+
+TOSHI_NAMESPACE_END

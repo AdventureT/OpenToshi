@@ -8,28 +8,28 @@ using namespace Toshi;
 
 AXYZViewportManager::AXYZViewportManager()
 {
-	auto renderer = TRenderDX11::Interface();
+	auto renderer       = TRenderDX11::Interface();
 	auto pDisplayParams = renderer->GetCurrentDisplayParams();
 
 	float x, y, w, h;
 	GetUseableArea(x, y, w, h);
 
-	float halfWidth = w * 0.5f;
-	float halfHeight = h * 0.5f;
+	float halfWidth     = w * 0.5f;
+	float halfHeight    = h * 0.5f;
 	float oneThirdWidth = w / 3.0f;
 
-	m_Viewports[VIEWPORT_FullScreen]            = CreateViewport(x,                     y,              w,             h         );
-	m_Viewports[VIEWPORT_2X2_TOPLEFT]           = CreateViewport(x,                     y,              halfWidth,     halfHeight);
-	m_Viewports[VIEWPORT_2X2_TOPRIGHT]          = CreateViewport(x + halfWidth,         y, halfWidth,   halfHeight               );
-	m_Viewports[VIEWPORT_2X2_BOTTOMLEFT]        = CreateViewport(x,                     y + halfHeight, halfWidth,     halfHeight);
-	m_Viewports[VIEWPORT_2X2_BOTTOMRIGHT]       = CreateViewport(x + halfWidth,         y + halfHeight, halfWidth,     halfHeight);
-	m_Viewports[VIEWPORT_1P1_HORIZONTAL_TOP]    = CreateViewport(x,                     y,              w,             halfHeight);
-	m_Viewports[VIEWPORT_1P1_HORIZONTAL_BOTTOM] = CreateViewport(x,                     y + halfHeight, w,             halfHeight);
-	m_Viewports[VIEWPORT_1P1_VERTICAL_LEFT]     = CreateViewport(x,                     y,              halfWidth,     h         );
-	m_Viewports[VIEWPORT_1P1_VERTICAL_RIGHT]    = CreateViewport(x + halfWidth,         y,              halfWidth,     h         );
-	m_Viewports[VIEWPORT_1P1P1_LEFT]            = CreateViewport(x,                     y,              oneThirdWidth, h         );
-	m_Viewports[VIEWPORT_1P1P1_CENTER]          = CreateViewport(x + oneThirdWidth * 1, y,              oneThirdWidth, h         );
-	m_Viewports[VIEWPORT_1P1P1_RIGHT]           = CreateViewport(x + oneThirdWidth * 2, y,              oneThirdWidth, h         );
+	m_Viewports[VIEWPORT_FullScreen]            = CreateViewport(x, y, w, h);
+	m_Viewports[VIEWPORT_2X2_TOPLEFT]           = CreateViewport(x, y, halfWidth, halfHeight);
+	m_Viewports[VIEWPORT_2X2_TOPRIGHT]          = CreateViewport(x + halfWidth, y, halfWidth, halfHeight);
+	m_Viewports[VIEWPORT_2X2_BOTTOMLEFT]        = CreateViewport(x, y + halfHeight, halfWidth, halfHeight);
+	m_Viewports[VIEWPORT_2X2_BOTTOMRIGHT]       = CreateViewport(x + halfWidth, y + halfHeight, halfWidth, halfHeight);
+	m_Viewports[VIEWPORT_1P1_HORIZONTAL_TOP]    = CreateViewport(x, y, w, halfHeight);
+	m_Viewports[VIEWPORT_1P1_HORIZONTAL_BOTTOM] = CreateViewport(x, y + halfHeight, w, halfHeight);
+	m_Viewports[VIEWPORT_1P1_VERTICAL_LEFT]     = CreateViewport(x, y, halfWidth, h);
+	m_Viewports[VIEWPORT_1P1_VERTICAL_RIGHT]    = CreateViewport(x + halfWidth, y, halfWidth, h);
+	m_Viewports[VIEWPORT_1P1P1_LEFT]            = CreateViewport(x, y, oneThirdWidth, h);
+	m_Viewports[VIEWPORT_1P1P1_CENTER]          = CreateViewport(x + oneThirdWidth * 1, y, oneThirdWidth, h);
+	m_Viewports[VIEWPORT_1P1P1_RIGHT]           = CreateViewport(x + oneThirdWidth * 2, y, oneThirdWidth, h);
 
 	TMatrix44 cameraMatrix;
 	cameraMatrix.Identity();
@@ -40,7 +40,7 @@ AXYZViewportManager::AXYZViewportManager()
 	for (size_t i = 0; i < VIEWPORT_Count; i++)
 	{
 		m_UsedCameras[i] = TFALSE;
-		m_Cameras[i] = TNULL;
+		m_Cameras[i]     = TNULL;
 
 		auto pCamObject = new TCameraObject();
 		pCamObject->SetProjectionCentreX(0.5f);
@@ -55,8 +55,8 @@ AXYZViewportManager::AXYZViewportManager()
 		m_CameraObjects[i] = pCamObject;
 	}
 
-	m_Unk = TNULL;
-	m_iRenderingViewportIndex = -1;
+	m_Unk                              = TNULL;
+	m_iRenderingViewportIndex          = -1;
 	m_UsedCameras[VIEWPORT_FullScreen] = TTRUE;
 }
 
@@ -82,13 +82,13 @@ TViewport* AXYZViewportManager::CreateViewport(float x, float y, float w, float 
 
 void AXYZViewportManager::GetUseableArea(float& x, float& y, float& w, float& h)
 {
-	auto renderer = TRenderDX11::Interface();
+	auto renderer       = TRenderDX11::Interface();
 	auto pDisplayParams = renderer->GetCurrentDisplayParams();
 
 	x = 0;
 	y = 0;
-	w = TSTATICCAST(float, pDisplayParams->Width);
-	h = TSTATICCAST(float, pDisplayParams->Height);
+	w = TFLOAT(pDisplayParams->Width);
+	h = TFLOAT(pDisplayParams->Height);
 }
 
 void AXYZViewportManager::SetMainFullScreen(TBOOL fullscreen)

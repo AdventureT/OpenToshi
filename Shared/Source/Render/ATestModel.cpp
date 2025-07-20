@@ -7,7 +7,7 @@
 struct SysMeshVertex
 {
 	Toshi::TVector3 Position;
-	uint32_t Color;
+	uint32_t        Color;
 	Toshi::TVector2 UV;
 };
 
@@ -83,22 +83,28 @@ void ATestModel::Render(float deltaTime)
 void ATestModel::CreateCube()
 {
 	static SysMeshVertex s_Vertices[] = {
-		{ { -1.0f,  1.0f,  -1.0f, }, 0xFFFFFFFF, { 0.0f, 0.0f } },
-		{ {  1.0f,  1.0f,  -1.0f },  0xFFFFFFFF, { 1.0f, 0.0f } },
-		{ { -1.0f, -1.0f,  -1.0f },  0xFFFFFFFF, { 0.0f, 1.0f } },
-		{ {  1.0f, -1.0f,  -1.0f },  0xFFFFFFFF, { 1.0f, 1.0f } },
-		{ {  -1.0f, -1.0f, 1.0f },   0xFFFFFFFF, { 0.0f, 1.0f } },
-		{ {  1.0f, -1.0f,  1.0f },   0xFFFFFFFF, { 1.0f, 1.0f } },
-		{ {  -1.0f,  1.0f,  1.0f },  0xFFFFFFFF, { 0.0f, 0.0f } },
-		{ {  1.0f,  1.0f,  1.0f },   0xFFFFFFFF, { 1.0f, 0.0f } },
+		{ {
+		      -1.0f,
+		      1.0f,
+		      -1.0f,
+		  },
+		  0xFFFFFFFF,
+		  { 0.0f, 0.0f } },
+		{ { 1.0f, 1.0f, -1.0f }, 0xFFFFFFFF, { 1.0f, 0.0f } },
+		{ { -1.0f, -1.0f, -1.0f }, 0xFFFFFFFF, { 0.0f, 1.0f } },
+		{ { 1.0f, -1.0f, -1.0f }, 0xFFFFFFFF, { 1.0f, 1.0f } },
+		{ { -1.0f, -1.0f, 1.0f }, 0xFFFFFFFF, { 0.0f, 1.0f } },
+		{ { 1.0f, -1.0f, 1.0f }, 0xFFFFFFFF, { 1.0f, 1.0f } },
+		{ { -1.0f, 1.0f, 1.0f }, 0xFFFFFFFF, { 0.0f, 0.0f } },
+		{ { 1.0f, 1.0f, 1.0f }, 0xFFFFFFFF, { 1.0f, 0.0f } },
 	};
 
-	static uint16_t s_Indices[] = {
+	static TUINT16 s_Indices[] = {
 		0, 1, 2, 3, 4, 5, 6, 7, 0, 1
 	};
 
 	auto pTexManager = Toshi::TTextureManager::GetSingletonSafe();
-	auto pSysShader = Toshi::TSysShader::GetSingletonSafe();
+	auto pSysShader  = Toshi::TSysShader::GetSingletonSafe();
 
 	m_pCubeMaterial = pSysShader->CreateMaterial();
 	m_pCubeMaterial->SetFlag(Toshi::TMaterial::Flags_AlphaUpdate, TTRUE);
@@ -109,7 +115,7 @@ void ATestModel::CreateCube()
 	m_pCubeMaterial->SetTexture(0, pTexture);
 
 	auto pMesh = pSysShader->CreateMesh("test_cube");
-	pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+	pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(TUINT16));
 
 	Toshi::TSysMesh::TLockBuffer lock;
 
@@ -117,7 +123,7 @@ void ATestModel::CreateCube()
 	{
 		Toshi::TUtil::MemCopy(lock.pVertexBufferData, s_Vertices, sizeof(s_Vertices));
 		Toshi::TUtil::MemCopy(lock.pIndexBufferData, s_Indices, sizeof(s_Indices));
-		pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+		pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(TUINT16));
 	}
 
 	pMesh->SetMaterial(m_pCubeMaterial);
@@ -127,18 +133,18 @@ void ATestModel::CreateCube()
 void ATestModel::CreatePlane()
 {
 	static SysMeshVertex s_Vertices[] = {
-		{ { -1.0f, 1.0f,  -1.0f },  0xFFFFFFFF, { 0.0f, 0.0f } },
-		{ {  1.0f, 1.0f,  -1.0f },  0xFFFFFFFF, { 12.0f, 0.0f } },
-		{ {  -1.0f, 1.0f, 1.0f },   0xFFFFFFFF, { 0.0f, 12.0f } },
-		{ {  1.0f, 1.0f,  1.0f },   0xFFFFFFFF, { 12.0f, 12.0f } },
+		{ { -1.0f, 1.0f, -1.0f }, 0xFFFFFFFF, { 0.0f, 0.0f } },
+		{ { 1.0f, 1.0f, -1.0f }, 0xFFFFFFFF, { 12.0f, 0.0f } },
+		{ { -1.0f, 1.0f, 1.0f }, 0xFFFFFFFF, { 0.0f, 12.0f } },
+		{ { 1.0f, 1.0f, 1.0f }, 0xFFFFFFFF, { 12.0f, 12.0f } },
 	};
 
-	static uint16_t s_Indices[] = {
+	static TUINT16 s_Indices[] = {
 		0, 1, 2, 3
 	};
 
 	auto pTexManager = Toshi::TTextureManager::GetSingletonSafe();
-	auto pSysShader = Toshi::TSysShader::GetSingletonSafe();
+	auto pSysShader  = Toshi::TSysShader::GetSingletonSafe();
 
 	m_pPlaneMaterial = pSysShader->CreateMaterial();
 	m_pPlaneMaterial->SetFlag(Toshi::TMaterial::Flags_AlphaUpdate, TTRUE);
@@ -150,7 +156,7 @@ void ATestModel::CreatePlane()
 	m_pPlaneMaterial->SetTexture(0, pTexture);
 
 	auto pMesh = pSysShader->CreateMesh("test_cube");
-	pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+	pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(TUINT16));
 
 	Toshi::TSysMesh::TLockBuffer lock;
 
@@ -158,7 +164,7 @@ void ATestModel::CreatePlane()
 	{
 		Toshi::TUtil::MemCopy(lock.pVertexBufferData, s_Vertices, sizeof(s_Vertices));
 		Toshi::TUtil::MemCopy(lock.pIndexBufferData, s_Indices, sizeof(s_Indices));
-		pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+		pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(TUINT16));
 	}
 
 	pMesh->SetMaterial(m_pPlaneMaterial);
@@ -168,17 +174,17 @@ void ATestModel::CreatePlane()
 void ATestModel::CreateTriangle()
 {
 	static SysMeshVertex s_Vertices[] = {
-		{ { -0.5f,  0.5f, 0.0f }, 0xFFFFFFFF, { 0.0f, 0.0f } },
-		{ {  0.5f,  0.5f, 0.0f }, 0xFFFFFFFF, { 1.0f, 0.0f } },
-		{ {  0.0f, -0.5f, 0.0f }, 0xFFFFFFFF, { 0.5f, 1.0f } },
+		{ { -0.5f, 0.5f, 0.0f }, 0xFFFFFFFF, { 0.0f, 0.0f } },
+		{ { 0.5f, 0.5f, 0.0f }, 0xFFFFFFFF, { 1.0f, 0.0f } },
+		{ { 0.0f, -0.5f, 0.0f }, 0xFFFFFFFF, { 0.5f, 1.0f } },
 	};
 
-	static uint16_t s_Indices[] = {
+	static TUINT16 s_Indices[] = {
 		0, 1, 2
 	};
 
 	auto pTexManager = Toshi::TTextureManager::GetSingletonSafe();
-	auto pSysShader = Toshi::TSysShader::GetSingletonSafe();
+	auto pSysShader  = Toshi::TSysShader::GetSingletonSafe();
 
 	m_pTriangleMaterial = pSysShader->CreateMaterial();
 	m_pTriangleMaterial->SetFlag(Toshi::TMaterial::Flags_AlphaUpdate, TTRUE);
@@ -190,7 +196,7 @@ void ATestModel::CreateTriangle()
 	m_pTriangleMaterial->SetTexture(0, pTexture);
 
 	auto pMesh = pSysShader->CreateMesh("test_triangle");
-	pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+	pMesh->Create(0, sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(TUINT16));
 
 	Toshi::TSysMesh::TLockBuffer lock;
 
@@ -198,7 +204,7 @@ void ATestModel::CreateTriangle()
 	{
 		Toshi::TUtil::MemCopy(lock.pVertexBufferData, s_Vertices, sizeof(s_Vertices));
 		Toshi::TUtil::MemCopy(lock.pIndexBufferData, s_Indices, sizeof(s_Indices));
-		pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(uint16_t));
+		pMesh->Unlock(sizeof(s_Vertices) / sizeof(SysMeshVertex), sizeof(s_Indices) / sizeof(TUINT16));
 	}
 
 	pMesh->SetMaterial(m_pTriangleMaterial);

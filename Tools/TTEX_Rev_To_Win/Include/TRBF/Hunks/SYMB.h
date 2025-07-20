@@ -166,7 +166,7 @@ namespace TLib
 				for (auto& name : m_SymbolNames)
 				{
 					ttsfo.WriteRaw(name.c_str(), name.length());
-					ttsfo.Write((uint8_t)0);
+					ttsfo.Write((TUINT8)0);
 				}
 			}
 

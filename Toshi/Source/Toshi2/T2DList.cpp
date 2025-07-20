@@ -1,7 +1,6 @@
 #include "ToshiPCH.h"
 #include "T2DList.h"
 
-namespace Toshi
-{
+TOSHI_NAMESPACE_START
 
-}
+TOSHI_NAMESPACE_END

@@ -1,25 +1,22 @@
 #pragma once
 #include "T2GUIFont.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+static TINT* FindFontRef(const TCHAR* a_font);
+static TINT* FindFreeFontRef();
+
+class T2GUIFontDef2
 {
-	static int* FindFontRef(const char* a_font);
-	static int* FindFreeFontRef();
+	TCHAR* m_font;
 
-	class T2GUIFontDef2
-	{
-		char* m_font;
+	TBOOL Init();
+};
 
-		TBOOL Init();
-	};
+class T2GUIFontManager
+{
 
-	class T2GUIFontManager
-	{
+	TBOOL Open() {}
+};
 
-		TBOOL Open()
-		{
-
-		}
-	};
-
-}
+TOSHI_NAMESPACE_END

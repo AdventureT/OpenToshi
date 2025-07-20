@@ -5,14 +5,16 @@
 
 #include <cstdint>
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
 class TTransformObject
 {
 public:
 	enum class Mode
 	{
-		Quat = 0, Euler, Matrix
+		Quat = 0,
+		Euler,
+		Matrix
 	};
 
 public:
@@ -20,40 +22,31 @@ public:
 
 	void GetLocalMatrixImp(TMatrix44& outMatrix);
 
-	void SetEulerOrder(uint8_t x, uint8_t y, uint8_t z);
+	void SetEulerOrder(TUINT8 x, TUINT8 y, TUINT8 z);
 	void SetTranslate(const TVector3& translation);
 	void SetQuat(const TQuaternion& quaternion);
 	void SetMatrix(const TMatrix44& matrix);
 
-	void ResetChangedState()
-	{
-		m_bChanged = TFALSE;
-	}
+	void ResetChangedState() { m_bChanged = TFALSE; }
 
-	TBOOL HasChanged() const
-	{
-		return m_bChanged;
-	}
-	
-	Mode GetMode() const
-	{
-		return m_eMode;
-	}
+	TBOOL HasChanged() const { return m_bChanged; }
+
+	Mode GetMode() const { return m_eMode; }
 
 private:
-	void RotateX(float angle)
+	void RotateX(TFLOAT angle)
 	{
 		TASSERT(Mode::Euler == GetMode());
 		m_Matrix.RotateX(angle);
 	}
 
-	void RotateY(float angle)
+	void RotateY(TFLOAT angle)
 	{
 		TASSERT(Mode::Euler == GetMode());
 		m_Matrix.RotateY(angle);
 	}
 
-	void RotateZ(float angle)
+	void RotateZ(TFLOAT angle)
 	{
 		TASSERT(Mode::Euler == GetMode());
 		m_Matrix.RotateZ(angle);
@@ -62,16 +55,16 @@ private:
 private:
 	union
 	{
-		TMatrix44 m_Matrix;
+		TMatrix44   m_Matrix;
 		TQuaternion m_Quat;
-		TVector3 m_Euler;
+		TVector3    m_Euler;
 	};
 
-	Mode m_eMode;
+	Mode     m_eMode;
 	TVector3 m_Translation;
 	TVector3 m_ScaleVector;
-	uint8_t m_EulerOrder[3];
-	TBOOL m_bChanged;
+	TUINT8   m_EulerOrder[3];
+	TBOOL    m_bChanged;
 };
 
-}
+TOSHI_NAMESPACE_END

@@ -3,7 +3,7 @@
 #include <Toshi/File/TTRB.h>
 #include <Toshi/Core/TSystem.h>
 
-#define TEST_STL 1
+#define TEST_STL             1
 #define TEST_LOCALE_BARNYARD 1
 
 TBOOL ARootTask::OnUpdate(float deltaTime)
@@ -30,13 +30,16 @@ TBOOL ARootTask::OnUpdate(float deltaTime)
 
 		TOSHI_INFO("Vector's size: {0}", vec.size());
 		TOSHI_INFO("Vector's elements:");
-		for (auto& f : vec) { TOSHI_INFO(f); }
+		for (auto& f : vec)
+		{
+			TOSHI_INFO(f);
+		}
 		TOSHI_INFO("----------------------------------------------");
 		TOSHI_INFO("Toshi::STL::Map");
 		TOSHI_INFO("----------------------------------------------");
 		Toshi::STL::Map<int, float> map;
-		map[0] = 0.2f;
-		map[98] = 987.0f;
+		map[0]   = 0.2f;
+		map[98]  = 987.0f;
 		map[154] = 24.6f;
 		TOSHI_INFO("Map Size: {0}", map.size());
 		TOSHI_INFO("Map contains 0: {0}", map.contains(0));
@@ -48,8 +51,8 @@ TBOOL ARootTask::OnUpdate(float deltaTime)
 		TOSHI_INFO("Toshi::STL::UnorderedMap (HashTable)");
 		TOSHI_INFO("----------------------------------------------");
 		Toshi::STL::UnorderedMap<int, float> umap;
-		umap[0] = 0.2f;
-		umap[98] = 987.0f;
+		umap[0]   = 0.2f;
+		umap[98]  = 987.0f;
 		umap[154] = 24.6f;
 		TOSHI_INFO("UnorderedMap has {0} buckets", umap.bucket_count());
 		TOSHI_INFO("==============================================");
@@ -58,12 +61,12 @@ TBOOL ARootTask::OnUpdate(float deltaTime)
 #if TEST_LOCALE_BARNYARD
 		struct LocaleStrings
 		{
-			uint32_t Count;
+			uint32_t  Count;
 			wchar_t** Strings;
 		};
 
 		Toshi::TTRB localeFile;
-		auto result = localeFile.Load("Data/Barnyard_Locale/eng-uk.trb");
+		auto        result = localeFile.Load("Data/Barnyard_Locale/eng-uk.trb");
 		TASSERT(result == Toshi::TTRB::ERROR_OK, "Unable to open file");
 
 		LocaleStrings* table = localeFile.CastSymbol<LocaleStrings>("LocaleStrings");

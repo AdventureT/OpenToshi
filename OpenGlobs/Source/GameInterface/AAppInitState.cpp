@@ -17,44 +17,44 @@ using namespace Toshi;
 
 AGameState::UpdateResult AAppInitState::OnUpdate(float deltaTime)
 {
-    TIMPLEMENT();
+	TIMPLEMENT();
 
-    if (AAssetStreaming::GetSingleton()->HasActiveJobs())
-    {
-        ARenderer::GetSingleton()->SetBackgroundColour(0, 0, 0);
-        return AGameState::OnUpdate(deltaTime);
-    }
+	if (AAssetStreaming::GetSingleton()->HasActiveJobs())
+	{
+		ARenderer::GetSingleton()->SetBackgroundColour(0, 0, 0);
+		return AGameState::OnUpdate(deltaTime);
+	}
 
-    TString8 str;
-    str = str.Format("data/%s.trb", AApplication::g_oTheApp.GetLevelInformationFileName());
+	TString8 str;
+	str = str.Format("data/%s.trb", AApplication::g_oTheApp.GetLevelInformationFileName());
 
-    ALevelInformation* levelInformation = ALevelInformation::CreateSingleton();
-    levelInformation->Create(str);
+	ALevelInformation* levelInformation = ALevelInformation::CreateSingleton();
+	levelInformation->Create(str);
 
-    ARandom::CreateSingleton();
+	ARandom::CreateSingleton();
 	AModelLoader::CreateSingleton();
-    ADX11MoviePlayer::CreateSingleton<ADX11MoviePlayer>()->OnCreate();
+	ADX11MoviePlayer::CreateSingleton<ADX11MoviePlayer>()->OnCreate();
 
-    return UpdateResult_Remove;
+	return UpdateResult_Remove;
 }
 
 void AAppInitState::OnInsertion()
 {
-    TIMPLEMENT();
-    AGameState::OnInsertion();
+	TIMPLEMENT();
+	AGameState::OnInsertion();
 }
 
 void AAppInitState::OnRemoval()
 {
-    AGameState::OnRemoval();
+	AGameState::OnRemoval();
 
-    if (AApplication::g_oTheApp.ShouldLoadModelViewState())
-    {
-        TIMPLEMENT_D("AModelViewState");
-    }
-    else
-    {
-        AGameStateController::GetSingletonSafe()->PushState(new AFrontEndMovieState);
-        TIMPLEMENT_D("The game");
-    }
+	if (AApplication::g_oTheApp.ShouldLoadModelViewState())
+	{
+		TIMPLEMENT_D("AModelViewState");
+	}
+	else
+	{
+		AGameStateController::GetSingletonSafe()->PushState(new AFrontEndMovieState);
+		TIMPLEMENT_D("The game");
+	}
 }

@@ -22,12 +22,11 @@ void AInputHelper::AddMapping(AInputMap::INPUTBUTTON a_eInputButton, AInputManag
 	}
 
 	auto pButtonMap = inputMng->GetInputMap().GetButtonMap(inputMng->GetContext());
-	auto foundMap1 = pButtonMap->Find(TSTATICCAST(AInputMap::ActionButton, a_eInputButton));
-	auto endOfMap = &pButtonMap->End()->GetSecond();
+	auto foundMap1  = pButtonMap->Find(AInputMap::ActionButton(a_eInputButton));
 
-	if (foundMap1 != endOfMap)
+	if (foundMap1 != pButtonMap->End())
 	{
-		for (auto j = foundMap1->Begin(); j != foundMap1->End(); j++)
+		for (auto j = foundMap1->second.Begin(); j != foundMap1->second.End(); j++)
 		{
 			buttonInfoVector.PushBack({ *j, bVal ? 6 : 2, 0.0f, a_fRepeatTime });
 		}
@@ -66,44 +65,39 @@ TBOOL AInputHelper::IsJustDown(AInputMap::INPUTBUTTON a_eInputButton, AInputMana
 	auto inputMng = AInputManager2::GetSingleton();
 
 	if (a_eInputDevice != AInputManager2::INPUTDEVICE_Keyboard &&
-		inputMng->CheckIfValidDevice(
-			inputMng->GetControllerHandle(a_eInputDevice)
-		))
+	    inputMng->CheckIfValidDevice(
+	        inputMng->GetControllerHandle(a_eInputDevice)
+	    ))
 	{
 		return TFALSE;
 	}
 
 	auto buttonDevice = m_oButtonMap.Find(MakeButtonDevice(a_eInputButton, a_eInputDevice));
-	auto buttonMapEnd = &m_oButtonMap.End()->GetSecond();
 
-	if (buttonDevice == buttonMapEnd)
+	if (buttonDevice == m_oButtonMap.End())
 	{
 		return TFALSE;
 	}
 
-	auto t = *buttonDevice;
-
-	for (size_t i = buttonDevice->Size() - 1; i != 0; i--)
+	for (size_t i = buttonDevice->second.Size() - 1; i != 0; i--)
 	{
-		auto value = t[i];
-		if (HASFLAG(value.m_iFlag & FLAG_ISDOWN))
+		if (HASFLAG(buttonDevice->second[i].m_iFlag & FLAG_ISDOWN))
 		{
 			return TTRUE;
 		}
 	}
 
 	return TFALSE;
-
 }
 
 void AInputHelper::Update(float fVal)
 {
-	AInputMap::INPUTBUTTON eInputButton;
+	AInputMap::INPUTBUTTON      eInputButton;
 	AInputManager2::INPUTDEVICE eInputDevice;
 
 	for (auto i = m_oButtonMap.Begin(); i != m_oButtonMap.End(); i++)
 	{
-		auto key = i->GetFirst();
+		auto key   = i->GetFirst();
 		auto value = i->GetSecond();
 		GetInputButtonDevice(key, eInputButton, eInputDevice);
 		for (size_t i = 0; i < value.Size(); i++)
@@ -147,13 +141,12 @@ void AInputHelper::UpdateButtonInfo(Toshi::TInputDevice* a_pDevice, ButtonInfo* 
 
 void AInputHelper::UpdateButtonInfo(ButtonInfo* a_pButtonInfo, AInputManager2::INPUTDEVICE a_eInputDevice)
 {
-	TInputDevice* device = a_eInputDevice == AInputManager2::INPUTDEVICE_Keyboard ? 
-		TInputInterface::GetSingleton()->GetDeviceByIndex<TInputDeviceKeyboard>() : 
-		AInputManager2::GetSingleton()->GetControllerHandle(a_eInputDevice).m_pDevice;
+	TInputDevice* device = a_eInputDevice == AInputManager2::INPUTDEVICE_Keyboard ?
+	    TInputInterface::GetSingleton()->GetDeviceByIndex<TInputDeviceKeyboard>() :
+	    AInputManager2::GetSingleton()->GetControllerHandle(a_eInputDevice).m_pDevice;
 
 	if (device)
 	{
 		UpdateButtonInfo(device, a_pButtonInfo);
 	}
-
 }

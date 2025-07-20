@@ -4,43 +4,36 @@
 
 #include <SDL/SDL_opengl.h>
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	void TViewport::BeginSKU()
+void TViewport::BeginSKU()
+{
+	glViewport(GLint(GetX()), GLint(GetY()), GLsizei(GetWidth()), GLsizei(GetHeight()));
+
+	if (m_bAllowBackgroundClear || m_bAllowDepthClear)
 	{
-		glViewport(
-			TSTATICCAST(GLint, GetX()),
-			TSTATICCAST(GLint, GetY()),
-			TSTATICCAST(GLsizei, GetWidth()),
-			TSTATICCAST(GLsizei, GetHeight())
-		);
-
-		if (m_bAllowBackgroundClear || m_bAllowDepthClear)
+		if (m_bAllowBackgroundClear)
 		{
-			if (m_bAllowBackgroundClear)
-			{
-				uint8_t r, g, b, a;
-				GetBackgroundColor(r, g, b, a);
+			TUINT8 r, g, b, a;
+			GetBackgroundColor(r, g, b, a);
 
-				glClearColor(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
-				glClear(GL_COLOR_BUFFER_BIT);
-			}
+			glClearColor(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
 
-			if (m_bAllowDepthClear)
-			{
-				glClear(GL_DEPTH_BUFFER_BIT);
-			}
+		if (m_bAllowDepthClear)
+		{
+			glClear(GL_DEPTH_BUFFER_BIT);
 		}
 	}
-
-	void TViewport::EndSKU()
-	{
-		TRenderSDL::Interface()->FlushShaders();
-	}
-
-	void TViewport::ChangeSKU(ChangeEvent a_eEvent)
-	{
-
-	}
-
 }
+
+void TViewport::EndSKU()
+{
+	TRenderSDL::Interface()->FlushShaders();
+}
+
+void TViewport::ChangeSKU(ChangeEvent a_eEvent)
+{}
+
+TOSHI_NAMESPACE_END

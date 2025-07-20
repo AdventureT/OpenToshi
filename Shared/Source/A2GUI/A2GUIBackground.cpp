@@ -14,7 +14,7 @@ void A2GUIBackground::Create(const char* fileName)
 
 void A2GUIBackground::LoadMaterialLibrary(const char* fileName)
 {
-	TString8 sixTeenStr = TString8::TString8("16");
+	TString8 sixTeenStr  = TString8::TString8("16");
 	TString8 fileNameStr = TString8::TString8(fileName);
 
 	char matlibPath[MAX_FILEPATH_LENGTH];
@@ -34,7 +34,7 @@ void A2GUIBackground::LoadMaterialLibrary(const char* fileName)
 void A2GUIBackground::SetupBackground()
 {
 	auto gui = T2GUI::GetSingleton();
-	
+
 	SetAnchor(Anchor::BottomLeft);
 	SetPivot(Pivot::BottomLeft);
 
@@ -46,17 +46,17 @@ void A2GUIBackground::SetupBackground()
 	uint32_t textureHeights[2];
 
 	char* tgaName = TStringManager::GetTempString8();
-	
+
 	for (size_t i = 0; i < MAX_TILES; i++)
 	{
-		T2String8::Format(tgaName, "%s_%d.tga", m_pFileName, i+1);
+		T2String8::Format(tgaName, "%s_%d.tga", m_pFileName, i + 1);
 		T2GUIMaterial* pMaterial = T2GUI::CreateMaterial(tgaName);
-		textureWidths[i % 3] = pMaterial->GetTexture()->GetWidth();
-		textureHeights[i / 3] = pMaterial->GetTexture()->GetHeight();
+		textureWidths[i % 3]     = pMaterial->GetTexture()->GetWidth();
+		textureHeights[i / 3]    = pMaterial->GetTexture()->GetHeight();
 		T2GUI::DestroyMaterial(pMaterial);
 	}
 
-	float backgroundWidth = 0.0f + textureWidths[0] + textureWidths[1] + textureWidths[2];
+	float backgroundWidth  = 0.0f + textureWidths[0] + textureWidths[1] + textureWidths[2];
 	float backgroundHeight = 0.0f + textureHeights[0] + textureHeights[1];
 
 	int iTile = 0;
@@ -65,21 +65,21 @@ void A2GUIBackground::SetupBackground()
 	for (size_t i = 0; i < 2; i++)
 	{
 		int tileHeight = static_cast<int>((textureHeights[i] / backgroundHeight) * height);
-		tileX = 0;
+		tileX          = 0;
 
 		for (size_t j = 0; j < MAX_TILES / 2; j++)
 		{
 			TASSERT(iTile < MAX_TILES);
 			TASSERT(TNULL == m_Poly[iTile]);
 
-			int tileWidth = TSTATICCAST(int, (textureWidths[j] / backgroundWidth) * width);
-			auto& pTile = m_Poly[iTile];
-			pTile = new T2GUIPolygon;
+			int   tileWidth = TINT((textureWidths[j] / backgroundWidth) * width);
+			auto& pTile     = m_Poly[iTile];
+			pTile           = new T2GUIPolygon;
 
 			pTile->Create(4);
 			pTile->SetAnchor(Anchor::BottomLeft);
 			pTile->SetPivot(Pivot::MiddleCenter);
-			
+
 			T2String8::Format(tgaName, "%s_%d.tga", m_pFileName, iTile + 1);
 			T2GUIMaterial* pMaterial = T2GUI::CreateMaterial(tgaName);
 			pMaterial->GetTexture()->SetWrap(D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_CLAMP);
@@ -96,7 +96,7 @@ void A2GUIBackground::SetupBackground()
 			uv[3].y = 1.0;
 
 			auto startX = tileX;
-			auto endX = tileX + tileWidth;
+			auto endX   = tileX + tileWidth;
 
 			auto vertices = pTile->GetVertices();
 			vertices[0].x = static_cast<float>(startX);

@@ -1,11 +1,10 @@
 #pragma once
 #include "ACamera.h"
 
-class ACameraManager : 
-	public Toshi::TSingleton<ACameraManager>
+class ACameraManager : public Toshi::TSingleton<ACameraManager>
 {
 public:
-	static constexpr uint8_t MAX_CAMERA = 14;
+	static constexpr TUINT8 MAX_CAMERA = 14;
 
 public:
 	ACameraManager();
@@ -21,12 +20,12 @@ public:
 		return TNULL;
 	}
 
-	template<class T>
+	template <class T>
 	void CreateCamera()
 	{
 		static_assert(std::is_base_of_v<ACamera, T> == TTRUE);
 
-		for (uint8_t i = 0; i < MAX_CAMERA; i++)
+		for (TUINT8 i = 0; i < MAX_CAMERA; i++)
 		{
 			if (m_ppCameras[i] == TNULL)
 			{
@@ -49,8 +48,8 @@ public:
 	}
 
 private:
-	TBOOL m_bFlag;                    // 0x0000
+	TBOOL    m_bFlag;                 // 0x0000
 	ACamera* m_ppCameras[MAX_CAMERA]; // 0x0340
-	int8_t m_iCurrentCamera;          // 0x0378
-	int m_iSomeCount;                 // 0x037C
+	int8_t   m_iCurrentCamera;        // 0x0378
+	int      m_iSomeCount;            // 0x037C
 };

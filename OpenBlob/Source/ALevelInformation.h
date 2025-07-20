@@ -1,20 +1,21 @@
 #include "Toshi/File/TTRB.h"
 #include "Toshi/Core/THashTable.h"
 
-class ALevelInformation : public Toshi::TTRB, public Toshi::TSingleton<ALevelInformation>
+class ALevelInformation : public Toshi::TTRB
+    , public Toshi::TSingleton<ALevelInformation>
 {
 public:
 	struct LevelProperties
 	{
-		char* m_levelName;
-		char* levelNamePath;
-		char* levelFileName;
-		char smth[0x58];
+		TCHAR* m_levelName;
+		TCHAR* levelNamePath;
+		TCHAR* levelFileName;
+		TCHAR  smth[0x58];
 	};
 
 	struct LevelHeader
 	{
-		int m_levelCount;
+		TINT             m_levelCount;
 		LevelProperties* m_pLevelProps;
 	};
 
@@ -24,15 +25,15 @@ public:
 		m_pData = TNULL;
 	}
 
-	void Create(const char* a_levelInfo);
-	void MakeStringToIDHashTable();
+	void         Create(const TCHAR* a_levelInfo);
+	void         MakeStringToIDHashTable();
 	LevelHeader* GetLevelHeader() { return reinterpret_cast<LevelHeader*>(m_pData); }
-	const char* GetLevelName(int a_iLevelIndex);
+	const TCHAR* GetLevelName(TINT a_iLevelIndex);
 
 public:
 	static Toshi::THashTable::t_ItemCompareFunc LevelNameHashCompareFunc;
 
 private:
-	uint8_t* m_pData; // 0x14
+	TUINT8*           m_pData;      // 0x14
 	Toshi::THashTable m_pHashTable; // 0x18
 };

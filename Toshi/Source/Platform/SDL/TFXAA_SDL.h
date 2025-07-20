@@ -1,7 +1,7 @@
 #pragma once
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TFXAA;
+class TFXAA;
 
-}
+TOSHI_NAMESPACE_END

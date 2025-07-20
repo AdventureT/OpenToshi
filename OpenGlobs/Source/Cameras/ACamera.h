@@ -1,19 +1,18 @@
 #pragma once
 
-class ACamera :
-	public Toshi::TGenericClassDerived<ACamera, Toshi::TObject, "ACamera", TMAKEVERSION(1, 0), TFALSE>
+class ACamera : public Toshi::TGenericClassDerived<ACamera, Toshi::TObject, "ACamera", TMAKEVERSION(1, 0), TFALSE>
 {
 public:
 	struct CameraMatrix
 	{
 		Toshi::TMatrix44 m_mMatrix;
 		Toshi::TMatrix44 m_mShakeMatrix;
-		float m_fNear;
-		float m_fFar;
-		float m_fFOV;
-		float m_fAspect;
-		float m_fProjectionCentreX;
-		float m_fProjectionCentreY;
+		float            m_fNear;
+		float            m_fFar;
+		float            m_fFOV;
+		float            m_fAspect;
+		float            m_fProjectionCentreX;
+		float            m_fProjectionCentreY;
 	};
 
 	enum CameraType
@@ -27,15 +26,16 @@ public:
 	};
 
 public:
-	ACamera(CameraType a_eCamType) : m_eCamType(a_eCamType)
+	ACamera(CameraType a_eCamType)
+	    : m_eCamType(a_eCamType)
 	{
 		ResetCameraMatrix(m_Matrix);
 		TASSERT(a_eCamType >= 0 && a_eCamType < CT_TYPECOUNT);
 	}
 
 	TBOOL IsInViewCone(const Toshi::TVector4& a_rvPos, float a_fSphereRadius) const;
-	void LookAtPoint(const Toshi::TVector4& a_vPoint);
-	
+	void  LookAtPoint(const Toshi::TVector4& a_vPoint);
+
 	static void ResetCameraMatrix(CameraMatrix& camMat);
 
 	void RotateAroundWorldUp(float rotation)
@@ -82,13 +82,12 @@ public:
 	}
 
 public:
-	static constexpr float sm_fDefaultFOV = Toshi::TMath::DegToRad(60.0f);
+	static constexpr float       sm_fDefaultFOV = Toshi::TMath::DegToRad(60.0f);
 	static const Toshi::TVector4 sm_vInitialPos;
 	static const Toshi::TVector4 sm_vWorldUp;
 
 protected:
-	TBOOL m_bSomeFlag;                 // 0x04
-	CameraType m_eCamType;             // 0x08
-	CameraMatrix m_Matrix;             // 0x6C
+	TBOOL        m_bSomeFlag; // 0x04
+	CameraType   m_eCamType;  // 0x08
+	CameraMatrix m_Matrix;    // 0x6C
 };
-

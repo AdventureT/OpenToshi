@@ -4,7 +4,7 @@
 
 TOSHI_NAMESPACE_USING
 
-TBOOL XURXUIListItemData::Load(TXUIResource& resource, uint8_t*& a_pData)
+TBOOL XURXUIListItemData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUICheckBoxData::Load(resource, a_pData);
 
@@ -18,22 +18,20 @@ TBOOL XURXUIListItemData::Load(TXUIResource& resource, uint8_t*& a_pData)
 		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_SelectedSize, m_uiSelectedSize);
 		reader.ReadProperty<XUI_EPT_BOOL>(PropType_KeepSizeUnfocused, m_bKeepSizeUnfocused);
 		reader.ReadProperty<XUI_EPT_VECTOR>(PropType_InterItemSpacing, m_vInterItemSpacing);
-
 	}
 
 	return TTRUE;
 }
 
-TBOOL XURXUIListItemData::ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
+TBOOL XURXUIListItemData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
-	if (a_uiObjectIndex == 0)
-		return a_uiPropIndex < PropType_NUMOF;
+	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
 
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIControlData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
-TBOOL XURXUIListItemData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
+TBOOL XURXUIListItemData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, Layout, propType);
 	TXUI_TRANSLATE_TIMELINE_PROP(name, Checkable, propType);
@@ -45,7 +43,7 @@ TBOOL XURXUIListItemData::TranslateTimelineProp(const char* name, uint32_t& a_ui
 	return XURXUIControlData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
-uint32_t XURXUIListItemData::GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType)
+TUINT32 XURXUIListItemData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0)
 	{
@@ -58,19 +56,17 @@ uint32_t XURXUIListItemData::GetTimelinePropSize(uint32_t a_uiObjectIndex, uint3
 	}
 }
 
-TBOOL XURXUIListItemData::IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType)
+TBOOL XURXUIListItemData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
-	if (a_uiObjectIndex == 0)
-		return TFALSE;
+	if (a_uiObjectIndex == 0) return TFALSE;
 
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIControlData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
-TBOOL XURXUIListItemData::IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType)
+TBOOL XURXUIListItemData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
-	if (a_uiObjectIndex == 0)
-		return TFALSE;
+	if (a_uiObjectIndex == 0) return TFALSE;
 
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIControlData::IsColourPropType(a_uiObjectIndex - 1, propType);

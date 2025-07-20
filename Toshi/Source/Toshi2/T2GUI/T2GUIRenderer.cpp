@@ -1,10 +1,11 @@
 #include "ToshiPCH.h"
 #include "T2GUIRenderer.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+TTexture* T2GUIRenderer::GetTexture(const TCHAR* texName) const
 {
-	TTexture* T2GUIRenderer::GetTexture(const char* texName) const
-	{
-		return TNULL;
-	}
+	return TNULL;
 }
+
+TOSHI_NAMESPACE_END

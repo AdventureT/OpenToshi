@@ -1,7 +1,7 @@
 #pragma once
 #include <Toshi/Math/TVector2.h>
-namespace Toshi
-{
+TOSHI_NAMESPACE_START
+
 	class T2GUIElementNode
 	{
 	public:
@@ -108,7 +108,7 @@ namespace Toshi
 		virtual void GetMins(float& a_minX, float& a_minY);
 		virtual void GetMaxs(float& a_maxX, float& a_maxY);
 		virtual void SetColour(uint32_t a_colour) { m_colour = a_colour; }
-		virtual void SetAlpha(float a_alpha) { m_colour &= ~0xFF; m_colour |= (uint8_t)(a_alpha * 255.0f); }
+		virtual void SetAlpha(float a_alpha) { m_colour &= ~0xFF; m_colour |= (TUINT8)(a_alpha * 255.0f); }
 		virtual float GetAlpha() { return (m_colour & 0xFF) / 255.0f; }
 		virtual void SetVisible(bool enable = true) { enable ? m_flags |= 1 : m_flags &= ~1; }
 		virtual void SetFocus(bool enable = true) { enable ? m_flags |= 2 : m_flags &= ~2; }
@@ -123,6 +123,7 @@ namespace Toshi
 		float m_width;               // 0x3C
 		float m_height;              // 0x40
 		uint32_t m_colour;           // 0x44
-		uint8_t m_flags;             // 0x48
+		TUINT8 m_flags;             // 0x48
 	};	
-}
+
+TOSHI_NAMESPACE_END

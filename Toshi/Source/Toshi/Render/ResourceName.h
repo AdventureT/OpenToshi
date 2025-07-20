@@ -1,15 +1,14 @@
 #pragma once
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class ResourceName
 {
-	class ResourceName
-	{
-		char m_cNameLength; // 0x0
-		char* m_sName; // 0x1
+	TCHAR  m_cNameLength; // 0x0
+	TCHAR* m_sName;       // 0x1
 
-	public:
-		const char* GetName() { return m_sName; }
-		int GetNameLength() { return m_cNameLength; }
-	};
-}
+public:
+	const TCHAR* GetName() { return m_sName; }
+	TINT         GetNameLength() { return m_cNameLength; }
+};
 
-
+TOSHI_NAMESPACE_END

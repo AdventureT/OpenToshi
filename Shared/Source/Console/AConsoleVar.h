@@ -1,34 +1,34 @@
 #pragma once
 
 #define CVAR_CREATE(NAME, DEFAULT_VALUE) \
-::AConsoleVar g_cvar_##NAME(#NAME, DEFAULT_VALUE);
+	::AConsoleVar g_cvar_##NAME(#NAME, DEFAULT_VALUE);
 
 #define CVAR_EXTERN(NAME) \
-extern ::AConsoleVar g_cvar_#NAME;
+	extern ::AConsoleVar g_cvar_ #NAME;
 
 #define CVAR_GET_INT(NAME) \
-g_cvar_##NAME.GetInt()
+	g_cvar_##NAME.GetInt()
 
 #define CVAR_GET_FLOAT(NAME) \
-g_cvar_##NAME.GetFloat()
+	g_cvar_##NAME.GetFloat()
 
 #define CVAR_GET_BOOL(NAME) \
-g_cvar_##NAME.GetBool()
+	g_cvar_##NAME.GetBool()
 
 #define CVAR_GET_STRING(NAME) \
-g_cvar_##NAME.GetString()
+	g_cvar_##NAME.GetString()
 
 #define CVAR_SET_INT(NAME, VALUE) \
-g_cvar_##NAME.SetInt(VALUE)
+	g_cvar_##NAME.SetInt(VALUE)
 
 #define CVAR_SET_FLOAT(NAME, VALUE) \
-g_cvar_##NAME.SetFloat(VALUE)
+	g_cvar_##NAME.SetFloat(VALUE)
 
 #define CVAR_SET_BOOL(NAME, VALUE) \
-g_cvar_##NAME.SetBool(VALUE)
+	g_cvar_##NAME.SetBool(VALUE)
 
 #define CVAR_SET_STRING(NAME, VALUE) \
-g_cvar_##NAME.SetString(VALUE)
+	g_cvar_##NAME.SetString(VALUE)
 
 class AConsoleVar
 {
@@ -47,29 +47,29 @@ public:
 public:
 	AConsoleVar(const char* name, int value)
 	{
-		m_szName = name;
-		m_eType = TYPE_INT;
+		m_szName   = name;
+		m_eType    = TYPE_INT;
 		m_ValueInt = value;
 	}
 
 	AConsoleVar(const char* name, float value)
 	{
-		m_szName = name;
-		m_eType = TYPE_FLOAT;
+		m_szName     = name;
+		m_eType      = TYPE_FLOAT;
 		m_ValueFloat = value;
 	}
 
 	AConsoleVar(const char* name, TBOOL value)
 	{
-		m_szName = name;
-		m_eType = TYPE_BOOL;
+		m_szName    = name;
+		m_eType     = TYPE_BOOL;
 		m_ValueBool = value;
 	}
 
 	AConsoleVar(const char* name, const char*& value)
 	{
 		m_szName = name;
-		m_eType = TYPE_STRING;
+		m_eType  = TYPE_STRING;
 		Toshi::TStringManager::String8Copy(m_ValueString, value, MAX_STRING_SIZE);
 	}
 
@@ -133,7 +133,7 @@ public:
 
 private:
 	TYPE m_eType;
-	
+
 	union
 	{
 		int   m_ValueInt;

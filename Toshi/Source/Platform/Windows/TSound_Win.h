@@ -1,17 +1,15 @@
 #pragma once
 #include "Toshi/Sound/TSound.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TSound_Win : public TSound
 {
-	class TSound_Win : public TSound
-	{
-	public:
-		TBOOL Initialise(int maxchannels, int unk);
+public:
+	TBOOL Initialise(TINT maxchannels, TINT unk);
 
-		static FMOD_SYSTEM_CALLBACK SoundCB;
-		
-	};
-	
-}
+	static FMOD_SYSTEM_CALLBACK SoundCB;
+};
 
 
+TOSHI_NAMESPACE_END

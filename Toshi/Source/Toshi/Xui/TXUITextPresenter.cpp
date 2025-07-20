@@ -4,7 +4,7 @@
 
 TOSHI_NAMESPACE_USING
 
-TBOOL XURXUITextPresenterData::Load(TXUIResource& resource, uint8_t*& a_pData)
+TBOOL XURXUITextPresenterData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIElementData::Load(resource, a_pData);
 
@@ -25,14 +25,14 @@ TBOOL XURXUITextPresenterData::Load(TXUIResource& resource, uint8_t*& a_pData)
 	return TTRUE;
 }
 
-TBOOL XURXUITextPresenterData::ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
+TBOOL XURXUITextPresenterData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
-TBOOL XURXUITextPresenterData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
+TBOOL XURXUITextPresenterData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, TextColor, propType);
 	TXUI_TRANSLATE_TIMELINE_PROP(name, DropShadowColor, propType);
@@ -46,7 +46,7 @@ TBOOL XURXUITextPresenterData::TranslateTimelineProp(const char* name, uint32_t&
 	return XURXUIElementData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
-uint32_t XURXUITextPresenterData::GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType)
+TUINT32 XURXUITextPresenterData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex != 0)
 	{
@@ -57,14 +57,14 @@ uint32_t XURXUITextPresenterData::GetTimelinePropSize(uint32_t a_uiObjectIndex, 
 	return 2;
 }
 
-TBOOL XURXUITextPresenterData::IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType)
+TBOOL XURXUITextPresenterData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
-TBOOL XURXUITextPresenterData::IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType)
+TBOOL XURXUITextPresenterData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex != 0)
 	{

@@ -3,28 +3,23 @@
 #include "Toshi2/T2ModelPtr.h"
 #include "TModel.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TModelManager : public TSingleton<TModelManager>
 {
-	class TModelManager : public TSingleton<TModelManager>
-	{
-	public:
-		TModelManager() { }
+public:
+	TModelManager() {}
 
-		void AddModel(T2ModelPtr model);		
-		void RemoveModel(T2ModelPtr model);
-		void FindModel(T2ModelPtr& outModel, const char* name);
+	void AddModel(T2ModelPtr model);
+	void RemoveModel(T2ModelPtr model);
+	void FindModel(T2ModelPtr& outModel, const TCHAR* name);
 
-		T2ModelPtr GetFirstModel() const
-		{
-			return m_HeadModel;
-		}
+	T2ModelPtr GetFirstModel() const { return m_HeadModel; }
 
-		T2ModelPtr GetNextModel(T2ModelPtr model) const
-		{
-			return model->m_NextModelResource;
-		}
+	T2ModelPtr GetNextModel(T2ModelPtr model) const { return model->m_NextModelResource; }
 
-	private:
-		T2ModelPtr m_HeadModel;
-	};
-}
+private:
+	T2ModelPtr m_HeadModel;
+};
+
+TOSHI_NAMESPACE_END

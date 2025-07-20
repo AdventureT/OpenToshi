@@ -2,89 +2,65 @@
 #include "TTransformObject.h"
 #include "TRender.h"
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
 class TCameraObject
 {
 public:
-	static constexpr float s_kMinFOV = (1.0f / 180.0f) * TMath::PI;
-	static constexpr float s_kMaxFOV = TMath::PI;
+	static constexpr TFLOAT s_kMinFOV = (1.0f / 180.0f) * TMath::PI;
+	static constexpr TFLOAT s_kMaxFOV = TMath::PI;
 
 public:
 	TCameraObject();
 
 	void Render();
 
-	float SetNear(float fNear)
-	{
-		return std::exchange(m_fNear, fNear);
-	}
+	TFLOAT SetNear(TFLOAT fNear) { return std::exchange(m_fNear, fNear); }
 
-	float SetFar(float fFar)
-	{
-		return std::exchange(m_fFar, fFar);
-	}
+	TFLOAT SetFar(TFLOAT fFar) { return std::exchange(m_fFar, fFar); }
 
-	float SetFOV(float fFOV)
+	TFLOAT SetFOV(TFLOAT fFOV)
 	{
 		TMath::Clip(fFOV, s_kMinFOV, s_kMaxFOV);
 		return std::exchange(m_fFOV, fFOV);
 	}
 
-	float SetProjectionCentreX(float fCentreX)
+	TFLOAT SetProjectionCentreX(TFLOAT fCentreX)
 	{
 		TMath::Clip(fCentreX, 0.0f, 1.0f);
 		return std::exchange(m_fCentreX, fCentreX);
 	}
 
-	float SetProjectionCentreY(float fCentreY)
+	TFLOAT SetProjectionCentreY(TFLOAT fCentreY)
 	{
 		TMath::Clip(fCentreY, 0.0f, 1.0f);
 		return std::exchange(m_fCentreY, fCentreY);
 	}
 
-	float GetNear() const
-	{
-		return m_fNear;
-	}
+	TFLOAT GetNear() const { return m_fNear; }
 
-	float GetFar() const
-	{
-		return m_fFar;
-	}
+	TFLOAT GetFar() const { return m_fFar; }
 
-	float GetFOV() const
-	{
-		return m_fFOV;
-	}
+	TFLOAT GetFOV() const { return m_fFOV; }
 
-	TRenderContext::CameraMode GetMode() const
-	{
-		return m_eMode;
-	}
+	TRenderContext::CameraMode GetMode() const { return m_eMode; }
 
-	TBOOL IsEnabled() const
-	{
-		return m_bEnabled;
-	}
+	TBOOL IsEnabled() const { return m_bEnabled; }
 
-	TTransformObject& GetTransformObject()
-	{
-		return m_TransformObject;
-	}
+	TTransformObject& GetTransformObject() { return m_TransformObject; }
 
 private:
-	float m_fNear;
-	float m_fFar;
-	float m_fFOV;
-	int m_Unk1;
+	TFLOAT                     m_fNear;
+	TFLOAT                     m_fFar;
+	TFLOAT                     m_fFOV;
+	TINT                       m_Unk1;
 	TRenderContext::CameraMode m_eMode;
-	float m_fCentreX;
-	float m_fCentreY;
-	TTransformObject m_TransformObject;
-	TMatrix44 m_TransformMatrix;
-	TBOOL m_bEnabled;
-	float m_fUnk2;
+	TFLOAT                     m_fCentreX;
+	TFLOAT                     m_fCentreY;
+	TTransformObject           m_TransformObject;
+	TMatrix44                  m_TransformMatrix;
+	TBOOL                      m_bEnabled;
+	TFLOAT                     m_fUnk2;
 };
 
-}
+TOSHI_NAMESPACE_END

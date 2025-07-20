@@ -3,11 +3,8 @@
 
 TOSHI_NAMESPACE_BEGIN
 
-class TXUINineGrid :
-	public TGenericClassDerived<TXUINineGrid, TXUIElement, "TXUINineGrid", TMAKEVERSION(1, 0), TFALSE>
-{
-
-};
+class TXUINineGrid : public TGenericClassDerived<TXUINineGrid, TXUIElement, "TXUINineGrid", TMAKEVERSION(1, 0), TFALSE>
+{};
 
 class XURXUINineGridData : public XURXUIElementData
 {
@@ -25,26 +22,23 @@ class XURXUINineGridData : public XURXUIElementData
 	};
 
 public:
-
-	XURXUINineGridData()
-	{
-		m_pClass = TFindClass(TXUINineGrid, TXUIElement);
-	}
+	XURXUINineGridData() { m_pClass = TFindClass(TXUINineGrid, TXUIElement); }
 
 public:
-	virtual TBOOL Load(TXUIResource& resource, uint8_t*& a_pData) override;
-	virtual TBOOL ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex) override;
-	virtual TBOOL TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType) override;
-	virtual uint32_t GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType) override;
-	virtual TBOOL IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
-	virtual TBOOL IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType) override;
+	virtual TBOOL   Load(TXUIResource& resource, TUINT8*& a_pData) override;
+	virtual TBOOL   ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex) override;
+	virtual TBOOL   TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType) override;
+	virtual TUINT32 GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
+	virtual TBOOL   IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
+	virtual TBOOL   IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
+
 protected:
-	XUIEPTString m_TextureFileName;
+	XUIEPTString   m_TextureFileName;
 	XUIEPTUnsigned m_uiLeftOffset;
 	XUIEPTUnsigned m_uiTopOffset;
 	XUIEPTUnsigned m_uiRightOffset;
 	XUIEPTUnsigned m_uiBottomOffset;
-	XUIEPTBool m_bNoCenter;
+	XUIEPTBool     m_bNoCenter;
 };
 
 TOSHI_NAMESPACE_END

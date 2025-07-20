@@ -3,132 +3,133 @@
 #include "TSystem.h"
 #include "TTask.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+TFLOAT TScheduler::s_MaxTimeDeltaAllowed          = 0.25f;
+TFLOAT TScheduler::s_DebugSlowMaxTimeDeltaAllowed = 1.0f;
+
+TScheduler::TScheduler()
 {
-	float TScheduler::s_MaxTimeDeltaAllowed = 0.25f;
-	float TScheduler::s_DebugSlowMaxTimeDeltaAllowed = 1.0f;
+	m_DeltaTime          = 0.0;
+	m_TasksUpdateTime    = 0.0;
+	m_TotalTime          = 0.0;
+	m_MaxDeltaTime       = 0.25f;
+	m_FrameCount         = 0;
+	m_UseFixedMaxFps     = TFALSE;
+	m_FixedMaxFps        = 0.0;
+	m_UseDebugDeltaTime  = TFALSE;
+	m_DebugDeltaTime     = 0.01f;
+	m_DebugDeltaTimeMult = 1.0f;
+}
 
-	TScheduler::TScheduler()
+TTask* TScheduler::CreateTask(TClass* pClass, TTask* pParent)
+{
+	TASSERT(pClass->IsA(TGetClass(TTask)));
+
+	TTask* pTask = static_cast<TTask*>(pClass->CreateObject());
+	TASSERT(pTask != TNULL);
+
+	if (pParent == TNULL)
 	{
-		m_DeltaTime = 0.0;
-		m_TasksUpdateTime = 0.0;
-		m_TotalTime = 0.0;
-		m_MaxDeltaTime = 0.25f;
-		m_FrameCount = 0;
-		m_UseFixedMaxFps = TFALSE;
-		m_FixedMaxFps = 0.0;
-		m_UseDebugDeltaTime = TFALSE;
-		m_DebugDeltaTime = 0.01f;
-		m_DebugDeltaTimeMult = 1.0f;
+		m_TaskTree.InsertAtRoot(pTask);
+	}
+	else
+	{
+		m_TaskTree.Insert(pParent, pTask);
 	}
 
-	TTask* TScheduler::CreateTask(TClass* pClass, TTask* pParent)
+	return pTask;
+}
+
+void TScheduler::DeleteTaskAtomic(TTask* task)
+{
+	if (task != TNULL)
 	{
-		TASSERT(pClass->IsA(TGetClass(TTask)));
-		
-		TTask* pTask = static_cast<TTask*>(pClass->CreateObject());
-		TASSERT(pTask != TNULL);
+		TTask* taskParent = TNULL;
 
-		if (pParent == TNULL)
+		if (task->IsChildOfDefaultRoot() == TFALSE)
 		{
-			m_TaskTree.InsertAtRoot(pTask);
+			taskParent = task->Parent();
+
+			if (taskParent->IsDying() == TFALSE && taskParent->OnChildDying(task) == TFALSE)
+			{
+				// The parent is not dying and doesn't allow us to kill the task
+				return;
+			}
 		}
-		else
+
+		if (task->Attached() != TNULL)
 		{
-			m_TaskTree.Insert(pParent, pTask);
+			TTask* node = task->Attached()->Attached();
+
+			while (node != TNULL)
+			{
+				auto next = (node->Prev() != node) ? node->Prev() : TNULL;
+				DeleteTaskAtomic(node);
+				node = next;
+			}
 		}
 
-		return pTask;
-	}
+		TClass* pClass = task->GetClass();
+		task->OnDestroy();
+		m_TaskTree.Remove(task, TFALSE);
+		task->Delete();
 
-	void TScheduler::DeleteTaskAtomic(TTask* task)
-	{
-		if (task != TNULL)
+		if (taskParent != TNULL)
 		{
-			TTask* taskParent = TNULL;
-
-			if (task->IsChildOfDefaultRoot() == TFALSE)
-			{
-				taskParent = task->Parent();
-
-				if (taskParent->IsDying() == TFALSE && taskParent->OnChildDying(task) == TFALSE)
-				{
-					// The parent is not dying and doesn't allow us to kill the task
-					return;
-				}
-			}
-
-			if (task->Attached() != TNULL)
-			{
-				TTask* node = task->Attached()->Attached();
-
-				while (node != TNULL)
-				{
-					auto next = (node->Prev() != node) ? node->Prev() : TNULL;
-					DeleteTaskAtomic(node);
-					node = next;
-				}
-			}
-
-			TClass* pClass = task->GetClass();
-			task->OnDestroy();
-			m_TaskTree.Remove(task, TFALSE);
-			task->Delete();
-
-			if (taskParent != TNULL)
-			{
-				taskParent->OnChildDied(pClass, task);
-			}
+			taskParent->OnChildDied(pClass, task);
 		}
 	}
+}
 
-	void TScheduler::DestroyDyingTasks(TTask* task)
+void TScheduler::DestroyDyingTasks(TTask* task)
+{
+	if (task != TNULL)
 	{
-		if (task != TNULL)
-		{
-			TTask* currentTask = task->Prev();
-
-			while (currentTask != TNULL)
-			{
-				TTask* nextTask = (currentTask->Prev() != task) ? currentTask->Prev() : TNULL;
-
-				if (!currentTask->IsDying())
-				{
-					if (currentTask->Attached() != TNULL)
-					{
-						DestroyDyingTasks(currentTask->Attached());
-					}
-				}
-				else
-				{
-					DeleteTask(currentTask);
-				}
-
-				currentTask = nextTask;
-			}
-		}
-	}
-
-	void TScheduler::UpdateActiveTasks(TTask* task)
-	{
-		TTask* currentTask = task;
+		TTask* currentTask = task->Prev();
 
 		while (currentTask != TNULL)
 		{
-			TTask* nextTask = (currentTask->Next() != task) ? currentTask->Next() : TNULL;
+			TTask* nextTask = (currentTask->Prev() != task) ? currentTask->Prev() : TNULL;
 
-			TBOOL recurse = TTRUE;
-			if (task->IsCreated() && task->IsActive())
+			if (!currentTask->IsDying())
 			{
-				recurse = currentTask->OnUpdate(m_DeltaTime);
+				if (currentTask->Attached() != TNULL)
+				{
+					DestroyDyingTasks(currentTask->Attached());
+				}
 			}
-
-			if (currentTask->Attached() != TNULL && recurse)
+			else
 			{
-				UpdateActiveTasks(currentTask->Attached());
+				DeleteTask(currentTask);
 			}
 
 			currentTask = nextTask;
 		}
 	}
 }
+
+void TScheduler::UpdateActiveTasks(TTask* task)
+{
+	TTask* currentTask = task;
+
+	while (currentTask != TNULL)
+	{
+		TTask* nextTask = (currentTask->Next() != task) ? currentTask->Next() : TNULL;
+
+		TBOOL recurse = TTRUE;
+		if (task->IsCreated() && task->IsActive())
+		{
+			recurse = currentTask->OnUpdate(m_DeltaTime);
+		}
+
+		if (currentTask->Attached() != TNULL && recurse)
+		{
+			UpdateActiveTasks(currentTask->Attached());
+		}
+
+		currentTask = nextTask;
+	}
+}
+
+TOSHI_NAMESPACE_END

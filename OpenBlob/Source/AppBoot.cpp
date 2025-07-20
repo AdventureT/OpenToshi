@@ -1,7 +1,7 @@
 #include "pch.h"
 
 // Predefining Toshi initialization settings
-#define TOSHI_TMEMORY_SIZE 640 * 1024 * 1024
+#define TOSHI_TMEMORY_SIZE  640 * 1024 * 1024
 #define TOSHI_TMEMORY_FLAGS Toshi::TMemory::Flags_Standard
 
 // Including the entrypoint
@@ -29,14 +29,19 @@
 #include <Toshi/Input/TInputInterface.h>
 #include <GameInterface/AXUIState.h>
 
-#include TOSHI_MULTIRENDER(A2GUI/A2GUIRenderer)
-#include TOSHI_MULTIRENDER(TRender)
+#ifdef TOSHI_RENDERER_DX11
+#  include "Platform/DX11/A2GUI/A2GUIRenderer_DX11.h"
+#  include "Platform/DX11/TRender_DX11.h"
+#elif defined(TOSHI_RENDERER_OPENGL) // TOSHI_RENDERER_DX11
+#  include "Platform/SDL/A2GUI/A2GUIRenderer_SDL.h"
+#  include "Platform/SDL/TRender_SDL.h"
+#endif // TOSHI_RENDERER_OPENGL
 
 AApplication AApplication::g_oTheApp;
 
 CVAR_CREATE(testcvar, TFALSE)
 
-TBOOL AApplication::OnCreate(int argc, char** argv)
+TBOOL AApplication::OnCreate(TINT argc, TCHAR** argv)
 {
 	TOSHI_INFO("Starting Blob...");
 	AMemory::CreatePools();
@@ -45,13 +50,13 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 	AAssetStreaming::CreateSingleton();
 	ALocaleManager::Create();
 
-	m_Renderer = ARenderer::GetSingletonSafe();
+	m_Renderer             = ARenderer::GetSingletonSafe();
 	TBOOL interfaceCreated = m_Renderer->CreateInterface();
 
 	TOSHI_INFO("testcvar value: {0}", CVAR_GET_BOOL(testcvar));
 	//TASSERT(TFALSE, "Assertion test");
 
-	/*Toshi::T2SimpleArray<int> simpleArray;
+	/*Toshi::T2SimpleArray<TINT> simpleArray;
 	simpleArray.Create(4);
 
 	simpleArray[0] = 1;
@@ -59,32 +64,32 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 	simpleArray[2] = 3;
 	simpleArray[3] = 4;*/
 
-	Toshi::TArray<int>::Storage genArray;
+	Toshi::TArray<TINT>::Storage genArray;
 	genArray.Push(5);
 	genArray.Push(9);
 
-	Toshi::TArray<int> arr(genArray);
+	Toshi::TArray<TINT> arr(genArray);
 
-	for (int i = 0; i < genArray.GetNumElements(); i++)
+	for (TINT i = 0; i < genArray.GetNumElements(); i++)
 	{
 		TOSHI_INFO("{0}", genArray[i]);
 	}
-	
+
 	if (interfaceCreated)
 	{
 		auto pGUIRenderer = new A2GUIRenderer;
-		auto pGUI = Toshi::T2GUI::Open(AMemory::ms_apMemoryBlocks[AMemory::POOL_FrequentAllocations]);
+		auto pGUI         = Toshi::T2GUI::Open(AMemory::ms_apMemoryBlocks[AMemory::POOL_FrequentAllocations]);
 		pGUI->SetRenderer(pGUIRenderer);
 
 		AInputManager2::CreateSingleton();
 
 		// Temp solution
-		Toshi::TXUI::ms_pXUIMemoryBlock = AMemory::GetPool(AMemory::POOL_XUI);
+		Toshi::TXUI::ms_pXUIMemoryBlock    = AMemory::GetPool(AMemory::POOL_XUI);
 		Toshi::TXUI::ms_pXUITRBMemoryBlock = AMemory::GetPool(AMemory::POOL_XUI);
-		auto txui = Toshi::TXUI::CreateSingleton();
+		auto txui                          = Toshi::TXUI::CreateSingleton();
 
 		const size_t poolSize = 128 * 1024 * 1024;
-		void* mempool = Toshi::TMemory::GetGlobalHeap()->Memalign(0x20, poolSize);
+		void*        mempool  = Toshi::TMemory::GetGlobalHeap()->Memalign(0x20, poolSize);
 
 		TBOOL bResult = Toshi::TSound::CreateSingleton()->Create(mempool, poolSize, -1, -1, Toshi::TSound::SpeakerType_7POINT1);
 		TASSERT(TTRUE == bResult);
@@ -93,7 +98,7 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 		system->setFileSystem(NULL, NULL, NULL, NULL, NULL, NULL, 0);
 
 		// Doens't Load
-		
+
 		Toshi::TMemoryHeap* oldHeap = AXUIState::SetFontMemBlock(AMemory::GetPool(AMemory::POOL_XUI));
 
 		//AXUIState::SetSkin1("commonskin.trb", "commonskin.xur");
@@ -107,7 +112,7 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 		m_Renderer->Create();
 		AGameState::SetupLoadIcon();
 		SetRenderWorld(TTRUE);
-		
+
 		m_pGameStateController = AGameStateController::CreateSingleton();
 		ACameraManager::CreateSingleton();
 
@@ -121,18 +126,18 @@ TBOOL AApplication::OnCreate(int argc, char** argv)
 		AExampleClass* exampleClass = new AExampleClass();
 		exampleClass->Delete();
 	}
-	
+
 	return TTRUE;
 }
 
-TBOOL AApplication::OnUpdate(float deltaTime)
+TBOOL AApplication::OnUpdate(TFLOAT deltaTime)
 {
 	UpdateSound(deltaTime);
 
-	Toshi::T2GUI* pGUI = Toshi::T2GUI::GetSingleton();
-	AMoviePlayer* pMoviePlayer = AMoviePlayer::GetSingleton();
+	Toshi::T2GUI*   pGUI          = Toshi::T2GUI::GetSingleton();
+	AMoviePlayer*   pMoviePlayer  = AMoviePlayer::GetSingleton();
 	AInputManager2* pInputManager = AInputManager2::GetSingleton();
-	
+
 	if (pGUI) pGUI->Tick(deltaTime);
 	if (pInputManager) pInputManager->Update(deltaTime);
 	if (pMoviePlayer) pMoviePlayer->OnUpdate(deltaTime);
@@ -142,7 +147,7 @@ TBOOL AApplication::OnUpdate(float deltaTime)
 	return TTRUE;
 }
 
-TBOOL AApplication::UpdateSound(float deltaTime)
+TBOOL AApplication::UpdateSound(TFLOAT deltaTime)
 {
 	Toshi::TSound* sound = Toshi::TSound::GetSingletonSafe();
 	sound->Update();

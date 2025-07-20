@@ -9,9 +9,8 @@ class AMusicManager : public Toshi::TSingleton<AMusicManager>
 
 	struct BuildingColour
 	{
-		int m_iNumberOfColours; // 0x0
+		TINT m_iNumberOfColours; // 0x0
 	};
 
-	void Update(float deltatime);
+	void Update(TFLOAT deltatime);
 };
-

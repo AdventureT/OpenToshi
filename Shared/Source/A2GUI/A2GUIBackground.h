@@ -8,10 +8,10 @@ class A2GUIBackground : public Toshi::T2GUIElement
 private:
 	static constexpr uint32_t MAX_FILENAME_LENGTH = 128;
 	static constexpr uint32_t MAX_FILEPATH_LENGTH = 256;
-	static constexpr uint32_t MAX_TILES           =   6;
+	static constexpr uint32_t MAX_TILES           = 6;
 
-	static constexpr uint32_t s_aTextureXSizes    = 256;
-	static constexpr uint32_t s_aTextureYSizes    = 256;
+	static constexpr uint32_t s_aTextureXSizes = 256;
+	static constexpr uint32_t s_aTextureYSizes = 256;
 
 	static constexpr int s_OffsetX = 0;
 	static constexpr int s_OffsetY = 0;
@@ -34,8 +34,7 @@ public:
 	void Destroy();
 
 private:
-	char m_pFileName[MAX_FILENAME_LENGTH];
-	Toshi::TTRB* m_pTrb;
+	char                 m_pFileName[MAX_FILENAME_LENGTH];
+	Toshi::TTRB*         m_pTrb;
 	Toshi::T2GUIPolygon* m_Poly[MAX_TILES];
 };
-

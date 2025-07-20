@@ -16,22 +16,22 @@ AExampleClass::AExampleClass()
 
 	TRandom rnd;
 	TOSHI_INFO("=================TRandom Test=================");
-	TOSHI_INFO("1) Random int (9000, 10000): {0}", rnd.GetInt(9000, 10000));
-	TOSHI_INFO("2) Random int (9000, 10000): {0}", rnd.GetInt(9000, 10000));
-	TOSHI_INFO("3) Random int (9000, 10000): {0}", rnd.GetInt(9000, 10000));
-	TOSHI_INFO("4) Random int (9000, 10000): {0}", rnd.GetInt(9000, 10000));
-	TOSHI_INFO("5) Random float: {0}", rnd.GetFloat());
-	TOSHI_INFO("6) Random float: {0}", rnd.GetFloat());
-	TOSHI_INFO("7) Random float: {0}", rnd.GetFloat());
-	TOSHI_INFO("8) Random float: {0}", rnd.GetFloat());
-	TOSHI_INFO("9) Random int (500): {0}", rnd.GetInt(500));
-	TOSHI_INFO("10) Random int (500): {0}", rnd.GetInt(500));
-	TOSHI_INFO("11) Random int (500): {0}", rnd.GetInt(500));
-	TOSHI_INFO("12) Random int (500): {0}", rnd.GetInt(500));
-	TOSHI_INFO("13) Random int: {0}", rnd.GetInt());
-	TOSHI_INFO("14) Random int: {0}", rnd.GetInt());
-	TOSHI_INFO("15) Random int: {0}", rnd.GetInt());
-	TOSHI_INFO("16) Random int: {0}", rnd.GetInt());
+	TOSHI_INFO("1) Random TINT (9000, 10000): {0}", rnd.GetInt(9000, 10000));
+	TOSHI_INFO("2) Random TINT (9000, 10000): {0}", rnd.GetInt(9000, 10000));
+	TOSHI_INFO("3) Random TINT (9000, 10000): {0}", rnd.GetInt(9000, 10000));
+	TOSHI_INFO("4) Random TINT (9000, 10000): {0}", rnd.GetInt(9000, 10000));
+	TOSHI_INFO("5) Random TFLOAT: {0}", rnd.GetFloat());
+	TOSHI_INFO("6) Random TFLOAT: {0}", rnd.GetFloat());
+	TOSHI_INFO("7) Random TFLOAT: {0}", rnd.GetFloat());
+	TOSHI_INFO("8) Random TFLOAT: {0}", rnd.GetFloat());
+	TOSHI_INFO("9) Random TINT (500): {0}", rnd.GetInt(500));
+	TOSHI_INFO("10) Random TINT (500): {0}", rnd.GetInt(500));
+	TOSHI_INFO("11) Random TINT (500): {0}", rnd.GetInt(500));
+	TOSHI_INFO("12) Random TINT (500): {0}", rnd.GetInt(500));
+	TOSHI_INFO("13) Random TINT: {0}", rnd.GetInt());
+	TOSHI_INFO("14) Random TINT: {0}", rnd.GetInt());
+	TOSHI_INFO("15) Random TINT: {0}", rnd.GetInt());
+	TOSHI_INFO("16) Random TINT: {0}", rnd.GetInt());
 	TOSHI_INFO("==============================================");
 
 	{
@@ -39,9 +39,9 @@ AExampleClass::AExampleClass()
 
 		if (file)
 		{
-			char sos[0x800]{};
+			TCHAR sos[0x800]{};
 			file->Seek(5, TFile::TSEEK_SET);
-			int read = file->Read(&sos, sizeof(sos));
+			TINT read = file->Read(&sos, sizeof(sos));
 
 			TOSHI_INFO("File size: {0} bytes", file->GetSize());
 			file->Seek(5, TFile::TSEEK_SET);
@@ -55,36 +55,36 @@ AExampleClass::AExampleClass()
 
 		if (file)
 		{
-			unsigned char* buf = (unsigned char*)TMalloc(file->GetSize());//-12);
+			TUINT8* buf = (TUINT8*)TMalloc(file->GetSize()); //-12);
 			//file->Seek(12, TFile::TSEEK_CUR);
-			file->Read(buf, file->GetSize());//-12);
+			file->Read(buf, file->GetSize()); //-12);
 
 			// This is only for testing purposes
-			*(int*)(&buf[8]) = 0; // Setting the CRC to 0 so the new CRC doesn't take the old one and CRCs it
+			*(TINT*)(&buf[8]) = 0; // Setting the CRC to 0 so the new CRC doesn't take the old one and CRCs it
 
-			uint32_t crc = TUtil::CRC32(buf, file->GetSize());
+			TUINT32 crc = TUtil::CRC32(buf, file->GetSize());
 
 			TFree(buf);
 			file->Destroy();
 		}
 	}
-	
+
 	TFile* file = TFile::Create("Data\\XUI\\DE\\common.trb");
-	
-    if (file)
-    {
-        static TTRB trb;
-        trb.Load(file);
-        TAssetInit::InitAssets(trb, TTRUE, TFALSE);
-    }
-	
+
+	if (file)
+	{
+		static TTRB trb;
+		trb.Load(file);
+		TAssetInit::InitAssets(trb, TTRUE, TFALSE);
+	}
+
 
 	/*TError* error = TError::GetSingleton();
 	error->AddError("Material \'%s\' Couldnt find texture \'%s\'", "test", "debloblol.tga");
 	error->AddError("couldnt create resource \'%s\' because we have reached our max (%d)", "Resource1", 5);
-	const char* error1 = error->GetError(0);
-	const char* error2 = error->GetError(1);
-	const char* error3 = error->GetError(2);*/
+	const TCHAR* error1 = error->GetError(0);
+	const TCHAR* error2 = error->GetError(1);
+	const TCHAR* error3 = error->GetError(2);*/
 
 	/*new Toshi::TLogFile();
 
@@ -106,9 +106,9 @@ AExampleClass::AExampleClass()
 	{
 		file->Seek(0x6E1 + 2, TFile::TSEEK_SET);
 
-		uint8_t buf[0x30];
+		TUINT8 buf[0x30];
 		file->Read(buf, 0x30);
-		uint8_t* buf2 = buf;
+		TUINT8* buf2 = buf;
 		XURXUISceneData* element = new XURXUISceneData();
 		TXUIResource resource;
 		element->Load(resource, buf2);
@@ -118,8 +118,8 @@ AExampleClass::AExampleClass()
 	if (error == TTRB::ERROR_OK)
 	{
 		TXUIResource xuiResource;
-		xuiResource.ReadHeader((unsigned char*)trb.GetSymbolAddress("txui"));
-		int size = xuiResource.GetTotalSize((unsigned char*)trb.GetSymbolAddress("txui"));
+		xuiResource.ReadHeader((TUINT8*)trb.GetSymbolAddress("txui"));
+		TINT size = xuiResource.GetTotalSize((TUINT8*)trb.GetSymbolAddress("txui"));
 		TOSHI_INFO(size);
 	}
 	

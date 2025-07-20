@@ -23,7 +23,7 @@ void ACurrentLevelInformation::Create(DataBlock a_type)
 
 		TASSERT(!m_streamingJobs[i]);
 		TASSERT(!m_datablocks[i]);
-		m_datablocks[i] = new Toshi::TTRB();
+		m_datablocks[i]    = new Toshi::TTRB();
 		m_streamingJobs[i] = (ATRBLoaderJob*)assetStreaming->GetAvaiableJob();
 		m_streamingJobs[i]->Init(m_datablocks[i], szFilename);
 		assetStreaming->AddMainThreadJob2(m_streamingJobs[i]);
@@ -32,7 +32,7 @@ void ACurrentLevelInformation::Create(DataBlock a_type)
 
 Toshi::TTRB* ACurrentLevelInformation::GetDataBlock(DataBlock a_type)
 {
-	
+
 	return nullptr;
 }
 
@@ -40,6 +40,5 @@ void ACurrentLevelInformation::Stream()
 {
 	for (size_t i = 0; i < DataBlockCount; i++)
 	{
-		
 	}
 }

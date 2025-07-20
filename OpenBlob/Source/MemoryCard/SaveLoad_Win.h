@@ -7,7 +7,7 @@ class SaveLoadSKU : public SaveLoad
 {
 public:
 	// Not in the correct order but names should be correct
-	enum Operation : int
+	enum Operation : TINT
 	{
 		OPERATION_UNK = -1,
 		OPERATION_SAVE,
@@ -22,10 +22,9 @@ public:
 		OPERATION_UNK7,
 	};
 
-	int8_t m_error; // 0x10
-	Operation m_Operation; // 0x14
+	TINT8       m_error;     // 0x10
+	Operation   m_Operation; // 0x14
 	EnSaveData* m_pSaveData; // 0x18
 
 	void OnUpdate();
 };
-

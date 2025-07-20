@@ -3,42 +3,42 @@
 
 #ifdef TOSHI_SKU_WINDOWS
 
-#ifndef TOSHI_DIST
-#define TOSHI_ENTRY int main(int argc, char** argv)
-#else
-#define TOSHI_ENTRY int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, INT cmdShow)
-#endif
+#  ifndef TOSHI_DIST
+#	define TOSHI_ENTRY TINT main(TINT argc, TCHAR** argv)
+#  else
+#	define TOSHI_ENTRY TINT WINAPI WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, INT cmdShow)
+#  endif
 
-#ifndef TOSHI_CONSOLE
+#  ifndef TOSHI_CONSOLE
 
-#ifndef TOSHI_APP
-#define TOSHI_APP \
-Toshi::TApplication& app = AApplication::g_oTheApp; \
-app.Create("Blob07 - (c) Blue Tongue Software", 0, 0); \
-app.Execute();
-#endif
+#	ifndef TOSHI_APP
+#	  define TOSHI_APP                                          \
+		  Toshi::TApplication& app = AApplication::g_oTheApp;    \
+		  app.Create("Blob07 - (c) Blue Tongue Software", 0, 0); \
+		  app.Execute();
+#	endif
 
-#else
+#  else
 
-#define TOSHI_ENTRY int main(int argc, char** argv)
+#	define TOSHI_ENTRY TINT main(TINT argc, TCHAR** argv)
 
-#ifndef TOSHI_APP
-#define TOSHI_APP \
-extern int TMain(int argc, char** argv); \
-return TMain(__argc, __argv);
-#endif
+#	ifndef TOSHI_APP
+#	  define TOSHI_APP                               \
+		  extern TINT TMain(TINT argc, TCHAR** argv); \
+		  return TMain(__argc, __argv);
+#	endif
 
-#endif
+#  endif
 
-#ifndef TOSHI_TMEMORY_FLAGS
-#define TOSHI_TMEMORY_FLAGS Toshi::TMemory::Flags_Standard
-#endif
+#  ifndef TOSHI_TMEMORY_FLAGS
+#	define TOSHI_TMEMORY_FLAGS Toshi::TMemory::Flags_Standard
+#  endif
 
-#ifndef TOSHI_TMEMORY_SIZE
-#define TOSHI_TMEMORY_SIZE 64 * 1024 * 1024
-#endif
+#  ifndef TOSHI_TMEMORY_SIZE
+#	define TOSHI_TMEMORY_SIZE 64 * 1024 * 1024
+#  endif
 
-static const char* GetOSName(OSVERSIONINFOEXW& osVersionInfo)
+static const TCHAR* GetOSName(OSVERSIONINFOEXW& osVersionInfo)
 {
 	TBOOL isWorkstation = osVersionInfo.wProductType == VER_NT_WORKSTATION;
 
@@ -80,17 +80,17 @@ TOSHI_ENTRY
 	Toshi::TUtil::ToshiCreate(0, 0, memorySettings);
 	Toshi::TUtil::Log("Build Version %s", "0.28");
 
-	OSVERSIONINFOEXW osVersionInfo = { };
+	OSVERSIONINFOEXW osVersionInfo    = {};
 	osVersionInfo.dwOSVersionInfoSize = sizeof(osVersionInfo);
 
-	const char* osName = "unknown";
-	HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+	const TCHAR* osName = "unknown";
+	HMODULE      ntdll  = GetModuleHandleW(L"ntdll.dll");
 
 	if (ntdll != NULL)
 	{
-		typedef void (WINAPI* t_RtlGetVersion) (OSVERSIONINFOEXW*);
+		typedef void(WINAPI * t_RtlGetVersion)(OSVERSIONINFOEXW*);
 		auto RtlGetVersion = reinterpret_cast<t_RtlGetVersion>(GetProcAddress(ntdll, "RtlGetVersion"));
-		
+
 		if (RtlGetVersion != NULL)
 		{
 			RtlGetVersion(&osVersionInfo);
@@ -113,20 +113,17 @@ TOSHI_ENTRY
 
 	if (IsDebuggerPresent())
 	{
-		SetUnhandledExceptionFilter(
-			[](_EXCEPTION_POINTERS* ExceptionInfo) -> LONG
-			{
-				TOSHI_CORE_ERROR("Blob_UnhandledExceptionFilter");
-				TBREAK();
-				return EXCEPTION_EXECUTE_HANDLER;
-			}
-		);
+		SetUnhandledExceptionFilter([](_EXCEPTION_POINTERS* ExceptionInfo) -> LONG {
+			TOSHI_CORE_ERROR("Blob_UnhandledExceptionFilter");
+			TBREAK();
+			return EXCEPTION_EXECUTE_HANDLER;
+		});
 	}
 
 	// de blob does steam init
 
 	TOSHI_APP;
-	
+
 	if (hMutex != NULL)
 	{
 		ReleaseMutex(hMutex);
@@ -140,5 +137,5 @@ TOSHI_ENTRY
 }
 
 #else
-#error "Unknown platform", 0
+#  error "Unknown platform", 0
 #endif

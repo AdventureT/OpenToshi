@@ -1,3 +1,4 @@
-#define DIRECTINPUT_VERSION 0x0800
+#pragma once
+
 #include <dinput.h>
 #include <joystickapi.h>

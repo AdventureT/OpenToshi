@@ -3,315 +3,311 @@
 #include "XURReader.h"
 #include <Toshi/Xui/TXUI.h>
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+TBOOL XURXUIFillData::IsColourPropType(TUINT32 propType)
 {
-    TBOOL XURXUIFillData::IsColourPropType(uint32_t propType)
-    {
-        return propType == PropType_FillType;
-    }
-
-    TBOOL XURXUIFillData::IsFloatPropType(uint32_t propType)
-    {
-        return propType == PropType_FillRotation;
-    }
-
-    uint32_t XURXUIFillData::GetTimelinePropSize(uint32_t propType)
-    {
-        return propType != PropType_FillTextureFileName ? 4 : 2;
-    }
-
-    TBOOL XURXUIFillData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
-    {
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.FillType", propType, PropType_FillType);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.FillColor", propType, PropType_FillColor);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.TextureFileName", propType, PropType_FillTextureFileName);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Translation", propType, PropType_FillTranslation);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Scale", propType, PropType_FillScale);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Rotation", propType, PropType_FillRotation);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.WrapX", propType, PropType_FillWrapX);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.WrapY", propType, PropType_FillWrapY);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.BrushFlags", propType, PropType_FillBrushFlags);
-
-        return TFALSE;
-    }
-
-    TBOOL XURXUIFillData::ValidateTimelineProp(uint32_t param_2)
-    {
-        return param_2 < PropType_NUMOF;
-    }
-
-    TBOOL XURXUIFillData::Load(TXUIResource& resource, uint8_t*& a_pData)
-    {
-        XURXUIObjectData::Load(resource, a_pData);
-        
-        if (*a_pData++ != 0)
-        {
-            XURReader reader(a_pData);
-            if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
-
-            reader.ReadProperty<XUI_EPT_USHORT32>(PropType_FillType, m_FillType);
-            reader.ReadProperty<XUI_EPT_COLOR>(PropType_FillColor, m_FillColor);
-            reader.ReadProperty<XUI_EPT_STRING>(PropType_FillTextureFileName, m_FillTextureFileName);
-            
-            if (reader.ShouldReadThisProp(PropType_Gradient))
-            {
-                m_Gradient.Load(resource, a_pData);
-            }
-
-            reader.ReadProperty<XUI_EPT_VECTOR>(PropType_FillTranslation, m_FillTranslation);
-            reader.ReadProperty<XUI_EPT_VECTOR>(PropType_FillScale, m_FillScale);
-            reader.ReadProperty<XUI_EPT_FLOAT>(PropType_FillRotation, m_FillRotation);
-            reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapX, m_FillWrapX);
-            reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapY, m_FillWrapY);
-
-            reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillBrushFlags, m_FillBrushFlags);
-            reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_Unknown, m_Unknown);
-        }
-
-        return TTRUE;
-    }
-
-    // StrokeData
-
-    TBOOL XURXUIStrokeData::IsColourPropType(uint32_t propType)
-    {
-        return propType == PropType_StrokeColor;
-    }
-
-    TBOOL XURXUIStrokeData::IsFloatPropType(uint32_t propType)
-    {
-        return propType == PropType_StrokeWidth;
-    }
-
-    uint32_t XURXUIStrokeData::GetTimelinePropSize(uint32_t propType)
-    {
-        return 4;
-    }
-
-    TBOOL XURXUIStrokeData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
-    {
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Stroke.StrokeWidth", propType, PropType_StrokeWidth);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Stroke.StrokeColor", propType, PropType_StrokeColor);
-
-        return TFALSE;
-    }
-
-    TBOOL XURXUIStrokeData::ValidateTimelineProp(uint32_t param_2)
-    {
-        return param_2 < PropType_NUMOF;
-    }
-
-    TBOOL XURXUIStrokeData::Load(TXUIResource& resource, uint8_t*& a_pData)
-    {
-        XURXUIObjectData::Load(resource, a_pData);
-
-        if (*a_pData++ != 0)
-        {
-            XURReader reader(a_pData);
-            if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
-
-            reader.ReadProperty<XUI_EPT_FLOAT>(PropType_StrokeWidth, m_StrokeWidth);
-            reader.ReadProperty<XUI_EPT_COLOR>(PropType_StrokeColor, m_StrokeColor);
-        }
-
-        return TTRUE;
-    }
-
-    // GradientData
-
-    TBOOL XURXUIGradientData::IsColourPropType(uint32_t propType)
-    {
-        return propType == 2;
-    }
-
-    TBOOL XURXUIGradientData::IsFloatPropType(uint32_t propType)
-    {
-        return propType == 3;
-    }
-
-    uint32_t XURXUIGradientData::GetTimelinePropSize(uint32_t propType)
-    {
-        return propType == PropType_FillGradientRadial ? 1 : 4;
-    }
-
-    TBOOL XURXUIGradientData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
-    {
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.Radial", propType, PropType_FillGradientRadial);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.NumStops", propType, PropType_FillGradientNumStops);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.StopPos", propType, PropType_FillGradientStopPos);
-        TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.StopColor", propType, PropType_FillGradientStopColor);
-
-        return TFALSE;
-    }
-
-    TBOOL XURXUIGradientData::ValidateTimelineProp(uint32_t param_2)
-    {
-        return param_2 < PropType_NUMOF;
-    }
-
-    TBOOL XURXUIGradientData::Load(TXUIResource& resource, uint8_t*& a_pData)
-    {
-        XURXUIObjectData::Load(resource, a_pData);
-        XUIEPTUInt8 num;
-
-        if (*a_pData++ != 0)
-        {
-            XURReader reader(a_pData);
-            if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
-
-            reader.ReadProperty<XUI_EPT_BOOL>(PropType_FillGradientRadial, m_Radial);
-            reader.ReadProperty<XUI_EPT_USHORT32>(PropType_FillGradientNumStops, m_NumStops);
-
-            if (reader.ShouldReadThisProp(PropType_FillGradientStopPos))
-            {
-                num = reader.ReadEPTUInt8();
-                m_StopPos = new (TXUI::MemoryBlock()) XUIEPTFloat[num];
-
-                for (XUIEPTUInt8 i = 0; i < num; i++)
-                {
-                    m_StopPos[i] = reader.ReadEPTFloat();
-                }
-            }
-
-            if (reader.ShouldReadThisProp(PropType_FillGradientStopColor))
-            {
-                num = reader.ReadEPTUInt8();
-                m_StopColors = new (TXUI::MemoryBlock()) XUIEPTColor[num];
-
-                for (XUIEPTUInt8 i = 0; i < num; i++)
-                {
-                    m_StopColors[i] = reader.ReadEPTColor();
-                }
-            }
-        }
-
-        return TTRUE;
-    }
-
-    TBOOL XURXUIFigureData::IsColourPropType(uint32_t a_uiObjectIndex, PropType propType)
-    {
-        if (a_uiObjectIndex == 0)
-            return TFALSE;
-
-        TASSERT(a_uiObjectIndex > 0);
-        return XURXUIElementData::IsColourPropType(a_uiObjectIndex - 1, propType);
-    }
-
-    TBOOL XURXUIFigureData::IsFloatPropType(uint32_t a_uiObjectIndex, PropType propType)
-    {
-        if (a_uiObjectIndex == 0)
-            return TFALSE;
-
-        TASSERT(a_uiObjectIndex > 0);
-        return XURXUIElementData::IsFloatPropType(a_uiObjectIndex - 1, propType);
-    }
-
-    uint32_t XURXUIFigureData::GetTimelinePropSize(uint32_t a_uiObjectIndex, PropType propType)
-    {
-        if (a_uiObjectIndex == 0)
-            return propType == PropType_Closed ? 1 : 4;
-
-        TASSERT(a_uiObjectIndex > 0);
-        return XURXUIElementData::GetTimelinePropSize(a_uiObjectIndex - 1, propType);
-    }
-
-    TBOOL XURXUIFigureData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
-    {
-        if (!m_Stroke.TranslateTimelineProp(name, a_uiObjectIndex, propType))
-        {
-            if (!m_Fill.TranslateTimelineProp(name, a_uiObjectIndex, propType))
-            {
-                TXUI_TRANSLATE_TIMELINE_PROP(name, Closed, propType);
-                TXUI_TRANSLATE_TIMELINE_PROP(name, Points, propType);
-
-                a_uiObjectIndex++;
-                return XURXUIElementData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
-            }
-        }
-
-        return TTRUE;
-    }
-
-    TBOOL XURXUIFigureData::ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
-{
-        if (a_uiObjectIndex == 0)
-            return a_uiPropIndex < PropType_NUMOF;
-
-        TASSERT(a_uiObjectIndex > 0);
-        return XURXUIElementData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
-    }
-
-    TBOOL XURXUIFigureData::Load(TXUIResource& resource, uint8_t*& a_pData)
-    {
-        XURXUIElementData::Load(resource, a_pData);
-
-        if (*a_pData++ != 0)
-        {
-            XURReader reader(a_pData);
-            if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
-
-            if (reader.ShouldReadThisProp(PropType_Stroke))
-            {
-                m_Stroke.Load(resource, a_pData);
-            }
-
-            if (reader.ShouldReadThisProp(PropType_Fill))
-            {
-                m_Fill.Load(resource, a_pData);
-            }
-
-            XUIEPTCustom points;
-            TBOOL hasClosed = reader.ReadProperty<XUI_EPT_BOOL>(PropType_Closed, m_Closed);
-            TBOOL hasPoints = reader.ReadProperty<XUI_EPT_CUSTOM>(PropType_Points, points);
-        
-            if (hasPoints)
-            {
-                auto pCustData = resource.GetCust(points);
-                TTODO("Load points");
-            }
-        }
-
-        return TTRUE;
-    }
-
-    TBOOL XURXUIFigureData::ValidateTimelineSubProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
-    {
-        if (a_uiObjectIndex == 0)
-            return m_Stroke.ValidateTimelineProp(a_uiPropIndex);
-        else if (a_uiObjectIndex == 3)
-            return m_Fill.m_Gradient.ValidateTimelineProp(a_uiPropIndex);
-        else
-            return m_Fill.ValidateTimelineProp(a_uiPropIndex);
-    }
-
-    uint32_t XURXUIFigureData::GetTimelineSubPropSize(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
-    {
-        if (a_uiObjectIndex == 0)
-            return m_Stroke.GetTimelinePropSize(a_uiPropIndex);
-        else if (a_uiObjectIndex == 3)
-            return m_Fill.m_Gradient.GetTimelinePropSize(a_uiPropIndex);
-        else
-            return m_Fill.GetTimelinePropSize(a_uiPropIndex);
-    }
-
-    TBOOL XURXUIFigureData::IsFloatSubPropType(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
-    {
-        if (a_uiObjectIndex == 0)
-            return m_Stroke.IsFloatPropType(a_uiPropIndex);
-        else if (a_uiObjectIndex == 3)
-            return m_Fill.m_Gradient.IsFloatPropType(a_uiPropIndex);
-        else
-            return m_Fill.IsFloatPropType(a_uiPropIndex);
-    }
-
-    TBOOL XURXUIFigureData::IsColourSubPropType(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
-    {
-        if (a_uiObjectIndex == 0)
-            return m_Stroke.IsColourPropType(a_uiPropIndex);
-        else if (a_uiObjectIndex == 3)
-            return m_Fill.m_Gradient.IsColourPropType(a_uiPropIndex);
-        else
-            return m_Fill.IsColourPropType(a_uiPropIndex);
-    }
-
+	return propType == PropType_FillType;
 }
+
+TBOOL XURXUIFillData::IsFloatPropType(TUINT32 propType)
+{
+	return propType == PropType_FillRotation;
+}
+
+TUINT32 XURXUIFillData::GetTimelinePropSize(TUINT32 propType)
+{
+	return propType != PropType_FillTextureFileName ? 4 : 2;
+}
+
+TBOOL XURXUIFillData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
+{
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.FillType", propType, PropType_FillType);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.FillColor", propType, PropType_FillColor);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.TextureFileName", propType, PropType_FillTextureFileName);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Translation", propType, PropType_FillTranslation);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Scale", propType, PropType_FillScale);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Rotation", propType, PropType_FillRotation);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.WrapX", propType, PropType_FillWrapX);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.WrapY", propType, PropType_FillWrapY);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.BrushFlags", propType, PropType_FillBrushFlags);
+
+	return TFALSE;
+}
+
+TBOOL XURXUIFillData::ValidateTimelineProp(TUINT32 param_2)
+{
+	return param_2 < PropType_NUMOF;
+}
+
+TBOOL XURXUIFillData::Load(TXUIResource& resource, TUINT8*& a_pData)
+{
+	XURXUIObjectData::Load(resource, a_pData);
+
+	if (*a_pData++ != 0)
+	{
+		XURReader reader(a_pData);
+		if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
+
+		reader.ReadProperty<XUI_EPT_USHORT32>(PropType_FillType, m_FillType);
+		reader.ReadProperty<XUI_EPT_COLOR>(PropType_FillColor, m_FillColor);
+		reader.ReadProperty<XUI_EPT_STRING>(PropType_FillTextureFileName, m_FillTextureFileName);
+
+		if (reader.ShouldReadThisProp(PropType_Gradient))
+		{
+			m_Gradient.Load(resource, a_pData);
+		}
+
+		reader.ReadProperty<XUI_EPT_VECTOR>(PropType_FillTranslation, m_FillTranslation);
+		reader.ReadProperty<XUI_EPT_VECTOR>(PropType_FillScale, m_FillScale);
+		reader.ReadProperty<XUI_EPT_FLOAT>(PropType_FillRotation, m_FillRotation);
+		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapX, m_FillWrapX);
+		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapY, m_FillWrapY);
+
+		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillBrushFlags, m_FillBrushFlags);
+		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_Unknown, m_Unknown);
+	}
+
+	return TTRUE;
+}
+
+// StrokeData
+
+TBOOL XURXUIStrokeData::IsColourPropType(TUINT32 propType)
+{
+	return propType == PropType_StrokeColor;
+}
+
+TBOOL XURXUIStrokeData::IsFloatPropType(TUINT32 propType)
+{
+	return propType == PropType_StrokeWidth;
+}
+
+TUINT32 XURXUIStrokeData::GetTimelinePropSize(TUINT32 propType)
+{
+	return 4;
+}
+
+TBOOL XURXUIStrokeData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
+{
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Stroke.StrokeWidth", propType, PropType_StrokeWidth);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Stroke.StrokeColor", propType, PropType_StrokeColor);
+
+	return TFALSE;
+}
+
+TBOOL XURXUIStrokeData::ValidateTimelineProp(TUINT32 param_2)
+{
+	return param_2 < PropType_NUMOF;
+}
+
+TBOOL XURXUIStrokeData::Load(TXUIResource& resource, TUINT8*& a_pData)
+{
+	XURXUIObjectData::Load(resource, a_pData);
+
+	if (*a_pData++ != 0)
+	{
+		XURReader reader(a_pData);
+		if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
+
+		reader.ReadProperty<XUI_EPT_FLOAT>(PropType_StrokeWidth, m_StrokeWidth);
+		reader.ReadProperty<XUI_EPT_COLOR>(PropType_StrokeColor, m_StrokeColor);
+	}
+
+	return TTRUE;
+}
+
+// GradientData
+
+TBOOL XURXUIGradientData::IsColourPropType(TUINT32 propType)
+{
+	return propType == 2;
+}
+
+TBOOL XURXUIGradientData::IsFloatPropType(TUINT32 propType)
+{
+	return propType == 3;
+}
+
+TUINT32 XURXUIGradientData::GetTimelinePropSize(TUINT32 propType)
+{
+	return propType == PropType_FillGradientRadial ? 1 : 4;
+}
+
+TBOOL XURXUIGradientData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
+{
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.Radial", propType, PropType_FillGradientRadial);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.NumStops", propType, PropType_FillGradientNumStops);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.StopPos", propType, PropType_FillGradientStopPos);
+	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.StopColor", propType, PropType_FillGradientStopColor);
+
+	return TFALSE;
+}
+
+TBOOL XURXUIGradientData::ValidateTimelineProp(TUINT32 param_2)
+{
+	return param_2 < PropType_NUMOF;
+}
+
+TBOOL XURXUIGradientData::Load(TXUIResource& resource, TUINT8*& a_pData)
+{
+	XURXUIObjectData::Load(resource, a_pData);
+	XUIEPTUInt8 num;
+
+	if (*a_pData++ != 0)
+	{
+		XURReader reader(a_pData);
+		if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
+
+		reader.ReadProperty<XUI_EPT_BOOL>(PropType_FillGradientRadial, m_Radial);
+		reader.ReadProperty<XUI_EPT_USHORT32>(PropType_FillGradientNumStops, m_NumStops);
+
+		if (reader.ShouldReadThisProp(PropType_FillGradientStopPos))
+		{
+			num       = reader.ReadEPTUInt8();
+			m_StopPos = new (TXUI::MemoryBlock()) XUIEPTFloat[num];
+
+			for (XUIEPTUInt8 i = 0; i < num; i++)
+			{
+				m_StopPos[i] = reader.ReadEPTFloat();
+			}
+		}
+
+		if (reader.ShouldReadThisProp(PropType_FillGradientStopColor))
+		{
+			num          = reader.ReadEPTUInt8();
+			m_StopColors = new (TXUI::MemoryBlock()) XUIEPTColor[num];
+
+			for (XUIEPTUInt8 i = 0; i < num; i++)
+			{
+				m_StopColors[i] = reader.ReadEPTColor();
+			}
+		}
+	}
+
+	return TTRUE;
+}
+
+TBOOL XURXUIFigureData::IsColourPropType(TUINT32 a_uiObjectIndex, PropType propType)
+{
+	if (a_uiObjectIndex == 0) return TFALSE;
+
+	TASSERT(a_uiObjectIndex > 0);
+	return XURXUIElementData::IsColourPropType(a_uiObjectIndex - 1, propType);
+}
+
+TBOOL XURXUIFigureData::IsFloatPropType(TUINT32 a_uiObjectIndex, PropType propType)
+{
+	if (a_uiObjectIndex == 0) return TFALSE;
+
+	TASSERT(a_uiObjectIndex > 0);
+	return XURXUIElementData::IsFloatPropType(a_uiObjectIndex - 1, propType);
+}
+
+TUINT32 XURXUIFigureData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, PropType propType)
+{
+	if (a_uiObjectIndex == 0) return propType == PropType_Closed ? 1 : 4;
+
+	TASSERT(a_uiObjectIndex > 0);
+	return XURXUIElementData::GetTimelinePropSize(a_uiObjectIndex - 1, propType);
+}
+
+TBOOL XURXUIFigureData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
+{
+	if (!m_Stroke.TranslateTimelineProp(name, a_uiObjectIndex, propType))
+	{
+		if (!m_Fill.TranslateTimelineProp(name, a_uiObjectIndex, propType))
+		{
+			TXUI_TRANSLATE_TIMELINE_PROP(name, Closed, propType);
+			TXUI_TRANSLATE_TIMELINE_PROP(name, Points, propType);
+
+			a_uiObjectIndex++;
+			return XURXUIElementData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
+		}
+	}
+
+	return TTRUE;
+}
+
+TBOOL XURXUIFigureData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
+{
+	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
+
+	TASSERT(a_uiObjectIndex > 0);
+	return XURXUIElementData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
+}
+
+TBOOL XURXUIFigureData::Load(TXUIResource& resource, TUINT8*& a_pData)
+{
+	XURXUIElementData::Load(resource, a_pData);
+
+	if (*a_pData++ != 0)
+	{
+		XURReader reader(a_pData);
+		if (m_Index != 0) reader.ReadPropsInfo<PropType_NUMOF>();
+
+		if (reader.ShouldReadThisProp(PropType_Stroke))
+		{
+			m_Stroke.Load(resource, a_pData);
+		}
+
+		if (reader.ShouldReadThisProp(PropType_Fill))
+		{
+			m_Fill.Load(resource, a_pData);
+		}
+
+		XUIEPTCustom points;
+		TBOOL        hasClosed = reader.ReadProperty<XUI_EPT_BOOL>(PropType_Closed, m_Closed);
+		TBOOL        hasPoints = reader.ReadProperty<XUI_EPT_CUSTOM>(PropType_Points, points);
+
+		if (hasPoints)
+		{
+			auto pCustData = resource.GetCust(points);
+			TTODO("Load points");
+		}
+	}
+
+	return TTRUE;
+}
+
+TBOOL XURXUIFigureData::ValidateTimelineSubProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
+{
+	if (a_uiObjectIndex == 0)
+		return m_Stroke.ValidateTimelineProp(a_uiPropIndex);
+	else if (a_uiObjectIndex == 3)
+		return m_Fill.m_Gradient.ValidateTimelineProp(a_uiPropIndex);
+	else
+		return m_Fill.ValidateTimelineProp(a_uiPropIndex);
+}
+
+TUINT32 XURXUIFigureData::GetTimelineSubPropSize(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
+{
+	if (a_uiObjectIndex == 0)
+		return m_Stroke.GetTimelinePropSize(a_uiPropIndex);
+	else if (a_uiObjectIndex == 3)
+		return m_Fill.m_Gradient.GetTimelinePropSize(a_uiPropIndex);
+	else
+		return m_Fill.GetTimelinePropSize(a_uiPropIndex);
+}
+
+TBOOL XURXUIFigureData::IsFloatSubPropType(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
+{
+	if (a_uiObjectIndex == 0)
+		return m_Stroke.IsFloatPropType(a_uiPropIndex);
+	else if (a_uiObjectIndex == 3)
+		return m_Fill.m_Gradient.IsFloatPropType(a_uiPropIndex);
+	else
+		return m_Fill.IsFloatPropType(a_uiPropIndex);
+}
+
+TBOOL XURXUIFigureData::IsColourSubPropType(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
+{
+	if (a_uiObjectIndex == 0)
+		return m_Stroke.IsColourPropType(a_uiPropIndex);
+	else if (a_uiObjectIndex == 3)
+		return m_Fill.m_Gradient.IsColourPropType(a_uiPropIndex);
+	else
+		return m_Fill.IsColourPropType(a_uiPropIndex);
+}
+
+TOSHI_NAMESPACE_END

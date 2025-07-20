@@ -5,86 +5,70 @@
 
 #include <utility>
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TScheduler;
+
+class TPString8Pool;
+
+class TSystemManager : public TSingleton<TSystemManager>
 {
-	class TScheduler;
+public:
+	TSystemManager();
 
-	class TPString8Pool;
+	void Update();
 
-	class TSystemManager : public TSingleton<TSystemManager>
+	TBOOL Pause(TBOOL pause)
 	{
-	public:
-		TSystemManager();
-	
-		void Update();
+		TBOOL oldState = m_Paused;
 
-		TBOOL Pause(TBOOL pause)
-		{
-			TBOOL oldState = m_Paused;
+		m_Paused = pause;
+		m_Emitter.Throw(&pause);
 
-			m_Paused = pause;
-			m_Emitter.Throw(&pause);
+		return oldState;
+	}
 
-			return oldState;
-		}
+	TUINT32 GetFrameCount() { return m_FrameCount; }
 
-		uint32_t GetFrameCount()
-		{
-			return m_FrameCount;
-		}
+	THPTimer* GetTimer() { return &m_Timer; }
 
-		THPTimer* GetTimer()
-		{
-			return &m_Timer;
-		}
+	TScheduler* GetScheduler() const { return m_Scheduler; }
 
-		TScheduler* GetScheduler() const
-		{
-			return m_Scheduler;
-		}
+	TFLOAT GetAverageFps() const { return m_AverageFps; }
 
-		float GetAverageFps() const
-		{
-			return m_AverageFps;
-		}
+public:
+	static TBOOL Create();
 
-	public:
-		static TBOOL Create();
+public:
+	static void CreateStringPool()
+	{
+		TASSERT(ms_poStringPool == TNULL);
+		ms_poStringPool  = new TPString8Pool*;
+		*ms_poStringPool = TNULL;
+	}
 
-	public:
-		static void CreateStringPool()
-		{
-			TASSERT(ms_poStringPool == TNULL);
-			ms_poStringPool = new TPString8Pool*;
-			*ms_poStringPool = TNULL;
-		}
+	static TPString8Pool* GetStringPool()
+	{
+		TASSERT(ms_poStringPool != TNULL);
+		return *ms_poStringPool;
+	}
 
-		static TPString8Pool* GetStringPool()
-		{
-			TASSERT(ms_poStringPool != TNULL);
-			return *ms_poStringPool;
-		}
+	static TPString8Pool* SetStringPool(TPString8Pool* a_pStringPool) { return std::exchange(*ms_poStringPool, a_pStringPool); }
 
-		static TPString8Pool* SetStringPool(TPString8Pool* a_pStringPool)
-		{
-			return std::exchange(*ms_poStringPool, a_pStringPool);
-		}
+private:
+	inline static TPString8Pool** ms_poStringPool;
 
-	private:
-		inline static TPString8Pool** ms_poStringPool;
+private:
+	TEmitter<TSystemManager, TBOOL> m_Emitter; // 0x00
+	TScheduler*                     m_Scheduler;
+	TBOOL                           m_Paused;
+	TUINT32                         m_Unk2;
+	THPTimer                        m_Timer;
+	TUINT32                         m_Unk3;
+	TFLOAT                          m_Second;
+	TFLOAT                          m_AverageFps;
+	TUINT32                         m_FrameCount;
+	TBOOL                           m_Unk7;
+};
 
-	private:
-		TEmitter<TSystemManager, TBOOL> m_Emitter; // 0x00
-		TScheduler* m_Scheduler;
-		TBOOL m_Paused;
-		uint32_t m_Unk2;
-		THPTimer m_Timer;
-		uint32_t m_Unk3;
-		float m_Second;
-		float m_AverageFps;
-		uint32_t m_FrameCount;
-		TBOOL m_Unk7;
-	};
-}
-
-
+TOSHI_NAMESPACE_END

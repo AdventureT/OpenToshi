@@ -3,19 +3,19 @@
 #include "TSkeleton.h"
 #include "TModelCollision.h"
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	namespace TTMDWin
-	{
-		struct TTRBWinHeader
-		{
-			char* m_pTXSModelName;
-			int m_iLODCount;
-			float m_fUnknown;
-			TTMDBase::SkeletonHeader* m_pSkeletonHeader;
-			TSkeleton* m_pSkeleton;
-			TModelCollision* m_pModelCollision;
-		};
-	};
+namespace TTMDWin
+{
+struct TTRBWinHeader
+{
+	TCHAR*                    m_pTXSModelName;
+	TINT                      m_iLODCount;
+	TFLOAT                    m_fUnknown;
+	TTMDBase::SkeletonHeader* m_pSkeletonHeader;
+	TSkeleton*                m_pSkeleton;
+	TModelCollision*          m_pModelCollision;
+};
+}; // namespace TTMDWin
 
-}
+TOSHI_NAMESPACE_END

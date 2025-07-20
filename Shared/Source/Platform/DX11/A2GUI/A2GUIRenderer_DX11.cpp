@@ -12,11 +12,11 @@ using namespace Toshi;
 
 A2GUIRenderer::A2GUIRenderer()
 {
-	m_pTransforms = TNULL;
+	m_pTransforms            = TNULL;
 	m_iTransformStackPointer = 0;
-	m_pMaterial = TNULL;
-	m_bIsInScene = TFALSE;
-	m_pTransforms = new T2GUITransform[TRANSFORMSTACKSIZE];
+	m_pMaterial              = TNULL;
+	m_bIsInScene             = TFALSE;
+	m_pTransforms            = new T2GUITransform[TRANSFORMSTACKSIZE];
 }
 
 A2GUIRenderer::~A2GUIRenderer()
@@ -40,12 +40,12 @@ void A2GUIRenderer::BeginScene()
 {
 	TASSERT(m_iTransformStackPointer == 0);
 
-	auto pRender = TRenderDX11::Interface();
+	auto pRender        = TRenderDX11::Interface();
 	auto pDisplayParams = pRender->GetCurrentDisplayParams();
 	auto pRenderContext = (TRenderContextDX11*)pRender->GetCurrentRenderContext();
 	pRender->FlushShaders();
 
-	static TBOOL s_IsMatrixSet = TFALSE;
+	static TBOOL     s_IsMatrixSet = TFALSE;
 	static TMatrix44 s_IdentityMatrix;
 
 	if (!s_IsMatrixSet)
@@ -58,12 +58,12 @@ void A2GUIRenderer::BeginScene()
 	pRenderContext->SetWorldViewMatrix(s_IdentityMatrix);
 
 	TRenderContext::PROJECTIONPARAMS projParams;
-	projParams.m_Proj.x = 1.0f;
-	projParams.m_Proj.y = -1.0f;
-	projParams.m_Centre.x = pDisplayParams->Width * 0.5f;
-	projParams.m_Centre.y = pDisplayParams->Height * 0.5f;
+	projParams.m_Proj.x    = 1.0f;
+	projParams.m_Proj.y    = -1.0f;
+	projParams.m_Centre.x  = pDisplayParams->Width * 0.5f;
+	projParams.m_Centre.y  = pDisplayParams->Height * 0.5f;
 	projParams.m_fNearClip = 0.0f;
-	projParams.m_fFarClip = 1.0f;
+	projParams.m_fFarClip  = 1.0f;
 
 	pRenderContext->SetCameraMode(TRenderContext::CameraMode_Orthographic);
 	pRenderContext->SetProjectionParams(projParams);
@@ -78,15 +78,15 @@ void A2GUIRenderer::EndScene()
 
 void A2GUIRenderer::SetMaterial(T2GUIMaterial* pMat)
 {
-	auto pPrimShader = TPrimShader::GetSingleton();
-	TTexture* pTex = TNULL;
+	auto      pPrimShader = TPrimShader::GetSingleton();
+	TTexture* pTex        = TNULL;
 
 	if (pMat != TNULL)
 	{
 		TASSERT(pMat->IsA(TGetClass(T2GUIMaterial)));
 		pTex = pMat->GetTexture();
 	}
-	
+
 	pPrimShader->SetImageAndUnlock(pTex);
 	m_pMaterial = pMat;
 }
@@ -101,7 +101,7 @@ void A2GUIRenderer::PushTransform(const T2GUITransform& transform, const TVector
 
 	T2GUITransform& currTransform = *(m_pTransforms + m_iTransformStackPointer);
 	T2GUITransform& prevTransform = *(&currTransform - 1);
-	
+
 	transform1 = transform;
 	transform2 = prevTransform;
 	transform2.Transform(transform2.GetPos(), vec1);
@@ -120,7 +120,7 @@ void A2GUIRenderer::PopTransform()
 void A2GUIRenderer::SetTransform(const T2GUITransform& transform)
 {
 	m_pTransforms[m_iTransformStackPointer] = transform;
-	m_bIsInScene = TTRUE;
+	m_bIsInScene                            = TTRUE;
 }
 
 void A2GUIRenderer::SetColour(uint32_t colour)
@@ -133,41 +133,41 @@ void A2GUIRenderer::RenderRectangle(const TVector2& a, const TVector2& b, const 
 	if (m_bIsInScene)
 	{
 		auto pRenderContext = TRender::GetSingleton()->GetCurrentRenderContext();
-		auto pTransform = m_pTransforms + m_iTransformStackPointer;
-		
+		auto pTransform     = m_pTransforms + m_iTransformStackPointer;
+
 		TMatrix44 mat44;
 		pTransform->Matrix44(mat44);
 		pRenderContext->SetModelViewMatrix(mat44);
 		pRenderContext->SetWorldViewMatrix(mat44);
-		
+
 		m_bIsInScene = TFALSE;
 	}
 
 	TPrimShader::Vertex* pVertex;
-	auto pPrimShader = TPrimShader::GetSingleton();
+	auto                 pPrimShader = TPrimShader::GetSingleton();
 	pPrimShader->StartRendering(TPrimShader::PrimType_TriangleStrip);
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = uv1;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = uv1;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { a.x, a.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = { uv2.x, uv1.y };
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = { uv2.x, uv1.y };
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { b.x, a.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = { uv1.x, uv2.y };
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = { uv1.x, uv2.y };
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { a.x, b.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = uv2;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = uv2;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { b.x, b.y, 0.0f };
 	pPrimShader->AddVert();
 
@@ -179,7 +179,7 @@ void A2GUIRenderer::RenderTriStrip(TVector2* vertices, TVector2* UV, uint32_t nu
 	if (m_bIsInScene)
 	{
 		auto pRenderContext = TRender::GetSingleton()->GetCurrentRenderContext();
-		auto pTransform = m_pTransforms + m_iTransformStackPointer;
+		auto pTransform     = m_pTransforms + m_iTransformStackPointer;
 
 		TMatrix44 mat44;
 		pTransform->Matrix44(mat44);
@@ -192,14 +192,14 @@ void A2GUIRenderer::RenderTriStrip(TVector2* vertices, TVector2* UV, uint32_t nu
 	TASSERT(numverts < MAXVERTS);
 
 	TPrimShader::Vertex* pVertex;
-	auto pPrimShader = TPrimShader::GetSingleton();
+	auto                 pPrimShader = TPrimShader::GetSingleton();
 	pPrimShader->StartRendering(TPrimShader::PrimType_TriangleStrip);
 
 	for (size_t i = 0; i < numverts; i++)
 	{
-		pVertex = pPrimShader->GetCurrentVertex();
-		pVertex->UV = { UV[i].x, UV[i].y };
-		pVertex->Color = m_ui32Colour;
+		pVertex           = pPrimShader->GetCurrentVertex();
+		pVertex->UV       = { UV[i].x, UV[i].y };
+		pVertex->Color    = m_ui32Colour;
 		pVertex->Position = { vertices[i].x, vertices[i].y, 0.0f };
 		pPrimShader->AddVert();
 	}
@@ -215,7 +215,7 @@ void A2GUIRenderer::RenderLine(const TVector2& a, const TVector2& b)
 	if (m_bIsInScene)
 	{
 		auto pRenderContext = TRender::GetSingleton()->GetCurrentRenderContext();
-		auto pTransform = m_pTransforms + m_iTransformStackPointer;
+		auto pTransform     = m_pTransforms + m_iTransformStackPointer;
 
 		TMatrix44 mat44;
 		pTransform->Matrix44(mat44);
@@ -226,18 +226,18 @@ void A2GUIRenderer::RenderLine(const TVector2& a, const TVector2& b)
 	}
 
 	TPrimShader::Vertex* pVertex;
-	auto pPrimShader = TPrimShader::GetSingleton();
+	auto                 pPrimShader = TPrimShader::GetSingleton();
 	pPrimShader->StartRendering(TPrimShader::PrimType_LineList);
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { a.x, a.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { b.x, b.y, 0.0f };
 	pPrimShader->AddVert();
 
@@ -253,7 +253,7 @@ void A2GUIRenderer::RenderLine(float x1, float y1, float x2, float y2)
 	if (m_bIsInScene)
 	{
 		auto pRenderContext = TRender::GetSingleton()->GetCurrentRenderContext();
-		auto pTransform = m_pTransforms + m_iTransformStackPointer;
+		auto pTransform     = m_pTransforms + m_iTransformStackPointer;
 
 		TMatrix44 mat44;
 		pTransform->Matrix44(mat44);
@@ -264,18 +264,18 @@ void A2GUIRenderer::RenderLine(float x1, float y1, float x2, float y2)
 	}
 
 	TPrimShader::Vertex* pVertex;
-	auto pPrimShader = TPrimShader::GetSingleton();
+	auto                 pPrimShader = TPrimShader::GetSingleton();
 	pPrimShader->StartRendering(TPrimShader::PrimType_LineList);
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { x1, y1, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { x2, y2, 0.0f };
 	pPrimShader->AddVert();
 
@@ -291,7 +291,7 @@ void A2GUIRenderer::RenderOutlineRectangle(const TVector2& a, const TVector2& b)
 	if (m_bIsInScene)
 	{
 		auto pRenderContext = TRender::GetSingleton()->GetCurrentRenderContext();
-		auto pTransform = m_pTransforms + m_iTransformStackPointer;
+		auto pTransform     = m_pTransforms + m_iTransformStackPointer;
 
 		TMatrix44 mat44;
 		pTransform->Matrix44(mat44);
@@ -302,30 +302,30 @@ void A2GUIRenderer::RenderOutlineRectangle(const TVector2& a, const TVector2& b)
 	}
 
 	TPrimShader::Vertex* pVertex;
-	auto pPrimShader = TPrimShader::GetSingleton();
+	auto                 pPrimShader = TPrimShader::GetSingleton();
 	pPrimShader->StartRendering(TPrimShader::PrimType_LineStrip);
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { a.x, a.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { b.x, b.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { a.x, b.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { a.x, a.y, 0.0f };
 	pPrimShader->AddVert();
 
@@ -341,7 +341,7 @@ void A2GUIRenderer::RenderFilledRectangle(const TVector2& a, const TVector2& b)
 	if (m_bIsInScene)
 	{
 		auto pRenderContext = TRender::GetSingleton()->GetCurrentRenderContext();
-		auto pTransform = m_pTransforms + m_iTransformStackPointer;
+		auto pTransform     = m_pTransforms + m_iTransformStackPointer;
 
 		TMatrix44 mat44;
 		pTransform->Matrix44(mat44);
@@ -352,30 +352,30 @@ void A2GUIRenderer::RenderFilledRectangle(const TVector2& a, const TVector2& b)
 	}
 
 	TPrimShader::Vertex* pVertex;
-	auto pPrimShader = TPrimShader::GetSingleton();
+	auto                 pPrimShader = TPrimShader::GetSingleton();
 	pPrimShader->StartRendering(TPrimShader::PrimType_TriangleStrip);
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { a.x, a.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { b.x, a.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { a.x, b.y, 0.0f };
 	pPrimShader->AddVert();
 
-	pVertex = pPrimShader->GetCurrentVertex();
-	pVertex->UV = TVector2::VEC_ZERO;
-	pVertex->Color = m_ui32Colour;
+	pVertex           = pPrimShader->GetCurrentVertex();
+	pVertex->UV       = TVector2::VEC_ZERO;
+	pVertex->Color    = m_ui32Colour;
 	pVertex->Position = { b.x, b.y, 0.0f };
 	pPrimShader->AddVert();
 
@@ -395,8 +395,8 @@ void A2GUIRenderer::RenderIndexedTriStripColoursList(TVector2* pVertices, TVecto
 
 void A2GUIRenderer::ScaleCoords(float& x, float& y)
 {
-	auto pDisplayParams = TRenderDX11::Interface()->GetCurrentDisplayParams();
-	T2GUIElement* pRoot = T2GUI::GetSingleton()->GetRootElement();
+	auto          pDisplayParams = TRenderDX11::Interface()->GetCurrentDisplayParams();
+	T2GUIElement* pRoot          = T2GUI::GetSingleton()->GetRootElement();
 
 	float fRootWidth, fRootHeight;
 	pRoot->GetDimensions(fRootWidth, fRootHeight);
@@ -425,7 +425,7 @@ T2GUIMaterial* A2GUIRenderer::CreateMaterial(TTexture* pTex)
 	T2GUIMaterial* pMaterial = new (AMemory::GetPool(AMemory::POOL_FrequentAllocations)) T2GUIMaterial;
 	pMaterial->Create();
 	pMaterial->SetTexture(pTex);
-	
+
 	return pMaterial;
 }
 

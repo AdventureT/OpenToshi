@@ -5,12 +5,12 @@
 #include <Plugins/PPropertyParser/PPropertiesWriter.h>
 #include <imgui/imgui_internal.h>
 
-void APropertiesResourceView::ShowProperties(PProperties* a_pProperties)
+void APropertiesResourceView::ShowProperties(PBProperties* a_pProperties)
 {
 	static constexpr int s_NodeFlags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_FramePadding;
 
 	TBOOL bUpdatedValue = TFALSE;
-	auto fnUpdateValue = [&](PProperties::PProperty* a_pProperty, PPropertyValue* a_pValue)
+	auto fnUpdateValue = [&](PBProperties::PBProperty* a_pProperty, PBPropertyValue* a_pValue)
 	{
 		bUpdatedValue = m_pSelectedProperty != a_pProperty || m_pSelectedValue != a_pValue;
 		m_pSelectedProperty = a_pProperty;
@@ -24,11 +24,11 @@ void APropertiesResourceView::ShowProperties(PProperties* a_pProperties)
 
 		switch (it->GetValue()->GetType())
 		{
-		case PPropertyValue::Type::Int:
-		case PPropertyValue::Type::String:
-		case PPropertyValue::Type::Float:
-		case PPropertyValue::Type::Bool:
-		case PPropertyValue::Type::UInt32:
+		case PBPropertyValue::Type::Int:
+		case PBPropertyValue::Type::String:
+		case PBPropertyValue::Type::Float:
+		case PBPropertyValue::Type::Bool:
+		case PBPropertyValue::Type::UInt32:
 			ImGui::TreeNodeEx(it, s_NodeFlags | iFlags | ImGuiTreeNodeFlags_Leaf, propName);
 			ImGui::TreePop();
 
@@ -36,7 +36,7 @@ void APropertiesResourceView::ShowProperties(PProperties* a_pProperties)
 				fnUpdateValue(it, it->GetValue());
 
 			break;
-		case PPropertyValue::Type::Array:
+		case PBPropertyValue::Type::Array:
 			if (ImGui::TreeNodeEx(it, iFlags | s_NodeFlags, propName))
 			{
 				if (ImGui::IsItemFocused())
@@ -52,19 +52,19 @@ void APropertiesResourceView::ShowProperties(PProperties* a_pProperties)
 
 					switch (pItem->GetType())
 					{
-					case PPropertyValue::Type::Int:
+					case PBPropertyValue::Type::Int:
 						ImGui::TreeNodeEx(pItem, s_NodeFlags | iItemFlags | ImGuiTreeNodeFlags_Leaf, "%d", pItem->GetInteger());
 						break;
-					case PPropertyValue::Type::String:
+					case PBPropertyValue::Type::String:
 						ImGui::TreeNodeEx(pItem, s_NodeFlags | iItemFlags | ImGuiTreeNodeFlags_Leaf, "%s", pItem->GetString());
 						break;
-					case PPropertyValue::Type::Float:
+					case PBPropertyValue::Type::Float:
 						ImGui::TreeNodeEx(pItem, s_NodeFlags | iItemFlags | ImGuiTreeNodeFlags_Leaf, "%f", pItem->GetFloat());
 						break;
-					case PPropertyValue::Type::Bool:
+					case PBPropertyValue::Type::Bool:
 						ImGui::TreeNodeEx(pItem, s_NodeFlags | iItemFlags | ImGuiTreeNodeFlags_Leaf, "%s", pItem->GetBoolean() ? "true" : "false");
 						break;
-					case PPropertyValue::Type::UInt32:
+					case PBPropertyValue::Type::UInt32:
 						ImGui::TreeNodeEx(pItem, s_NodeFlags | iItemFlags | ImGuiTreeNodeFlags_Leaf, "%u", pItem->GetUINT32());
 						break;
 					}
@@ -84,7 +84,7 @@ void APropertiesResourceView::ShowProperties(PProperties* a_pProperties)
 			}
 
 			break;
-		case PPropertyValue::Type::Props:
+		case PBPropertyValue::Type::Properties:
 			if (ImGui::TreeNodeEx(it, s_NodeFlags | iFlags, propName))
 			{
 				if (ImGui::IsItemFocused())
@@ -115,19 +115,19 @@ void APropertiesResourceView::ShowProperties(PProperties* a_pProperties)
 		{
 			switch (m_pSelectedValue->GetType())
 			{
-			case PPropertyValue::Type::Int:
+			case PBPropertyValue::Type::Int:
 				Toshi::TStringManager::String8Format(m_PropertyValueBuffer, sizeof(m_PropertyValueBuffer), "%d", m_pSelectedValue->GetInteger());
 				break;
-			case PPropertyValue::Type::String:
+			case PBPropertyValue::Type::String:
 				Toshi::TStringManager::String8Format(m_PropertyValueBuffer, sizeof(m_PropertyValueBuffer), "%s", m_pSelectedValue->GetString());
 				break;
-			case PPropertyValue::Type::Float:
+			case PBPropertyValue::Type::Float:
 				Toshi::TStringManager::String8Format(m_PropertyValueBuffer, sizeof(m_PropertyValueBuffer), "%f", m_pSelectedValue->GetFloat());
 				break;
-			case PPropertyValue::Type::Bool:
+			case PBPropertyValue::Type::Bool:
 				Toshi::TStringManager::String8Format(m_PropertyValueBuffer, sizeof(m_PropertyValueBuffer), "%s", m_pSelectedValue->GetBoolean() ? "true" : "false");
 				break;
-			case PPropertyValue::Type::UInt32:
+			case PBPropertyValue::Type::UInt32:
 				Toshi::TStringManager::String8Format(m_PropertyValueBuffer, sizeof(m_PropertyValueBuffer), "%u", m_pSelectedValue->GetUINT32());
 				break;
 			}
@@ -214,11 +214,11 @@ void APropertiesResourceView::Render()
 		{
 			switch (m_pSelectedValue->GetType())
 			{
-			case PPropertyValue::Type::Int:
+			case PBPropertyValue::Type::Int:
 				ImGui::Text("Property Value (Int):");
 				ImGui::InputInt(m_szIdPropertyValue, m_pSelectedValue->GetIntegerPointer());
 				break;
-			case PPropertyValue::Type::String:
+			case PBPropertyValue::Type::String:
 				ImGui::Text("Property Value (String):");
 				ImGui::InputText(m_szIdPropertyValue, m_PropertyValueBuffer, sizeof(m_PropertyValueBuffer));
 				ImGui::SameLine();
@@ -229,23 +229,23 @@ void APropertiesResourceView::Render()
 				}
 
 				break;
-			case PPropertyValue::Type::Float:
+			case PBPropertyValue::Type::Float:
 				ImGui::Text("Property Value (Float):");
 				ImGui::InputFloat(m_szIdPropertyValue, m_pSelectedValue->GetFloatPointer());
 				break;
-			case PPropertyValue::Type::Bool:
+			case PBPropertyValue::Type::Bool:
 				ImGui::Text("Property Value (Boolean):");
 				ImGui::SameLine();
 				ImGui::Checkbox(m_szIdPropertyValue, m_pSelectedValue->GetBooleanPointer());
 				break;
-			case PPropertyValue::Type::UInt32:
+			case PBPropertyValue::Type::UInt32:
 				ImGui::Text("Property Value (UInt32):");
 				ImGui::DragInt(m_szIdPropertyValue, TREINTERPRETCAST(int*, m_pSelectedValue->GetUINT32Pointer()));
 				break;
-			case PPropertyValue::Type::Array:
+			case PBPropertyValue::Type::Array:
 				ImGui::Text("Property Value (Array):");
 				break;
-			case PPropertyValue::Type::Props:
+			case PBPropertyValue::Type::Properties:
 				ImGui::Text("Property Value (Properties):");
 				break;
 			}

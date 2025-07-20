@@ -1,71 +1,72 @@
 #pragma once
-#include "PProperties.h"
+#include "PBProperties.h"
 #include "Plugins/PTRB.h"
 #include "Toshi/File/TTRB.h"
 #include "Toshi/Strings/TPString8.h"
 #include "Toshi2/T2Map.h"
+#include "Toshi2/T2String.h"
 
 class PPropertiesWriter
 {
 private:
-	inline static Toshi::T2Map<const char*, PTRB::SECT::Stack::Ptr<char>, Toshi::TPooledString8::Comparator> s_aStringMap;
+	inline static Toshi::T2Map<const TCHAR*, PTRBSections::MemoryStream::Ptr<TCHAR>, Toshi::T2String8Comparator> s_aStringMap;
 
 private:
-	static PTRB::SECT::Stack::Ptr<char> GetStringPtr(const char* a_szString)
+	static PTRBSections::MemoryStream::Ptr<TCHAR> GetStringPtr(const TCHAR* a_szString)
 	{
-		return *s_aStringMap.Find(a_szString);
+		return s_aStringMap.Find(a_szString)->GetSecond();
 	}
 
-	static void DumpValue(PTRB::SECT::Stack::Ptr<PPropertyValue> a_ptrValue, const PPropertyValue& a_OrigValue, PTRB::SECT::Stack* a_pStack, PTRB::SECT::Stack::Ptr<PProperties>* a_pParentProperties)
+	static void DumpValue(PTRBSections::MemoryStream::Ptr<PBPropertyValue> a_ptrValue, const PBPropertyValue& a_OrigValue, PTRBSections::MemoryStream* a_pStack, PTRBSections::MemoryStream::Ptr<PBProperties>* a_pParentProperties)
 	{
 		a_ptrValue->m_eType = a_OrigValue.GetType();
 
 		switch (a_ptrValue->m_eType)
 		{
-		case PPropertyValue::Type::Bool:
-			a_ptrValue->m_uValue.Bool = a_OrigValue.GetBoolean();
-			break;
-		case PPropertyValue::Type::Int:
-			a_ptrValue->m_uValue.Int = a_OrigValue.GetInteger();
-			break;
-		case PPropertyValue::Type::UInt32:
-			a_ptrValue->m_uValue.UInt32 = a_OrigValue.GetUINT32();
-			break;
-		case PPropertyValue::Type::Float:
-			a_ptrValue->m_uValue.Float = a_OrigValue.GetFloat();
-			break;
-		case PPropertyValue::Type::String:
-			a_pStack->WritePointer(&a_ptrValue->m_uValue.String, GetStringPtr(a_OrigValue.GetString()));
-			break;
-		case PPropertyValue::Type::Props:
-		{
-			auto properties = DumpProperties(*a_OrigValue.GetProperties(), a_pStack, a_pParentProperties);
-			a_pStack->WritePointer(&a_ptrValue->m_uValue.Props, properties);
-			break;
-		}
-		case PPropertyValue::Type::Array:
-		{
-			auto arraySize = a_OrigValue.GetArray()->GetSize();
-			auto pArray = a_pStack->Alloc(&a_ptrValue->m_uValue.Array);
-			auto pValues = a_pStack->Alloc(&pArray->m_pValues, arraySize);
-			pArray->m_iSize = arraySize;
-
-			for (size_t i = 0; i < arraySize; i++)
+			case PBPropertyValue::Type::Bool:
+				a_ptrValue->m_uValue.Bool = a_OrigValue.GetBoolean();
+				break;
+			case PBPropertyValue::Type::Int:
+				a_ptrValue->m_uValue.Int = a_OrigValue.GetInteger();
+				break;
+			case PBPropertyValue::Type::LocaleString:
+				a_ptrValue->m_uValue.UInt32 = a_OrigValue.GetLocaleString().uiIndex;
+				break;
+			case PBPropertyValue::Type::Float:
+				a_ptrValue->m_uValue.Float = a_OrigValue.GetFloat();
+				break;
+			case PBPropertyValue::Type::String:
+				a_pStack->WritePointer(&a_ptrValue->m_uValue.String, GetStringPtr(a_OrigValue.GetString()));
+				break;
+			case PBPropertyValue::Type::Properties:
 			{
-				DumpValue(pValues + i, *a_OrigValue.GetArray()->GetValue(i), a_pStack, a_pParentProperties);
+				auto properties = DumpProperties(*a_OrigValue.GetProperties(), a_pStack, a_pParentProperties);
+				a_pStack->WritePointer(&a_ptrValue->m_uValue.Properties, properties);
+				break;
 			}
+			case PBPropertyValue::Type::Array:
+			{
+				auto arraySize  = a_OrigValue.GetArray()->GetSize();
+				auto pArray     = a_pStack->Alloc(&a_ptrValue->m_uValue.Array);
+				auto pValues    = a_pStack->Alloc(&pArray->m_pValues, arraySize);
+				pArray->m_iSize = arraySize;
 
-			break;
-		}
+				for (size_t i = 0; i < arraySize; i++)
+				{
+					DumpValue(pValues + i, *a_OrigValue.GetArray()->GetValue(i), a_pStack, a_pParentProperties);
+				}
+
+				break;
+			}
 		}
 	}
 
-	static PTRB::SECT::Stack::Ptr<PProperties> DumpProperties(const PProperties& a_oProperties, PTRB::SECT::Stack* a_pStack, PTRB::SECT::Stack::Ptr<PProperties>* a_pParentProperties = TNULL)
+	static PTRBSections::MemoryStream::Ptr<PBProperties> DumpProperties(const PBProperties& a_oProperties, PTRBSections::MemoryStream* a_pStack, PTRBSections::MemoryStream::Ptr<PBProperties>* a_pParentProperties = TNULL)
 	{
-		auto properties = a_pStack->Alloc<PProperties>();
+		auto properties = a_pStack->Alloc<PBProperties>();
 
 		properties->m_iCount = a_oProperties.GetPropertyCount();
-		auto props = a_pStack->Alloc<PProperties::PProperty>(&properties->m_pProperties, properties->m_iCount);
+		auto props           = a_pStack->Alloc<PBProperties::PBProperty>(&properties->m_pProperties, properties->m_iCount);
 
 		const TBOOL bIsRoot = a_oProperties.GetParentProperties() == TNULL;
 
@@ -90,10 +91,10 @@ private:
 		{
 			auto& origProp = a_oProperties.Begin()[i];
 
-			auto prop = props + i;
-			auto propName = a_pStack->Alloc<PPropertyName>(&prop->m_pName);
-			auto propValue = a_pStack->Alloc<PPropertyValue>(&prop->m_pValue);
-			
+			auto prop      = props + i;
+			auto propName  = a_pStack->Alloc<PBPropertyName>(&prop->m_pName);
+			auto propValue = a_pStack->Alloc<PBPropertyValue>(&prop->m_pValue);
+
 			a_pStack->WritePointer(&propName->m_szName, GetStringPtr(origProp.GetName().GetString()));
 			DumpValue(propValue, *origProp.GetValue(), a_pStack, &properties);
 		}
@@ -101,15 +102,15 @@ private:
 		return properties;
 	}
 
-	static void AddStringToMap(const char* a_szString)
+	static void AddStringToMap(const TCHAR* a_szString)
 	{
-		if (s_aStringMap.Find(a_szString) == &s_aStringMap.End()->GetSecond())
+		if (s_aStringMap.Find(a_szString) == s_aStringMap.End())
 		{
-			s_aStringMap.Insert(a_szString, { });
+			s_aStringMap.Insert(a_szString, {});
 		}
 	}
 
-	static void FillStringMap(const PProperties& a_oProperties)
+	static void FillStringMap(const PBProperties& a_oProperties)
 	{
 		for (auto it = a_oProperties.Begin(); it != a_oProperties.End(); it++)
 		{
@@ -121,37 +122,37 @@ private:
 
 			switch (propType)
 			{
-			case PPropertyValue::Type::Props:
-				FillStringMap(*propValue->GetProperties());
-				break;
-			case PPropertyValue::Type::String:
-				AddStringToMap(propValue->GetString());
-				break;
-			case PPropertyValue::Type::Array:
-				for (size_t i = 0; i < propValue->GetArray()->GetSize(); i++)
-				{
-					auto arrayValue = propValue->GetArray()->GetValue(i);
-
-					if (arrayValue->GetType() == PPropertyValue::Type::String)
+				case PBPropertyValue::Type::Properties:
+					FillStringMap(*propValue->GetProperties());
+					break;
+				case PBPropertyValue::Type::String:
+					AddStringToMap(propValue->GetString());
+					break;
+				case PBPropertyValue::Type::Array:
+					for (size_t i = 0; i < propValue->GetArray()->GetSize(); i++)
 					{
-						AddStringToMap(arrayValue->GetString());
+						auto arrayValue = propValue->GetArray()->GetValue(i);
+
+						if (arrayValue->GetType() == PBPropertyValue::Type::String)
+						{
+							AddStringToMap(arrayValue->GetString());
+						}
 					}
-				}
-				break;
+					break;
 			}
 		}
 	}
 
 public:
-	static TBOOL WriteTRB(const Toshi::TString8& a_sFilePath, const PProperties& a_oProperties, TBOOL a_bCompress = TFALSE)
+	static TBOOL WriteTRB(const Toshi::TString8& a_sFilePath, const PBProperties& a_oProperties, TBOOL a_bCompress = TFALSE)
 	{
 		TASSERT(a_oProperties.GetParentProperties() == TNULL);
 
-		PTRB::TRBF trb;
-		auto sect = trb.GetSECT();
-		auto symb = trb.GetSYMB();
+		PTRB trb;
+		auto sect = trb.GetSections();
+		auto symb = trb.GetSymbols();
 
-		auto stack = sect->CreateStack();
+		auto stack = sect->CreateStream();
 
 		FillStringMap(a_oProperties);
 

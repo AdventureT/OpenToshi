@@ -60,7 +60,7 @@ TBOOL AImGuiRenderer::CreateImGui()
 		0.0f, -0.5f, 0.0f,
 	};
 
-	static uint16_t s_Indices[] = { 0, 1, 2 };
+	static TUINT16 s_Indices[] = { 0, 1, 2 };
 
 	m_VertexArray = Toshi::TRenderSDL::CreateVertexArray(
 		Toshi::TRenderSDL::CreateVertexBuffer(s_Vertices, sizeof(s_Vertices), GL_STATIC_DRAW),
@@ -125,7 +125,7 @@ void AImGuiRenderer::Update(float a_fDeltaTime)
 	m_pCameraObject->Render();
 	m_ShaderProgram.Use();
 
-	auto pContext = TSTATICCAST(Toshi::TRenderContextSDL*, pRender->GetCurrentRenderContext());
+	auto pContext = TSTATICCAST(Toshi::TRenderContextSDL, pRender->GetCurrentRenderContext());
 
 	Toshi::TMatrix44 modelView;
 	modelView.Identity();

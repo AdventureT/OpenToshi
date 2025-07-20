@@ -3,20 +3,20 @@
 #include "TSysShaderHAL_SDL.h"
 #include "../../TRender_SDL.h"
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	TSysMaterialHAL::~TSysMaterialHAL()
+TSysMaterialHAL::~TSysMaterialHAL()
+{
+	if (m_pOrderTable)
 	{
-		if (m_pOrderTable)
-		{
-			TOrderTable::DeregisterMaterial(GetRegMaterial());
-			m_pOrderTable = TNULL;
-		}
+		TOrderTable::DeregisterMaterial(GetRegMaterial());
+		m_pOrderTable = TNULL;
 	}
+}
 
-	void TSysMaterialHAL::PreRender()
-	{
-		/*auto pShader = TSTATICCAST(TSysShaderHAL*, m_pOwnerShader);
+void TSysMaterialHAL::PreRender()
+{
+	/*auto pShader = TSTATICCAST(TSysShaderHAL, m_pOwnerShader);
 
 		auto pRender = TRenderSDL::Interface();
 		auto pDeviceContext = pRender->m_pDeviceContext;
@@ -150,68 +150,56 @@ namespace Toshi {
 			TASSERT(TFALSE, "TSysShader default");
 			break;
 		}*/
-	}
+}
 
-	void TSysMaterialHAL::PostRender()
-	{
-		/*if (HASFLAG(m_Flags & Flags_NoDepthTest))
+void TSysMaterialHAL::PostRender()
+{
+	/*if (HASFLAG(m_Flags & Flags_NoDepthTest))
 		{
 			auto pRender = TRenderSDL::Interface();
 			pRender->SetZMode(TTRUE, D3D11_COMPARISON_LESS_EQUAL, D3D11_DEPTH_WRITE_MASK_ZERO);
 		}*/
-	}
-
-	TBOOL TSysMaterialHAL::Create(BlendMode eBlendMode)
-	{
-		TSysMaterialHAL::SetBlendMode(eBlendMode);
-		return TMaterial::Create();
-	}
-
-	void TSysMaterialHAL::SetBlendMode(BlendMode eBlendMode)
-	{
-		auto pShader = TSTATICCAST(TSysShaderHAL*, m_pOwnerShader);
-
-		switch (eBlendMode)
-		{
-		case BlendMode::Default:
-			SetOrderTable(pShader->GetOrderTable(0));
-			break;
-		default:
-			SetOrderTable(pShader->GetOrderTable(1));
-			break;
-		case BlendMode::Mode3:
-			SetOrderTable(pShader->GetOrderTable(2));
-			break;
-		case BlendMode::Mode5:
-			SetOrderTable(pShader->GetOrderTable(3));
-			break;
-		case BlendMode::Mode6:
-			SetOrderTable(pShader->GetOrderTable(4));
-			break;
-		case BlendMode::Mode7:
-			SetOrderTable(pShader->GetOrderTable(5));
-			break;
-		}
-
-		TSysMaterial::SetBlendMode(eBlendMode);
-	}
-
-	void TSysMaterialHAL::SetOrderTable(TOrderTable* pOrderTable)
-	{
-		if (m_pOrderTable != pOrderTable)
-		{
-			if (m_pOrderTable != TNULL)
-			{
-				TOrderTable::DeregisterMaterial(m_pRegMaterial);
-			}
-
-			if (pOrderTable != TNULL)
-			{
-				pOrderTable->RegisterMaterial(this);
-			}
-
-			m_pOrderTable = pOrderTable;
-		}
-	}
-
 }
+
+TBOOL TSysMaterialHAL::Create(BlendMode eBlendMode)
+{
+	TSysMaterialHAL::SetBlendMode(eBlendMode);
+	return TMaterial::Create();
+}
+
+void TSysMaterialHAL::SetBlendMode(BlendMode eBlendMode)
+{
+	auto pShader = TSTATICCAST(TSysShaderHAL, m_pOwnerShader);
+
+	switch (eBlendMode)
+	{
+		case BlendMode::Default: SetOrderTable(pShader->GetOrderTable(0)); break;
+		default: SetOrderTable(pShader->GetOrderTable(1)); break;
+		case BlendMode::Mode3: SetOrderTable(pShader->GetOrderTable(2)); break;
+		case BlendMode::Mode5: SetOrderTable(pShader->GetOrderTable(3)); break;
+		case BlendMode::Mode6: SetOrderTable(pShader->GetOrderTable(4)); break;
+		case BlendMode::Mode7: SetOrderTable(pShader->GetOrderTable(5)); break;
+	}
+
+	TSysMaterial::SetBlendMode(eBlendMode);
+}
+
+void TSysMaterialHAL::SetOrderTable(TOrderTable* pOrderTable)
+{
+	if (m_pOrderTable != pOrderTable)
+	{
+		if (m_pOrderTable != TNULL)
+		{
+			TOrderTable::DeregisterMaterial(m_pRegMaterial);
+		}
+
+		if (pOrderTable != TNULL)
+		{
+			pOrderTable->RegisterMaterial(this);
+		}
+
+		m_pOrderTable = pOrderTable;
+	}
+}
+
+TOSHI_NAMESPACE_END

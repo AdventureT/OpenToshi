@@ -1,18 +1,17 @@
 #pragma once
 #include "TFile.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TNullFile : TFile
 {
-	class TNullFile : TFile
-	{
-		int m_iBytesWritten;
-	protected:
+	TINT m_iBytesWritten;
 
-		inline void Close() { }
-	public:
-		inline int GetBytesWritten() { return m_iBytesWritten; }
+protected:
+	inline void Close() {}
 
-	};
-}
+public:
+	inline TINT GetBytesWritten() { return m_iBytesWritten; }
+};
 
-
+TOSHI_NAMESPACE_END

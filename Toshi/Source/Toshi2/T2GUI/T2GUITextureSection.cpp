@@ -1,7 +1,7 @@
 #include "ToshiPCH.h"
 #include "T2GUITextureSection.h"
 
-TBOOL T2GUITextureSection::Open(const char* fileName)
+TBOOL T2GUITextureSection::Open(const TCHAR* fileName)
 {
-    return TFALSE;
+	return TFALSE;
 }

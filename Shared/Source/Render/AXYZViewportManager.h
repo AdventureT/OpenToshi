@@ -78,12 +78,12 @@ public:
 	}
 
 private:
-	Toshi::TViewport* m_Viewports[VIEWPORT_Count];
+	Toshi::TViewport*     m_Viewports[VIEWPORT_Count];
 	Toshi::TCameraObject* m_CameraObjects[VIEWPORT_Count];
-	ACamera* m_Cameras[VIEWPORT_Count];
-	TBOOL m_UsedCameras[VIEWPORT_Count];
-	void* m_Unk;
-	int m_iRenderingViewportIndex;
+	ACamera*              m_Cameras[VIEWPORT_Count];
+	TBOOL                 m_UsedCameras[VIEWPORT_Count];
+	void*                 m_Unk;
+	int                   m_iRenderingViewportIndex;
 
 	/*void SetMargins(int left, int right, int top, int bottom)
 	{
@@ -99,4 +99,3 @@ private:
 	int m_iMarginTop;
 	int m_iMarginBottom;*/
 };
-

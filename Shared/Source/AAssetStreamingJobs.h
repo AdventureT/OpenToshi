@@ -10,7 +10,6 @@ class ATRBLoaderJob : public AMainThreadJob2
 public:
 	ATRBLoaderJob()
 	{
-		
 	}
 
 	virtual ~ATRBLoaderJob() = default;
@@ -37,4 +36,3 @@ public:
 		return m_IsRunning;
 	}
 };
-

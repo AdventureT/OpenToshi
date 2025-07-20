@@ -1,30 +1,25 @@
 #pragma once
 #include "Toshi/Render/TRender.h"
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TRenderContextSDL : public TRenderContext
-	{
-	public:
-		TRenderContextSDL(TRender* a_pRender) : TRenderContext(a_pRender)
-		{
+class TRenderContextSDL : public TRenderContext
+{
+public:
+	TRenderContextSDL(TRender* a_pRender)
+	    : TRenderContext(a_pRender) {}
 
-		}
+	TMatrix44& GetProjectionMatrix() { return m_Projection; }
 
-		TMatrix44& GetProjectionMatrix()
-		{
-			return m_Projection;
-		}
+	void ComputePerspectiveProjection();
+	void ComputePerspectiveFrustum();
+	void ComputeOrthographicProjection();
+	void ComputeOrthographicFrustum();
 
-		void ComputePerspectiveProjection();
-		void ComputePerspectiveFrustum();
-		void ComputeOrthographicProjection();
-		void ComputeOrthographicFrustum();
+	virtual void Update() override;
 
-		virtual void Update() override;
+private:
+	TMatrix44 m_Projection;
+};
 
-	private:
-		TMatrix44 m_Projection;
-	};
-
-}
+TOSHI_NAMESPACE_END

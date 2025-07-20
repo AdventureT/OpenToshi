@@ -10,7 +10,11 @@
 
 #include "ADisplayMode_Win.h"
 
-#include TOSHI_MULTIRENDER(A2GUI/A2GUIRenderer)
+#ifdef TOSHI_RENDERER_DX11
+#  include "Platform/DX11/A2GUI/A2GUIRenderer_DX11.h"
+#elif defined(TOSHI_RENDERER_OPENGL) // TOSHI_RENDERER_DX11
+#  include "Platform/SDL/A2GUI/A2GUIRenderer_SDL.h"
+#endif // TOSHI_RENDERER_OPENGL
 
 #include <Toshi/Render/TAssetInit.h>
 #include <Toshi/Shaders/SysShader/TSysShaderHAL.h>
@@ -25,16 +29,15 @@ TOSHI_NAMESPACE_USING
 
 static void MainScene(TFLOAT deltaTime, void* pCameraObject)
 {
-
 }
 
 ARenderer::ARenderer()
 {
 	// 005ed0e0
 	TIMPLEMENT();
-	m_bRenderGUI = TTRUE;
+	m_bRenderGUI       = TTRUE;
 	m_bIsLoadingScreen = TFALSE;
-	m_BackgroundColor = TCOLOR(0, 0, 0);
+	m_BackgroundColor  = TCOLOR(0, 0, 0);
 }
 
 ARenderer::~ARenderer()
@@ -46,7 +49,7 @@ ARenderer::~ARenderer()
 void ARenderer::Update(TFLOAT deltaTime)
 {
 	TIMPLEMENT();
-	auto pRender = TRenderDX11::Interface();
+	auto pRender        = TRenderDX11::Interface();
 	auto pDisplayParams = pRender->GetCurrentDisplayParams();
 
 	AMoviePlayer* pMoviePlayer = AMoviePlayer::GetSingleton();
@@ -66,15 +69,15 @@ void ARenderer::Update(TFLOAT deltaTime)
 		GetAppCamera();
 		InitialiseViewPort();
 
-		for (int i = AXYZViewportManager::VIEWPORT_Count - 1; i >= 0; i--)
+		for (TINT i = AXYZViewportManager::VIEWPORT_Count - 1; i >= 0; i--)
 		{
 			if (m_pViewportManager->IsViewportCameraUsed(i))
 			{
 				m_pViewportManager->SetRenderingViewportIndex(i);
 
-				auto pViewport = m_pViewportManager->GetViewport(i);
+				auto pViewport     = m_pViewportManager->GetViewport(i);
 				auto pCameraObject = m_pViewportManager->GetViewportCameraObject(i);
-				auto pCamera = m_pViewportManager->GetViewportCamera(i);
+				auto pCamera       = m_pViewportManager->GetViewportCamera(i);
 
 				if (pCamera == TNULL)
 					pCamera = ACameraManager::GetSingleton()->GetCurrentCamera();
@@ -96,7 +99,7 @@ void ARenderer::Update(TFLOAT deltaTime)
 
 	RenderGUI(TFALSE);
 	auto pGameStateController = AGameStateController::GetSingleton();
-	auto pGameState = pGameStateController->GetCurrentGameState();
+	auto pGameState           = pGameStateController->GetCurrentGameState();
 
 	if (TFALSE == pGameState->GetClass()->IsA(TGetClass(AFrontEndMovieState)))
 	{
@@ -143,10 +146,10 @@ TBOOL ARenderer::CreateTRender()
 	auto adapterList = renderer->GetAdapterList();
 
 	auto adapter = adapterList->Head()->As<TD3DAdapter>();
-	auto mode = adapter->GetMode();
+	auto mode    = adapter->GetMode();
 
-	int width = 1280;
-	int height = 720;
+	TINT width  = 1280;
+	TINT height = 720;
 
 	if (AApplication::g_oTheApp.m_Width == -1)
 	{
@@ -158,17 +161,17 @@ TBOOL ARenderer::CreateTRender()
 
 		if (!AApplication::g_oTheApp.m_bUseDefaultHeightWidth)
 		{
-			width = mode->GetWidth();
+			width  = mode->GetWidth();
 			height = mode->GetHeight();
 		}
 
-		displayParams.Unk3 = 32;
-		displayParams.Unk4 = 3;
-		displayParams.Unk5 = AApplication::g_oTheApp.m_bUseDefaultHeightWidth;
-		displayParams.IsFullscreen = AApplication::g_oTheApp.m_bIsFullscreen;
+		displayParams.Unk3                    = 32;
+		displayParams.Unk4                    = 3;
+		displayParams.Unk5                    = AApplication::g_oTheApp.m_bUseDefaultHeightWidth;
+		displayParams.IsFullscreen            = AApplication::g_oTheApp.m_bIsFullscreen;
 		displayParams.MultisampleQualityLevel = 1;
-		displayParams.Width = width;
-		displayParams.Height = height;
+		displayParams.Width                   = width;
+		displayParams.Height                  = height;
 		renderer->CreateDisplay(&displayParams);
 
 		return TTRUE;
@@ -190,36 +193,33 @@ TBOOL ARenderer::CreateTRender()
 				MessageBoxA(TNULL, "The specified width and heith must be greater than 1280x720 and match a valid mode", "Invalid args", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
 				return TFALSE;
 			}
-			displayParams.Unk3 = 32;
-			displayParams.Unk4 = 3;
-			displayParams.Unk5 = AApplication::g_oTheApp.m_bUseDefaultHeightWidth;
-			displayParams.IsFullscreen = AApplication::g_oTheApp.m_bIsFullscreen;
+			displayParams.Unk3                    = 32;
+			displayParams.Unk4                    = 3;
+			displayParams.Unk5                    = AApplication::g_oTheApp.m_bUseDefaultHeightWidth;
+			displayParams.IsFullscreen            = AApplication::g_oTheApp.m_bIsFullscreen;
 			displayParams.MultisampleQualityLevel = 1;
-			displayParams.Width = AApplication::g_oTheApp.m_Width;
-			displayParams.Height = AApplication::g_oTheApp.m_Height;
+			displayParams.Width                   = AApplication::g_oTheApp.m_Width;
+			displayParams.Height                  = AApplication::g_oTheApp.m_Height;
 			renderer->CreateDisplay(&displayParams);
 			return TTRUE;
 		}
 		else
 		{
-			if (AApplication::g_oTheApp.m_Width <= 1280
-				&& AApplication::g_oTheApp.m_Height <= 720
-				&& mode->GetHeight() < AApplication::g_oTheApp.m_Height
-				&& mode->GetWidth() < AApplication::g_oTheApp.m_Width)
+			if (AApplication::g_oTheApp.m_Width <= 1280 && AApplication::g_oTheApp.m_Height <= 720 && mode->GetHeight() < AApplication::g_oTheApp.m_Height && mode->GetWidth() < AApplication::g_oTheApp.m_Width)
 			{
-				char formattedString[512];
+				TCHAR formattedString[512];
 				T2String8::Format(formattedString, "The specified width and heith must be between 1280x720 and the current desktop resolution (%dx%d)", mode->GetWidth(), mode->GetHeight());
 				MessageBoxA(TNULL, formattedString, "Invalid args", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
 				return TFALSE;
 			}
 
-			displayParams.Unk3 = 32;
-			displayParams.Unk4 = 3;
-			displayParams.Unk5 = AApplication::g_oTheApp.m_bUseDefaultHeightWidth;
-			displayParams.IsFullscreen = AApplication::g_oTheApp.m_bIsFullscreen;
+			displayParams.Unk3                    = 32;
+			displayParams.Unk4                    = 3;
+			displayParams.Unk5                    = AApplication::g_oTheApp.m_bUseDefaultHeightWidth;
+			displayParams.IsFullscreen            = AApplication::g_oTheApp.m_bIsFullscreen;
 			displayParams.MultisampleQualityLevel = 1;
-			displayParams.Width = width;
-			displayParams.Height = height;
+			displayParams.Width                   = width;
+			displayParams.Height                  = height;
 			renderer->CreateDisplay(&displayParams);
 			return TTRUE;
 		}
@@ -347,7 +347,7 @@ void ARenderer::RenderMainScene(TFLOAT deltaTime, TViewport* pViewport, TCameraO
 
 void ARenderer::CreateMainViewport()
 {
-	auto renderer = TRenderDX11::Interface();
+	auto renderer       = TRenderDX11::Interface();
 	auto pDisplayParams = renderer->GetCurrentDisplayParams();
 
 	m_pViewport = new TViewport();
@@ -373,7 +373,7 @@ void ARenderer::GetAppCamera()
 
 	auto pCamMngr = ACameraManager::GetSingleton();
 
-	for (int i = AXYZViewportManager::VIEWPORT_Count - 1; i >= 0; i--)
+	for (TINT i = AXYZViewportManager::VIEWPORT_Count - 1; i >= 0; i--)
 	{
 		if (m_pViewportManager->IsViewportCameraUsed(i))
 		{
@@ -385,7 +385,7 @@ void ARenderer::GetAppCamera()
 			if (pCamera == TNULL)
 				continue;
 
-			auto cameraMatrix = pCamera->GetCameraMatrix();
+			auto      cameraMatrix      = pCamera->GetCameraMatrix();
 			TMatrix44 cameraFinalMatrix = cameraMatrix.m_mMatrix;
 			TTODO("Apply shake matrix");
 
@@ -408,7 +408,7 @@ void ARenderer::InitialiseViewPort()
 	TUINT8 g = TCOLOR_GET_GREEN(m_BackgroundColor);
 	TUINT8 b = TCOLOR_GET_BLUE(m_BackgroundColor);
 
-	for (int i = AXYZViewportManager::VIEWPORT_Count - 1; i >= 0; i--)
+	for (TINT i = AXYZViewportManager::VIEWPORT_Count - 1; i >= 0; i--)
 	{
 		if (m_pViewportManager->IsViewportCameraUsed(i))
 		{

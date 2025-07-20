@@ -4,7 +4,7 @@
 
 TOSHI_NAMESPACE_USING
 
-TBOOL XURXUIImagePresenterData::Load(TXUIResource& resource, uint8_t*& a_pData)
+TBOOL XURXUIImagePresenterData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIElementData::Load(resource, a_pData);
 
@@ -21,14 +21,14 @@ TBOOL XURXUIImagePresenterData::Load(TXUIResource& resource, uint8_t*& a_pData)
 	return TTRUE;
 }
 
-TBOOL XURXUIImagePresenterData::ValidateTimelineProp(uint32_t a_uiObjectIndex, uint32_t a_uiPropIndex)
+TBOOL XURXUIImagePresenterData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
-TBOOL XURXUIImagePresenterData::TranslateTimelineProp(const char* name, uint32_t& a_uiObjectIndex, PropType& propType)
+TBOOL XURXUIImagePresenterData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, SizeMode, propType);
 	TXUI_TRANSLATE_TIMELINE_PROP(name, DataAssoc, propType);
@@ -38,21 +38,21 @@ TBOOL XURXUIImagePresenterData::TranslateTimelineProp(const char* name, uint32_t
 	return XURXUIElementData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
-uint32_t XURXUIImagePresenterData::GetTimelinePropSize(uint32_t a_uiObjectIndex, uint32_t propType)
+TUINT32 XURXUIImagePresenterData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return 4;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::GetTimelinePropSize(a_uiObjectIndex - 1, propType);
 }
 
-TBOOL XURXUIImagePresenterData::IsFloatPropType(uint32_t a_uiObjectIndex, uint32_t propType)
+TBOOL XURXUIImagePresenterData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
 	TASSERT(a_uiObjectIndex > 0);
 	return XURXUIElementData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
-TBOOL XURXUIImagePresenterData::IsColourPropType(uint32_t a_uiObjectIndex, uint32_t propType)
+TBOOL XURXUIImagePresenterData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
 	TASSERT(a_uiObjectIndex > 0);

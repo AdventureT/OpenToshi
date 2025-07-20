@@ -12,8 +12,8 @@ void AGameStateController::Create()
 
 void AGameStateController::Update(float deltaTime)
 {
-	AGameState* pCurrentGameState = GetCurrentGameState();
-	AGameState::UpdateResult updResult = pCurrentGameState->OnUpdate(deltaTime);
+	AGameState*              pCurrentGameState = GetCurrentGameState();
+	AGameState::UpdateResult updResult         = pCurrentGameState->OnUpdate(deltaTime);
 
 	deltaTime = Toshi::TMath::Min(deltaTime, 0.1f);
 
@@ -82,7 +82,7 @@ void AGameStateController::ResetStack()
 	while (1 < m_oStateStack.Size())
 	{
 		auto& state = m_oStateStack.Back();
-		
+
 		if (shouldDeactivate && HASFLAG(state->GetState() & AGameState::State_Activated))
 		{
 			state->OnDeactivate();

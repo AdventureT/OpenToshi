@@ -1,86 +1,67 @@
 #pragma once
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	// The name of the class is just a guess since it's possible to find the original name
-	// Use this when allocated array has 4 extra bytes containing size of array
-	template <class T>
-	class T2SimpleArray
+// The name of the class is just a guess since it's possible to find the original name
+// Use this when allocated array has 4 extra bytes containing size of array
+template <class T> class T2SimpleArray
+{
+private:
+	struct AllocateData
 	{
-	private:
-		struct AllocateData
-		{
-			size_t m_uiSize;
-		};
+		size_t m_uiSize;
+	};
 
-	public:
-		T2SimpleArray()
+public:
+	T2SimpleArray() { m_pArray = TNULL; }
+
+	~T2SimpleArray() { Destroy(); }
+
+	void Create(size_t a_uiSize)
+	{
+		size_t uiAllocDataSize = sizeof(AllocateData) + sizeof(T) * a_uiSize;
+
+		AllocateData* pAllocData = TSTATICCAST(AllocateData, TMalloc(uiAllocDataSize));
+		T*            pArrayData = TREINTERPRETCAST(T*, pAllocData + 1);
+
+		if (pAllocData)
+		{
+			pAllocData->m_uiSize = a_uiSize;
+			new (pArrayData) T[a_uiSize];
+
+			m_pArray = pArrayData;
+		}
+		else
 		{
 			m_pArray = TNULL;
 		}
+	}
 
-		~T2SimpleArray()
+	void Destroy()
+	{
+		if (m_pArray)
 		{
-			Destroy();
-		}
-
-		void Create(size_t a_uiSize)
-		{
-			size_t uiAllocDataSize = sizeof(AllocateData) + sizeof(T) * a_uiSize;
-			
-			AllocateData* pAllocData = TSTATICCAST(AllocateData*, TMalloc(uiAllocDataSize));
-			T* pArrayData = TREINTERPRETCAST(T*, pAllocData + 1);
-
-			if (pAllocData)
+			for (size_t i = 0; i < GetSize(); i++)
 			{
-				pAllocData->m_uiSize = a_uiSize;
-				new (pArrayData) T[a_uiSize];
-
-				m_pArray = pArrayData;
+				m_pArray[i].~T();
 			}
-			else
-			{
-				m_pArray = TNULL;
-			}
+
+			TFree(GetAllocatedData());
+			m_pArray = TNULL;
 		}
+	}
 
-		void Destroy()
-		{
-			if (m_pArray)
-			{
-				for (size_t i = 0; i < GetSize(); i++)
-				{
-					m_pArray[i].~T();
-				}
+	size_t GetSize() const { return GetAllocatedData()->m_uiSize; }
 
-				TFree(GetAllocatedData());
-				m_pArray = TNULL;
-			}
-		}
+	T& operator[](size_t a_uiIndex) { return m_pArray[a_uiIndex]; }
 
-		size_t GetSize() const
-		{
-			return GetAllocatedData()->m_uiSize;
-		}
+	const T& operator[](size_t a_uiIndex) const { return m_pArray[a_uiIndex]; }
 
-		T& operator[](size_t a_uiIndex)
-		{
-			return m_pArray[a_uiIndex];
-		}
+private:
+	AllocateData* GetAllocatedData() const { return TREINTERPRETCAST(AllocateData*, TREINTERPRETCAST(uintptr_t, m_pArray) - sizeof(AllocateData)); }
 
-		const T& operator[](size_t a_uiIndex) const
-		{
-			return m_pArray[a_uiIndex];
-		}
+private:
+	T* m_pArray;
+};
 
-	private:
-		AllocateData* GetAllocatedData() const
-		{
-			return TREINTERPRETCAST(AllocateData*, TREINTERPRETCAST(uintptr_t, m_pArray) - sizeof(AllocateData));
-		}
-
-	private:
-		T* m_pArray;
-	};
-
-}
+TOSHI_NAMESPACE_END

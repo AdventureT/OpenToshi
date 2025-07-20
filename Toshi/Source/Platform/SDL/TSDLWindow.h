@@ -5,41 +5,34 @@
 
 #include <SDL/SDL.h>
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	class TSDLWindowListener
-	{
-	public:
-		virtual TBOOL OnEvent(const SDL_Event& a_rEvent) = 0;
-	};
+class TSDLWindowListener
+{
+public:
+	virtual TBOOL OnEvent(const SDL_Event& a_rEvent) = 0;
+};
 
-	class TSDLWindow :
-		public TGenericClassDerived<TSDLWindow, TObject, "TSDLWindow", TMAKEVERSION(1, 0), TFALSE>
-	{
-	public:
-		TSDLWindow() = default;
-		
-		TBOOL Create(TRender* a_pRender, const char* a_szTitle);
-		
-		void Update();
+class TSDLWindow : public TGenericClassDerived<TSDLWindow, TObject, "TSDLWindow", TMAKEVERSION(1, 0), TFALSE>
+{
+public:
+	TSDLWindow() = default;
 
-		void SetFullscreen(TBOOL a_bFullScreen);
-		void SetPosition(int a_iX, int a_iY, int a_iWidth, int a_iHeight);
+	TBOOL Create(TRender* a_pRender, const TCHAR* a_szTitle);
 
-		void SetListener(TSDLWindowListener* a_pListener)
-		{
-			m_pListener = a_pListener;
-		}
+	void Update();
 
-		SDL_Window* GetNativeWindow() const
-		{
-			return m_pWindow;
-		}
+	void SetFullscreen(TBOOL a_bFullScreen);
+	void SetPosition(TINT a_iX, TINT a_iY, TINT a_iWidth, TINT a_iHeight);
 
-	private:
-		SDL_Window* m_pWindow = TNULL;
-		TSDLWindowListener* m_pListener;
-		TRender* m_pRender;
-	};
+	void SetListener(TSDLWindowListener* a_pListener) { m_pListener = a_pListener; }
 
-}
+	SDL_Window* GetNativeWindow() const { return m_pWindow; }
+
+private:
+	SDL_Window*         m_pWindow = TNULL;
+	TSDLWindowListener* m_pListener;
+	TRender*            m_pRender;
+};
+
+TOSHI_NAMESPACE_END

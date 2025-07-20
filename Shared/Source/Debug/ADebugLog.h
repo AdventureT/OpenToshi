@@ -19,6 +19,6 @@ private:
 	char* m_szBaseName;
 	char* m_szExtension;
 	char* m_pBuffer;
-	int m_iBufSize;
-	int m_iBufUsedSize;
+	int   m_iBufSize;
+	int   m_iBufUsedSize;
 };

@@ -15,8 +15,8 @@ public:
 	struct PoolDefinitionInfo
 	{
 		const char* Name;
-		Pool Type;
-		uint32_t Size;
+		Pool        Type;
+		uint32_t    Size;
 	};
 
 public:
@@ -39,7 +39,7 @@ public:
 	}
 
 public:
-	static PoolDefinitionInfo ms_aPoolDefinitionInfo[POOL_NumOf];
-	static Toshi::TMemoryHeap* ms_apMemoryBlocks[POOL_NumOf];
+	static PoolDefinitionInfo         ms_aPoolDefinitionInfo[POOL_NumOf];
+	static Toshi::TMemoryHeap*        ms_apMemoryBlocks[POOL_NumOf];
 	static inline Toshi::T2Allocator* ms_aMemoryAllocators = TNULL;
 };

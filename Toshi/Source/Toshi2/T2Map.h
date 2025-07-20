@@ -3,63 +3,96 @@
 #include "T2RedBlackTree.h"
 #include "Toshi/Core/TComparator.h"
 
-namespace Toshi {
+TOSHI_NAMESPACE_START
 
-	template <class KeyType, class ValueType, class Comparator = TComparator<KeyType>>
-	class T2Map
+template <class KeyType, class ValueType, class Comparator = TComparator<KeyType>> class T2Map
+{
+public:
+	using Pair      = T2Pair<KeyType, ValueType, Comparator>;
+	using Iterator  = T2RedBlackTree<Pair>::Iterator;
+	using CIterator = T2RedBlackTree<Pair>::CIterator;
+	using Node      = T2RedBlackTree<Pair>::Node;
+
+public:
+	T2Map(T2Allocator* a_pAllocator = GetGlobalAllocator())
+	    : m_RedBlackTree(a_pAllocator) {}
+
+	~T2Map() { Clear(); }
+
+	void Clear() { m_RedBlackTree.DeleteAll(); }
+
+	TSIZE Size() const { return m_RedBlackTree.Size(); }
+
+	template <class... Args> ValueType* Emplace(const KeyType& key, Args&&... args)
 	{
-	public:
-		using Pair = T2Pair<KeyType, ValueType, Comparator>;
-		using Iterator = T2RedBlackTree<Pair>::Iterator;
+		Pair     pair{ key, ValueType(std::forward<Args>(args)...) };
+		Iterator result = m_RedBlackTree.Insert(std::move(pair));
+		return &result.GetValue()->GetSecond();
+	}
 
-	public:
-		T2Map(T2Allocator* a_pAllocator = &T2Allocator::s_GlobalAllocator) : m_RedBlackTree(a_pAllocator)
+	ValueType* Insert(const KeyType& key, const ValueType& value)
+	{
+		Pair     pair{ key, value };
+		Iterator result = m_RedBlackTree.Insert(std::move(pair));
+		return &result.GetValue()->GetSecond();
+	}
+
+	ValueType* Insert(const KeyType& key, ValueType&& value)
+	{
+		Pair     pair{ key, std::move(value) };
+		Iterator result = m_RedBlackTree.Insert(std::move(pair));
+		return &result.GetValue()->GetSecond();
+	}
+
+	void Remove(const KeyType& key)
+	{
+		Iterator result = m_RedBlackTree.Find({ key });
+
+		TASSERT(result != End());
+		m_RedBlackTree.Delete(result.GetNode());
+	}
+
+	void Remove(Iterator& it)
+	{
+		TASSERT(it != End());
+		m_RedBlackTree.Delete(it.GetNode());
+	}
+
+	Iterator FindByValue(const ValueType& value)
+	{
+		for (auto it = Begin(); it != End(); it++)
 		{
-
+			if (it.GetValue()->GetSecond() == value)
+			{
+				return it;
+			}
 		}
 
-		void Clear()
-		{
-			m_RedBlackTree.DeleteAll();
-		}
+		return End();
+	}
 
-		ValueType* Insert(const KeyType& key, const ValueType& value)
-		{
-			T2RedBlackTreeNode<Pair>* result = TNULL;
-			m_RedBlackTree.Insert(result, { key, value });
+	Iterator Find(const KeyType& key) { return m_RedBlackTree.Find({ key }); }
 
-			return &result->GetValue()->GetSecond();
-		}
+	Iterator FindNext(Iterator a_oIterator, const KeyType& a_rKey) { return m_RedBlackTree.FindNext(a_oIterator.GetNode(), { a_rKey }); }
 
-		void Remove(const KeyType& key)
-		{
-			T2RedBlackTreeNode<Pair>* result = TNULL;
-			m_RedBlackTree.Find(result, { key });
+	TBOOL IsValid(Iterator a_oIterator) const { return a_oIterator != End(); }
 
-			TASSERT(result != End());
-			m_RedBlackTree.Delete(result);
-		}
+	Iterator Begin() { return m_RedBlackTree.Begin(); }
 
-		ValueType* Find(const KeyType& key)
-		{
-			T2RedBlackTreeNode<Pair>* result = TNULL;
-			m_RedBlackTree.Find(result, { key });
+	Iterator End() { return m_RedBlackTree.End(); }
 
-			return result ? &result->GetValue()->GetSecond() : &m_RedBlackTree.End()->GetSecond();
-		}
+	const CIterator Begin() const { return m_RedBlackTree.Begin(); }
 
-		Iterator Begin()
-		{
-			return m_RedBlackTree.Begin();
-		}
+	const CIterator End() const { return m_RedBlackTree.End(); }
 
-		Iterator End()
-		{
-			return m_RedBlackTree.End();
-		}
+	TBOOL IsEmpty() const { return Begin() == End(); }
 
-	private:
-		T2RedBlackTree<Pair> m_RedBlackTree;
-	};
+	Iterator operator[](const KeyType& key) { return m_RedBlackTree.Find({ key }); }
 
-}
+	T2Allocator* GetAllocator() const { return m_RedBlackTree.GetAllocator(); }
+
+private:
+	T2RedBlackTree<Pair> m_RedBlackTree;
+};
+
+TOSHI_NAMESPACE_END

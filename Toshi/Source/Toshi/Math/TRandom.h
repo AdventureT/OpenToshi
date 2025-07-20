@@ -11,46 +11,45 @@ MODIFIED:
 */
 // mix with source: https://github.com/jawnsy/Math-Random-ISAAC-XS/blob/master/src/rand.c
 
-#define RANDSIZL  (4)  /* 8 for crypto, 4 for simulations (aka Toshi uses 4) */
-#define RANDSIZ   (1 << RANDSIZL)
+#define RANDSIZL (4) /* 8 for crypto, 4 for simulations (aka Toshi uses 4) */
+#define RANDSIZ  (1 << RANDSIZL)
 
 #include "Toshi/Core/THPTimer.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class TRandom
 {
-	class TRandom
-	{
-	public:
-		TRandom();
+public:
+	TRandom();
 
-		int GetInt();
-		int GetInt(uint32_t a_iLower, uint32_t a_iUpper);
-		inline int GetInt(uint32_t a_iUpper) { return GetInt(0, a_iUpper); };
+	TINT        GetInt();
+	TINT        GetInt(TUINT32 a_iLower, TUINT32 a_iUpper);
+	inline TINT GetInt(TUINT32 a_iUpper) { return GetInt(0, a_iUpper); };
 
-		float GetFloat();
-		float GetFloat2();
+	TFLOAT GetFloat();
+	TFLOAT GetFloat2();
 
-		void SetSeed(unsigned int a_uiSeed);
+	void SetSeed(TUINT a_uiSeed);
 
-		uint32_t RandRaw();
-		
-		inline uint32_t GetSeed() { return m_uiSeed; }
+	TUINT32 RandRaw();
 
-	private:
-		void Isaac();
-		void RandInit();
+	inline TUINT32 GetSeed() { return m_uiSeed; }
 
-	private:
-		uint32_t m_uiSeed; // 0x0
-		uint32_t m_uiRndCnt; // 0x4
-		uint32_t m_pRandrsl[RANDSIZ]; //0x8
+private:
+	void Isaac();
+	void RandInit();
 
-		uint32_t m_pRandmem[RANDSIZ]; // 0x48
+private:
+	TUINT32 m_uiSeed;            // 0x0
+	TUINT32 m_uiRndCnt;          // 0x4
+	TUINT32 m_pRandrsl[RANDSIZ]; //0x8
 
-		uint32_t m_uiRandA; // 0x88
-		uint32_t m_uiRandB; // 0x8C
-		uint32_t m_uiRandC; // 0x90
-	};
+	TUINT32 m_pRandmem[RANDSIZ]; // 0x48
 
-}
+	TUINT32 m_uiRandA; // 0x88
+	TUINT32 m_uiRandB; // 0x8C
+	TUINT32 m_uiRandC; // 0x90
+};
 
+TOSHI_NAMESPACE_END

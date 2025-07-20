@@ -1,28 +1,29 @@
 #pragma once
 #include "T2GUIElement.h"
 
-namespace Toshi
+TOSHI_NAMESPACE_START
+
+class T2GUIMaterial;
+
+class T2GUIRectangle : public T2GUIElement
 {
-	class T2GUIMaterial;
+public:
+	T2GUIRectangle();
 
-	class T2GUIRectangle : public T2GUIElement
+	virtual void Render() override;
+
+	void Create(TFLOAT width, TFLOAT height)
 	{
-	public:
-		T2GUIRectangle();
+		m_Width  = PackFloat(width);
+		m_Height = PackFloat(height);
+	}
 
-		virtual void Render() override;
+	void SetMaterial(T2GUIMaterial* pMaterial);
 
-		void Create(float width, float height)
-		{
-			m_Width = PackFloat(width);
-			m_Height = PackFloat(height);
-		}
+private:
+	T2GUIMaterial* m_pMaterial;
+	TVector2       m_UV1;
+	TVector2       m_UV2;
+};
 
-		void SetMaterial(T2GUIMaterial* pMaterial);
-
-	private:
-		T2GUIMaterial* m_pMaterial;
-		TVector2 m_UV1;
-		TVector2 m_UV2;
-	};
-}
+TOSHI_NAMESPACE_END
