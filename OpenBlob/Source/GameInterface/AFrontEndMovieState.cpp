@@ -259,6 +259,11 @@ void AFrontEndMovieState::DEBUG_RenderImGui()
 	AIMGUI_FORMAT("Audio delay: %dms", TINT(pMoviePlayer->m_Position - audioPosition));
 	AIMGUI_FORMAT("Background image left time: %.2fs", m_fBackgroundLeftTime);
 
+	if (ImGui::Button("Skip"))
+	{
+		StopMovieIfPlaying();
+	}
+
 	if (ImGui::Button("Reset state"))
 	{
 		m_iAssetId            = Asset_Legal;
