@@ -239,9 +239,8 @@ TBOOL TNativeFile::DirExists(TCHAR* a_pcStr)
 
 	if (dirExists == FALSE)
 	{
-		LPSTR msgBuffer; // Is this valid? Compiler gives warnings and Ghidra uses &a_pcStr as an argument
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), msgBuffer, 0, NULL);
-		LocalFree(msgBuffer);
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&a_pcStr, 0, NULL);
+		LocalFree(a_pcStr);
 	}
 
 	delete buffer;
