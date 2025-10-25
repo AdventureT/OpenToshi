@@ -103,6 +103,11 @@ TBOOL AApplication::OnCreate(TINT argc, TCHAR** argv)
 
 		//AXUIState::SetSkin1("commonskin.trb", "commonskin.xur");
 		AXUIState::SetSkin2("frontendskin.trb", "frontendskin.xur");
+		TIMPLEMENT_D("Font according to steam language");
+		AXUIState::InitFont("data/font/blob.font.trb");
+		AXUIState::SetCommonSkin("common.trb");
+		TIMPLEMENT_D("Implement rest of XUI Classes")
+		//AXUIState::SetSkinWithFont("frontend.trb", TFALSE);
 
 		txui->m_pAudio = new AXUIFMODExAudio();
 		AXUIState::SetFontMemBlock(oldHeap);

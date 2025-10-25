@@ -3,6 +3,8 @@
 #include "Toshi/Xui/TXUI.h"
 #include "Locale/ALocaleManager.h"
 #include "Toshi/Render/TAssetInit.h"
+#include "AAssetStreaming.h"
+#include "AAssetStreamingJobs.h"
 
 TOSHI_NAMESPACE_USING
 
@@ -64,5 +66,96 @@ TBOOL AXUIState::InitFont(const TCHAR* a_szTRBFileName)
 	TAssetInit::InitAssets(s_FontTRB, TTRUE, TFALSE);
 	s_bFontLoaded = TRUE;
 	SetFontMemBlock(oldHeap);
+	return TTRUE;
+}
+
+void AXUIState::SetFrontendCarousel(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileName)
+{
+	TStringManager::String8Copy(s_AssetLoadQueue, "data/xui/", BUFFSIZE);
+	const TINT   iStrLen    = TStringManager::String8Length(s_AssetLoadQueue);
+	const TINT   iExcessLen = BUFFSIZE - iStrLen;
+	const TCHAR* locale     = ALocaleManager::Instance().GetCurLocaleCode();
+	TStringManager::String8Copy(s_AssetLoadQueue + iStrLen, locale, iExcessLen);
+	const TINT iLen = TStringManager::String8Length(s_AssetLoadQueue);
+	TASSERT(iLen < BUFFSIZE);
+	s_AssetLoadQueue[iLen] = '/';
+	TStringManager::String8Copy(s_AssetLoadQueue + iLen + 1, a_szTRBFileName, BUFFSIZE - iLen + 1);
+	AAssetStreaming* pAssetStreaming = AAssetStreaming::GetSingleton();
+	ATRBLoaderJob *job = static_cast<ATRBLoaderJob*>(pAssetStreaming->CancelAllWaitingTerrainJobs());
+	job->Init(&s_XUITRB, s_AssetLoadQueue);
+	TIMPLEMENT_D("Some kind of callback setting");
+	pAssetStreaming->AddMainThreadJob2(job);
+}
+
+TBOOL AXUIState::SetSkinWithFont(const TCHAR* a_szTRBFileName, bool m_bLoad)
+{
+	static bool g_bFontLoaded = TFALSE;
+	static TTRB g_oFontTrb;
+	if (g_bFontLoaded)
+	{
+		TAssetInit::DeinitAssets(g_oFontTrb);
+		g_oFontTrb.Close();
+		g_bFontLoaded = TFALSE;
+	}
+	TStringManager::String8Copy(s_AssetLoadQueue, "data/xui/", BUFFSIZE);
+	const TINT   iStrLen    = TStringManager::String8Length(s_AssetLoadQueue);
+	const TINT   iExcessLen = BUFFSIZE - iStrLen;
+	const TCHAR* locale     = ALocaleManager::Instance().GetCurLocaleCode();
+	TStringManager::String8Copy(s_AssetLoadQueue + iStrLen, locale, iExcessLen);
+	const TINT iLen = TStringManager::String8Length(s_AssetLoadQueue);
+	TASSERT(iLen < BUFFSIZE);
+	s_AssetLoadQueue[iLen] = '/';
+	TStringManager::String8Copy(s_AssetLoadQueue + iLen + 1, a_szTRBFileName, BUFFSIZE - iLen + 1);
+
+	g_oFontTrb.SetMemoryFunctions(FontTRBAllocator, FontTRBDeallocator, TNULL);
+	static TMemoryHeap* g_pFontMem;
+	g_pFontMem = SetFontMemBlock(TMemory::GetGlobalHeap());
+	if (m_bLoad)
+	{
+		AAssetStreaming* pAssetStreaming = AAssetStreaming::GetSingleton();
+		ATRBLoaderJob*   job             = static_cast<ATRBLoaderJob*>(pAssetStreaming->CancelAllWaitingTerrainJobs());
+		job->Init(&g_oFontTrb, s_AssetLoadQueue);
+		TIMPLEMENT_D("Some kind of callback setting");
+		pAssetStreaming->AddMainThreadJob2(job);
+		return TTRUE;
+	}
+	TTRB::ERROR error = g_oFontTrb.Load(s_AssetLoadQueue);
+	TASSERT(error == TTRB::ERROR_OK);
+	TAssetInit::InitAssets(g_oFontTrb, TTRUE, TFALSE);
+
+	g_bFontLoaded = TRUE;
+	SetFontMemBlock(g_pFontMem);
+	g_pFontMem = TNULL;
+	return TTRUE;
+}
+
+TBOOL AXUIState::SetCommonSkin(const TCHAR* a_szTRBFileName)
+{
+	TStringManager::String8Copy(s_AssetLoadQueue, "data/xui/", BUFFSIZE);
+	const TINT   iStrLen    = TStringManager::String8Length(s_AssetLoadQueue);
+	const TINT   iExcessLen = BUFFSIZE - iStrLen;
+	const TCHAR* locale     = ALocaleManager::Instance().GetCurLocaleCode();
+	TStringManager::String8Copy(s_AssetLoadQueue + iStrLen, locale, iExcessLen);
+	const TINT iLen = TStringManager::String8Length(s_AssetLoadQueue);
+	TASSERT(iLen < BUFFSIZE);
+	s_AssetLoadQueue[iLen] = '/';
+	TStringManager::String8Copy(s_AssetLoadQueue + iLen + 1, a_szTRBFileName, BUFFSIZE - iLen + 1);
+
+	static bool g_bFontLoaded = TFALSE;
+	static TTRB g_oFontTrb;
+	g_oFontTrb.SetMemoryFunctions(FontTRBAllocator, FontTRBDeallocator, TNULL);
+	TMemoryHeap *pFontMem = SetFontMemBlock(TMemory::GetGlobalHeap());
+	if (g_bFontLoaded)
+	{
+		TAssetInit::DeinitAssets(g_oFontTrb);
+		g_oFontTrb.Close();
+		g_bFontLoaded = TFALSE;
+	}
+	TTRB::ERROR error = g_oFontTrb.Load(s_AssetLoadQueue);
+	TASSERT(error == TTRB::ERROR_OK);
+	TAssetInit::InitAssets(g_oFontTrb, TTRUE, TFALSE);
+
+	g_bFontLoaded = TRUE;
+	SetFontMemBlock(pFontMem);
 	return TTRUE;
 }
