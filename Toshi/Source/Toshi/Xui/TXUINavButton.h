@@ -3,12 +3,12 @@
 
 TOSHI_NAMESPACE_BEGIN
 
-class TXUINavButton : public TGenericClassDerived<TXUINavButton, TXUIButton, "TXUIBackButton", TMAKEVERSION(1, 0), TFALSE>
+class TXUINavButton : public TGenericClassDerived<TXUINavButton, TXUIButton, "TXUINavButton", TMAKEVERSION(1, 0), TFALSE>
 {};
 
 class XURXUINavButtonData : public XURXUIButtonData
 {
-	TXUI_TYPEINFO(XUI_CLASS_NAVBUTTON, XURXUINavButtonData)
+	TXUI_TYPEINFO(XUI_CLASS_NAVBUTTON, XURXUIButtonData)
 
 	enum PropType_ : PropType
 	{

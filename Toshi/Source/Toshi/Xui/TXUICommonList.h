@@ -1,26 +1,31 @@
 #pragma once
-#include "TXUIControl.h"
+#include "TXUIList.h"
 
 TOSHI_NAMESPACE_BEGIN
 
-class TXUIList : public TGenericClassDerived<TXUIList, TXUIControl, "TXUIList", TMAKEVERSION(1, 0), TFALSE>
-{};
-
-class XURXUIListData : public XURXUIControlData
+class TXUICommonList : public TGenericClassDerived<TXUICommonList, TXUIList, "TXUICommonList", TMAKEVERSION(1, 0), TFALSE>
 {
-	TXUI_TYPEINFO(XUI_CLASS_LIST, XURXUIControlData)
+};
+
+class XURXUICommonListData : public XURXUIListData
+{
+	TXUI_TYPEINFO(XUI_CLASS_COMMONLIST, XURXUIListData)
 
 	enum PropType_ : PropType
 	{
-		PropType_Wrap,
-		PropType_NUMOF,
+		PropType_ItemsText,
+		PropType_ItemsImage,
+		PropType_ItemsNavPath,
+		PropType_NUMOF
 	};
 
 public:
-	XURXUIListData()
+	XURXUICommonListData()
 	{
-		m_bWrap  = TFALSE;
-		m_pClass = TFindClass(TXUIList, TXUIControl);
+		m_sItemsText = 0;
+		m_sItemsImage = 0;
+		m_sItemsNavPath = 0;
+		m_pClass = TFindClass(TXUICommonList, TXUIList);
 	}
 
 public:
@@ -32,7 +37,9 @@ public:
 	virtual TBOOL   IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) override;
 
 private:
-	XUIEPTBool m_bWrap;
+	/* 0 */ XUIEPTString m_sItemsText;
+	/* 1 */ XUIEPTString m_sItemsImage;
+	/* 2 */ XUIEPTString m_sItemsNavPath;
 };
 
 TOSHI_NAMESPACE_END

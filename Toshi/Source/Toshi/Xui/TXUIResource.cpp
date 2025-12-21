@@ -19,6 +19,7 @@
 #include "TXUIScrollEnd.h"
 #include "TXUISliderBar.h"
 #include "TXUICheckBox.h"
+#include "TXUICommonList.h"
 #include "TXUIList.h"
 #include "TXUIListItem.h"
 #include "TXUIVideo.h"
@@ -487,8 +488,7 @@ XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, cons
 	}
 	else if (TStringManager::String16Compare(objectName, _TS16("XuiCommonList"), -1) == 0)
 	{
-		TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-		return TNULL;
+		return new (TXUI::MemoryBlock()) XURXUICommonListData();
 	}
 	else if (TStringManager::String16Compare(objectName, _TS16("XuiRadioGroup"), -1) == 0)
 	{

@@ -61,8 +61,8 @@ TBOOL XURXUIFillData::Load(TXUIResource& resource, TUINT8*& a_pData)
 		reader.ReadProperty<XUI_EPT_VECTOR>(PropType_FillTranslation, m_FillTranslation);
 		reader.ReadProperty<XUI_EPT_VECTOR>(PropType_FillScale, m_FillScale);
 		reader.ReadProperty<XUI_EPT_FLOAT>(PropType_FillRotation, m_FillRotation);
-		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapX, m_FillWrapX);
-		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillWrapY, m_FillWrapY);
+		reader.ReadProperty<XUI_EPT_USHORT32>(PropType_FillWrapX, m_FillWrapX);
+		reader.ReadProperty<XUI_EPT_USHORT32>(PropType_FillWrapY, m_FillWrapY);
 
 		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_FillBrushFlags, m_FillBrushFlags);
 		reader.ReadProperty<XUI_EPT_UNSIGNED>(PropType_Unknown, m_Unknown);
@@ -263,6 +263,7 @@ TBOOL XURXUIFigureData::Load(TXUIResource& resource, TUINT8*& a_pData)
 		if (hasPoints)
 		{
 			auto pCustData = resource.GetCust(points);
+			TASSERT(PARSEDWORD_BIG(pCustData) < (1<<16));
 			TTODO("Load points");
 		}
 	}
