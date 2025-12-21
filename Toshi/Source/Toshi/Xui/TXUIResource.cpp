@@ -6,6 +6,7 @@
 #include "Toshi/Xui/TXUI.h"
 #include "TXUIGroup.h"
 #include "TXUIBackButton.h"
+#include "TXUINavButton.h"
 #include "TXUIText.h"
 #include "TXUITextPresenter.h"
 #include "TXUIImage.h"
@@ -456,8 +457,7 @@ XURXUIObjectData* TXUIResource::CreateObjectData(TXUIResource& a_rResource, cons
 	}
 	else if (TStringManager::String16Compare(objectName, _TS16("XuiNavButton"), -1) == 0)
 	{
-		TASSERT(TFALSE, "Some XUI class is not implemented, can't continue reading data");
-		return TNULL;
+		return new (TXUI::MemoryBlock()) XURXUINavButtonData();
 	}
 	else if (TStringManager::String16Compare(objectName, _TS16("XuiBackButton"), -1) == 0)
 	{
