@@ -15,15 +15,15 @@ We do not condone using this project as a means for piracy in any form. This pro
 
 Building on Windows requires
 
-- Visual Studio 2019/2022
+- Visual Studio 2022/2026
 
 Clone the repository with the following commands:
 
 	git clone https://github.com/AdventureT/OpenToshi.git
 	cd OpenToshi
 	git submodule update --init --recursive
-	./Generate-VS2019 (DirectX 11).bat (if you use Visual Studio 2019)
 	./Generate-VS2022 (DirectX 11).bat (if you use Visual Studio 2022)
+	./Generate-VS2026 (DirectX 11).bat (if you use Visual Studio 2026)
 
 Then compile the generated solution and that's it
 
