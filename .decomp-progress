@@ -1,6 +1,6 @@
 projects
 {
-    "de_Blob"
+    "deBlob"
     {
         "functions"     "Tools/ProgressCalculation/functions.csv"
         "ignore"        "Tools/ProgressCalculation/ignorelist.txt"
