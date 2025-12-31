@@ -6,16 +6,19 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00706820
 TPrimShader::TPrimShader()
 {
 	Initialize();
 }
 
+// $deBlob: FUNCTION 00706870
 TPrimShader::~TPrimShader()
 {
 	Destroy();
 }
 
+// $deBlob: FUNCTION 00706150
 void TPrimShader::Destroy()
 {
 	m_pBuffer->Release();
@@ -26,6 +29,7 @@ void TPrimShader::Destroy()
 	TFree(m_pMeshes);
 }
 
+// $deBlob: FUNCTION 007061d0
 TBOOL TPrimShader::AddMesh()
 {
 	TASSERT(TFALSE == m_bIsLocked);
@@ -52,6 +56,7 @@ TBOOL TPrimShader::AddMesh()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00706330
 void TPrimShader::AddVert()
 {
 	if (m_bIsLocked)
@@ -64,6 +69,7 @@ void TPrimShader::AddVert()
 	}
 }
 
+// $deBlob: FUNCTION 00706280
 void TPrimShader::Unlock()
 {
 	TASSERT(TTRUE == m_bIsLocked);
@@ -74,6 +80,7 @@ void TPrimShader::Unlock()
 	DrawPrim(m_ePrimType, pMesh->uiNumPrims, pMesh->uiStartPrim);
 }
 
+// $deBlob: FUNCTION 00706520
 void TPrimShader::StartRendering(PrimType primType)
 {
 	TRenderDX11*        pRender        = TRenderDX11::Interface();
@@ -133,6 +140,7 @@ void TPrimShader::StartRendering(PrimType primType)
 	pRender->m_CurrentRasterizerId.Flags.Parts.CullMode = D3D11_CULL_NONE;
 }
 
+// $deBlob: FUNCTION 00706750
 void TPrimShader::StopRendering()
 {
 	TRenderDX11* pRender = TRenderDX11::Interface();
@@ -149,6 +157,7 @@ void TPrimShader::StopRendering()
 	pRender->SetZMode(TTRUE, D3D11_COMPARISON_LESS_EQUAL, D3D11_DEPTH_WRITE_MASK_ALL);
 }
 
+// $deBlob: FUNCTION 007063d0
 void TPrimShader::DrawPrim(PrimType primType, UINT numPrim, UINT startPrim)
 {
 	D3D11_PRIMITIVE_TOPOLOGY primitive;
@@ -171,6 +180,7 @@ void TPrimShader::DrawPrim(PrimType primType, UINT numPrim, UINT startPrim)
 	TRenderDX11::Interface()->DrawNonIndexed(primitive, m_pBuffer, numPrim, sizeof(TPrimShader::Vertex), startPrim, 0);
 }
 
+// $deBlob: FUNCTION 00705f10
 void TPrimShader::Initialize()
 {
 	m_uiNumMeshes      = 1000;

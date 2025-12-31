@@ -11,8 +11,10 @@ public:
 public:
 	TPostProcess();
 
+	// $deBlob: FUNCTION 006b9190
 	void ApplyGaussBlur(ID3D11ShaderResourceView* pSRV, TFLOAT fIntensity) { RenderImpl(m_pPSGaussBlur5x5, pSRV, fIntensity, TNULL); }
 
+	// $deBlob: FUNCTION 006b91b0
 	void ApplyGaussBlurWithAlpha(ID3D11ShaderResourceView* pSRV, TFLOAT fIntensity, ID3D11ShaderResourceView* pStencilSRV) { RenderImpl(pStencilSRV ? m_pPSGaussBlurAlphaStencil : m_pPSGaussBlurAlpha, pSRV, fIntensity, pStencilSRV); }
 
 private:

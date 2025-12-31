@@ -20,6 +20,7 @@ class XURXUIImageData : public XURXUIElementData
 	};
 
 public:
+	// $deBlob: FUNCTION 006dd890
 	XURXUIImageData() { m_pClass = TFindClass(TXUIImage, TXUIElement); }
 
 	virtual TBOOL   Load(TXUIResource& resource, TUINT8*& a_pData) override;

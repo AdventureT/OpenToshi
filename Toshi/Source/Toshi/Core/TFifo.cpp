@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00661e60
 TBOOL TGenericFifo::Create(TCHAR* a_pBuffer, TINT a_iMaxItems, TINT a_iItemSize)
 {
 	TASSERT(a_iMaxItems > 0, "Max items is less than zero");
@@ -33,6 +34,7 @@ TBOOL TGenericFifo::Destroy()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00662080
 TBOOL TGenericFifo::Push(void* a_pItem, Flags a_iFlags)
 {
 	TBOOL noSemaphore = a_iFlags & Flags_NoSemaphore;
@@ -63,6 +65,7 @@ TBOOL TGenericFifo::Push(void* a_pItem, Flags a_iFlags)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006621a0
 TBOOL TGenericFifo::Pop(void* a_pOut, Flags a_iFlags)
 {
 	TBOOL noSemaphore = a_iFlags & Flags_NoSemaphore;

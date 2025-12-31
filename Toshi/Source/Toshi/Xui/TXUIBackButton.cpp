@@ -22,6 +22,7 @@ TUINT32 XURXUIBackButtonData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT
 	return 4;
 }
 
+// $deBlob: FUNCTION 006d00d0
 TBOOL XURXUIBackButtonData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	a_uiObjectIndex++;

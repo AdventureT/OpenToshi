@@ -20,6 +20,7 @@ public:
 	static const TINT AXIS_WHEEL            = 0x3000C;
 
 public:
+	// $deBlob: FUNCTION 0067c7e0
 	TInputDeviceMouse() {}
 
 	virtual TBOOL        GetDoodadProperties(TINT doodad, TInputDevice::DoodadProperties& props) const override;

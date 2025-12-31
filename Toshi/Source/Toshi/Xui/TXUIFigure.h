@@ -62,6 +62,7 @@ class XURXUIFillData : public XURXUIObjectData
 	};
 
 public:
+	// $deBlob: FUNCTION 006c5930
 	XURXUIFillData() {}
 
 
@@ -145,6 +146,7 @@ class XURXUIFigureData : public XURXUIElementData
 	};
 
 public:
+	// $deBlob: FUNCTION 006c6050
 	XURXUIFigureData()
 	    : XURXUIElementData() { m_pClass = TFindClass(TXUIFigure, TXUIElement); }
 

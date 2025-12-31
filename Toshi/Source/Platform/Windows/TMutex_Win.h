@@ -21,6 +21,7 @@ public:
 		return TTRUE;
 	}
 
+	// $deBlob: FUNCTION 00661d60
 	// Returns TTRUE if success
 	TBOOL Destroy()
 	{

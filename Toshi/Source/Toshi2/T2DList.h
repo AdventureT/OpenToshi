@@ -28,8 +28,10 @@ public:
 			m_pPrev          = this;
 		}
 
+		// $deBlob: FUNCTION 006eedc0
 		TBOOL IsLinked() const { return m_pNext != this; }
 
+		// $deBlob: FUNCTION 006eedd0
 		void InsertBefore(Node* pInsertBefore)
 		{
 			TASSERT(!IsLinked());
@@ -39,6 +41,7 @@ public:
 			m_pPrev->m_pNext       = this;
 		}
 
+		// $deBlob: FUNCTION 006eee20
 		void InsertAfter(Node* pInsertAfter)
 		{
 			TASSERT(!IsLinked());
@@ -48,6 +51,7 @@ public:
 			m_pNext->m_pPrev      = this;
 		}
 
+		// $deBlob: FUNCTION 006eee70
 		void Remove()
 		{
 			TASSERT(IsLinked());
@@ -67,6 +71,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 006eeec0
 	T2GenericDList() {}
 
 	~T2GenericDList()
@@ -77,6 +82,7 @@ public:
 
 	TBOOL IsLinked() const { return m_oRoot.IsLinked(); }
 
+	// $deBlob: FUNCTION 006eef40
 	void ClearBefore(Node* pNode)
 	{
 		if (pNode != &m_oRoot)
@@ -92,6 +98,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 006eefb0
 	void Clear()
 	{
 		Node* pNode = m_oRoot.m_pNext;
@@ -104,6 +111,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 006ef030
 	TBOOL IsInList(Node* pNode) const
 	{
 		for (Node* pCNode = m_oRoot.m_pNext; pCNode != &m_oRoot; pCNode = pCNode->m_pNext)
@@ -114,6 +122,7 @@ public:
 		return TFALSE;
 	}
 
+	// $deBlob: FUNCTION 006ef010
 	size_t Size() const
 	{
 		size_t size = 0;

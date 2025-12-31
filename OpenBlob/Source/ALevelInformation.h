@@ -20,6 +20,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 0056da50
 	ALevelInformation()
 	{
 		m_pData = TNULL;

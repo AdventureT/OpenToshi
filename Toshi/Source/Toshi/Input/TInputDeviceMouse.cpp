@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0067c810
 TBOOL TInputDeviceMouse::GetDoodadProperties(TINT doodad, TInputDevice::DoodadProperties& props) const
 {
 	if (12 < doodad - 0x30000)
@@ -26,6 +27,7 @@ TBOOL TInputDeviceMouse::GetDoodadProperties(TINT doodad, TInputDevice::DoodadPr
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0067c870
 const TCHAR* TInputDeviceMouse::GetButtonFromDoodad(TINT doodad) const
 {
 	switch (doodad)

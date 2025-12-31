@@ -43,6 +43,7 @@ public:
 	void Init();
 	void Deinit();
 
+	// $deBlob: FUNCTION 005f99c0
 	TTexture* GetTexture(TINT a_iId) const
 	{
 		TASSERT(a_iId < m_iNumTex);
@@ -55,12 +56,14 @@ public:
 		return m_aTextures[a_iId].m_pName;
 	}
 
+	// $deBlob: FUNCTION 006b1e80
 	Pass* GetPassInfo(TINT a_iPass) const
 	{
 		TASSERT(a_iPass < m_iNumPasses);
 		return &m_aPasses[a_iPass];
 	}
 
+	// $deBlob: FUNCTION 006b1f20
 	TUINT32 GetPassBlendMode(TINT a_iPass) const
 	{
 		TASSERT(a_iPass < m_iNumPasses);
@@ -73,6 +76,7 @@ public:
 		return m_aPasses[a_iPass].m_pTexture->m_pTexture;
 	}
 
+	// $deBlob: FUNCTION 006b1e20
 	const TCHAR* GetPassTextureName(TINT a_iPass) const
 	{
 		TASSERT(a_iPass < m_iNumPasses);

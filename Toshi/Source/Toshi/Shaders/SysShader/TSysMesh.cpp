@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0070ad80
 TSysMesh::TSysMesh()
 {
 	m_uiFlags       = 0;
@@ -13,6 +14,7 @@ TSysMesh::TSysMesh()
 	m_pIndexPool    = TNULL;
 }
 
+// $deBlob: FUNCTION 0070aab0
 TBOOL TSysMesh::Validate()
 {
 	if (!m_State.IsSet(State::Validated)) m_State.Set(State::Validated);
@@ -20,6 +22,7 @@ TBOOL TSysMesh::Validate()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0070aad0
 void TSysMesh::Invalidate()
 {
 	if (m_pVertexPool != TNULL && m_pIndexPool != TNULL) Deallocate();
@@ -27,6 +30,7 @@ void TSysMesh::Invalidate()
 	if (m_State.IsSet(State::Validated)) m_State.Unset(State::Validated);
 }
 
+// $deBlob: FUNCTION 0070ab00
 TBOOL TSysMesh::Create(FLAGS uiFlags, TUINT16 uiMaxVertices, TUINT16 uiMaxIndices)
 {
 	TASSERT(TFALSE == IsCreated());
@@ -45,6 +49,7 @@ TBOOL TSysMesh::Create(FLAGS uiFlags, TUINT16 uiMaxVertices, TUINT16 uiMaxIndice
 	}
 }
 
+// $deBlob: FUNCTION 0070ab70
 TBOOL TSysMesh::Lock(TLockBuffer* pLockBuffer)
 {
 	TASSERT(!(m_uiFlags & FLAGS_LOCKED));
@@ -53,6 +58,7 @@ TBOOL TSysMesh::Lock(TLockBuffer* pLockBuffer)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0070abf0
 void TSysMesh::Unlock(TUINT16 uiNumVertices, TUINT16 uiNumIndices)
 {
 	TASSERT(m_uiFlags & FLAGS_LOCKED);
@@ -62,16 +68,19 @@ void TSysMesh::Unlock(TUINT16 uiNumVertices, TUINT16 uiNumIndices)
 	TIMPLEMENT();
 }
 
+// $deBlob: FUNCTION 0070ad50
 TResource* TSysMesh::GetVertexPool() const
 {
 	return m_pVertexPool;
 }
 
+// $deBlob: FUNCTION 0070ad60
 TResource* TSysMesh::GetIndexPool() const
 {
 	return m_pIndexPool;
 }
 
+// $deBlob: FUNCTION 0070add0
 TBOOL TSysMesh::Allocate()
 {
 	TASSERT(0 != m_uiMaxVertices);
@@ -88,6 +97,7 @@ TBOOL TSysMesh::Allocate()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0070af50
 void TSysMesh::Deallocate()
 {
 	if (m_pVertexPool != TNULL)

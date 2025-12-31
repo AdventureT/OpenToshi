@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006b4d30
 TFXAA::TFXAA()
     : m_Width(1280), m_Height(720), m_pTexture(TNULL), m_pShader(TNULL), m_pRenderTarget(TNULL), m_pTextureView(TNULL)
 {
@@ -24,6 +25,7 @@ TFXAA::TFXAA()
 	Initialize();
 }
 
+// $deBlob: FUNCTION 006b4e20
 TFXAA::~TFXAA()
 {
 	if (m_pTexture != TNULL)
@@ -47,6 +49,7 @@ TFXAA::~TFXAA()
 	}
 }
 
+// $deBlob: FUNCTION 006b4fb0
 void TFXAA::Initialize()
 {
 	auto renderInterface = TRenderDX11::Interface();
@@ -71,6 +74,7 @@ void TFXAA::Initialize()
 	m_pRenderTarget->SetPrivateData(WKPDID_D3DDebugObjectName, 7, "FXAA RT");
 }
 
+// $deBlob: FUNCTION 006b4e80
 void TFXAA::Render(ID3D11ShaderResourceView* pShaderResourceView)
 {
 	auto                    pRender        = TRenderDX11::Interface();

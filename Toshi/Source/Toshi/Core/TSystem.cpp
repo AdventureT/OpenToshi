@@ -6,6 +6,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00661870
 TSystemManager::TSystemManager()
     : m_Emitter(this)
 {
@@ -17,6 +18,7 @@ TSystemManager::TSystemManager()
 	m_Unk7       = TFALSE;
 }
 
+// $deBlob: FUNCTION 00661640
 void TSystemManager::Update()
 {
 	// Calculating average fps
@@ -36,6 +38,7 @@ void TSystemManager::Update()
 	m_Scheduler->Update();
 }
 
+// $deBlob: FUNCTION 00661540
 TBOOL TSystemManager::Create()
 {
 	TSystemManager::CreateSingleton()->m_Scheduler = new TScheduler();

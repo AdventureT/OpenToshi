@@ -24,6 +24,7 @@ void TMSWindow::Disable()
 	m_IsWindowed = TFALSE;
 }
 
+// $deBlob: FUNCTION 006b0da0
 void TMSWindow::Update()
 {
 	MSG msg;
@@ -68,6 +69,7 @@ void TMSWindow::UnregisterWindowClass()
 	}
 }
 
+// $deBlob: FUNCTION 006b0ca0
 void TMSWindow::SetPosition(UINT x, UINT y, UINT width, UINT height)
 {
 	RECT rect;

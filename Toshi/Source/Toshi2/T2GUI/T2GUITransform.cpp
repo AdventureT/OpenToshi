@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006f47d0
 void T2GUITransform::Rotate(TFLOAT angle)
 {
 	TFLOAT fCos;
@@ -18,6 +19,7 @@ void T2GUITransform::Rotate(TFLOAT angle)
 	m_Rot[1].SetY(-f0Y * fSin + m_Rot[1].GetY() * fCos);
 }
 
+// $deBlob: FUNCTION 006f48d0
 void T2GUITransform::GetInverse(T2GUITransform& outTransform)
 {
 	TASSERT(m_Rot[0].GetX() * m_Rot[1].GetY() - m_Rot[1].GetX() * m_Rot[0].GetY() != 0.0f);
@@ -36,6 +38,7 @@ void T2GUITransform::GetInverse(T2GUITransform& outTransform)
 	outTransform.m_Pos.y *= -1;
 }
 
+// $deBlob: FUNCTION 005e5670
 void T2GUITransform::PreMultiply(const T2GUITransform& transform)
 {
 	TFLOAT fVar1 = m_Rot[0].GetX();
@@ -52,6 +55,7 @@ void T2GUITransform::PreMultiply(const T2GUITransform& transform)
 	m_Rot[1].SetY(fVar7 * fVar6 + fVar4 * fVar2);
 }
 
+// $deBlob: FUNCTION 006f46b0
 void T2GUITransform::PostMultiply(const T2GUITransform& transform)
 {
 	TFLOAT fVar1 = m_Rot[0].GetX();
@@ -68,11 +72,13 @@ void T2GUITransform::PostMultiply(const T2GUITransform& transform)
 	m_Rot[1].SetY(fVar3 * fVar7 + fVar5 * fVar2);
 }
 
+// $deBlob: FUNCTION 00550cc0
 void T2GUITransform::Matrix44(TMatrix44& outMatrix)
 {
 	outMatrix = { m_Rot[0].GetX(), m_Rot[0].GetY(), 0.0f, 0.0f, m_Rot[1].GetX(), m_Rot[1].GetY(), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, m_Pos.x, m_Pos.y, 0.0f, 1.0f };
 }
 
+// $deBlob: FUNCTION 006f4ad0
 void T2GUITransform::Multiply(T2GUITransform& outTransform, const T2GUITransform& a, const T2GUITransform& b)
 {
 	TFLOAT a1 = a.m_Rot[0].GetX();

@@ -4,11 +4,13 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006b57f0
 TResource::~TResource()
 {
 	m_State |= TResourceState_Dead;
 }
 
+// $deBlob: FUNCTION 006b51d0
 TBOOL TResource::Create()
 {
 	TASSERT(TFALSE == IsCreated(), "This resource is already created");
@@ -17,6 +19,7 @@ TBOOL TResource::Create()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006b5210
 TBOOL TResource::Validate()
 {
 	TASSERT(IsDying() == TFALSE, "Resource is dying and cannot be validated");
@@ -28,16 +31,19 @@ TBOOL TResource::Validate()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006b5820
 void TResource::Invalidate()
 {
 	m_State &= ~TResourceState_Valid;
 }
 
+// $deBlob: FUNCTION 006b5320
 void TResource::DestroyResource()
 {
 	GetRenderer()->DestroyResource(this);
 }
 
+// $deBlob: FUNCTION 006b5620
 void TResource::OnDestroy()
 {
 	TASSERT(TTRUE == IsCreated(), "Tried to destroy resource that wasn't created");
@@ -46,6 +52,7 @@ void TResource::OnDestroy()
 	m_State |= TResourceState_Dying;
 }
 
+// $deBlob: FUNCTION 006b5350
 void TResource::SetName(const TCHAR* name)
 {
 	// 006b5350

@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006ab880
 TTransformObject::TTransformObject()
 {
 	m_EulerOrder[0] = 2;
@@ -17,6 +18,7 @@ TTransformObject::TTransformObject()
 	m_ScaleVector = { 1.0f, 1.0f, 1.0f };
 }
 
+// $deBlob: FUNCTION 006abda0
 void TTransformObject::GetLocalMatrixImp(TMatrix44& outMatrix)
 {
 	if (m_eMode == Mode::Quat)
@@ -48,6 +50,7 @@ void TTransformObject::GetLocalMatrixImp(TMatrix44& outMatrix)
 	m_Matrix.Scale(m_ScaleVector.x, m_ScaleVector.y, m_ScaleVector.z);
 }
 
+// $deBlob: FUNCTION 006abd80
 void TTransformObject::SetEulerOrder(TUINT8 x, TUINT8 y, TUINT8 z)
 {
 	m_EulerOrder[0] = x;
@@ -55,6 +58,7 @@ void TTransformObject::SetEulerOrder(TUINT8 x, TUINT8 y, TUINT8 z)
 	m_EulerOrder[2] = z;
 }
 
+// $deBlob: FUNCTION 006abd40
 void TTransformObject::SetTranslate(const TVector3& translation)
 {
 	m_Translation = translation;
@@ -64,6 +68,7 @@ void TTransformObject::SetTranslate(const TVector3& translation)
 	m_bChanged = TTRUE;
 }
 
+// $deBlob: FUNCTION 006abcc0
 void TTransformObject::SetQuat(const TQuaternion& quaternion)
 {
 	m_eMode    = Mode::Quat;
@@ -71,6 +76,7 @@ void TTransformObject::SetQuat(const TQuaternion& quaternion)
 	m_Quat     = quaternion;
 }
 
+// $deBlob: FUNCTION 006abcf0
 void TTransformObject::SetMatrix(const TMatrix44& matrix)
 {
 	m_eMode       = Mode::Matrix;

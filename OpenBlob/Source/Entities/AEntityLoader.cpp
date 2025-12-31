@@ -4,6 +4,7 @@
 #include "AAssetStreaming.h"
 
 
+// $deBlob: FUNCTION 007934a0
 void AEntityLoader::Update(TFLOAT a_flt)
 {
 	Toshi::THPTimer timer = Toshi::THPTimer();

@@ -28,6 +28,7 @@ class XURXUIControlData : public XURXUIElementData
 	};
 
 public:
+	// $deBlob: FUNCTION 006c9ed0
 	XURXUIControlData()
 	{
 		m_pClass = TFindClass(TXUIControl, TXUIElement);

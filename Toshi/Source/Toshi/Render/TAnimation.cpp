@@ -6,6 +6,7 @@ TOSHI_NAMESPACE_START
 
 TMemoryHeap* s_pAnimMemHeap = TNULL;
 
+// $deBlob: FUNCTION 0068e0a0
 TBOOL TAnimation::UpdateTime(TFLOAT a_fDeltaTime)
 {
 	auto pSkeleton = m_pSkeletonInstance->GetSkeleton();
@@ -108,11 +109,13 @@ TFLOAT TAnimation::SetDestWeight(TFLOAT a_fDestWeight, TFLOAT a_fBlendInSpeed)
 	return fOldValue;
 }
 
+// $deBlob: FUNCTION 0056f2c0
 TSkeletonSequence* TAnimation::GetSequencePtr() const
 {
 	return m_pSkeletonInstance->GetSkeleton()->GetSequence(m_iSeqID);
 }
 
+// $deBlob: FUNCTION 0068f5d0
 TINT TAnimation::FindSequenceMaxUnk3(const TQList<TAnimation>& a_rList)
 {
 	TINT iResult = -1;

@@ -21,6 +21,7 @@ public:
 	T2Locale(const T2Locale&)  = delete;
 	T2Locale(const T2Locale&&) = delete;
 
+	// $deBlob: FUNCTION 00663000
 	virtual ~T2Locale(){};
 	virtual const TCHAR* GetLanguageFilename(Lang lang) = 0;
 
@@ -41,8 +42,10 @@ protected:
 
 	inline TINT GetNumStrings() const { return m_StringTable->m_numstrings; }
 
+	// $deBlob: FUNCTION 00662fd0
 	static void* TRBAllocator(TTRB::AllocType alloctype, size_t size, TINT16 unk, size_t unk2, void* userData) { return static_cast<T2Locale*>(userData)->TRBAlloc(size); }
 
+	// $deBlob: FUNCTION 00662ff0
 	static void TRBDeallocator(TTRB::AllocType alloctype, void* ptr, TINT16 unk, size_t unk2, void* userData)
 	{
 		// T2Locale doesn't have deallocator

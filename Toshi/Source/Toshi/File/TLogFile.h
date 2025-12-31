@@ -31,6 +31,7 @@ public:
 public:
 	TLogFile();
 
+	// $deBlob: FUNCTION 00687780
 	~TLogFile()
 	{
 		TASSERT(TNULL == m_pFile, "TFile must be NULL");
@@ -56,14 +57,19 @@ public:
 		RecalcLevel();
 	}
 
+	// $deBlob: FUNCTION 00687950
 	void AllowIndentation(TBOOL allow) { m_bAllowIndentation = allow; }
 
+	// $deBlob: FUNCTION 00687940
 	void SetSimpleMode(TBOOL enable) { m_bIsSimpleMode = enable; }
 
+	// $deBlob: FUNCTION 00687b70
 	TINT GetTypeCount(Type type) const { return m_typeCounts[type]; }
 
+	// $deBlob: FUNCTION 00687b90
 	TINT GetTotalLogCount() const { return m_iTotalLogCount; }
 
+	// $deBlob: FUNCTION 00687b80
 	const TCHAR* GetLevelString() const { return m_LevelString; }
 
 private:

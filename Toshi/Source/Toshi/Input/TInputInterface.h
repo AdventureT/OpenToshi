@@ -62,10 +62,12 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 00677310
 	TInputInterface() { m_bIsExclusiveMode = TFALSE; }
 
 	TInputDevice* GetDeviceByIndex(TClass* pClass, size_t index);
 
+	// $deBlob: FUNCTION 00677720
 	template <class C> C* GetDeviceByIndex(size_t index = 0)
 	{
 		C* pDevice = TSTATICCAST(C, GetDeviceByIndex(TGetClass(C), index));
@@ -119,6 +121,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 00679b80
 	TInputDevice()
 	    : m_Repeats(0, 16), m_Array2(0, 16)
 	{
@@ -133,6 +136,7 @@ public:
 	virtual TBOOL        Unacquire()              = 0;
 	virtual void         Release()                = 0;
 	virtual void         Update(TFLOAT deltaTime) = 0;
+	// $deBlob: FUNCTION 0067a9f0
 	virtual TBOOL        Flush() { return TTRUE; }
 	virtual TINT         ProcessEvents(EventEmitter& emitter, TFLOAT deltaTime)                = 0;
 	virtual TINT         GetButtonCount() const                                                = 0;
@@ -141,6 +145,7 @@ public:
 	virtual TBOOL        StartRepeat(Doodad a_iDoodad, TFLOAT a_fFirstRepeatTime, TFLOAT a_fRepeatTime);
 	virtual void         StopRepeat(Doodad a_iDoodad);
 	virtual void         StopAllRepeats();
+	// $deBlob: FUNCTION 00679aa0
 	virtual TBOOL        IsForceFeedbackDevice() { return TFALSE; }
 	virtual Platform     GetPlatform() const                        = 0;
 	virtual const TCHAR* GetButtonFromDoodad(TINT a_iDoodad) const  = 0;
@@ -156,6 +161,7 @@ public:
 
 	TInputInterface* GetInputInterface() { return m_pInputInterface; }
 
+	// $deBlob: FUNCTION 00679cb0
 	void SetInputInterface(TInputInterface* a_pInterface) { m_pInputInterface = a_pInterface; }
 
 protected:

@@ -14,6 +14,7 @@ class XURXUICanvasData : public XURXUIElementData
 	TXUI_TYPEINFO(XUI_CLASS_CANVAS, XURXUIElementData)
 
 public:
+	// $deBlob: FUNCTION 006dd5a0
 	XURXUICanvasData() { m_pClass = TFindClass(TXUICanvas, TXUIElement); }
 
 public:

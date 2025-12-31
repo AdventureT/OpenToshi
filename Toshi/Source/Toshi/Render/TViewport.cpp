@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006b2540
 TViewport::TViewport()
 {
 	m_ColorR                = 0;

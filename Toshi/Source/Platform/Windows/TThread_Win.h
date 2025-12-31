@@ -76,6 +76,7 @@ public:
 		LeaveCriticalSection(&m_CriticalSection);
 	}
 
+	// $deBlob: FUNCTION 006628f0
 	void InsertThread(TThread* a_pThread)
 	{
 		EnterCriticalSection(&m_CriticalSection);

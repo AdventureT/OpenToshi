@@ -6,6 +6,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 005f8ed0
 AModelLoader::AModelLoader()
 {
 	TModel::SetTRBLoadCallback(AModelLoaderLoadTRBCallback);
@@ -16,6 +17,7 @@ AModelLoader::AModelLoader()
 	}
 }
 
+// $deBlob: FUNCTION 005f9020
 void AModelLoader::GetMaterial(TShader* pShader, const char* pName, TMaterial*& pOutMaterial, TXSMaterial::TextureType eTextureType)
 {
 	TASSERT(TAssetInit::GetInitialisingTRB());
@@ -69,11 +71,13 @@ void AModelLoader::GetMaterial(TShader* pShader, const char* pName, TMaterial*& 
 	}
 }
 
+// $deBlob: FUNCTION 005f9670
 TBOOL AModelLoader::AModelLoaderLoadTRBCallback(TTRB& pTRB, TModel* pModel)
 {
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 005f9550
 TMaterial* AModelLoader::GetCreatedMaterial(const TString8& name, TTRB* pTRB)
 {
 	for (auto it = ms_oMaterialList.Begin(); it != ms_oMaterialList.End(); it++)
@@ -87,6 +91,7 @@ TMaterial* AModelLoader::GetCreatedMaterial(const TString8& name, TTRB* pTRB)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 005f9f90
 TBOOL AModelLoader::LoadTRBCallback2(TModel* pModel, TTMDWin::TTRBWinHeader* pHeader)
 {
 	pModel->m_iLODCount = pHeader->m_iLODCount;
@@ -102,6 +107,7 @@ TBOOL AModelLoader::LoadTRBCallback2(TModel* pModel, TTMDWin::TTRBWinHeader* pHe
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 005f9680
 TBOOL AModelLoader::AModelLoaderLoadTRBCallback2(TModel* pModel, TTMDWin::TTRBWinHeader* pHeader)
 {
 	return LoadTRBCallback2(pModel, pHeader);

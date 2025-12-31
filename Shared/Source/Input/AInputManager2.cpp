@@ -10,6 +10,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 005daef0
 AInputManager2::AInputManager2()
     : m_aControllers()
 {
@@ -54,6 +55,7 @@ AInputManager2::~AInputManager2()
 	TIMPLEMENT();
 }
 
+// $deBlob: FUNCTION 005db260
 void AInputManager2::Update(float a_fDeltaTime)
 {
 	auto pInputInterface = TInputInterface::GetSingleton();
@@ -71,6 +73,7 @@ void AInputManager2::Update(float a_fDeltaTime)
 	}
 }
 
+// $deBlob: FUNCTION 005db480
 void AInputManager2::AddInGameController(const AInputDeviceHandle& a_Handle)
 {
 	TASSERT(a_Handle.IsValid());
@@ -81,6 +84,7 @@ void AInputManager2::AddInGameController(const AInputDeviceHandle& a_Handle)
 	}*/
 }
 
+// $deBlob: FUNCTION 005db540
 void AInputManager2::RemoveInGameController(const AInputDeviceHandle& a_Handle)
 {
 	TASSERT(a_Handle.IsValid());
@@ -91,6 +95,7 @@ void AInputManager2::RemoveInGameController(const AInputDeviceHandle& a_Handle)
 	//}
 }
 
+// $deBlob: FUNCTION 005dc060
 AInputManager2::AInputDeviceHandle AInputManager2::GetControllerHandle(INPUTDEVICE a_eDevice)
 {
 	TASSERT(0 <= a_eDevice);
@@ -99,6 +104,7 @@ AInputManager2::AInputDeviceHandle AInputManager2::GetControllerHandle(INPUTDEVI
 	return m_aControllers[a_eDevice];
 }
 
+// $deBlob: FUNCTION 005dcba0
 void AInputManager2::UpdateControllers()
 {
 	size_t iDeviceId          = 0;
@@ -130,6 +136,7 @@ void AInputManager2::UpdateControllers()
 	}
 }
 
+// $deBlob: FUNCTION 00679ae0
 TBOOL AInputManager2::HasDeviceOfPlatform(Platform a_ePlatform) const
 {
 	auto pRegisteredDevices = TInputDevice::GetRegisteredDevices();

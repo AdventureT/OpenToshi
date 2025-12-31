@@ -43,6 +43,7 @@ TINT T2String8::Format(TCHAR* a_pcString, TINT size, const TCHAR* a_pcFormat, ..
 	return iResult;
 }
 
+// $deBlob: FUNCTION 006ebe30
 TINT T2String8::Compare(const TCHAR* str1, const TCHAR* str2, TSIZE size)
 {
 	if (size != -1) return strncmp(str1, str2, size);
@@ -57,6 +58,7 @@ TINT T2String8::CompareNoCase(const TCHAR* str1, const TCHAR* str2, TSIZE size /
 	return _stricmp(str1, str2);
 }
 
+// $deBlob: FUNCTION 006ebf30
 TCHAR* T2String8::Copy(TCHAR* dst, const TCHAR* src, TSIZE size /*= -1*/)
 {
 	if (size != -1) return strncpy(dst, src, size);
@@ -114,6 +116,7 @@ TCHAR* T2String8::FindString(TCHAR* str, const TCHAR* substr)
 	return strstr(str, substr);
 }
 
+// $deBlob: FUNCTION 006ec150
 TSIZE T2String8::Length(const TCHAR* str)
 {
 	if (str != TNULL) return strlen(str);
@@ -134,6 +137,7 @@ TBOOL T2String8::IsUpperCase(const TCHAR* str)
 	return *str == '\0';
 }
 
+// $deBlob: FUNCTION 006ec340
 void T2String8::ToLowerCase(TCHAR* str)
 {
 	while (*str)

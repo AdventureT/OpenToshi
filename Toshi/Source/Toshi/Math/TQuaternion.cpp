@@ -34,6 +34,7 @@ void TQuaternion::SetFromEulerRollPitchYaw(TFLOAT a_fRoll, TFLOAT a_fPitch, TFLO
 	Set(fX, fY, fZ, fW);
 }
 
+// $deBlob: FUNCTION 00674c50
 void TQuaternion::SetRotation(const TVector3& a_rVec3, TFLOAT a_fVal)
 {
 	TFLOAT fVal;
@@ -81,6 +82,7 @@ void TQuaternion::SetVectorDirection(const TVector3& a_rVec3, const TVector3& a_
 	}
 }
 
+// $deBlob: FUNCTION 00675670
 void TQuaternion::RotateVector(TVector3& param_1, const TQuaternion& param_2, const TVector3 param_3)
 {
 	TQuaternion quat = param_2;
@@ -140,6 +142,7 @@ TQuaternion& TQuaternion::operator*=(const TQuaternion& a_Quat)
 	return *this;
 }
 
+// $deBlob: FUNCTION 00675100
 void TQuaternion::Nlerp(TQuaternion& a_rOut, const TQuaternion& a_rStart, const TQuaternion& a_rEnd, TFLOAT a_fProgress)
 {
 	TFLOAT fDot = TVector4::DotProduct4(a_rStart.AsVector4(), a_rEnd.AsVector4());
@@ -178,6 +181,7 @@ void TQuaternion::Nlerp(TQuaternion& a_rOut, const TQuaternion& a_rStart, const 
 	}
 }
 
+// $deBlob: FUNCTION 00674f50
 void TQuaternion::Slerp(TQuaternion& a_rOut, const TQuaternion& a_rStart, const TQuaternion& a_rEnd, TFLOAT a_fProgress)
 {
 	if (a_fProgress == 0.0f)

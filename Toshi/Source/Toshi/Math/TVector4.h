@@ -157,6 +157,7 @@ public:
 		w = TMath::Cos(vec.w);
 	}
 
+	// $deBlob: FUNCTION 00673350
 	void CrossProduct(const TVector4& vec1, const TVector4& vec2)
 	{
 		x = vec2.z * vec1.y - vec2.y * vec1.z;
@@ -177,6 +178,7 @@ public:
 		TVector4::w = start.w;
 	}
 
+	// $deBlob: FUNCTION 00673710
 	double GetScalarProjectionOnUnit(const TVector4& vec) { return (double)(TVector4::z * vec.z + TVector4::x * vec.x + TVector4::y * vec.y); }
 
 	void Abs(const TVector4& vec4) { Set(TMath::Abs(vec4.x), TMath::Abs(vec4.y), TMath::Abs(vec4.z), w); }
@@ -194,11 +196,14 @@ public:
 	void Negate4(const TVector4& vec) { Set(-vec.x, -vec.y, -vec.z, -vec.w); }
 	void Negate4() { Set(-x, -y, -z, -w); }
 
+	// $deBlob: FUNCTION 00672e60
 	TFLOAT Magnitude() const { return TMath::Sqrt(x * x + y * y + z * z); }
+	// $deBlob: FUNCTION 00672e20
 	TFLOAT MagnitudeSq() const { return x * x + y * y + z * z; }
 	TFLOAT MagnitudeXZ() const { return TMath::Sqrt(x * x + z * z); }
 	TFLOAT MagnitudeSqXZ() const { return x * x + z * z; }
 
+	// $deBlob: FUNCTION 00672700
 	TVector4& Progress(const TVector4& a_rVec, TFLOAT a_fScalar)
 	{
 		x = a_rVec.x * a_fScalar;
@@ -245,6 +250,7 @@ public:
 
 public:
 	static TFLOAT Distance(const TVector4& vec1, const TVector4& vec2) { return (vec2 - vec1).Magnitude(); }
+	// $deBlob: FUNCTION 00673250
 	static TFLOAT DistanceSq(const TVector4& vec1, const TVector4& vec2) { return (vec2 - vec1).MagnitudeSq(); }
 	static TFLOAT DistanceXZ(const TVector4& vec1, const TVector4& vec2) { return (vec2 - vec1).MagnitudeXZ(); }
 	static TFLOAT DistanceSqXZ(const TVector4& vec1, const TVector4& vec2) { return (vec2 - vec1).MagnitudeSqXZ(); }

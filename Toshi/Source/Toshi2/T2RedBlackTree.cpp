@@ -5,6 +5,7 @@ TOSHI_NAMESPACE_START
 
 constinit T2GenericRedBlackTreeNode T2GenericRedBlackTree::ms_oNil;
 
+// $deBlob: FUNCTION 006f2a60
 T2GenericRedBlackTreeNode* T2GenericRedBlackTree::GetFirstNode() const
 {
 	T2GenericRedBlackTreeNode* pCurrentNode = &m_oRoot;
@@ -19,6 +20,7 @@ T2GenericRedBlackTreeNode* T2GenericRedBlackTree::GetFirstNode() const
 	return pResult;
 }
 
+// $deBlob: FUNCTION 006f23c0
 T2GenericRedBlackTreeNode* T2GenericRedBlackTree::Insert(T2GenericRedBlackTreeNode* pNode)
 {
 	T2GenericRedBlackTreeNode* pNode_00;
@@ -83,6 +85,7 @@ T2GenericRedBlackTreeNode* T2GenericRedBlackTree::Insert(T2GenericRedBlackTreeNo
 	return pNode;
 }
 
+// $deBlob: FUNCTION 006f2710
 void T2GenericRedBlackTree::DeleteFixUp(T2GenericRedBlackTreeNode* pNode)
 {
 	TINT                       uVar2;
@@ -173,6 +176,7 @@ void T2GenericRedBlackTree::DeleteFixUp(T2GenericRedBlackTreeNode* pNode)
 	CheckValid();
 }
 
+// $deBlob: FUNCTION 006f2230
 T2GenericRedBlackTreeNode* T2GenericRedBlackTree::DeleteNode(T2GenericRedBlackTreeNode* pNode)
 {
 	T2GenericRedBlackTreeNode* pTVar1;
@@ -258,6 +262,7 @@ T2GenericRedBlackTreeNode* T2GenericRedBlackTree::DeleteNode(T2GenericRedBlackTr
 	return pNode;
 }
 
+// $deBlob: FUNCTION 006f2610
 void T2GenericRedBlackTree::LeftRotate(T2GenericRedBlackTreeNode* pNode)
 {
 	T2GenericRedBlackTreeNode* pTVar1;
@@ -288,6 +293,7 @@ void T2GenericRedBlackTree::LeftRotate(T2GenericRedBlackTreeNode* pNode)
 	CheckValid();
 }
 
+// $deBlob: FUNCTION 006f2690
 void T2GenericRedBlackTree::RightRotate(T2GenericRedBlackTreeNode* pNode)
 {
 	T2GenericRedBlackTreeNode* pTVar1;
@@ -318,6 +324,7 @@ void T2GenericRedBlackTree::RightRotate(T2GenericRedBlackTreeNode* pNode)
 	CheckValid();
 }
 
+// $deBlob: FUNCTION 006f25b0
 T2GenericRedBlackTreeNode* T2GenericRedBlackTree::GetSuccessorOf(const T2GenericRedBlackTreeNode* pNode)
 {
 	T2GenericRedBlackTreeNode* pTVar1;
@@ -359,6 +366,7 @@ T2GenericRedBlackTreeNode* T2GenericRedBlackTree::GetSuccessorOf(const T2Generic
 	return pTVar1;
 }
 
+// $deBlob: FUNCTION 006f2550
 T2GenericRedBlackTreeNode* T2GenericRedBlackTree::GetPredecessorOf(const T2GenericRedBlackTreeNode* pNode)
 {
 	T2GenericRedBlackTreeNode* pTVar1;

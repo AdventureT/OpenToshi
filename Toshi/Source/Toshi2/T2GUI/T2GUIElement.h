@@ -90,6 +90,7 @@ public:
 		m_pParent = TNULL;
 	}
 
+	// $deBlob: FUNCTION 006f6100
 	void AddChildTail(T2GUIElement* pElement)
 	{
 		if (pElement->IsLinked()) pElement->Remove();
@@ -97,6 +98,7 @@ public:
 		m_Children.PushBack(pElement);
 	}
 
+	// $deBlob: FUNCTION 006f60c0
 	void AddChildHead(T2GUIElement* pElement)
 	{
 		if (pElement->IsLinked()) pElement->Remove();
@@ -104,6 +106,7 @@ public:
 		m_Children.PushFront(pElement);
 	}
 
+	// $deBlob: FUNCTION 006f65b0
 	void SetTransform(TFLOAT x, TFLOAT y, TFLOAT angle = 0.0f)
 	{
 		m_Transform.Reset();

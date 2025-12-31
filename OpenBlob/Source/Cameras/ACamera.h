@@ -26,6 +26,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 0058d140
 	ACamera(CameraType a_eCamType)
 	    : m_eCamType(a_eCamType)
 	{
@@ -46,11 +47,13 @@ public:
 	void RotateAroundAxis(const Toshi::TVector4& a_vAxis, TFLOAT rotation);
 	void RotateAroundRight(TFLOAT rotation, TFLOAT a_fVal);
 
+	// $deBlob: FUNCTION 0058d210
 	void SetMatrix(const Toshi::TMatrix44& a_mMatrix)
 	{
 		m_Matrix.m_mMatrix = a_mMatrix;
 	}
 
+	// $deBlob: FUNCTION 0058d250
 	void SetShakeMatrix(const Toshi::TMatrix44& a_mSkakeMatrix)
 	{
 		m_Matrix.m_mShakeMatrix = a_mSkakeMatrix;

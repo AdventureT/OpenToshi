@@ -17,12 +17,14 @@ private:
 	static constexpr int s_OffsetY = 0;
 
 public:
+	// $deBlob: FUNCTION 005d5810
 	A2GUIBackground()
 	{
 		m_pTrb = TNULL;
 		Toshi::TUtil::MemClear(m_Poly, sizeof(m_Poly));
 	}
 
+	// $deBlob: FUNCTION 005d5870
 	~A2GUIBackground()
 	{
 		Destroy();

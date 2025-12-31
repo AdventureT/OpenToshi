@@ -24,6 +24,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 005fb7c0
 	TMesh()
 	{
 		m_pOwnerShader = TNULL;
@@ -31,24 +32,30 @@ public:
 		m_State        = State::None;
 	}
 
+	// $deBlob: FUNCTION 0055f4d0
 	virtual TBOOL Validate()
 	{
 		m_State.Set(State::Validated);
 		return TTRUE;
 	}
 
+	// $deBlob: FUNCTION 0055f420
 	virtual void Invalidate() { m_State.Unset(State::Validated); }
 
+	// $deBlob: FUNCTION 0055f3b0
 	virtual TBOOL Create()
 	{
 		m_State.Set(State::Created);
 		return TTRUE;
 	}
 
+	// $deBlob: FUNCTION 005696d0
 	virtual TBOOL Render() { return TTRUE; }
 
+	// $deBlob: FUNCTION 0055f450
 	virtual void OnDestroy() { m_State.Unset(State::Created); }
 
+	// $deBlob: FUNCTION 00692500
 	void DestroyResource()
 	{
 		Invalidate();

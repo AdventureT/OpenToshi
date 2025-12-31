@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00709420
 TSysShaderHAL::TSysShaderHAL(OrderTablePriorities* priorities)
 {
 	m_pVertexShader            = TNULL;
@@ -23,9 +24,11 @@ TSysShaderHAL::TSysShaderHAL(OrderTablePriorities* priorities)
 	}
 }
 
+// $deBlob: FUNCTION 0070a6c0
 TSysShaderHAL::~TSysShaderHAL()
 {}
 
+// $deBlob: FUNCTION 00709a50
 void TSysShaderHAL::OnDestroy()
 {
 	if (m_pVertexShader)
@@ -61,12 +64,14 @@ void TSysShaderHAL::OnDestroy()
 	TSysShader::OnDestroy();
 }
 
+// $deBlob: FUNCTION 00709570
 void TSysShaderHAL::Flush()
 {
 	m_OrderTables[0].Render();
 	m_OrderTables[1].Render();
 }
 
+// $deBlob: FUNCTION 00709590
 void TSysShaderHAL::StartFlush()
 {
 	TSysMaterialHAL::s_eSysMaterialLazyState = 1;
@@ -84,6 +89,7 @@ void TSysShaderHAL::StartFlush()
 	pDeviceContext->VSSetShader(m_pVertexShader, TNULL, 0);
 }
 
+// $deBlob: FUNCTION 00709620
 void TSysShaderHAL::EndFlush()
 {
 	auto pRender = TRenderDX11::Interface();
@@ -92,6 +98,7 @@ void TSysShaderHAL::EndFlush()
 	pRender->SetBlendMode(TTRUE, D3D11_BLEND_OP_ADD, D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_INV_SRC_ALPHA);
 }
 
+// $deBlob: FUNCTION 00709650
 TBOOL TSysShaderHAL::Create()
 {
 	TASSERT(!IsCreated());
@@ -168,12 +175,14 @@ TBOOL TSysShaderHAL::Create()
 	return TSysShader::Create();
 }
 
+// $deBlob: FUNCTION 00709ae0
 TBOOL TSysShaderHAL::Validate()
 {
 	TASSERT(TTRUE == IsCreated());
 	return TSysShader::Validate();
 }
 
+// $deBlob: FUNCTION 00709b20
 void TSysShaderHAL::Invalidate()
 {
 	if (IsValidated())
@@ -182,6 +191,7 @@ void TSysShaderHAL::Invalidate()
 	}
 }
 
+// $deBlob: FUNCTION 00709c80
 void TSysShaderHAL::Render(TRenderPacket* pRenderPacket)
 {
 	auto pRender        = TRenderDX11::Interface();
@@ -196,6 +206,7 @@ void TSysShaderHAL::Render(TRenderPacket* pRenderPacket)
 	pRender->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, pMesh->GetIndexCount(), pMesh->GetIndexBuffer(), 0, DXGI_FORMAT_R16_UINT, pMesh->GetVertexBuffer(), 24, 0);
 }
 
+// $deBlob: FUNCTION 00709b30
 TSysMaterial* TSysShaderHAL::CreateMaterial()
 {
 	TASSERT(IsCreated());
@@ -207,6 +218,7 @@ TSysMaterial* TSysShaderHAL::CreateMaterial()
 	return pMaterial;
 }
 
+// $deBlob: FUNCTION 00709be0
 TSysMesh* TSysShaderHAL::CreateMesh(const TCHAR* name)
 {
 	TASSERT(IsCreated());

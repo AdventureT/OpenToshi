@@ -6,6 +6,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 005f1030
 AXYZViewportManager::AXYZViewportManager()
 {
 	auto renderer       = TRenderDX11::Interface();
@@ -60,6 +61,7 @@ AXYZViewportManager::AXYZViewportManager()
 	m_UsedCameras[VIEWPORT_FullScreen] = TTRUE;
 }
 
+// $deBlob: FUNCTION 005f1aa0
 TViewport* AXYZViewportManager::CreateViewport(float x, float y, float w, float h)
 {
 	auto pViewport = new TViewport();

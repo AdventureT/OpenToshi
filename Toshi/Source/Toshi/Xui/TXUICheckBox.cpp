@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006e1ee0
 TBOOL XURXUICheckBoxData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIControlData::Load(resource, a_pData);
@@ -19,6 +20,7 @@ TBOOL XURXUICheckBoxData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006e1fb0
 TBOOL XURXUICheckBoxData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
@@ -27,6 +29,7 @@ TBOOL XURXUICheckBoxData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 
 	return XURXUIControlData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006e2010
 TBOOL XURXUICheckBoxData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, PressKey, propType);
@@ -35,6 +38,7 @@ TBOOL XURXUICheckBoxData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_ui
 	return XURXUIControlData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
+// $deBlob: FUNCTION 006e2060
 TUINT32 XURXUICheckBoxData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0)
@@ -48,6 +52,7 @@ TUINT32 XURXUICheckBoxData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32
 	}
 }
 
+// $deBlob: FUNCTION 006e20c0
 TBOOL XURXUICheckBoxData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
@@ -56,6 +61,7 @@ TBOOL XURXUICheckBoxData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propT
 	return XURXUIControlData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
+// $deBlob: FUNCTION 006e2120
 TBOOL XURXUICheckBoxData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;

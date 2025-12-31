@@ -7,6 +7,7 @@
 
 TOSHI_NAMESPACE_BEGIN
 
+// $deBlob: FUNCTION 006be810
 XURXUIObjectData::~XURXUIObjectData()
 {
 	for (TUINT8 i = 0; i < m_NumChildren; i++)
@@ -21,6 +22,7 @@ XURXUIObjectData::~XURXUIObjectData()
 	if (m_TimelinesData) delete[] m_TimelinesData;
 }
 
+// $deBlob: FUNCTION 006be890
 TBOOL XURXUIObjectData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);
@@ -28,6 +30,7 @@ TBOOL XURXUIObjectData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006be930
 void XURXUIObjectData::LoadChildren(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);
@@ -57,6 +60,7 @@ void XURXUIObjectData::LoadChildren(TXUIResource& resource, TUINT8*& a_pData)
 	}
 }
 
+// $deBlob: FUNCTION 006beae0
 TBOOL XURXUIObjectData::LoadNamedFrames(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);
@@ -81,6 +85,7 @@ TBOOL XURXUIObjectData::LoadNamedFrames(TXUIResource& resource, TUINT8*& a_pData
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006becf0
 void XURXUIObjectData::LoadTimelines(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);
@@ -99,6 +104,7 @@ void XURXUIObjectData::LoadTimelines(TXUIResource& resource, TUINT8*& a_pData)
 	}
 }
 
+// $deBlob: FUNCTION 006bf190
 XURXUIElementData* XURXUIObjectData::FindChildElementData(TUINT32 a_iStringId)
 {
 	for (size_t i = 0; i < m_NumChildren; i++)
@@ -114,6 +120,7 @@ XURXUIElementData* XURXUIObjectData::FindChildElementData(TUINT32 a_iStringId)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006bf280
 TBOOL XURXUIElementData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIObjectData::Load(resource, a_pData);
@@ -212,6 +219,7 @@ TBOOL XURXUIElementData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006bf330
 TBOOL XURXUIElementData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, Id, propType);
@@ -232,12 +240,14 @@ TBOOL XURXUIElementData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiO
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006bf2e0
 TBOOL XURXUIElementData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	TASSERT(a_uiObjectIndex == 0);
 	return a_uiPropIndex < PropType_NUMOF;
 }
 
+// $deBlob: FUNCTION 006bfb20
 // TXUIElement
 
 TXUIElement::TXUIElement()
@@ -252,6 +262,7 @@ TXUIElement::TXUIElement()
 	m_eXUIState = m_eXUIState & 0x01ffffff | 0xfe000000;
 }
 
+// $deBlob: FUNCTION 00626380
 TBOOL TXUIElement::SkipRender()
 {
 	// Skip Rendering since Scale is 0.0f and/or Opacity is 0.0f which you can't see
@@ -262,11 +273,13 @@ TBOOL TXUIElement::SkipRender()
 	return T2GUIElement::SkipRender();
 }
 
+// $deBlob: FUNCTION 00626410
 TBOOL TXUIElement::IsPaused() const
 {
 	return (m_eXUIState & XUIState_STATEMASK) == XUIState_PAUSED;
 }
 
+// $deBlob: FUNCTION 006c0440
 void TXUIElement::SetHeight(TFLOAT height)
 {
 	TVector2 currentDimension;
@@ -284,6 +297,7 @@ void TXUIElement::SetHeight(TFLOAT height)
 	}
 }
 
+// $deBlob: FUNCTION 006c0330
 void TXUIElement::SetWidth(TFLOAT width)
 {
 	TVector2 currentDimension;
@@ -301,11 +315,13 @@ void TXUIElement::SetWidth(TFLOAT width)
 	}
 }
 
+// $deBlob: FUNCTION 006c1d40
 void TXUIElement::UpdateAnchoring(const TVector2& vec)
 {
 	TIMPLEMENT();
 }
 
+// $deBlob: FUNCTION 005805f0
 TBOOL TXUIElement::IsVisible()
 {
 	if (HASFLAG(m_State & FLAGS_VISIBLE) && HASFLAG(m_State & (TUINT8)T2GUIElement::s_uiGlobalVisMask))
@@ -316,6 +332,7 @@ TBOOL TXUIElement::IsVisible()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006bfd30
 TBOOL TXUIElement::Create(TXUIResource& a_rResource, XURXUIElementData* a_pElementData, TBOOL hasChildren)
 {
 	m_pObjectData = a_pElementData;
@@ -373,6 +390,7 @@ TBOOL TXUIElement::Create(TXUIResource& a_rResource, XURXUIElementData* a_pEleme
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006c00c0
 void TXUIElement::CreateChildren(TXUIResource& a_rResource, XURXUIElementData* a_pElementData)
 {
 	for (TUINT16 i = 0; i < a_pElementData->m_NumChildren; i++)

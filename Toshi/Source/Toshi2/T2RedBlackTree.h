@@ -38,6 +38,7 @@ protected:
 class T2GenericRedBlackTree
 {
 protected:
+	// $deBlob: FUNCTION 006f21b0
 	T2GenericRedBlackTree(T2Allocator* pAllocator)
 	    : m_oRoot(ms_oNil)
 	{
@@ -45,6 +46,7 @@ protected:
 		m_iNumElements = 0;
 	}
 
+	// $deBlob: FUNCTION 006f21f0
 	~T2GenericRedBlackTree() { TASSERT(m_iNumElements == 0); }
 
 	T2Allocator* GetAllocator() const { return m_pAllocator; }
@@ -62,6 +64,7 @@ protected:
 	static T2GenericRedBlackTreeNode* GetPredecessorOf(const T2GenericRedBlackTreeNode* pNode);
 
 private:
+	// $deBlob: FUNCTION 006f2ac0
 	void CheckValid()
 	{
 		TASSERT(ms_oNil.red == 0);
@@ -291,6 +294,7 @@ public:
 		return InsertImpl(pNode);
 	}
 
+	// $deBlob: FUNCTION 005d9f30
 	Iterator Find(const T& value) const
 	{
 		Node* pCurrentNode = TSTATICCAST(Node, m_oRoot.m_pLeft);

@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006b9700
 void TRenderContextDX11::ComputePerspectiveProjection()
 {
 	m_Projection.m_f11 = (m_ProjParams.m_Proj.x * 2.0f) / m_oParams.fWidth;
@@ -24,6 +25,7 @@ void TRenderContextDX11::ComputePerspectiveProjection()
 	m_Projection.m_f44 = 0.0f;
 }
 
+// $deBlob: FUNCTION 006b9820
 void TRenderContextDX11::ComputePerspectiveFrustum()
 {
 	TASSERT(m_ProjParams.m_Proj.x != 0.0f);
@@ -66,6 +68,7 @@ void TRenderContextDX11::ComputePerspectiveFrustum()
 	m_aFrustumPlanes2[WORLDPLANE_FAR]    = m_aFrustumPlanes1[WORLDPLANE_FAR];
 }
 
+// $deBlob: FUNCTION 006b9c30
 void TRenderContextDX11::ComputeOrthographicProjection()
 {
 	TASSERT(m_ProjParams.m_Proj.x != 0.0f);
@@ -96,6 +99,7 @@ void TRenderContextDX11::ComputeOrthographicProjection()
 	m_Projection.m_f44 = 1.0f;
 }
 
+// $deBlob: FUNCTION 006b9ff0
 void TRenderContextDX11::ComputeOrthographicFrustum()
 {
 	TASSERT(m_ProjParams.m_Proj.x != 0.0f);
@@ -132,6 +136,7 @@ void TRenderContextDX11::ComputeOrthographicFrustum()
 	m_aFrustumPlanes2[WORLDPLANE_FAR]    = m_aFrustumPlanes1[WORLDPLANE_FAR];
 }
 
+// $deBlob: FUNCTION 006b96a0
 void TRenderContextDX11::Update()
 {
 	if (IsDirty())

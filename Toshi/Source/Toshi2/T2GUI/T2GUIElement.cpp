@@ -6,6 +6,7 @@ TOSHI_NAMESPACE_START
 
 constinit TUINT32 T2GUIElement::s_uiGlobalVisMask = 0xFF;
 
+// $deBlob: FUNCTION 006f5fe0
 T2GUIElement::T2GUIElement()
 {
 	m_pParent      = TNULL;
@@ -19,11 +20,13 @@ T2GUIElement::T2GUIElement()
 	m_Flags        = 3;
 }
 
+// $deBlob: FUNCTION 006f6040
 T2GUIElement::~T2GUIElement()
 {
 	TASSERT(!m_Children.IsLinked());
 }
 
+// $deBlob: FUNCTION 006f6240
 void T2GUIElement::Tick(TFLOAT deltaTime)
 {
 	for (auto it = m_Children.Front(); it != m_Children.End(); it++)
@@ -35,11 +38,13 @@ void T2GUIElement::Tick(TFLOAT deltaTime)
 	}
 }
 
+// $deBlob: FUNCTION 005b1dd0
 TBOOL T2GUIElement::IsPaused() const
 {
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 005b1da0
 TBOOL T2GUIElement::SkipRender()
 {
 	if (HASFLAG(m_Flags & FLAGS_VISIBLE) && HASFLAG(m_Flags & (TUINT8)s_uiGlobalVisMask))
@@ -50,6 +55,7 @@ TBOOL T2GUIElement::SkipRender()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006f6290
 void T2GUIElement::PreRender()
 {
 	TVector2 vec1 = { 0.0f, 0.0f };
@@ -122,6 +128,7 @@ void T2GUIElement::PreRender()
 	T2GUI::GetSingleton()->GetRenderer()->PushTransform(m_Transform, vec1, vec2);
 }
 
+// $deBlob: FUNCTION 006f6540
 void T2GUIElement::Render()
 {
 	for (auto it = m_Children.Front(); it != m_Children.End(); it++)
@@ -140,39 +147,46 @@ void T2GUIElement::Render()
 	}
 }
 
+// $deBlob: FUNCTION 006f6590
 void T2GUIElement::PostRender()
 {
 	T2GUI::GetSingleton()->GetRenderer()->PopTransform();
 }
 
+// $deBlob: FUNCTION 005b1a50
 void T2GUIElement::GetDimensions(TFLOAT& width, TFLOAT& height)
 {
 	width  = UnpackFloat(m_Width);
 	height = UnpackFloat(m_Height);
 }
 
+// $deBlob: FUNCTION 005b1b70
 TFLOAT T2GUIElement::GetWidth()
 {
 	return UnpackFloat(m_Width);
 }
 
+// $deBlob: FUNCTION 005b1a90
 TFLOAT T2GUIElement::GetHeight()
 {
 	return UnpackFloat(m_Height);
 }
 
+// $deBlob: FUNCTION 005b1d40
 void T2GUIElement::SetWidth(TFLOAT width)
 {
 	TASSERT(width >= 0.0f);
 	m_Width = PackFloat(width);
 }
 
+// $deBlob: FUNCTION 005b1ca0
 void T2GUIElement::SetHeight(TFLOAT height)
 {
 	TASSERT(height >= 0.0f);
 	m_Height = PackFloat(height);
 }
 
+// $deBlob: FUNCTION 005b1c40
 void T2GUIElement::SetDimensions(TFLOAT width, TFLOAT height)
 {
 	TASSERT(width >= 0.0f);
@@ -181,6 +195,7 @@ void T2GUIElement::SetDimensions(TFLOAT width, TFLOAT height)
 	m_Height = PackFloat(height);
 }
 
+// $deBlob: FUNCTION 005b1b10
 void T2GUIElement::GetMins(TFLOAT& x, TFLOAT& y)
 {
 	TFLOAT width, height;
@@ -189,6 +204,7 @@ void T2GUIElement::GetMins(TFLOAT& x, TFLOAT& y)
 	y = height * -0.5f;
 }
 
+// $deBlob: FUNCTION 005b1ac0
 void T2GUIElement::GetMaxs(TFLOAT& x, TFLOAT& y)
 {
 	TFLOAT width, height;
@@ -197,22 +213,26 @@ void T2GUIElement::GetMaxs(TFLOAT& x, TFLOAT& y)
 	y = height * 0.5f;
 }
 
+// $deBlob: FUNCTION 005b1c30
 void T2GUIElement::SetColour(TUINT32 colour)
 {
 	m_Color = colour;
 }
 
+// $deBlob: FUNCTION 005b1c00
 void T2GUIElement::SetAlpha(TFLOAT alpha)
 {
 	TUINT8 alpha8 = (TUINT8)(alpha * 255.0f);
 	m_Color       = (m_Color & 0x00FFFFFF) | alpha8 << 24;
 }
 
+// $deBlob: FUNCTION 005b1a20
 TFLOAT T2GUIElement::GetAlpha()
 {
 	return ((m_Color & 0x00FFFFFF) >> 24) * 255.0f;
 }
 
+// $deBlob: FUNCTION 005b1d20
 void T2GUIElement::SetVisible(TBOOL visible)
 {
 	if (visible)
@@ -225,6 +245,7 @@ void T2GUIElement::SetVisible(TBOOL visible)
 	}
 }
 
+// $deBlob: FUNCTION 005b1c80
 void T2GUIElement::SetFocus(TBOOL focused)
 {
 	if (focused)
@@ -237,11 +258,13 @@ void T2GUIElement::SetFocus(TBOOL focused)
 	}
 }
 
+// $deBlob: FUNCTION 006f6600
 void T2GUIElement::GetScreenTransform(T2GUITransform& outTransform)
 {
 	TIMPLEMENT();
 }
 
+// $deBlob: FUNCTION 006f6bc0
 TBOOL T2GUIElement::IsPointInside(const TVector2& point)
 {
 	TFLOAT minX, minY;
@@ -258,11 +281,13 @@ TBOOL T2GUIElement::IsPointInside(const TVector2& point)
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 005b1b60
 const TVector2& T2GUIElement::GetPivot()
 {
 	return TVector2::VEC_ZERO;
 }
 
+// $deBlob: FUNCTION 006f6b60
 void T2GUIElement::GetInvScreenTransform(T2GUITransform& outTransform)
 {
 	T2GUITransform screenTransform;

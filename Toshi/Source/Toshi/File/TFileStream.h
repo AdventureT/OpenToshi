@@ -11,6 +11,7 @@ public:
 	friend class TFileStream;
 
 public:
+	// $deBlob: FUNCTION 006867d0
 	TFileStreamJob(TSemaphore* semaphore)
 	    : m_pSemaphore(semaphore), m_bIsProcessed(TFALSE) {}
 
@@ -26,6 +27,7 @@ protected:
 class TFileStream : public TThread
 {
 public:
+	// $deBlob: FUNCTION 00686730
 	TFileStream()
 	{
 		/**
@@ -56,6 +58,7 @@ private:
 class TTRBStreamJob : public TFileStreamJob
 {
 public:
+	// $deBlob: FUNCTION 006866d0
 	TTRBStreamJob()
 	    : TFileStreamJob(TNULL)
 	{
@@ -65,8 +68,10 @@ public:
 
 	virtual ~TTRBStreamJob() = default;
 
+	// $deBlob: FUNCTION 00686710
 	virtual void Process() { m_trb->Load(m_fileName); }
 
+	// $deBlob: FUNCTION 006866f0
 	void Init(TTRB* trb, const TCHAR* fileName)
 	{
 		m_trb = trb;

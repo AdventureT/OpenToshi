@@ -40,6 +40,7 @@ public:
 
 	static void MemClear(void* ptr, size_t size) { memset(ptr, 0, size); }
 
+	// $deBlob: FUNCTION 0065d4f0
 	static TINT MemCompare(void* ptr1, void* ptr2, TINT size) { return memcmp(ptr1, ptr2, size); }
 
 	static void LogInitialise();
@@ -48,8 +49,10 @@ public:
 	static void LogConsole(const TCHAR* format, ...);
 	static void LogSet(TLogFile* a_logFile);
 
+	// $deBlob: FUNCTION 0065d5c0
 	static TLogFile* GetLog() { return Toshi::TUtil::GetSingleton()->m_pLogFile2; }
 
+	// $deBlob: FUNCTION 0065d770
 	static void LogDown() { GetLog()->Down(); }
 
 	static void LogUp() { GetLog()->Up(); }

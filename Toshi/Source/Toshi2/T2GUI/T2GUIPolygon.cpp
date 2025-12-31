@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006f9840
 void T2GUIPolygon::Render()
 {
 	auto renderer = T2GUI::GetSingleton()->GetRenderer();
@@ -12,6 +13,7 @@ void T2GUIPolygon::Render()
 	T2GUIElement::Render();
 }
 
+// $deBlob: FUNCTION 006f9730
 void T2GUIPolygon::GetDimensions(TFLOAT& width, TFLOAT& height)
 {
 	if (!m_bCalculatedDimensions)
@@ -38,11 +40,13 @@ void T2GUIPolygon::GetDimensions(TFLOAT& width, TFLOAT& height)
 	height = UnpackFloat(m_Height);
 }
 
+// $deBlob: FUNCTION 006f9810
 void T2GUIPolygon::SetDimensions(TFLOAT width, TFLOAT height)
 {
 	TASSERT(TFALSE, "T2GUIPolygon::SetDimensions(): Can\'t set T2GUIPolygon dimensions directly!");
 }
 
+// $deBlob: FUNCTION 006f96a0
 void T2GUIPolygon::Create(TINT numpoints)
 {
 	TASSERT(numpoints > 2);

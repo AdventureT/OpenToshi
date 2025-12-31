@@ -105,8 +105,10 @@ public:
 
 	template <typename T> T* CastSymbol(const TCHAR* symbName) { return TSTATICCAST(T, GetSymbolAddress(symbName)); }
 
+	// $deBlob: FUNCTION 00686ee0
 	static size_t GetSymbolTableSize(size_t count) { return sizeof(TTRBSymbol) * count + sizeof(SYMB); }
 
+	// $deBlob: FUNCTION 00686ef0
 	static size_t GetHeaderSize(size_t count) { return sizeof(SecInfo) * count + sizeof(Header); }
 
 	SecInfo* GetSectionInfoList() const { return reinterpret_cast<SecInfo*>(m_pHeader + 1); }
@@ -158,6 +160,7 @@ public:
 		return reinterpret_cast<const TCHAR*>(reinterpret_cast<uintptr_t>(m_SYMB) + GetSymbolTableSize(m_SYMB->m_i32SymbCount) + symbol->NameOffset);
 	}
 
+	// $deBlob: FUNCTION 00686b50
 	SYMB* GetSymbolTable() const { return m_SYMB; }
 
 	static TINT16 HashString(const TCHAR* str)

@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0067a2e0
 TINT TInputDevice::ProcessRepeats(EventEmitter& a_rEmitter, TFLOAT a_fDeltaTime)
 {
 	TINT iNumProcessed = 0;
@@ -42,6 +43,7 @@ TINT TInputDevice::ProcessRepeats(EventEmitter& a_rEmitter, TFLOAT a_fDeltaTime)
 	return iNumProcessed;
 }
 
+// $deBlob: FUNCTION 00679cc0
 TBOOL TInputDevice::StartRepeat(Doodad a_iDoodad, TFLOAT a_fFirstRepeatTime, TFLOAT a_fRepeatTime)
 {
 	TArray<RepeatInfo> it;
@@ -63,6 +65,7 @@ TBOOL TInputDevice::StartRepeat(Doodad a_iDoodad, TFLOAT a_fFirstRepeatTime, TFL
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00679e20
 void TInputDevice::StopRepeat(Doodad a_iDoodad)
 {
 	if (m_Repeats.GetNumElements() != 0)
@@ -93,11 +96,13 @@ void TInputDevice::StopRepeat(Doodad a_iDoodad)
 	}
 }
 
+// $deBlob: FUNCTION 00679ec0
 void TInputDevice::StopAllRepeats()
 {
 	m_Repeats.Clear();
 }
 
+// $deBlob: FUNCTION 0067a2a0
 void TInputDevice::ThrowRepeatEvent(EventEmitter& emitter, RepeatInfo* repeatInfo, TFLOAT deltaTime)
 {
 	emitter.Throw(TInputInterface::InputEvent(this, repeatInfo->iDoodad, TInputInterface::EVENT_TYPE_REPEAT));

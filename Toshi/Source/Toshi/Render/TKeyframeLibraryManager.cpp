@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0068e8d0
 TKeyframeLibrary* TKeyframeLibraryManager::GetLibrary(const TCHAR* a_szName)
 {
 	for (auto it = m_List.Begin(); it != m_List.End(); it++)
@@ -16,6 +17,7 @@ TKeyframeLibrary* TKeyframeLibraryManager::GetLibrary(const TCHAR* a_szName)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 0068e7c0
 TKeyframeLibrary* TKeyframeLibraryManager::LoadLibrary(TKeyframeLibrary::TRBHeader* a_pTRBHeader)
 {
 	TVALIDPTR(a_pTRBHeader);
@@ -28,6 +30,7 @@ TKeyframeLibrary* TKeyframeLibraryManager::LoadLibrary(TKeyframeLibrary::TRBHead
 	return pLibrary;
 }
 
+// $deBlob: FUNCTION 0068e830
 TKeyframeLibrary* TKeyframeLibraryManager::LoadLibraryFromTRB(TTRB* a_pTRB, const TCHAR* a_szSymbolName)
 {
 	TVALIDPTR(a_pTRB);
@@ -42,6 +45,7 @@ TKeyframeLibrary* TKeyframeLibraryManager::LoadLibraryFromTRB(TTRB* a_pTRB, cons
 	return pLibrary;
 }
 
+// $deBlob: FUNCTION 0068e8a0
 void TKeyframeLibraryManager::UnloadLibrary(TKeyframeLibrary* a_pLibrary)
 {
 	TVALIDPTR(a_pLibrary);

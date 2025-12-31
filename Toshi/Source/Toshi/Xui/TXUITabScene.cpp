@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006e79c0
 TBOOL XURXUITabSceneData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUISceneData::Load(resource, a_pData);
@@ -24,6 +25,7 @@ TBOOL XURXUITabSceneData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006e7a20
 TBOOL XURXUITabSceneData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
@@ -32,6 +34,7 @@ TBOOL XURXUITabSceneData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 
 	return XURXUISceneData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006e7a90
 TBOOL XURXUITabSceneData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, TabCount, propType);
@@ -45,6 +48,7 @@ TBOOL XURXUITabSceneData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_ui
 	return XURXUISceneData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
+// $deBlob: FUNCTION 006e7b80
 TUINT32 XURXUITabSceneData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0)
@@ -61,6 +65,7 @@ TUINT32 XURXUITabSceneData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32
 	}
 }
 
+// $deBlob: FUNCTION 006e7c00
 TBOOL XURXUITabSceneData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
@@ -69,6 +74,7 @@ TBOOL XURXUITabSceneData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propT
 	return XURXUISceneData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
+// $deBlob: FUNCTION 006e7c60
 TBOOL XURXUITabSceneData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;

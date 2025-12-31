@@ -26,6 +26,7 @@ public:
 	t_ItemCompareFunc m_ItemCompareFunc;     // 0x28
 
 public:
+	// $deBlob: FUNCTION 006ef810
 	THashTable()
 	{
 		m_iBucketSize         = 0;
@@ -70,6 +71,7 @@ public:
 	void* Append(void* a_pData);
 
 	TBOOL Create(TINT a_iItemCountTotal, TINT a_iItemSize, TINT unk, TINT a_iHashNodeCount);
+	// $deBlob: FUNCTION 006efd10
 	void  SetItemCompareFunction(t_ItemCompareFunc a_HashCompareFunc) { m_ItemCompareFunc = a_HashCompareFunc; }
 	void  SetItemHashFunction(t_ItemHashFunc a_HashCompareFunc) { m_ItemHashFunc = a_HashCompareFunc; }
 };

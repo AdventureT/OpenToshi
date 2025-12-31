@@ -8,6 +8,7 @@ AMemory::PoolDefinitionInfo AMemory::ms_aPoolDefinitionInfo[POOL_NumOf] = {
 
 Toshi::TMemoryHeap* AMemory::ms_apMemoryBlocks[POOL_NumOf];
 
+// $deBlob: FUNCTION 005e56e0
 void AMemory::CreatePools()
 {
 	for (size_t i = 0; i < POOL_NumOf; i++)
@@ -16,6 +17,7 @@ void AMemory::CreatePools()
 	}
 }
 
+// $deBlob: FUNCTION 005e5980
 void AMemory::CreatePool(Pool type)
 {
 	TASSERT(type < POOL_NumOf);

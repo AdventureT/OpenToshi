@@ -221,6 +221,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 00660e80
 	void DeleteAll()
 	{
 		TNode* node = GetRoot()->Attached();

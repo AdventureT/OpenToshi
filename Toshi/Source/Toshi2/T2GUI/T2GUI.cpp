@@ -5,6 +5,7 @@ TOSHI_NAMESPACE_START
 
 TMemoryHeap* T2GUI::s_pMemHeap = TNULL;
 
+// $deBlob: FUNCTION 006f4ef0
 T2GUI::T2GUI()
 {
 	m_pRenderer = TNULL;
@@ -16,6 +17,7 @@ T2GUI::T2GUI()
 	m_pContext2            = pContext;
 }
 
+// $deBlob: FUNCTION 006f4f90
 T2GUI::~T2GUI()
 {
 	if (m_pContext2)
@@ -24,6 +26,7 @@ T2GUI::~T2GUI()
 	}
 }
 
+// $deBlob: FUNCTION 006f50a0
 void T2GUI::Render()
 {
 	if (m_pContext1 && m_pRenderer)
@@ -34,6 +37,7 @@ void T2GUI::Render()
 	}
 }
 
+// $deBlob: FUNCTION 006f50e0
 T2GUIMaterial* T2GUI::CreateMaterial(const TCHAR* a_materialName)
 {
 	TTexture* texture = GetTexture(a_materialName);
@@ -55,6 +59,7 @@ T2GUIMaterial* T2GUI::CreateMaterial(const TCHAR* a_materialName)
 	return mat;
 }
 
+// $deBlob: FUNCTION 006f51b0
 void T2GUI::DestroyMaterial(TMaterial* material)
 {
 	if (material != TNULL)
@@ -64,6 +69,7 @@ void T2GUI::DestroyMaterial(TMaterial* material)
 	}
 }
 
+// $deBlob: FUNCTION 006f5220
 TTexture* T2GUI::GetTexture(const TCHAR* a_textureName)
 {
 	TCHAR textureName[0x80];

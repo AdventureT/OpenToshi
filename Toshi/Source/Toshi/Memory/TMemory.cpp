@@ -83,6 +83,7 @@ void* TMemory::dlheapmalloc(TMemoryHeap* heap, size_t size)
 	return chunk;
 }
 
+// $deBlob: FUNCTION 006fc580
 void* TMemory::dlheapcalloc(TMemoryHeap* heap, size_t nitems, size_t size)
 {
 	// 006fc580
@@ -100,6 +101,7 @@ void* TMemory::dlheapcalloc(TMemoryHeap* heap, size_t nitems, size_t size)
 	return chunk;
 }
 
+// $deBlob: FUNCTION 006fc6f0
 void* TMemory::dlheapmemalign(TMemoryHeap* heap, size_t alignment, size_t size)
 {
 	// 006fc6f0
@@ -117,6 +119,7 @@ void* TMemory::dlheapmemalign(TMemoryHeap* heap, size_t alignment, size_t size)
 	return chunk;
 }
 
+// $deBlob: FUNCTION 006fc5f0
 void* TMemory::dlheaprealloc(TMemoryHeap* heap, void* mem, size_t newsize)
 {
 	// 006fc5f0
@@ -131,6 +134,7 @@ void* TMemory::dlheaprealloc(TMemoryHeap* heap, void* mem, size_t newsize)
 	return chunk;
 }
 
+// $deBlob: FUNCTION 006fc750
 void TMemory::dlheapfree(TMemoryHeap* heap, void* mem)
 {
 	TASSERT((heap->m_Flags & TMemoryHeapFlags_AllocAsPile) == 0, "Cannot free pile memory");
@@ -158,6 +162,7 @@ void TMemory::dlheapdestroy(TMemoryHeap* heap)
 	}
 }
 
+// $deBlob: FUNCTION 006fc320
 TMemoryHeap* TMemory::dlheapcreatesubheap(TMemoryHeap* heap, size_t size, TMemoryHeapFlags flags, const TCHAR name[HEAP_MAXNAME])
 {
 	// 006fc320
@@ -205,6 +210,7 @@ TMemoryHeap* TMemory::dlheapcreatesubheap(TMemoryHeap* heap, size_t size, TMemor
 	return subHeap;
 }
 
+// $deBlob: FUNCTION 006fc400
 TMemoryHeap* TMemory::dlheapcreateinplace(void* ptr, size_t heapSize, TMemoryHeapFlags flags, const TCHAR name[HEAP_MAXNAME])
 {
 	TASSERT(heapSize > 0, "Allocation size is zero");
@@ -238,6 +244,7 @@ TMemoryHeap* TMemory::dlheapcreateinplace(void* ptr, size_t heapSize, TMemoryHea
 	}
 }
 
+// $deBlob: FUNCTION 006fc8b0
 void* TMemoryHeap::AllocAsPile(TMemoryHeap* heap, size_t size, size_t alignment)
 {
 	TASSERT(heap->m_Flags & TMemoryHeapFlags_AllocAsPile, "Can't allocate as pile on a non-pile heap");

@@ -5,6 +5,7 @@ Toshi::THashTable::t_ItemCompareFunc ALevelInformation::LevelNameHashCompareFunc
 	return Toshi::TStringManager::String8Compare((TCHAR*)unk, (TCHAR*)unk2, -1) == 0;
 };
 
+// $deBlob: FUNCTION 0056dba0
 void ALevelInformation::Create(const TCHAR* a_trbName)
 {
 	m_pData = TNULL;
@@ -16,6 +17,7 @@ void ALevelInformation::Create(const TCHAR* a_trbName)
 	MakeStringToIDHashTable();
 }
 
+// $deBlob: FUNCTION 0056dd70
 void ALevelInformation::MakeStringToIDHashTable()
 {
 	TINT levelCount = GetLevelHeader()->m_levelCount;

@@ -11,6 +11,7 @@ const TVector4 TVector4::VEC_NEGX = { -1, 0, 0, 1 };
 const TVector4 TVector4::VEC_NEGY = { 0, -1, 0, 1 };
 const TVector4 TVector4::VEC_NEGZ = { 0, 0, -1, 1 };
 
+// $deBlob: FUNCTION 00673000
 void TVector4::Normalise()
 {
 	if (MagnitudeSq() != 0.0f)
@@ -24,6 +25,7 @@ void TVector4::Normalise()
 	}
 }
 
+// $deBlob: FUNCTION 00673960
 void TVector4::ProjectNormalToPlane(const TVector4& vec, const TVector4& vec2)
 {
 	TVector4 crossProduct;

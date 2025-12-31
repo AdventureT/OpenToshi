@@ -23,6 +23,7 @@ Toshi::THashTable::t_ItemHashFunc Toshi::THashTable::DefaultItemHashFunc = [](vo
 	return hash - (hash / unk3) * unk3;
 };
 
+// $deBlob: FUNCTION 006efa60
 void* Toshi::THashTable::Insert(void* a_pData)
 {
 	TASSERT(0 != m_iItemSize);
@@ -35,6 +36,7 @@ void* Toshi::THashTable::Insert(void* a_pData)
 	return foundBucket ? foundBucket : Append(a_pData);
 }
 
+// $deBlob: FUNCTION 006ef9c0
 void* Toshi::THashTable::Find(void* a_pData)
 {
 	TASSERT(0 != m_iItemSize);
@@ -57,6 +59,7 @@ void* Toshi::THashTable::Find(void* a_pData)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006efad0
 void* Toshi::THashTable::Append(void* a_pData)
 {
 	TASSERT(0 != m_iItemSize);
@@ -84,6 +87,7 @@ void* Toshi::THashTable::Append(void* a_pData)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006ef8a0
 TBOOL Toshi::THashTable::Create(TINT a_iItemCountTotal, TINT a_iItemSize, TINT a_iBucketSize, TINT a_iHashNodeCount)
 {
 	if (m_pBuckets == TNULL)

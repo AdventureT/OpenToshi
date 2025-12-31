@@ -33,6 +33,7 @@ TBOOL XURXUILabelData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_u
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006d3ac0
 TBOOL XURXUILabelData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIControlData::Load(resource, a_pData);

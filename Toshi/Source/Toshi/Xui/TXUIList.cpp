@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006d1420
 TBOOL XURXUIListData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIControlData::Load(resource, a_pData);
@@ -19,6 +20,7 @@ TBOOL XURXUIListData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006d14c0
 TBOOL XURXUIListData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
@@ -27,6 +29,7 @@ TBOOL XURXUIListData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_ui
 	return XURXUIControlData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006d1520
 TBOOL XURXUIListData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, Wrap, propType);
@@ -35,6 +38,7 @@ TBOOL XURXUIListData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObje
 	return XURXUIControlData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
+// $deBlob: FUNCTION 006d1570
 TUINT32 XURXUIListData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0)
@@ -48,6 +52,7 @@ TUINT32 XURXUIListData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 pro
 	}
 }
 
+// $deBlob: FUNCTION 006d15e0
 TBOOL XURXUIListData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
@@ -56,6 +61,7 @@ TBOOL XURXUIListData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 	return XURXUIControlData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
+// $deBlob: FUNCTION 006d1640
 TBOOL XURXUIListData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;

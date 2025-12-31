@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0070a3b0
 TBOOL TSysMeshHAL::Render()
 {
 	if (!s_bStopRendering)
@@ -20,6 +21,7 @@ TBOOL TSysMeshHAL::Render()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0070a5b0
 TBOOL TSysMeshHAL::Create(FLAGS uiFlags, TUINT16 uiMaxVertices, TUINT16 uiMaxIndices)
 {
 	m_uiFlags       = uiFlags;
@@ -34,6 +36,7 @@ TBOOL TSysMeshHAL::Create(FLAGS uiFlags, TUINT16 uiMaxVertices, TUINT16 uiMaxInd
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0070a400
 TBOOL TSysMeshHAL::Lock(TLockBuffer* pBufferLock)
 {
 	TASSERT((m_uiFlags & FLAGS_LOCKED) == 0);
@@ -52,6 +55,7 @@ TBOOL TSysMeshHAL::Lock(TLockBuffer* pBufferLock)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0070a4b0
 void TSysMeshHAL::Unlock(TUINT16 uiNumVertices, TUINT16 uiNumIndices)
 {
 	TASSERT(m_uiFlags & FLAGS_LOCKED);
@@ -67,6 +71,7 @@ void TSysMeshHAL::Unlock(TUINT16 uiNumVertices, TUINT16 uiNumIndices)
 	m_IndexCount  = uiNumIndices;
 }
 
+// $deBlob: FUNCTION 0070a880
 void TSysMeshHAL::SetZBias(TINT zBias)
 {
 	TASSERT(zBias >= 0);

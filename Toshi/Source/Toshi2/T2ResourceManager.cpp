@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006fab00
 void T2Resource::CreateResource(const TCHAR* resourceName, void* pData, T2ResourceManager::t_CreateDestroyCallbk a_fnCreateDestroyCallbk, void* pCallbkData)
 {
 	if (m_iID == T2ResourcePtr::IDINVALID)
@@ -16,6 +17,7 @@ void T2Resource::CreateResource(const TCHAR* resourceName, void* pData, T2Resour
 	TASSERT(TFALSE, "resource already created!");
 }
 
+// $deBlob: FUNCTION 006f9af0
 void T2ResourceData::DeInit()
 {
 	TASSERT(HasFlag(FLAG_INITIALISED));
@@ -39,6 +41,7 @@ void T2ResourceData::DeInit()
 	}
 }
 
+// $deBlob: FUNCTION 006f9cc0
 void T2ResourceData::SetLoadedData(void* a_pData)
 {
 	Unload();
@@ -47,6 +50,7 @@ void T2ResourceData::SetLoadedData(void* a_pData)
 	m_iFlags &= ~FLAG_LOADING;
 }
 
+// $deBlob: FUNCTION 006f9c00
 void T2ResourceData::Load(const TCHAR* filepath)
 {
 	if (HASFLAG(m_iFlags & (FLAG_LOADED | FLAG_LOADING))) return;
@@ -72,6 +76,7 @@ void T2ResourceData::Load(const TCHAR* filepath)
 	m_pTRB2 = TNULL;
 }
 
+// $deBlob: FUNCTION 006f9ce0
 void T2ResourceData::Unload()
 {
 	if (HASFLAG(m_iFlags & FLAG_LOADED))
@@ -93,6 +98,7 @@ void T2ResourceData::Unload()
 	}
 }
 
+// $deBlob: FUNCTION 006f9b90
 void* T2ResourceData::GetData()
 {
 	if (!HasFlag(FLAG_LOADED))
@@ -116,6 +122,7 @@ void* T2ResourceData::GetData()
 	return m_pData;
 }
 
+// $deBlob: FUNCTION 006fa950
 void T2ResourceManager::IncRefCount(TINT a_iID)
 {
 	if (a_iID != T2ResourcePtr::IDINVALID)
@@ -128,6 +135,7 @@ void T2ResourceManager::IncRefCount(TINT a_iID)
 	}
 }
 
+// $deBlob: FUNCTION 006faa20
 void T2ResourceManager::DecRefCount(TINT a_iID)
 {
 	if (a_iID != T2ResourcePtr::IDINVALID)
@@ -149,6 +157,7 @@ void T2ResourceManager::DecRefCount(TINT a_iID)
 	}
 }
 
+// $deBlob: FUNCTION 006f9910
 void T2ResourceData::Init(const TCHAR* a_pName, T2ResourceManager::t_CreateDestroyCallbk a_fnCreateDestroyCallbk, void* a_pCallbkData)
 {
 	TASSERT(m_fnCreateDestroyCallbk == TNULL);
@@ -167,6 +176,7 @@ void T2ResourceData::Init(const TCHAR* a_pName, T2ResourceManager::t_CreateDestr
 	m_iFlags |= FLAG_INITIALISED;
 }
 
+// $deBlob: FUNCTION 006f9e40
 T2ResourceManager::T2ResourceManager(TINT a_iMaxNumResources)
 {
 	m_iMaxNumResources  = a_iMaxNumResources;
@@ -180,11 +190,13 @@ T2ResourceManager::T2ResourceManager(TINT a_iMaxNumResources)
 	m_pData[0].m_iFlags |= T2ResourceData::FLAG_INITIALISED;
 }
 
+// $deBlob: FUNCTION 006f9ed0
 T2ResourceManager::~T2ResourceManager()
 {
 	delete[] m_pData;
 }
 
+// $deBlob: FUNCTION 006fa2e0
 T2ResourceData* T2ResourceManager::GetResourceData(TINT a_iID)
 {
 	TASSERT(a_iID != T2ResourcePtr::IDINVALID, "Invalid ID");
@@ -196,6 +208,7 @@ T2ResourceData* T2ResourceManager::GetResourceData(TINT a_iID)
 	return &m_pData[a_iID];
 }
 
+// $deBlob: FUNCTION 006fa840
 void* T2ResourceManager::GetData(TINT a_iID)
 {
 	TASSERT(a_iID >= 0, "ID must be greater than 0");
@@ -206,6 +219,7 @@ void* T2ResourceManager::GetData(TINT a_iID)
 	return a_iID == T2ResourcePtr::IDINVALID ? TNULL : m_pData[a_iID].GetData();
 }
 
+// $deBlob: FUNCTION 006fa5c0
 TINT T2ResourceManager::CreateResource(const TCHAR* resourceName, void* pData, t_CreateDestroyCallbk a_fnCreateDestroyCallbk, void* pCallbkData)
 {
 	TINT iID = FindUnusedResource();
@@ -236,6 +250,7 @@ TINT T2ResourceManager::CreateResource(const TCHAR* resourceName, void* pData, t
 	return iID;
 }
 
+// $deBlob: FUNCTION 006fa6e0
 void T2ResourceManager::DestroyResource(TINT a_iID)
 {
 	if (a_iID != T2ResourcePtr::IDINVALID)
@@ -252,6 +267,7 @@ void T2ResourceManager::DestroyResource(TINT a_iID)
 	}
 }
 
+// $deBlob: FUNCTION 006fa0f0
 TBOOL T2ResourceManager::ReloadResource(const TCHAR* pName, const TCHAR* pFilepath)
 {
 	TINT iID;
@@ -270,6 +286,7 @@ TBOOL T2ResourceManager::ReloadResource(const TCHAR* pName, const TCHAR* pFilepa
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006f9fc0
 T2ResourcePtr T2ResourceManager::FindResource(TINT& iOutResource, const TCHAR* pName)
 {
 	TASSERT(T2String8::IsLowerCase(pName));
@@ -294,6 +311,7 @@ T2ResourcePtr T2ResourceManager::FindResource(TINT& iOutResource, const TCHAR* p
 	return T2ResourcePtr(iID);
 }
 
+// $deBlob: FUNCTION 006fa770
 TINT T2ResourceManager::FindUnusedResource()
 {
 	TASSERT(m_iNumUsedResources < m_iMaxNumResources);

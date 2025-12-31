@@ -3,9 +3,11 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006f2e90
 TTask::TTask()
 {}
 
+// $deBlob: FUNCTION 006f2ed0
 TTask::~TTask()
 {
 	TASSERT(IsLinked() == TFALSE);
@@ -15,6 +17,7 @@ TTask::~TTask()
 		}*/
 }
 
+// $deBlob: FUNCTION 006f2f30
 TBOOL TTask::Create()
 {
 	TASSERT(IsCreated() == TFALSE);
@@ -38,6 +41,7 @@ TBOOL TTask::Create()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006f2fc0
 TBOOL TTask::CreateFailed()
 {
 	TASSERT(IsCreated() == TFALSE);
@@ -51,6 +55,7 @@ TBOOL TTask::CreateFailed()
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006f30b0
 TBOOL TTask::Reset()
 {
 	TTask* firstAttached = Attached();
@@ -66,33 +71,41 @@ TBOOL TTask::Reset()
 	return result;
 }
 
+// $deBlob: FUNCTION 006f30e0
 TBOOL TTask::OnCreate()
 {
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006f30f0
 TBOOL TTask::OnUpdate(TFLOAT deltaTime)
 {
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006f3100
 void TTask::OnPreDestroy()
 {}
 
+// $deBlob: FUNCTION 006f3110
 void TTask::OnDestroy()
 {}
 
+// $deBlob: FUNCTION 006f3120
 TBOOL TTask::OnChildDying(TTask* child)
 {
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006f3130
 void TTask::OnChildDied(TClass* pClass, TTask* deletedTask)
 {}
 
+// $deBlob: FUNCTION 006f3140
 void TTask::OnActivate()
 {}
 
+// $deBlob: FUNCTION 006f3150
 void TTask::OnDeactivate()
 {}
 

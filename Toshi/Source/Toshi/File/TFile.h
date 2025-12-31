@@ -17,18 +17,23 @@ class TFileSystem : public TDList<TFileSystem>::TNode
 public:
 	TFileSystem(const TCHAR* name);
 	TFileSystem(const TFileSystem& other);
+	// $deBlob: FUNCTION 00685d60
 	virtual ~TFileSystem() { UnmountFileSystem(); }
 
 	// Override these funcs in TNativeFileSystem
 	virtual TFile*   CreateFile(TString8 const& fn, TUINT32 flags) = 0;
 	virtual void     DestroyFile(TFile*)                           = 0;
+	// $deBlob: FUNCTION 00685d80
 	virtual TBOOL    RemoveFile(TString8 const&) { return TTRUE; }
 	virtual TString8 MakeInternalPath(TString8 const&) = 0;
+	// $deBlob: FUNCTION 00685d90
 	virtual TBOOL    GetFirstFile(TString8 const&, TString8&, TUINT) { return TFALSE; }
+	// $deBlob: FUNCTION 00685da0
 	virtual TBOOL    GetNextFile(TString8&, TUINT32) { return TFALSE; }
 	virtual void     SetPrefix(const TString8& prefix);
 	virtual TBOOL    MakeDirectory(TString8 const&) = 0;
 
+	// $deBlob: FUNCTION 00685920
 	inline void UnmountFileSystem() { TNode::Remove(); }
 
 	inline TString8 const& GetName() const { return m_Name; }
@@ -54,6 +59,7 @@ public:
 
 	virtual TFile*   CreateFile(TString8 const& fn, TUINT32 flags) override;
 	virtual void     DestroyFile(TFile*) override;
+	// $deBlob: FUNCTION 006893c0
 	virtual TString8 MakeInternalPath(TString8 const&) { return {}; }
 	virtual TBOOL    MakeDirectory(TString8 const&) override;
 	virtual TBOOL    GetNextFile(TString8& fileName, TUINT32 flags);
@@ -87,6 +93,7 @@ public:
 	virtual TBOOL     Seek(TINT offset, TFile::TSEEK origin) = 0; //0x8
 	virtual TUINT32   Tell()                                 = 0; //0xC
 	virtual DWORD     GetSize()                              = 0; //0x10
+	// $deBlob: FUNCTION 006864e0
 	virtual _FILETIME GetDate() { return {}; }                    //0x14
 	virtual TINT      GetCChar()                                   = 0;
 	virtual TWCHAR    GetWChar()                                   = 0;
@@ -96,6 +103,7 @@ public:
 	virtual TINT      WPrintf(const TWCHAR* format, ...)           = 0;
 	virtual TINT      VCPrintf(const TCHAR* format, va_list vargs) = 0;
 	virtual TINT      VWPrintf(const TWCHAR* format, ...)          = 0;
+	// $deBlob: FUNCTION 00686390
 	virtual ~TFile() {}
 
 	static TString8     ConcatPath(const TString8& a_rcString, const TString8& a_rcString2);
@@ -107,6 +115,7 @@ public:
 		return *this;
 	}
 
+	// $deBlob: FUNCTION 00685f20
 	// FUN_00685f60
 	inline void Destroy() { m_pFileSystem->DestroyFile(this); }
 
@@ -164,8 +173,10 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 006859a0
 	TFileManager()
 	    : m_WorkingDirectory("/"), m_ValidatedCount(0), m_Mutex() { InvalidateSystemPath(); }
+	// $deBlob: FUNCTION 00685a40
 	~TFileManager() { Destroy(); }
 
 	void Destroy();
@@ -176,10 +187,12 @@ public:
 	TFileSystem*        FindFileSystem(const TString8& name);
 	static TFileSystem* FindFileSystem(TDList<TFileSystem>& list, const TString8& name);
 
+	// $deBlob: FUNCTION 00685820
 	inline TString8 MakeAbsolutePath(const TString8& a_cString) const { return TFile::ConcatPath(a_cString, m_WorkingDirectory); }
 	inline void     FileSystemRelease() { m_Mutex.Unlock(); }
 	inline void     FileSystemWait() { m_Mutex.Lock(); }
 
+	// $deBlob: FUNCTION 006857a0
 	inline void SetSystemPath(const TString8& name)
 	{
 		m_SysPath = name;
@@ -229,6 +242,7 @@ class TNullFileSystem
     , public TSingleton<TNullFileSystem>
 {
 public:
+	// $deBlob: FUNCTION 0068a1e0
 	TNullFileSystem(const TCHAR* name)
 	    : TFileSystem(name) { TFileManager::GetSingletonSafe()->MountFileSystem(this); }
 

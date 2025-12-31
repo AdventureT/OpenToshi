@@ -6,6 +6,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00693620
 void TTexture::Init()
 {
 	TASSERT(0 < m_DataSize, "DataSize is not empty");
@@ -94,6 +95,7 @@ void TTexture::Deinit()
 #endif
 }
 
+// $deBlob: FUNCTION 00693970
 void TTexture::Bind(GLenum a_eTarget)
 {
 	glBindTexture(a_eTarget, m_TexInfo->Handle);
@@ -140,6 +142,7 @@ TTexture* TTexture::InitRunTime(TEXTURE_FORMAT format, UINT width, UINT height, 
 	return pTexture;
 }
 
+// $deBlob: FUNCTION 00693a00
 void TTexture::SelectSamplerId()
 {
 	if (m_eAddressU == TEXTURE_ADDRESS_CLAMP && m_eAddressV == TEXTURE_ADDRESS_CLAMP)
@@ -189,6 +192,7 @@ void TTexture::SelectSamplerId()
 	}
 }
 
+// $deBlob: FUNCTION 006939b0
 void TTexture::SetWrap(TEXTURE_ADDRESS_MODE eAddressU, TEXTURE_ADDRESS_MODE eAddressV)
 {
 	m_eAddressU = eAddressU;
@@ -196,6 +200,7 @@ void TTexture::SetWrap(TEXTURE_ADDRESS_MODE eAddressU, TEXTURE_ADDRESS_MODE eAdd
 	SelectSamplerId();
 }
 
+// $deBlob: FUNCTION 00693b90
 TTextureManager::TTextureManager()
     : m_pLastTexture(TNULL)
 {
@@ -236,6 +241,7 @@ TTextureManager::TTextureManager()
 	TFree(srcData);
 }
 
+// $deBlob: FUNCTION 006940b0
 TTexture* TTextureManager::FindTexture(const TCHAR* texName)
 {
 	TASSERT(T2String8::IsLowerCase(texName));

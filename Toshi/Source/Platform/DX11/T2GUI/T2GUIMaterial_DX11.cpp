@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006f4d30
 T2GUIMaterial::T2GUIMaterial()
 {
 	m_pTexture   = TNULL;

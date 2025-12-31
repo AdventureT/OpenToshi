@@ -8,6 +8,7 @@
 
 #include <Toshi2/T2GUI/T2GUI.h>
 
+// $deBlob: FUNCTION 005c3e30
 AGameState::AGameState()
     : m_InputHelperSimple(1, Toshi::TInputInterface::GetSingleton()->GetDeviceByIndex<Toshi::TInputDeviceKeyboard>())
 {
@@ -15,6 +16,7 @@ AGameState::AGameState()
 	m_State = State_Null;
 }
 
+// $deBlob: FUNCTION 005c3ed0
 AGameState::~AGameState()
 {
 	TIMPLEMENT();
@@ -33,6 +35,7 @@ void AGameState::Unk3(void*, void*)
 {
 }
 
+// $deBlob: FUNCTION 005c4140
 AGameState::UpdateResult AGameState::OnUpdate(float deltaTime)
 {
 	m_InputHelperSimple.Update();
@@ -50,6 +53,7 @@ AGameState::UpdateResult AGameState::OnUpdate(float deltaTime)
 	return UpdateResult_OK;
 }
 
+// $deBlob: FUNCTION 005c4240
 void AGameState::OnInsertion()
 {
 	for (auto state = m_GameStates.Begin(); state != m_GameStates.End(); state++)
@@ -58,6 +62,7 @@ void AGameState::OnInsertion()
 	}
 }
 
+// $deBlob: FUNCTION 005c4300
 void AGameState::OnRemoval()
 {
 	for (auto state = m_GameStates.Begin(); state != m_GameStates.End(); state++)
@@ -68,6 +73,7 @@ void AGameState::OnRemoval()
 	m_GameStates.DeleteAll();
 }
 
+// $deBlob: FUNCTION 005c43d0
 void AGameState::OnSuspend()
 {
 	for (auto state = m_GameStates.Begin(); state != m_GameStates.End(); state++)
@@ -76,6 +82,7 @@ void AGameState::OnSuspend()
 	}
 }
 
+// $deBlob: FUNCTION 005c4490
 void AGameState::OnResume(AGameState* pOldState)
 {
 	for (auto state = m_GameStates.Begin(); state != m_GameStates.End(); state++)
@@ -84,6 +91,7 @@ void AGameState::OnResume(AGameState* pOldState)
 	}
 }
 
+// $deBlob: FUNCTION 005c4560
 void AGameState::OnActivate()
 {
 	for (auto state = m_GameStates.Begin(); state != m_GameStates.End(); state++)
@@ -92,6 +100,7 @@ void AGameState::OnActivate()
 	}
 }
 
+// $deBlob: FUNCTION 005c4620
 void AGameState::OnDeactivate()
 {
 	for (auto state = m_GameStates.Begin(); state != m_GameStates.End(); state++)
@@ -100,16 +109,19 @@ void AGameState::OnDeactivate()
 	}
 }
 
+// $deBlob: FUNCTION 005c1c90
 TBOOL AGameState::CanActivateConsoleState()
 {
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 005b0400
 TBOOL AGameState::CheckForControllerRemoval()
 {
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 005b0a20
 TBOOL AGameState::PauseOnControllerReinserted()
 {
 	return TFALSE;
@@ -121,6 +133,7 @@ void AGameState::DEBUG_RenderImGui()
 }
 #endif // TOSHI_DEBUG
 
+// $deBlob: FUNCTION 005c4030
 void AGameState::SetupLoadIcon()
 {
 	TASSERT(TNULL == sm_pLoadIconRect);
@@ -133,10 +146,12 @@ void AGameState::SetupLoadIcon()
 	sm_pLoadIconRect->SetPivot(Toshi::T2GUIElement::Pivot::TopLeft);
 }
 
+// $deBlob: FUNCTION 005c40e0
 void AGameState::DestroyLoadIcon()
 {
 }
 
+// $deBlob: FUNCTION 005c46f0
 void AGameState::RemoveSelf()
 {
 	TASSERT(AGameStateController::GetSingleton()->GetCurrentGameState() == this);

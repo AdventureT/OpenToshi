@@ -43,6 +43,7 @@ void TUtil::TrimLog(const TCHAR* fileName, size_t trimTo)
 	} while (TTRUE);
 }
 
+// $deBlob: FUNCTION 00828b00
 const TCHAR* TUtil::GetTime()
 {
 	time_t t   = time(NULL);

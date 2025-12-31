@@ -24,6 +24,7 @@ T2Locale::T2Locale(TINT langCount, size_t bufferSize, void* buffer)
 	m_Locale.SetMemoryFunctions(TRBAllocator, TRBDeallocator, this);
 }
 
+// $deBlob: FUNCTION 00662e30
 void T2Locale::SetLanguage(Lang langid)
 {
 	// 00662e30

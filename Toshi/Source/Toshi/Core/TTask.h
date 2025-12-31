@@ -41,9 +41,12 @@ public:
 
 	TScheduler* GetScheduler() const { return m_Scheduler; }
 	TUINT8&     GetFlags() { return m_State; }
+	// $deBlob: FUNCTION 006f3020
 	TBOOL       IsCreated() const { return m_State & State_Created; }
+	// $deBlob: FUNCTION 006f3030
 	TBOOL       IsActive() const { return m_State & State_Active; }
 	TBOOL       IsCreatedAndActive() const { return (m_State & (State_Created | State_Active)) == (State_Created | State_Active); }
+	// $deBlob: FUNCTION 006f3040
 	TBOOL       IsDying() const { return m_State & State_Dying; }
 
 private:

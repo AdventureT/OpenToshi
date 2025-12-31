@@ -71,6 +71,7 @@ public:
 	ALocaleManager(const ALocaleManager&)  = delete;
 	ALocaleManager(const ALocaleManager&&) = delete;
 
+	// $deBlob: FUNCTION 005e23e0
 	virtual ~ALocaleManager(){};
 	virtual const char* GetLanguageFilename(Lang langid) override;
 
@@ -80,12 +81,15 @@ public:
 
 	LocaleString GetOverwrittenFormatString(LocaleId stringid, LocaleString fallbackString);
 
+	// $deBlob: FUNCTION 005e1f00
 	const char* GetCurLocaleCode() { return GetLocaleCode(m_LangId); }
+	// $deBlob: FUNCTION 005e20b0
 	int         GetCurSoundChannel() { return GetSoundChannel(m_LangId); }
 
 public:
 	static void Create();
 	static void Destroy();
+	// $deBlob: FUNCTION 00679ad0
 	static void SetPlatform(Platform a_ePlatform) { s_ePlatform = a_ePlatform; }
 
 	static const char* GetLocaleCode(Lang code);
@@ -98,6 +102,7 @@ public:
 	static LocaleString FindOverwrittenLocaleString(LocaleId stringid, Lang langid);
 	static LocaleString FindOverwrittenFormatString(LocaleId stringid, Lang langid);
 
+	// $deBlob: FUNCTION 005e23c0
 	static LocaleString GetOverwrittenLocaleString(LocaleId stringid, Lang langid)
 	{
 		return (langid != -1) ? FindOverwrittenLocaleString(stringid, langid) : TNULL;

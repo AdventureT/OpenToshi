@@ -4,11 +4,13 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006f71e0
 T2GUIRectangle::T2GUIRectangle()
 {
 	m_pMaterial = TNULL;
 }
 
+// $deBlob: FUNCTION 006f7490
 void T2GUIRectangle::Render()
 {
 	T2GUIRenderer* pRenderer = T2GUI::GetSingleton()->GetRenderer();
@@ -25,6 +27,7 @@ void T2GUIRectangle::Render()
 	T2GUIElement::Render();
 }
 
+// $deBlob: FUNCTION 006f7250
 void T2GUIRectangle::SetMaterial(T2GUIMaterial* pMaterial)
 {
 	m_pMaterial = pMaterial;

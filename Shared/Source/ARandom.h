@@ -7,6 +7,7 @@ class ARandom : Toshi::TObject
     , public Toshi::TSingleton<ARandom>
 {
 public:
+	// $deBlob: FUNCTION 00575270
 	ARandom()
 	{
 	}

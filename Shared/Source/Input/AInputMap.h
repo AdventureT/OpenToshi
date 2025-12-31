@@ -91,6 +91,7 @@ public:
 	using ButtonMap           = Toshi::T2Map<ActionButton, BindVector, ButtonMapComparator>;
 
 public:
+	// $deBlob: FUNCTION 005dccb0
 	AInputMap()
 	{
 		InitialiseButtonMap();

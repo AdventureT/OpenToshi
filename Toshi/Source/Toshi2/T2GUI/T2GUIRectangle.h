@@ -12,6 +12,7 @@ public:
 
 	virtual void Render() override;
 
+	// $deBlob: FUNCTION 006f7210
 	void Create(TFLOAT width, TFLOAT height)
 	{
 		m_Width  = PackFloat(width);

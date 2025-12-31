@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006f2b30
 // $Barnyard: FUNCTION 006c1840
 TFreeList::TFreeList(TUINT a_uiItemSize, TINT a_iInitialSize, TINT a_iGrowSize, const TCHAR* a_pchName)
 {
@@ -44,6 +45,7 @@ TFreeList::Node* TFreeList::Allocate(TINT a_iNumber, TINT a_iSize)
 	return pData;
 }
 
+// $deBlob: FUNCTION 006f2d10
 // $Barnyard: FUNCTION 006c1990
 void TFreeList::SetCapacity(TINT a_iNewCapacity)
 {
@@ -56,6 +58,7 @@ void TFreeList::SetCapacity(TINT a_iNewCapacity)
 	}
 }
 
+// $deBlob: FUNCTION 006f2c80
 // $Barnyard: FUNCTION 006c1950
 void* TFreeList::New(TUINT a_uiSize)
 {
@@ -74,6 +77,7 @@ void* TFreeList::New(TUINT a_uiSize)
 	return Allocate(m_iGrowSize, a_uiSize);
 }
 
+// $deBlob: FUNCTION 006f2cf0
 // $Barnyard: FUNCTION 006c1880
 void TFreeList::Delete(void* a_Ptr)
 {

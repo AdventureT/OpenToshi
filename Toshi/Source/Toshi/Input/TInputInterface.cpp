@@ -26,6 +26,7 @@ TInputDevice* TInputInterface::GetDeviceByIndex(TClass* pClass, size_t index)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006776c0
 void TInputInterface::AddDevice(TInputDevice* device)
 {
 	if (device != TNULL)
@@ -35,6 +36,7 @@ void TInputInterface::AddDevice(TInputDevice* device)
 	}
 }
 
+// $deBlob: FUNCTION 006776f0
 void TInputInterface::RemoveDevice(TInputDevice* device)
 {
 	if (device != TNULL)
@@ -44,12 +46,14 @@ void TInputInterface::RemoveDevice(TInputDevice* device)
 	}
 }
 
+// $deBlob: FUNCTION 00677460
 TBOOL TInputInterface::Deinitialise()
 {
 	m_DeviceList.DeleteAll();
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00677510
 TBOOL TInputInterface::AcquireAll()
 {
 	TBOOL bRet = TTRUE;
@@ -60,6 +64,7 @@ TBOOL TInputInterface::AcquireAll()
 	return bRet;
 }
 
+// $deBlob: FUNCTION 00677550
 TBOOL TInputInterface::UnacquireAll()
 {
 	TBOOL bRet = TTRUE;
@@ -70,6 +75,7 @@ TBOOL TInputInterface::UnacquireAll()
 	return bRet;
 }
 
+// $deBlob: FUNCTION 00677590
 TBOOL TInputInterface::FlushAll()
 {
 	TBOOL bRet = TTRUE;
@@ -80,16 +86,19 @@ TBOOL TInputInterface::FlushAll()
 	return bRet;
 }
 
+// $deBlob: FUNCTION 006775d0
 void TInputInterface::SetExclusiveMode(TBOOL mode)
 {
 	m_bIsExclusiveMode = mode;
 }
 
+// $deBlob: FUNCTION 006775e0
 TBOOL TInputInterface::GetExclusiveMode() const
 {
 	return m_bIsExclusiveMode;
 }
 
+// $deBlob: FUNCTION 006775f0
 TINT TInputInterface::ProcessEvents(TFLOAT deltaTime)
 {
 	TINT iNumProcessed = 0;
@@ -113,6 +122,7 @@ TINT TInputInterface::ProcessEvents(TFLOAT deltaTime)
 	return iNumProcessed;
 }
 
+// $deBlob: FUNCTION 00677690
 void TInputInterface::StopAllRepeats()
 {
 	for (auto it = m_DeviceList.Begin(); it != m_DeviceList.End(); ++it)
@@ -188,6 +198,7 @@ TInputInterface::InputEvent::InputEvent(TInputDevice* a_pDevice, TINT a_iDoodad,
 	m_wszString[0]        = L'\0';
 }
 
+// $deBlob: FUNCTION 006778d0
 TINT TInputInterface::InputEvent::GetMagnitudeInt(TINT a_iAxis)
 {
 	TASSERT(a_iAxis >= 0 && a_iAxis < GetAxisCount());
@@ -207,6 +218,7 @@ TINT TInputInterface::InputEvent::GetMagnitudeInt(TINT a_iAxis)
 	}
 }
 
+// $deBlob: FUNCTION 00677950
 TFLOAT TInputInterface::InputEvent::GetMagnitudeFloat(TINT a_iAxis)
 {
 	TASSERT(a_iAxis >= 0 && a_iAxis < GetAxisCount());

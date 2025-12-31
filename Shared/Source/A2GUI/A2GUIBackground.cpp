@@ -4,6 +4,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 005d58d0
 void A2GUIBackground::Create(const char* fileName)
 {
 	Destroy();
@@ -12,6 +13,7 @@ void A2GUIBackground::Create(const char* fileName)
 	SetupBackground();
 }
 
+// $deBlob: FUNCTION 005d59b0
 void A2GUIBackground::LoadMaterialLibrary(const char* fileName)
 {
 	TString8 sixTeenStr  = TString8::TString8("16");
@@ -31,6 +33,7 @@ void A2GUIBackground::LoadMaterialLibrary(const char* fileName)
 	TAssetInit::InitAssets(*m_pTrb, TTRUE, TFALSE);
 }
 
+// $deBlob: FUNCTION 005d5b30
 void A2GUIBackground::SetupBackground()
 {
 	auto gui = T2GUI::GetSingleton();
@@ -118,6 +121,7 @@ void A2GUIBackground::SetupBackground()
 	}
 }
 
+// $deBlob: FUNCTION 005d5910
 void A2GUIBackground::Destroy()
 {
 	for (size_t i = 0; i < MAX_TILES; i++)

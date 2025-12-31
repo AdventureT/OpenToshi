@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006fc960
 TBOOL T2Mutex::Create()
 {
 	Destroy();
@@ -11,6 +12,7 @@ TBOOL T2Mutex::Create()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006fca10
 TBOOL T2Mutex::Lock(Flags flags)
 {
 	TASSERT(m_Mutex != NULL, "Mutex is NULL");
@@ -21,6 +23,7 @@ TBOOL T2Mutex::Lock(Flags flags)
 	return result == WAIT_OBJECT_0;
 }
 
+// $deBlob: FUNCTION 006fca70
 TBOOL T2Mutex::Unlock()
 {
 	TASSERT(m_Mutex != NULL, "Mutex is NULL");

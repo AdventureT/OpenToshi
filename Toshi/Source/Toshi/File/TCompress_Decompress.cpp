@@ -95,6 +95,7 @@ int8_t TCompress_Decompress::GetHeader(TFile* file, TCompress::Header& btecHeade
 	return TCOMPRESS_ERROR_OK;
 }
 
+// $deBlob: FUNCTION 0068aaf0
 // With the help of Revel8n approach
 // Could use some code cleanup
 TINT TCompress_Decompress::GetCommand(TFile* file, TBOOL& noOffset, TUINT32& size, TINT& offset)

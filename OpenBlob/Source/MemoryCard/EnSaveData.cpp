@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "EnSaveData.h"
 
+// $deBlob: FUNCTION 005e3b20
 TBOOL EnSaveData::Validate()
 {
 	TINT result = Toshi::TStringManager::String8Compare(m_savedata->header.m_id, "BB", 2);

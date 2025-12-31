@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_USING
 
+// $deBlob: FUNCTION 00618000
 TBOOL AXUIFMODExAudio::Create(TCHAR* a_szSoundName)
 {
 	auto sound = TSound::GetSingleton();
@@ -20,6 +21,7 @@ TBOOL AXUIFMODExAudio::Create(TCHAR* a_szSoundName)
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 00618070
 TBOOL AXUIFMODExAudio::Release()
 {
 	if (m_pSound != TNULL)
@@ -35,6 +37,7 @@ TBOOL AXUIFMODExAudio::Release()
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006180d0
 FMOD::Sound* AXUIFMODExAudio::GetSubSound(TCHAR* a_pSubSoundName)
 {
 	auto sound = TSound::GetSingleton();

@@ -6,6 +6,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006b1d00
 void T2Material::Init()
 {
 	InitData();
@@ -20,6 +21,7 @@ void T2Material::Init()
 	if (sm_pTRBLoadCallback) sm_pTRBLoadCallback(this, sm_pTRBLoadCallbackData);
 }
 
+// $deBlob: FUNCTION 006b1db0
 void T2Material::Deinit()
 {
 	if (sm_pTRBUnloadCallback) sm_pTRBUnloadCallback(this, sm_pTRBUnloadCallbackData);
@@ -39,6 +41,7 @@ void T2Material::Deinit()
 	DestroyResource();
 }
 
+// $deBlob: FUNCTION 006b21a0
 void T2Material::InitData()
 {
 	auto pTexManager = TTextureManager::GetSingleton();
@@ -56,6 +59,7 @@ void T2Material::InitData()
 	}
 }
 
+// $deBlob: FUNCTION 006b22d0
 void* T2Material::ResourceCallback(void* pCustomData, TTRB* trb, TBOOL bCreated)
 {
 	if (!bCreated) return TNULL;
@@ -87,6 +91,7 @@ void TMaterialManager::AddMaterial(T2Material* a_pMat)
 	}
 }
 
+// $deBlob: FUNCTION 006b2480
 void TMaterialManager::RemoveMaterial(T2Material* a_pMat)
 {
 	TASSERT(TNULL != a_pMat);
@@ -101,6 +106,7 @@ void TMaterialManager::RemoveMaterial(T2Material* a_pMat)
 	a_pMat->m_pNext = TNULL;
 }
 
+// $deBlob: FUNCTION 006b23c0
 T2Material* TMaterialManager::FindMaterial(const TCHAR* a_pName) const
 {
 	TASSERT(T2String8::IsLowerCase(a_pName));

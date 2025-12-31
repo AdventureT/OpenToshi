@@ -15,6 +15,7 @@ class ACurrentLevelInformation
 		{ 1, "Sound/SoundBreakPoints,trb" }
 	};
 
+	// $deBlob: FUNCTION 0056d500
 	ACurrentLevelInformation(TCHAR* a_szLevelName)
 	    : m_szLevelName(a_szLevelName)
 	{

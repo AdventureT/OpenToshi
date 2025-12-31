@@ -43,8 +43,10 @@ public:
 	}
 
 	TBOOL Create(void* poolmem, TINT poollen, TINT maxchannels, TINT filebuffersize, SpeakerType speakerType);
+	// $deBlob: FUNCTION 006ffdd0
 	TBOOL Create(const SoundInitValues soundInitValues) { return Create(soundInitValues.m_pPoolmem, soundInitValues.m_iPoolSize, soundInitValues.m_iMaxChannels, soundInitValues.m_ifileBufferSize, soundInitValues.m_eSpeakerType); }
 
+	// $deBlob: FUNCTION 00700100
 	void Update()
 	{
 		TASSERT(TNULL != m_pSystem);
@@ -52,6 +54,7 @@ public:
 		ErrorCheck(eResult);
 	}
 
+	// $deBlob: FUNCTION 00700220
 	FMOD::System* GetSystem()
 	{
 		TASSERT(TNULL != m_pSystem);

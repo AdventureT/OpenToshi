@@ -24,6 +24,7 @@ TBOOL TInputDXDeviceController::IsDirectInputController(LPCDIDEVICEINSTANCEA a_p
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0067c000
 TBOOL const TInputDXDeviceController::BindToDIDevice(HWND a_mainWindow, LPCDIDEVICEINSTANCEA a_poDeviceInstance, IDirectInputDevice8A* a_poDXInputDevice)
 {
 	TASSERT(a_poDeviceInstance != NULL);

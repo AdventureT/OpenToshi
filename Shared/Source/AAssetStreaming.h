@@ -63,17 +63,20 @@ public:
 		TASSERT(!m_pCurrentJob->IsLinked());
 	}
 
+	// $deBlob: FUNCTION 0056cd00
 	TBOOL HasActiveJobs() const
 	{
 		return !m_Jobs.IsEmpty() || m_pCurrentJob != TNULL;
 	}
 
+	// $deBlob: FUNCTION 0056ccb0
 	void AddMainThreadJob2(AMainThreadJob2* a_pJob)
 	{
 		TASSERT(m_pCurrentJob != a_pJob);
 		m_Jobs.PushBack(a_pJob);
 	}
 
+	// $deBlob: FUNCTION 0056cd10
 	AMainThreadJob2* CancelAllWaitingTerrainJobs()
 	{
 		TASSERT(!m_FreeList.IsEmpty(), "Job free list is empty!");

@@ -28,6 +28,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 00692350
 	TMaterial()
 	{
 		m_Flags        = Flags_NULL;
@@ -42,6 +43,7 @@ public:
 
 	virtual ~TMaterial() = default;
 
+	// $deBlob: FUNCTION 00692300
 	virtual void OnDestroy()
 	{
 		TASSERT(TTRUE == IsCreated());
@@ -49,6 +51,7 @@ public:
 		m_pUVAnimation = TNULL;
 	}
 
+	// $deBlob: FUNCTION 006923c0
 	virtual TBOOL Create()
 	{
 		TASSERT(TFALSE == IsCreated());
@@ -56,8 +59,10 @@ public:
 		return TTRUE;
 	}
 
+	// $deBlob: FUNCTION 0054f580
 	virtual void PreRender() {}
 
+	// $deBlob: FUNCTION 0054f570
 	virtual void PostRender() {}
 
 	void SetOwnerShader(TShader* pShader)
@@ -68,12 +73,14 @@ public:
 
 	TShader* GetOwnerShader() const { return m_pOwnerShader; }
 
+	// $deBlob: FUNCTION 0054f5a0
 	void SetTextureNum(TUINT32 a_iNumTextures)
 	{
 		TASSERT(a_iNumTextures <= MAXTEXTURES);
 		m_iNumTex = a_iNumTextures;
 	}
 
+	// $deBlob: FUNCTION 0055e410
 	void SetTexture(TUINT32 a_iStage, TTexture* a_pTexture)
 	{
 		TASSERT(a_iStage < MAXTEXTURES);
@@ -82,6 +89,7 @@ public:
 
 	TTexture* GetTexture(TUINT32 a_iStage = 0) const { return m_pTextures[a_iStage]; }
 
+	// $deBlob: FUNCTION 00692440
 	void SetName(const TCHAR* name)
 	{
 		if (name == TNULL)
@@ -94,6 +102,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 00692410
 	void SetFlag(Flags flag, TBOOL set = TFALSE)
 	{
 		if (set)

@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00828ba0
 TINT TStringTable::GetStringID(const TCHAR* string)
 {
 	{

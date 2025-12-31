@@ -17,11 +17,13 @@ TKeyframeLibraryInstance::TKeyframeLibraryInstance()
 	m_pScales       = TNULL;
 }
 
+// $deBlob: FUNCTION 0068e630
 TKeyframeLibrary* TKeyframeLibraryInstance::Create(TKeyframeLibrary* a_pLibrary)
 {
 	return CreateEx(a_pLibrary, a_pLibrary->m_iNumTranslations, a_pLibrary->m_iNumQuaternions, a_pLibrary->m_iNumScales, 0, 0, 0);
 }
 
+// $deBlob: FUNCTION 0068e650
 TKeyframeLibrary* TKeyframeLibraryInstance::CreateEx(TKeyframeLibrary* a_pLibrary, TINT a_iTKeyCount, TINT a_iQKeyCount, TINT a_iSKeyCount, TINT a_iTBaseIndex, TINT a_iQBaseIndex, TINT a_iSBaseIndex)
 {
 	TKeyframeLibrary* pOldLibrary = m_pLibrary;
@@ -47,6 +49,7 @@ TKeyframeLibrary* TKeyframeLibraryInstance::CreateEx(TKeyframeLibrary* a_pLibrar
 	return pOldLibrary;
 }
 
+// $deBlob: FUNCTION 0068e6d0
 void TKeyframeLibraryInstance::Destroy()
 {
 	if (m_pLibrary != TNULL)

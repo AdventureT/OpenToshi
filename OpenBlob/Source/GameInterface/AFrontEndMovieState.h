@@ -25,6 +25,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 005d4750
 	AFrontEndMovieState()
 	{
 		m_iAssetId            = Asset_Legal;

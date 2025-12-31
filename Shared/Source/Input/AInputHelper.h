@@ -4,6 +4,7 @@
 class AInputHelper
 {
 public:
+	// $deBlob: FUNCTION 005d9cc0
 	AInputHelper()
 	{
 		m_eInputContext = AInputMap::INPUTCONTEXT_UNK12;
@@ -34,6 +35,7 @@ public:
 
 	void Update(float fVal = 0.0f);
 
+	// $deBlob: FUNCTION 005d9d70
 	static uint32_t MakeButtonDevice(AInputMap::INPUTBUTTON a_eInputButton, AInputManager2::INPUTDEVICE a_eDevice)
 	{
 		TASSERT(0 == (0xFFFF0000 & a_eInputButton));
@@ -41,6 +43,7 @@ public:
 		return (a_eInputButton << 16 | a_eDevice);
 	}
 
+	// $deBlob: FUNCTION 005d9df0
 	static void GetInputButtonDevice(uint32_t a_iButtonDevice, AInputMap::INPUTBUTTON& a_eInputButton, AInputManager2::INPUTDEVICE& a_eInputDevice)
 	{
 		a_eInputButton = a_iButtonDevice >> 16;

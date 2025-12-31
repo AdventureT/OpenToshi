@@ -15,22 +15,27 @@ public:
 
 	void Render();
 
+	// $deBlob: FUNCTION 006add00
 	TFLOAT SetNear(TFLOAT fNear) { return std::exchange(m_fNear, fNear); }
 
+	// $deBlob: FUNCTION 006add20
 	TFLOAT SetFar(TFLOAT fFar) { return std::exchange(m_fFar, fFar); }
 
+	// $deBlob: FUNCTION 006add50
 	TFLOAT SetFOV(TFLOAT fFOV)
 	{
 		TMath::Clip(fFOV, s_kMinFOV, s_kMaxFOV);
 		return std::exchange(m_fFOV, fFOV);
 	}
 
+	// $deBlob: FUNCTION 006addb0
 	TFLOAT SetProjectionCentreX(TFLOAT fCentreX)
 	{
 		TMath::Clip(fCentreX, 0.0f, 1.0f);
 		return std::exchange(m_fCentreX, fCentreX);
 	}
 
+	// $deBlob: FUNCTION 006ade00
 	TFLOAT SetProjectionCentreY(TFLOAT fCentreY)
 	{
 		TMath::Clip(fCentreY, 0.0f, 1.0f);
@@ -39,6 +44,7 @@ public:
 
 	TFLOAT GetNear() const { return m_fNear; }
 
+	// $deBlob: FUNCTION 006ade70
 	TFLOAT GetFar() const { return m_fFar; }
 
 	TFLOAT GetFOV() const { return m_fFOV; }
@@ -47,6 +53,7 @@ public:
 
 	TBOOL IsEnabled() const { return m_bEnabled; }
 
+	// $deBlob: FUNCTION 006adec0
 	TTransformObject& GetTransformObject() { return m_TransformObject; }
 
 private:

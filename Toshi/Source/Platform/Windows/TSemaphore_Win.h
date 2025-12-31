@@ -8,6 +8,7 @@ public:
 	TSemaphore() = default;
 
 public:
+	// $deBlob: FUNCTION 00661b10
 	/*
 		* Platform specific methods
 		* Define them in TThread_{Platform}.cpp
@@ -26,6 +27,7 @@ public:
 
 	TBOOL Destroy() { return TFALSE; }
 
+	// $deBlob: FUNCTION 00661c20
 	TBOOL Signal()
 	{
 		TASSERT(m_hSemaHnd != NULL, "Handle is NULL");

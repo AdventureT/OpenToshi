@@ -27,6 +27,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006d7940
 TXUIResource::~TXUIResource()
 {
 	if (m_pMemoryHeap)
@@ -51,6 +52,7 @@ TXUIResource::~TXUIResource()
 	}
 }
 
+// $deBlob: FUNCTION 006d8750
 TBOOL TXUIResource::ReadHeader(TUINT8* buffer)
 {
 	XURReader reader(buffer);
@@ -163,6 +165,7 @@ TBOOL TXUIResource::Load(TUINT8* buffer)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006d8e10
 TBOOL TXUIResource::ReadDataSection(TUINT8* a_pData, TUINT32 size)
 {
 	XURReader reader(a_pData);
@@ -192,6 +195,7 @@ TBOOL TXUIResource::ReadDataSection(TUINT8* a_pData, TUINT32 size)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006d89f0
 TBOOL TXUIResource::ReadStringSection(TUINT8* buffer, TUINT32 size)
 {
 	TASSERT(TNULL == m_asStringTable, "StringTable must not be initialized");
@@ -239,6 +243,7 @@ TBOOL TXUIResource::ReadCustSection(TUINT8* buffer, TUINT32 size)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006d8c70
 TBOOL TXUIResource::ReadQuatSection(TUINT8* buffer, TUINT32 size)
 {
 	XURReader reader(buffer);
@@ -260,6 +265,7 @@ TBOOL TXUIResource::ReadQuatSection(TUINT8* buffer, TUINT32 size)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006d8f30
 TINT TXUIResource::GetStringTableSize(TUINT8* pPtr, TUINT32 size)
 {
 	XURReader reader(pPtr);
@@ -294,6 +300,7 @@ TINT TXUIResource::GetStringTableSize(TUINT8* pPtr, TUINT32 size)
 	return result;
 }
 
+// $deBlob: FUNCTION 006d8640
 void TXUIResource::PushID(const TWCHAR* a_wsID)
 {
 	m_oIDComparisonStack.Push(a_wsID);
@@ -303,6 +310,7 @@ void TXUIResource::PushID(const TWCHAR* a_wsID)
 	m_ID.Concat(a_wsID, -1);
 }
 
+// $deBlob: FUNCTION 006d8690
 void TXUIResource::PopID()
 {
 	const TWCHAR* top = m_oIDComparisonStack.Top();
@@ -364,6 +372,7 @@ XURXUIObjectData* TXUIResource::FindScene(const TWCHAR* a_wcName)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006d84d0
 XURXUIObjectData* TXUIResource::FindFirstScene(TUINT32 a_uiIndex)
 {
 	for (TUINT8 i = 0; i < m_pRoot->m_NumChildren; i++)

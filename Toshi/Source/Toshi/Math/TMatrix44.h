@@ -58,6 +58,7 @@ public:
 		m_f44 = a_f44;
 	}
 
+	// $deBlob: FUNCTION 00663680
 	void Identity()
 	{
 		m_f11 = IDENTITY.m_f11;
@@ -143,6 +144,7 @@ public:
 
 	void Multiply(const TMatrix44& a_rLeft, const TMatrix44& a_rRight);
 
+	// $deBlob: FUNCTION 00572e80
 	void Multiply(const TMatrix44& a_rRight)
 	{
 		TMatrix44 temp;
@@ -165,6 +167,7 @@ public:
 	void Transpose();
 	void Transpose(const TMatrix44& a_rSource);
 
+	// $deBlob: FUNCTION 00666990
 	static void TransformPlaneOrthogonal(TPlane& a_rOutPlane, const TMatrix44& a_rMatrix, const TPlane& a_rPlane)
 	{
 		RotateVector(a_rOutPlane.AsVector4(), a_rMatrix, a_rPlane.AsVector4());
@@ -180,6 +183,7 @@ public:
 		a_rOutVector.w = a_rVector.w;
 	}
 
+	// $deBlob: FUNCTION 00665e90
 	static void TransformVector(TVector4& a_rOutVector, const TMatrix44& a_rMatrix, const TVector4& a_rVector)
 	{
 		a_rOutVector.x = a_rMatrix.m_f11 * a_rVector.x + a_rMatrix.m_f21 * a_rVector.y + a_rMatrix.m_f31 * a_rVector.z + a_rMatrix.m_f41 * a_rVector.w;

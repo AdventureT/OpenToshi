@@ -8,6 +8,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0067fdc0
 TBOOL TInputDXInterface::Initialise()
 {
 	TASSERT(TNULL == m_poDirectInput8);
@@ -48,6 +49,7 @@ TBOOL TInputDXInterface::Initialise()
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 0067ff40
 TBOOL TInputDXInterface::Deinitialise()
 {
 	TInputInterface::Deinitialise();
@@ -61,6 +63,7 @@ TBOOL TInputDXInterface::Deinitialise()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00680030
 TBOOL TInputDXInterface::LostDevice()
 {
 	auto input = GetDirectInput();
@@ -71,6 +74,7 @@ TBOOL TInputDXInterface::LostDevice()
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 00680070
 BOOL TInputDXInterface::EnumerateDeviceCallback(LPCDIDEVICEINSTANCEA a_poDeviceInstance, LPVOID poDXInputInterface)
 {
 	TInputDXInterface*        pInputInterface = (TInputDXInterface*)poDXInputInterface;

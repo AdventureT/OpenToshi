@@ -10,6 +10,7 @@ class TRegMaterial;
 class TRenderPacket
 {
 public:
+	// $deBlob: FUNCTION 006ae8d0
 	void SetModelViewMatrix(TMatrix44* pMatrix44) { m_ModelViewMatrix = *pMatrix44; }
 
 	void SetMesh(TMesh* pMesh) { m_pMesh = pMesh; }
@@ -46,6 +47,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 006ae6c0
 	TRegMaterial()
 	{
 		m_State             = 0;
@@ -60,12 +62,16 @@ public:
 
 	State GetFlags() const { return m_State; }
 
+	// $deBlob: FUNCTION 006ae740
 	void SetFlags(State flags) { m_State = flags; }
 
+	// $deBlob: FUNCTION 006ae750
 	void SetOrderTable(TOrderTable* pOrderTable) { m_pOrderTable = pOrderTable; }
 
+	// $deBlob: FUNCTION 006ae760
 	void SetMaterial(TMaterial* pMaterial) { m_pMaterial = pMaterial; }
 
+	// $deBlob: FUNCTION 006ae7e0
 	void SetNextUsedMaterial(TRegMaterial* pRegMat) { m_pNextUsedMaterial = pRegMat; }
 
 	TRegMaterial* GetNextUsedMaterial() const { return m_pNextUsedMaterial; }
@@ -87,6 +93,7 @@ public:
 	using t_PostFlushCallback = void (*)(void* pCustomData);
 
 public:
+	// $deBlob: FUNCTION 006ae0d0
 	TOrderTable()
 	{
 		m_pLastRegMat            = TNULL;
@@ -99,6 +106,7 @@ public:
 		m_pLastRegMat            = TNULL;
 	}
 
+	// $deBlob: FUNCTION 006ae110
 	~TOrderTable()
 	{
 		if (s_pRegMaterials)
@@ -121,6 +129,7 @@ public:
 
 	static void DeregisterMaterial(TRegMaterial* pRegMat);
 
+	// $deBlob: FUNCTION 006ae410
 	void UseMaterial(TRegMaterial* pRegMat)
 	{
 		if (!HASFLAG(pRegMat->GetFlags() & TRegMaterial::State_Used))
@@ -151,6 +160,7 @@ public:
 	// Static methods
 	static void CreateStaticData(TUINT32 maxMaterials, TUINT32 maxRenderPackets);
 
+	// $deBlob: FUNCTION 006ae3e0
 	static TRenderPacket* AllocRenderPacket()
 	{
 		TRenderPacket* packet = &s_pRenderPackets[s_uiNumRenderPackets++];

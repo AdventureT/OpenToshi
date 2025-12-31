@@ -32,6 +32,7 @@ private:
 	void ReleaseTextures();
 	void CompileShader();
 
+	// $deBlob: FUNCTION 00552070
 	TBOOL IsMovieLooping() const
 	{
 		return m_bIsMovieLooping;

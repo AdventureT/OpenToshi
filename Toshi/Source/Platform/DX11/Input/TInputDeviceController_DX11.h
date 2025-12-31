@@ -7,6 +7,7 @@ TOSHI_NAMESPACE_START
 class TInputDXDeviceController : public TInputDeviceController
 {
 public:
+	// $deBlob: FUNCTION 0067b8e0
 	virtual TBOOL Initialise() { return TTRUE; }
 
 	static TBOOL IsDirectInputController(LPCDIDEVICEINSTANCEA a_poDeviceInstance);

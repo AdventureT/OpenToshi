@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006f38f0
 void T2GenericDynamicVector::Reallocate(TINT a_iNewSize, TINT a_iCount)
 {
 	if (a_iNewSize != m_iMaxSize)
@@ -23,6 +24,7 @@ void T2GenericDynamicVector::Reallocate(TINT a_iNewSize, TINT a_iCount)
 	}
 }
 
+// $deBlob: FUNCTION 006f39e0
 void T2GenericDynamicVector::Grow(TINT a_iNumElements, TINT a_iCount)
 {
 	TINT newSize = m_iNumElements + a_iNumElements;

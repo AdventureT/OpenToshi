@@ -16,6 +16,7 @@ TTRB::t_MemoryFuncDealloc AXUIState::FontTRBDeallocator = [](TTRB::AllocType all
 	return TFree(ptr);
 };
 
+// $deBlob: FUNCTION 005d33f0
 void AXUIState::SetSkin1(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileName)
 {
 	TStringManager::String8Copy(s_AssetLoadQueue, "data/xui/", BUFFSIZE);
@@ -30,6 +31,7 @@ void AXUIState::SetSkin1(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileN
 	TXUI::GetSingleton()->SetSkin1(s_AssetLoadQueue, a_szXURFileName);
 }
 
+// $deBlob: FUNCTION 005d34b0
 void AXUIState::SetSkin2(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileName)
 {
 	TStringManager::String8Copy(s_AssetLoadQueue, "data/xui/", BUFFSIZE);
@@ -44,6 +46,7 @@ void AXUIState::SetSkin2(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileN
 	TXUI::GetSingleton()->SetSkin2(s_AssetLoadQueue, a_szXURFileName);
 }
 
+// $deBlob: FUNCTION 005e5e20
 TMemoryHeap* AXUIState::SetFontMemBlock(TMemoryHeap* a_pMemHeap)
 {
 	TMemoryHeap* oldMemBlock = s_pFontTRBMemoryBlock;
@@ -51,6 +54,7 @@ TMemoryHeap* AXUIState::SetFontMemBlock(TMemoryHeap* a_pMemHeap)
 	return oldMemBlock;
 }
 
+// $deBlob: FUNCTION 005d3570
 TBOOL AXUIState::InitFont(const TCHAR* a_szTRBFileName)
 {
 	s_FontTRB.SetMemoryFunctions(FontTRBAllocator, FontTRBDeallocator, TNULL);
@@ -87,6 +91,7 @@ void AXUIState::SetFrontendCarousel(const TCHAR* a_szTRBFileName, const TCHAR* a
 	pAssetStreaming->AddMainThreadJob2(job);
 }
 
+// $deBlob: FUNCTION 005d3620
 TBOOL AXUIState::SetSkinWithFont(const TCHAR* a_szTRBFileName, bool m_bLoad)
 {
 	static bool g_bFontLoaded = TFALSE;

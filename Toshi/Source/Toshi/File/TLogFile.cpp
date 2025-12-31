@@ -9,6 +9,7 @@
 
 TOSHI_NAMESPACE_BEGIN
 
+// $deBlob: FUNCTION 00687740
 TLogFile::TLogFile()
     : m_LevelString(), m_typeCounts()
 {
@@ -21,6 +22,7 @@ TLogFile::TLogFile()
 	m_unk3              = 0;
 }
 
+// $deBlob: FUNCTION 006877c0
 TLogFile::Error TLogFile::Create(const TCHAR* fileName, const TCHAR* str2, TBOOL writeExisting)
 {
 	TASSERT(TNULL == m_pFile);
@@ -60,6 +62,7 @@ TLogFile::Error TLogFile::Create(const TCHAR* fileName, const TCHAR* str2, TBOOL
 	return Error::OK;
 }
 
+// $deBlob: FUNCTION 006878d0
 void TLogFile::Close()
 {
 	m_curLevel = 0;
@@ -77,6 +80,7 @@ void TLogFile::Close()
 	}
 }
 
+// $deBlob: FUNCTION 00687ba0
 void TLogFile::RecalcLevel()
 {
 	m_curLevel = m_curLevel < cLevelMax - 1 ? m_curLevel : cLevelMax;
@@ -90,6 +94,7 @@ void TLogFile::RecalcLevel()
 	m_LevelString[m_curLevel] = '\0';
 }
 
+// $deBlob: FUNCTION 00687960
 void TLogFile::Print(const TCHAR* format, ...)
 {
 	if (m_pFile != TNULL)
@@ -115,6 +120,7 @@ void TLogFile::Print(const TCHAR* format, ...)
 
 
 
+// $deBlob: FUNCTION 006879e0
 void TLogFile::Log(Type type, const TCHAR* str1, const TCHAR* str2, const TCHAR* format, ...)
 {
 	if (m_pFile != TNULL)

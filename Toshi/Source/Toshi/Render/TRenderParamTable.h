@@ -111,6 +111,7 @@ public:
 	static constexpr const TCHAR* s_TexParamNames[] = { "", "tcubeenvmap", "tframebuftex", "tlightfalloffmap", "tplanarenvmap", "tshadowtex", "{" };
 
 public:
+	// $deBlob: FUNCTION 006b6300
 	TRenderParamTable()
 	    : m_V4Table(s_V4ParamNames, V4PARAM_NUMOF), m_M44Table(s_M44ParamNames, M44PARAM_NUMOF), m_TexTable(s_TexParamNames, TEXPARAM_NUMOF)
 	{
@@ -178,6 +179,7 @@ public:
 		TASSERT(TEXPARAM_SHADOWTEX == FindParameterTexHandle("tshadowtex"));
 	}
 
+	// $deBlob: FUNCTION 006b6f40
 	~TRenderParamTable()
 	{
 		TFree(m_Vectors);
@@ -191,18 +193,21 @@ public:
 
 	TINT FindParameterTexHandle(const TCHAR* paramName) { return m_TexTable.GetStringID(paramName); }
 
+	// $deBlob: FUNCTION 006b6ff0
 	void SetParameterV4(TINT handle, const TVector4& vec4)
 	{
 		TASSERT(handle > 0 && handle < m_iNumV4Params);
 		m_Vectors[handle] = vec4;
 	}
 
+	// $deBlob: FUNCTION 006b7050
 	void SetParameterM44(TINT handle, const TMatrix44& mat44)
 	{
 		TASSERT(handle > 0 && handle < m_iNumMatrixParams);
 		m_Matrices[handle] = mat44;
 	}
 
+	// $deBlob: FUNCTION 006b70d0
 	void SetParameterTex(TINT handle, TTexture* tex)
 	{
 		TASSERT(handle > 0 && handle < m_iNumTexParams);

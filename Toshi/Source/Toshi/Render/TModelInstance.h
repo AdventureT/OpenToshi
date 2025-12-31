@@ -10,6 +10,7 @@ public:
 	friend TModel;
 
 public:
+	// $deBlob: FUNCTION 006b0830
 	TModel* GetModel() { return m_pModel; }
 
 	TSkeletonInstance* GetSkeletonInstance() { return m_pSkeletonInstance; }

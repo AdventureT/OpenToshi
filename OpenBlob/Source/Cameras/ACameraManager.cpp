@@ -4,6 +4,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 0058dc10
 ACameraManager::ACameraManager()
 {
 	TTODO("Some function calls");

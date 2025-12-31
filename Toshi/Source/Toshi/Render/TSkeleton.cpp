@@ -32,6 +32,7 @@ TBOOL TSkeleton::Create(TUINT32 param_1)
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 0068ed60
 TSkeletonInstance* TSkeleton::CreateInstance(TBOOL a_bSetBasePose)
 {
 	if (TINT(m_fnQuatLerp) < 3)
@@ -80,6 +81,7 @@ TSkeletonInstance* TSkeleton::CreateInstance(TBOOL a_bSetBasePose)
 	return pInstance;
 }
 
+// $deBlob: FUNCTION 0068f480
 void TSkeleton::SetQInterpFn(QUATINTERP a_eQuatInterp)
 {
 	if (a_eQuatInterp == QUATINTERP_Slerp)
@@ -88,6 +90,7 @@ void TSkeleton::SetQInterpFn(QUATINTERP a_eQuatInterp)
 		m_fnQuatLerp = TQuaternion::Nlerp;
 }
 
+// $deBlob: FUNCTION 0068ee90
 TINT TSkeleton::GetBoneID(const TCHAR* a_cBoneName, TUINT32 a_iLength)
 {
 	for (TINT16 i = 0; i < m_iBoneCount; i++)
@@ -101,6 +104,7 @@ TINT TSkeleton::GetBoneID(const TCHAR* a_cBoneName, TUINT32 a_iLength)
 	return -1;
 }
 
+// $deBlob: FUNCTION 0068eee0
 TINT TSkeleton::GetSequenceID(const TCHAR* a_sSequenceName, TUINT32 a_iLength)
 {
 	for (TINT16 i = 0; i < m_iSequenceCount; i++)
@@ -114,6 +118,7 @@ TINT TSkeleton::GetSequenceID(const TCHAR* a_sSequenceName, TUINT32 a_iLength)
 	return -1;
 }
 
+// $deBlob: FUNCTION 0068cf60
 void TSkeletonInstance::UpdateTime(TFLOAT a_fDeltaTime)
 {
 	if (!m_BaseAnimations.IsEmpty() || (!m_OverlayAnimations.IsEmpty() && m_iLastUpdateTimeFrame != TSystemManager::GetSingleton()->GetFrameCount()))
@@ -145,6 +150,7 @@ void TSkeletonInstance::UpdateTime(TFLOAT a_fDeltaTime)
 	}
 }
 
+// $deBlob: FUNCTION 0068d0e0
 void TSkeletonInstance::UpdateState(TBOOL a_bForceUpdate)
 {
 	if ((a_bForceUpdate || m_iLastUpdateStateFrame != TSystemManager::GetSingleton()->GetFrameCount()) && m_pSkeleton->GetKeyLibraryInstance().GetLibrary() != TNULL)
@@ -322,6 +328,7 @@ void TSkeletonInstance::UpdateState(TBOOL a_bForceUpdate)
 	}
 }
 
+// $deBlob: FUNCTION 0068db70
 TMatrix44* TSkeletonInstance::GetBoneTransformCurrent(TINT a_iBone, TMatrix44& a_rMatrix)
 {
 	if (a_iBone < m_pSkeleton->GetAutoBoneCount())
@@ -335,6 +342,7 @@ TMatrix44* TSkeletonInstance::GetBoneTransformCurrent(TINT a_iBone, TMatrix44& a
 	return &a_rMatrix;
 }
 
+// $deBlob: FUNCTION 0068c2c0
 TAnimation* TSkeletonInstance::AddAnimationFull(TINT16 a_iSequenceIndex, TFLOAT a_fDestWeight, TFLOAT a_fBlendInSpeed, TFLOAT a_fBlendOutSpeed, TAnimation::Flags a_eAnimFlags)
 {
 	TAnimation* pAnimation  = IsAnimating(a_iSequenceIndex);
@@ -422,6 +430,7 @@ TAnimation* TSkeletonInstance::AddAnimationFull(TINT16 a_iSequenceIndex, TFLOAT 
 	return pAnimation;
 }
 
+// $deBlob: FUNCTION 0068c680
 void TSkeletonInstance::RemoveAnimation(TAnimation* a_pAnimation, TFLOAT a_fBlendOutSpeed)
 {
 	TASSERT(TTRUE == a_pAnimation->IsActive());
@@ -462,6 +471,7 @@ void TSkeletonInstance::RemoveAnimation(TAnimation* a_pAnimation, TFLOAT a_fBlen
 	}
 }
 
+// $deBlob: FUNCTION 0068cb10
 void TSkeletonInstance::SetStateFromBasePose()
 {
 	for (TINT i = 0; i < m_pSkeleton->GetAutoBoneCount(); i++)
@@ -490,6 +500,7 @@ TAnimation* TSkeletonInstance::IsAnimating(TINT16 a_iSequenceIndex)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 0068e910
 TFLOAT TSkeletonSequenceBone::GetKeyPair(TINT a_iCurrentAnimTime, TUINT& a_rCurrentKeyIndex, TUINT& a_rLerpFromIndex, TUINT& a_rLerpToIndex)
 {
 	auto pFirstKeyTime = *GetKey(0);

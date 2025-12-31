@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ADebugLog.h"
 
+// $deBlob: FUNCTION 005b1de0
 ADebugLog::ADebugLog(const char* a_szBaseName, const char* a_szExtension, int a_iBufferCapacity)
 {
 	m_iBufUsedSize = 0;
@@ -24,6 +25,7 @@ ADebugLog::ADebugLog(const char* a_szBaseName, const char* a_szExtension, int a_
 	m_pBuffer = TREINTERPRETCAST(char*, TMemalign(4, m_iBufSize));
 }
 
+// $deBlob: FUNCTION 005b1ed0
 ADebugLog::~ADebugLog()
 {
 	Flush();
@@ -32,6 +34,7 @@ ADebugLog::~ADebugLog()
 	delete m_pBuffer;
 }
 
+// $deBlob: FUNCTION 005b2080
 void ADebugLog::CreateFile()
 {
 	char szBuffer[256];
@@ -46,6 +49,7 @@ void ADebugLog::CreateFile()
 	if (pFile) pFile->Destroy();
 }
 
+// $deBlob: FUNCTION 005b1f00
 void ADebugLog::Write(const char* a_szFormat, ...)
 {
 	static char s_FmtStr[DEBUGLOG_FMTSTR_BUFLEN];
@@ -68,6 +72,7 @@ void ADebugLog::Write(const char* a_szFormat, ...)
 		Flush();
 }
 
+// $deBlob: FUNCTION 005b1f70
 void ADebugLog::Flush()
 {
 	if (m_iBufUsedSize > 0)

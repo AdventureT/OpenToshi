@@ -6,6 +6,7 @@ TOSHI_NAMESPACE_BEGIN
 class TXUIScene : public TGenericClassDerived<TXUIScene, TXUIControl, "TXUIScene", TMAKEVERSION(1, 0), TFALSE>
 {
 public:
+	// $deBlob: FUNCTION 006cbd00
 	TXUIScene() {}
 };
 
@@ -26,6 +27,7 @@ class XURXUISceneData : public XURXUIControlData
 	};
 
 public:
+	// $deBlob: FUNCTION 006cb800
 	XURXUISceneData()
 	{
 		m_DefaultFocus         = 0;

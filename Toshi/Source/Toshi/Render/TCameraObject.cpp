@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006ada60
 TCameraObject::TCameraObject()
 {
 	m_fNear    = 1.0f;
@@ -17,6 +18,7 @@ TCameraObject::TCameraObject()
 	m_fUnk2    = 1.0f;
 }
 
+// $deBlob: FUNCTION 006adae0
 void TCameraObject::Render()
 {
 	if (m_bEnabled)

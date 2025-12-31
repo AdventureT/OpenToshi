@@ -2,6 +2,7 @@
 #include "ACurrentLevelInformation.h"
 
 
+// $deBlob: FUNCTION 0056d5b0
 void ACurrentLevelInformation::Create(DataBlock a_type)
 {
 	auto assetStreaming = AAssetStreaming::GetSingleton();
@@ -42,6 +43,7 @@ Toshi::TTRB* ACurrentLevelInformation::GetDataBlock(DataBlock a_type)
 	return m_datablocks[a_type];
 }
 
+// $deBlob: FUNCTION 0056d830
 Toshi::TTRB* ACurrentLevelInformation::Stream(DataBlock a_type)
 {
 	auto stream = AAssetStreaming::GetSingleton();

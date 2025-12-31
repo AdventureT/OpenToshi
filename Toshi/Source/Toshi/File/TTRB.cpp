@@ -14,6 +14,7 @@ static constexpr TTRB::t_MemoryFuncDealloc s_cbDefDeallocator = [](TTRB::AllocTy
 
 void* TTRB::s_pDefAllocatorUserData = TNULL;
 
+// $deBlob: FUNCTION 006868a0
 TTRB::TTRB()
 {
 	m_pHeader = TNULL;
@@ -245,6 +246,7 @@ TBOOL TTRB::ProcessForm(TTSFI& ttsf)
 	return result;
 }
 
+// $deBlob: FUNCTION 00686d10
 void* TTRB::GetSymbolAddress(const TCHAR* symbName)
 {
 	// FUN_00686d30
@@ -283,6 +285,7 @@ TINT TTRB::GetSymbolIndex(const TCHAR* symbName)
 	return -1;
 }
 
+// $deBlob: FUNCTION 006869d0
 void TTRB::Close()
 {
 	// FUN_006869d0
@@ -305,6 +308,7 @@ void TTRB::Close()
 	DeleteSymbolTable();
 }
 
+// $deBlob: FUNCTION 00686e20
 void TTRB::SetDefaultMemoryFuncs(t_MemoryFuncAlloc allocator, t_MemoryFuncDealloc deallocator, void* allocatorUserData)
 {
 	if (allocator != TNULL)

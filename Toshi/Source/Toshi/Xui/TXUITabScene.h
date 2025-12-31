@@ -22,6 +22,7 @@ class XURXUITabSceneData : public XURXUISceneData
 	};
 
 public:
+	// $deBlob: FUNCTION 006e7980
 	XURXUITabSceneData() { m_pClass = TFindClass(TXUITabScene, TXUIScene); }
 
 public:

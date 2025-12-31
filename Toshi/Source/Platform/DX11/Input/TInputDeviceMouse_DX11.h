@@ -14,6 +14,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 0067f030
 	TInputDXDeviceMouse() { m_poDXInputDevice = NULL; }
 
 	virtual ~TInputDXDeviceMouse() { Deinitialise(); }

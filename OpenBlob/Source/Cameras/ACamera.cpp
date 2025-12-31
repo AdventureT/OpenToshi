@@ -7,6 +7,7 @@ const Toshi::TVector4 ACamera::sm_vWorldUp    = { 0.0f, -1.0f, 0.0f, 1.0f };
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 0058d920
 void ACamera::ResetCameraMatrix(CameraMatrix& camMat)
 {
 	camMat.m_mMatrix.Identity();
@@ -68,6 +69,7 @@ void ACamera::RotateAroundRight(TFLOAT rotation, TFLOAT a_fVal)
 	LookAtDirection(vAxis);
 }
 
+// $deBlob: FUNCTION 0058d540
 TBOOL ACamera::IsInViewCone(const TVector4& a_rvPos, TFLOAT a_fSphereRadius) const
 {
 	const TMatrix44& transformMatrix = m_Matrix.m_mMatrix;
@@ -81,6 +83,7 @@ TBOOL ACamera::IsInViewCone(const TVector4& a_rvPos, TFLOAT a_fSphereRadius) con
 	);
 }
 
+// $deBlob: FUNCTION 0058d420
 void ACamera::LookAtPoint(const TVector4& point)
 {
 	TVector4 vec;

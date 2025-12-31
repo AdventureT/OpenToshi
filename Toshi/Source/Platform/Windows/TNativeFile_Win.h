@@ -20,7 +20,9 @@ public:
 	virtual _FILETIME GetDate() override;
 	virtual TINT      GetCChar() override;
 	virtual TWCHAR    GetWChar() override;
+	// $deBlob: FUNCTION 00689c30
 	virtual TINT      PutCChar(TCHAR character) { return 0; }
+	// $deBlob: FUNCTION 00689c60
 	virtual TINT      PutWChar(TWCHAR character) { return 0; }
 	virtual TINT      CPrintf(const TCHAR* format, ...);
 	virtual TINT      WPrintf(const TWCHAR* format, ...);

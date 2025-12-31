@@ -91,6 +91,7 @@ public:
 		m_ValueBool = value;
 	}
 
+	// $deBlob: FUNCTION 005b0e70
 	void SetString(const char*& value)
 	{
 		TASSERT(TYPE_STRING == m_eType);

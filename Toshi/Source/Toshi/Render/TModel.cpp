@@ -11,6 +11,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006af640
 TModel::TModel()
 {
 	m_Flags          = Flags::None;
@@ -30,6 +31,7 @@ TModel::TModel()
 	m_fUnk5       = 80.0f;
 }
 
+// $deBlob: FUNCTION 006af7c0
 TModel::~TModel()
 {
 	TASSERT(TNULL == m_pTRB);
@@ -44,6 +46,7 @@ TModel::~TModel()
 	DestroyResource();
 }
 
+// $deBlob: FUNCTION 006b5830
 void TModel::Create(const TCHAR* name, TBOOL bLoadImmediately)
 {
 	TASSERT(TFALSE == IsCreated());
@@ -55,12 +58,14 @@ void TModel::Create(const TCHAR* name, TBOOL bLoadImmediately)
 	m_pName = name;
 }
 
+// $deBlob: FUNCTION 006b58c0
 void TModel::Delete()
 {
 	Unload();
 	delete this;
 }
 
+// $deBlob: FUNCTION 006b58e0
 void TModel::Unload()
 {
 	TIMPLEMENT();
@@ -128,6 +133,7 @@ TBOOL TModel::LoadTRBFile(TFile* pFile)
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006af3d0
 void TModel::UnloadTRB(TBOOL bFreeTrb)
 {
 	if (m_pTRB != TNULL)
@@ -146,6 +152,7 @@ void TModel::UnloadTRB(TBOOL bFreeTrb)
 	m_pSkeleton      = TNULL;
 }
 
+// $deBlob: FUNCTION 006af460
 TModelInstance* TModel::CreateInstance()
 {
 	TIMPLEMENT();
@@ -168,6 +175,7 @@ TModelInstance* TModel::CreateInstance()
 	return pInstance;
 }
 
+// $deBlob: FUNCTION 006af970
 void TModel::CreateResource(const TCHAR* name)
 {
 	T2Resource::CreateResource(name, this, ResourceCallback, this);
@@ -176,6 +184,7 @@ void TModel::CreateResource(const TCHAR* name)
 	pModelManager->AddModel(GetResourceId());
 }
 
+// $deBlob: FUNCTION 006af5b0
 void TModel::CreateSkeleton(TTMDBase::SkeletonHeader* pSkeletonHeader, TSkeleton* pSkeleton, TBOOL bLoadAnimations)
 {
 	if (pSkeletonHeader != TNULL)
@@ -195,6 +204,7 @@ void TModel::CreateSkeleton(TTMDBase::SkeletonHeader* pSkeletonHeader, TSkeleton
 	}
 }
 
+// $deBlob: FUNCTION 006af5a0
 void TModel::CreateCollision(TModelCollision* pModelCollision)
 {
 	m_pCollisionData = pModelCollision;

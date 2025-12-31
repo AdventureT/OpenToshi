@@ -13,6 +13,7 @@ class TALIGNAS(4) TObject
 {
 public:
 	virtual TClass* GetClass() { return &s_Class; }
+	// $deBlob: FUNCTION 0065d160
 	virtual void    Delete() { delete this; };
 	virtual ~TObject() = default;
 

@@ -22,6 +22,7 @@
 #include "Toshi/Xui/TXUI.h"
 #include "XUI/Frontend/ABlobFrontEnd.h"
 
+// $deBlob: FUNCTION 005d4900
 AGameState::UpdateResult AFrontEndMovieState::OnUpdate(TFLOAT deltaTime)
 {
 	TIMPLEMENT();
@@ -115,6 +116,7 @@ AGameState::UpdateResult AFrontEndMovieState::OnUpdate(TFLOAT deltaTime)
 	return UpdateResult_OK;
 }
 
+// $deBlob: FUNCTION 005d4860
 void AFrontEndMovieState::OnInsertion()
 {
 	auto pGUI         = Toshi::T2GUI::GetSingletonSafe();
@@ -132,12 +134,14 @@ void AFrontEndMovieState::OnInsertion()
 	AGameState::OnInsertion();
 }
 
+// $deBlob: FUNCTION 005d48e0
 void AFrontEndMovieState::OnRemoval()
 {
 	TIMPLEMENT();
 	AGameState::OnRemoval();
 }
 
+// $deBlob: FUNCTION 005d4cf0
 void AFrontEndMovieState::OnActivate()
 {
 	AGameState::OnActivate();
@@ -152,6 +156,7 @@ void AFrontEndMovieState::OnActivate()
 	AApplication::g_oTheApp.SetRenderWorld(TFALSE);
 }
 
+// $deBlob: FUNCTION 005d4d60
 void AFrontEndMovieState::OnDeactivate()
 {
 	AGameState::OnDeactivate();
@@ -166,6 +171,7 @@ void AFrontEndMovieState::OnDeactivate()
 	AApplication::g_oTheApp.SetRenderWorld(TTRUE);
 }
 
+// $deBlob: FUNCTION 005d4f50
 TBOOL AFrontEndMovieState::HasBackgroundStoppedShowing()
 {
 	switch (m_iAssetId)
@@ -182,6 +188,7 @@ TBOOL AFrontEndMovieState::HasBackgroundStoppedShowing()
 	return m_fBackgroundLeftTime <= 0.0f;
 }
 
+// $deBlob: FUNCTION 005d4f90
 TBOOL AFrontEndMovieState::HasMovieStopped()
 {
 	switch (m_iAssetId)
@@ -197,6 +204,7 @@ TBOOL AFrontEndMovieState::HasMovieStopped()
 	return !AMoviePlayer::GetSingleton()->IsMoviePlaying();
 }
 
+// $deBlob: FUNCTION 005d4f30
 void AFrontEndMovieState::StopMovieIfPlaying()
 {
 	AMoviePlayer* pPlayer = AMoviePlayer::GetSingleton();
@@ -206,6 +214,7 @@ void AFrontEndMovieState::StopMovieIfPlaying()
 	}
 }
 
+// $deBlob: FUNCTION 005d4fe0
 void AFrontEndMovieState::StartMovie(Asset assetId)
 {
 	AMoviePlayer* pPlayer = AMoviePlayer::GetSingleton();
@@ -222,6 +231,7 @@ void AFrontEndMovieState::StartMovie(Asset assetId)
 	pPlayer->PlayMovie(s_Assets[assetId], 0, 0);
 }
 
+// $deBlob: FUNCTION 005d5300
 void AFrontEndMovieState::StartBlobFrontendMenu()
 {
 	TIMPLEMENT();

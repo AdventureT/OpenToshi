@@ -8,6 +8,7 @@ TBOOL        TAssetInit::g_bAllowCrossTRBReferences;
 TTRB*        TAssetInit::g_pCurrentTRB;
 TMemoryHeap* TAssetInit::g_pMemHeap = TNULL;
 
+// $deBlob: FUNCTION 006b1830
 void TAssetInit::InitAssets(TTRB& a_trb, TBOOL createResources, TBOOL allowCrossTRBReferences)
 {
 	size_t                funcCount = 0;
@@ -36,6 +37,7 @@ void TAssetInit::InitAssets(TTRB& a_trb, TBOOL createResources, TBOOL allowCross
 	g_pCurrentTRB = TNULL;
 }
 
+// $deBlob: FUNCTION 006b1950
 void TAssetInit::DeinitAssets(TTRB& a_trb)
 {
 	const FourCCFunction* functions = g_FourCCDeinitFunctions;

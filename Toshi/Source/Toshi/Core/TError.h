@@ -9,6 +9,7 @@ public:
 	~TError();
 
 	void         AddError(const TCHAR* error, ...);
+	// $deBlob: FUNCTION 00663530
 	const TCHAR* GetError(TUINT32 index) { return index > -1 && index < m_currentSize2 ? &m_Buffer1[m_Buffer2[index]] : "invalid error id"; }
 
 	TCHAR*  m_Buffer1;      // 0x0

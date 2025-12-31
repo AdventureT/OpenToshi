@@ -18,6 +18,7 @@ public:
 
 	void Update();
 
+	// $deBlob: FUNCTION 006616a0
 	TBOOL Pause(TBOOL pause)
 	{
 		TBOOL oldState = m_Paused;

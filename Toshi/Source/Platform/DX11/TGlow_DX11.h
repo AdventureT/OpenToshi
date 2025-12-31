@@ -11,6 +11,7 @@ public:
 
 	void Render(ID3D11ShaderResourceView* srv, ID3D11ShaderResourceView* srv2);
 
+	// $deBlob: FUNCTION 006b4cc0
 	void SetIntensity(TFLOAT a_fIntensity)
 	{
 		TASSERT(a_fIntensity >= 0.0f);
@@ -19,6 +20,7 @@ public:
 
 	TFLOAT GetIntensity() const { return m_fIntensity; }
 
+	// $deBlob: FUNCTION 006b4c60
 	void SetDist(TFLOAT a_fDist)
 	{
 		TASSERT(a_fDist >= 0.0f);

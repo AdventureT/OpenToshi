@@ -23,6 +23,7 @@ class XURXUISliderBarData : public XURXUIControlData
 	};
 
 public:
+	// $deBlob: FUNCTION 006e5500
 	XURXUISliderBarData()
 	{
 		m_iRangeMin  = 0;

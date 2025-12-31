@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006b8d60
 TPostProcess::TPostProcess()
 {
 	TTODO("Allocate some buffers, set other variables");
@@ -48,6 +49,7 @@ static inline TFLOAT GaussianDistribution(TFLOAT x, TFLOAT y, TFLOAT rho) noexce
 	return expf(-(x * x + y * y) / (2 * rho * rho)) / sqrtf(2 * DirectX::XM_PI * rho * rho);
 }
 
+// $deBlob: FUNCTION 006b8350
 void TPostProcess::GaussianBlur5x5(TINT texWidth, TINT texHeight, TVector4* offsets, TVector4* weights, TFLOAT fUnk)
 {
 	const TFLOAT tu = 1.0f / TFLOAT(texWidth);
@@ -95,6 +97,7 @@ void TPostProcess::GaussianBlur5x5(TINT texWidth, TINT texHeight, TVector4* offs
 	}
 }
 
+// $deBlob: FUNCTION 006b9420
 void TPostProcess::DrawScreenOverlay()
 {
 	TASSERT(m_pQuadVtxDecl);
@@ -112,6 +115,7 @@ void TPostProcess::DrawScreenOverlay()
 	renderer->DrawNonIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, m_pQuadVB, 4, 8, 0, 0);
 }
 
+// $deBlob: FUNCTION 006b8b00
 void TPostProcess::RenderImpl(ID3D11PixelShader* pPS, ID3D11ShaderResourceView* pSRV, TFLOAT fIntensity, ID3D11ShaderResourceView* pStencilSRV)
 {
 	auto renderer      = TRenderDX11::Interface();

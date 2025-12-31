@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006d5030
 TXUIRenderer::TXUIRenderer()
 {
 	m_pTransforms            = new T2GUITransform[TRANSFORMSTACKSIZE];
@@ -13,11 +14,13 @@ TXUIRenderer::TXUIRenderer()
 	m_OldDepthState.Raw      = 0;
 }
 
+// $deBlob: FUNCTION 006d50e0
 TXUIRenderer::~TXUIRenderer()
 {
 	delete[] m_pTransforms;
 }
 
+// $deBlob: FUNCTION 006d51c0
 void TXUIRenderer::BeginScene()
 {
 	TASSERT(m_iTransformStackPointer == 0);
@@ -65,11 +68,13 @@ void TXUIRenderer::BeginScene()
 	SetColour(0xFFFFFFFF);
 }
 
+// $deBlob: FUNCTION 006d53a0
 void TXUIRenderer::EndScene()
 {
 	TASSERT(0 == m_iTransformStackPointer);
 }
 
+// $deBlob: FUNCTION 006d53e0
 void TXUIRenderer::SetMaterial(T2GUIMaterial* pMat)
 {
 	auto      pPrimShader = TPrimShader::GetSingleton();
@@ -86,6 +91,7 @@ void TXUIRenderer::SetMaterial(T2GUIMaterial* pMat)
 	m_pMaterial = pMat;
 }
 
+// $deBlob: FUNCTION 006d5480
 void TXUIRenderer::PushTransform(const T2GUITransform& transform, const TVector2& vec1, const TVector2& vec2)
 {
 	T2GUITransform transform1;
@@ -105,6 +111,7 @@ void TXUIRenderer::PushTransform(const T2GUITransform& transform, const TVector2
 	m_bIsInScene = TTRUE;
 }
 
+// $deBlob: FUNCTION 006d5690
 void TXUIRenderer::PopTransform()
 {
 	TASSERT(m_iTransformStackPointer > 0);
@@ -112,17 +119,20 @@ void TXUIRenderer::PopTransform()
 	m_bIsInScene = TTRUE;
 }
 
+// $deBlob: FUNCTION 006d56e0
 void TXUIRenderer::SetTransform(const T2GUITransform& transform)
 {
 	m_pTransforms[m_iTransformStackPointer] = transform;
 	m_bIsInScene                            = TTRUE;
 }
 
+// $deBlob: FUNCTION 006d6eb0
 void TXUIRenderer::SetColour(TUINT32 colour)
 {
 	m_ui32Colour = colour;
 }
 
+// $deBlob: FUNCTION 006d5800
 void TXUIRenderer::RenderRectangle(const TVector2& a, const TVector2& b, const TVector2& uv1, const TVector2& uv2)
 {
 	if (m_bIsInScene)
@@ -170,6 +180,7 @@ void TXUIRenderer::RenderRectangle(const TVector2& a, const TVector2& b, const T
 	pPrimShader->StopRendering();
 }
 
+// $deBlob: FUNCTION 006d59b0
 void TXUIRenderer::RenderTriStrip(TVector2* vertices, TVector2* UV, TUINT32 numverts, TFLOAT fPosScaleX, TFLOAT fPosScaleY)
 {
 	if (m_bIsInScene)
@@ -296,6 +307,7 @@ void TXUIRenderer::RenderLine(TFLOAT x1, TFLOAT y1, TFLOAT x2, TFLOAT y2)
 	SetMaterial(pOldMat);
 }
 
+// $deBlob: FUNCTION 006d5f50
 void TXUIRenderer::RenderOutlineRectangle(const TVector2& a, const TVector2& b)
 {
 	auto pOldMat = m_pMaterial;
@@ -347,6 +359,7 @@ void TXUIRenderer::RenderOutlineRectangle(const TVector2& a, const TVector2& b)
 	SetMaterial(pOldMat);
 }
 
+// $deBlob: FUNCTION 006d6100
 void TXUIRenderer::RenderFilledRectangle(const TVector2& a, const TVector2& b)
 {
 	auto pOldMat = m_pMaterial;
@@ -398,6 +411,7 @@ void TXUIRenderer::RenderFilledRectangle(const TVector2& a, const TVector2& b)
 	SetMaterial(pOldMat);
 }
 
+// $deBlob: FUNCTION 006d62b0
 void TXUIRenderer::RenderIndexedTriList(TVector2* pVertices, TVector2* pUV, void* pIndices, TUINT32 numindices, TINT indexSize, TUINT32 numverts, TFLOAT fPosScaleX, TFLOAT fPosScaleY)
 {
 	if (m_bIsInScene)
@@ -475,6 +489,7 @@ void TXUIRenderer::RenderIndexedTriList(TVector2* pVertices, TVector2* pUV, void
 	pRender->SetBlendMode(TTRUE, D3D11_BLEND_OP_ADD, D3D11_BLEND_ONE, D3D11_BLEND_ZERO);
 }
 
+// $deBlob: FUNCTION 006d66d0
 void TXUIRenderer::RenderIndexedTriStripColoursList(TVector2* pVertices, TVector2* pUV, TUINT32* pColors, void* pIndices, TUINT32 numindices, TINT indexSize, TUINT32 numverts, TFLOAT fPosScaleX, TFLOAT fPosScaleY)
 {
 	if (m_bIsInScene)
@@ -547,6 +562,7 @@ void TXUIRenderer::RenderIndexedTriStripColoursList(TVector2* pVertices, TVector
 	pRender->DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, numindices, pIndices, eFormat, s_Vertices, sizeof(TPrimShader::Vertex), numverts);
 }
 
+// $deBlob: FUNCTION 006d6ab0
 void TXUIRenderer::ScaleCoords(TFLOAT& x, TFLOAT& y)
 {
 	auto          pDisplayParams = TRenderDX11::Interface()->GetCurrentDisplayParams();
@@ -559,6 +575,7 @@ void TXUIRenderer::ScaleCoords(TFLOAT& x, TFLOAT& y)
 	y /= pDisplayParams->Height / fRootHeight;
 }
 
+// $deBlob: FUNCTION 006d5730
 void TXUIRenderer::SetScissors(TFLOAT f1, TFLOAT f2, TFLOAT f3, TFLOAT f4)
 {
 	TASSERT(m_OldDepthState.Raw == 0);
@@ -570,6 +587,7 @@ void TXUIRenderer::SetScissors(TFLOAT f1, TFLOAT f2, TFLOAT f3, TFLOAT f4)
 	pRender->SetZMode(TTRUE, D3D11_COMPARISON_EQUAL, D3D11_DEPTH_WRITE_MASK_ALL);
 }
 
+// $deBlob: FUNCTION 006d57b0
 void TXUIRenderer::ClearScissors()
 {
 	auto pRender = TRenderDX11::Interface();
@@ -580,6 +598,7 @@ void TXUIRenderer::ClearScissors()
 	m_OldDepthState.Raw = 0;
 }
 
+// $deBlob: FUNCTION 006d5100
 TUINT32 TXUIRenderer::GetWidth(T2GUIMaterial* pMat)
 {
 	TASSERT(pMat->IsA(TGetClass(T2GUIMaterial)));
@@ -593,6 +612,7 @@ TUINT32 TXUIRenderer::GetWidth(T2GUIMaterial* pMat)
 	return 0;
 }
 
+// $deBlob: FUNCTION 006d5160
 TUINT32 TXUIRenderer::GetHeight(T2GUIMaterial* pMat)
 {
 	TASSERT(pMat->IsA(TGetClass(T2GUIMaterial)));
@@ -606,6 +626,7 @@ TUINT32 TXUIRenderer::GetHeight(T2GUIMaterial* pMat)
 	return 0;
 }
 
+// $deBlob: FUNCTION 006d5b70
 void TXUIRenderer::RenderTriStripColours(TVector2* pVertices, TVector2* pUV, TUINT32* pColors, size_t numverts, TFLOAT fPosScaleX, TFLOAT fPosScaleY)
 {
 	if (m_bIsInScene)

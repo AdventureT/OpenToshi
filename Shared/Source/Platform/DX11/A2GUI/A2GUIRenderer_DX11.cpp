@@ -10,6 +10,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 0054f600
 A2GUIRenderer::A2GUIRenderer()
 {
 	m_pTransforms            = TNULL;
@@ -24,6 +25,7 @@ A2GUIRenderer::~A2GUIRenderer()
 	delete[] m_pTransforms;
 }
 
+// $deBlob: FUNCTION 0054f7f0
 TTexture* A2GUIRenderer::GetTexture(const char* texName) const
 {
 	char lowercaseTexName[512];
@@ -36,6 +38,7 @@ TTexture* A2GUIRenderer::GetTexture(const char* texName) const
 	return TTextureManager::GetSingleton()->FindTexture(lowercaseTexName);
 }
 
+// $deBlob: FUNCTION 0054f970
 void A2GUIRenderer::BeginScene()
 {
 	TASSERT(m_iTransformStackPointer == 0);
@@ -71,11 +74,13 @@ void A2GUIRenderer::BeginScene()
 	SetColour(0xFFFFFFFF);
 }
 
+// $deBlob: FUNCTION 0054fad0
 void A2GUIRenderer::EndScene()
 {
 	TASSERT(m_iTransformStackPointer == 0);
 }
 
+// $deBlob: FUNCTION 0054fb10
 void A2GUIRenderer::SetMaterial(T2GUIMaterial* pMat)
 {
 	auto      pPrimShader = TPrimShader::GetSingleton();
@@ -91,6 +96,7 @@ void A2GUIRenderer::SetMaterial(T2GUIMaterial* pMat)
 	m_pMaterial = pMat;
 }
 
+// $deBlob: FUNCTION 0054fb90
 void A2GUIRenderer::PushTransform(const T2GUITransform& transform, const TVector2& vec1, const TVector2& vec2)
 {
 	T2GUITransform transform1;
@@ -110,6 +116,7 @@ void A2GUIRenderer::PushTransform(const T2GUITransform& transform, const TVector
 	m_bIsInScene = TTRUE;
 }
 
+// $deBlob: FUNCTION 0054fda0
 void A2GUIRenderer::PopTransform()
 {
 	TASSERT(m_iTransformStackPointer > 0);
@@ -117,17 +124,20 @@ void A2GUIRenderer::PopTransform()
 	m_bIsInScene = TTRUE;
 }
 
+// $deBlob: FUNCTION 0054fdf0
 void A2GUIRenderer::SetTransform(const T2GUITransform& transform)
 {
 	m_pTransforms[m_iTransformStackPointer] = transform;
 	m_bIsInScene                            = TTRUE;
 }
 
+// $deBlob: FUNCTION 00550fb0
 void A2GUIRenderer::SetColour(uint32_t colour)
 {
 	m_ui32Colour = colour;
 }
 
+// $deBlob: FUNCTION 0054fe40
 void A2GUIRenderer::RenderRectangle(const TVector2& a, const TVector2& b, const TVector2& uv1, const TVector2& uv2)
 {
 	if (m_bIsInScene)
@@ -174,6 +184,7 @@ void A2GUIRenderer::RenderRectangle(const TVector2& a, const TVector2& b, const 
 	pPrimShader->StopRendering();
 }
 
+// $deBlob: FUNCTION 0054ffe0
 void A2GUIRenderer::RenderTriStrip(TVector2* vertices, TVector2* UV, uint32_t numverts, float fPosScaleX, float fPosScaleY)
 {
 	if (m_bIsInScene)
@@ -283,6 +294,7 @@ void A2GUIRenderer::RenderLine(float x1, float y1, float x2, float y2)
 	SetMaterial(pOldMat);
 }
 
+// $deBlob: FUNCTION 00550320
 void A2GUIRenderer::RenderOutlineRectangle(const TVector2& a, const TVector2& b)
 {
 	auto pOldMat = m_pMaterial;
@@ -333,6 +345,7 @@ void A2GUIRenderer::RenderOutlineRectangle(const TVector2& a, const TVector2& b)
 	SetMaterial(pOldMat);
 }
 
+// $deBlob: FUNCTION 005504c0
 void A2GUIRenderer::RenderFilledRectangle(const TVector2& a, const TVector2& b)
 {
 	auto pOldMat = m_pMaterial;
@@ -383,16 +396,19 @@ void A2GUIRenderer::RenderFilledRectangle(const TVector2& a, const TVector2& b)
 	SetMaterial(pOldMat);
 }
 
+// $deBlob: FUNCTION 00550e40
 void A2GUIRenderer::RenderIndexedTriList(TVector2* pVertices, TVector2* pUV, void* pIndices, uint32_t numindices, int indexSize, uint32_t numverts, float fPosScaleX, float fPosScaleY)
 {
 	TASSERT(TFALSE, "Not implemented in the original engine");
 }
 
+// $deBlob: FUNCTION 00550e70
 void A2GUIRenderer::RenderIndexedTriStripColoursList(TVector2* pVertices, TVector2* pUV, uint32_t* pColors, void* pIndices, uint32_t numindices, int indexSize, uint32_t numverts, float fPosScaleX, float fPosScaleY)
 {
 	TASSERT(TFALSE, "Not implemented in the original engine");
 }
 
+// $deBlob: FUNCTION 00550a70
 void A2GUIRenderer::ScaleCoords(float& x, float& y)
 {
 	auto          pDisplayParams = TRenderDX11::Interface()->GetCurrentDisplayParams();
@@ -429,6 +445,7 @@ T2GUIMaterial* A2GUIRenderer::CreateMaterial(TTexture* pTex)
 	return pMaterial;
 }
 
+// $deBlob: FUNCTION 0054f780
 void A2GUIRenderer::DestroyMaterial(T2GUIMaterial* pMat)
 {
 	if (pMat != TNULL)
@@ -439,6 +456,7 @@ void A2GUIRenderer::DestroyMaterial(T2GUIMaterial* pMat)
 	}
 }
 
+// $deBlob: FUNCTION 0054f8b0
 uint32_t A2GUIRenderer::GetWidth(T2GUIMaterial* pMat)
 {
 	TASSERT(pMat->IsA(TGetClass(T2GUIMaterial)));
@@ -452,6 +470,7 @@ uint32_t A2GUIRenderer::GetWidth(T2GUIMaterial* pMat)
 	return 0;
 }
 
+// $deBlob: FUNCTION 0054f910
 uint32_t A2GUIRenderer::GetHeight(Toshi::T2GUIMaterial* pMat)
 {
 	TASSERT(pMat->IsA(TGetClass(T2GUIMaterial)));

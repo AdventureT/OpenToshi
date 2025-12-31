@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006bb170
 void TViewport::BeginSKU()
 {
 	auto pRender        = TRenderDX11::Interface();
@@ -48,11 +49,13 @@ void TViewport::BeginSKU()
 	}
 }
 
+// $deBlob: FUNCTION 006bb2f0
 void TViewport::EndSKU()
 {
 	TRenderDX11::Interface()->FlushShaders();
 }
 
+// $deBlob: FUNCTION 006bb300
 void TViewport::ChangeSKU(ChangeEvent a_eEvent)
 {}
 

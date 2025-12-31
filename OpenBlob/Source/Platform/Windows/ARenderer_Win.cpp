@@ -31,6 +31,7 @@ static void MainScene(TFLOAT deltaTime, void* pCameraObject)
 {
 }
 
+// $deBlob: FUNCTION 005ed0e0
 ARenderer::ARenderer()
 {
 	// 005ed0e0
@@ -40,12 +41,14 @@ ARenderer::ARenderer()
 	m_BackgroundColor  = TCOLOR(0, 0, 0);
 }
 
+// $deBlob: FUNCTION 005f0140
 ARenderer::~ARenderer()
 {
 	TIMPLEMENT();
 	// 005f0140
 }
 
+// $deBlob: FUNCTION 005ed6e0
 void ARenderer::Update(TFLOAT deltaTime)
 {
 	TIMPLEMENT();
@@ -118,6 +121,7 @@ void ARenderer::Update(TFLOAT deltaTime)
 	pRender->EndScene();
 }
 
+// $deBlob: FUNCTION 005ed3b0
 TBOOL ARenderer::CreateInterface()
 {
 	// 005ed3b0
@@ -135,6 +139,7 @@ TBOOL ARenderer::CreateInterface()
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 005f0780
 TBOOL ARenderer::CreateTRender()
 {
 	// 005f0780
@@ -226,6 +231,7 @@ TBOOL ARenderer::CreateTRender()
 	}
 }
 
+// $deBlob: FUNCTION 005ed3d0
 void ARenderer::Create()
 {
 	TIMPLEMENT();
@@ -268,6 +274,7 @@ void ARenderer::Create()
 	m_pRectangle->SetVisible(TTRUE);
 }
 
+// $deBlob: FUNCTION 005edc00
 void ARenderer::SetBackgroundColour(TUINT32 r, TUINT32 g, TUINT32 b)
 {
 	if (m_pViewport != TNULL)
@@ -278,11 +285,13 @@ void ARenderer::SetBackgroundColour(TUINT32 r, TUINT32 g, TUINT32 b)
 	m_BackgroundColor = TCOLOR(r, g, b);
 }
 
+// $deBlob: FUNCTION 005ef2f0
 void ARenderer::RenderLoadingScreen(TFLOAT fDeltaTime)
 {
 	TIMPLEMENT();
 }
 
+// $deBlob: FUNCTION 005efb60
 void ARenderer::RenderGUI(TBOOL allowBackgroundClear)
 {
 	TIMPLEMENT();
@@ -311,6 +320,7 @@ void ARenderer::RenderImGui(TBOOL allowBackgroundClear)
 #endif // TOSHI_DEBUG
 }
 
+// $deBlob: FUNCTION 005eeba0
 void ARenderer::RenderMainScene(TFLOAT deltaTime, TViewport* pViewport, TCameraObject* pCameraObject, ACamera* pCamera, t_MainScene mainSceneCb, TBOOL bAllowBackgroundClear)
 {
 	TIMPLEMENT();
@@ -345,6 +355,7 @@ void ARenderer::RenderMainScene(TFLOAT deltaTime, TViewport* pViewport, TCameraO
 	pRender->SetCurrentRenderContext(pOriginalContext);
 }
 
+// $deBlob: FUNCTION 005ef870
 void ARenderer::CreateMainViewport()
 {
 	auto renderer       = TRenderDX11::Interface();
@@ -367,6 +378,7 @@ void ARenderer::CreateMainViewport()
 	renderer->m_pGlow->SetIntensity(4.0f);
 }
 
+// $deBlob: FUNCTION 005ef610
 void ARenderer::GetAppCamera()
 {
 	TASSERT(ACameraManager::IsSingletonCreated());
@@ -402,6 +414,7 @@ void ARenderer::GetAppCamera()
 	}
 }
 
+// $deBlob: FUNCTION 005efa90
 void ARenderer::InitialiseViewPort()
 {
 	TUINT8 r = TCOLOR_GET_RED(m_BackgroundColor);
@@ -417,6 +430,7 @@ void ARenderer::InitialiseViewPort()
 	}
 }
 
+// $deBlob: FUNCTION 005f0a50
 void ARenderer::CreateTRenderResources()
 {
 	// Since this is deprecated and factory resource classes don't even exist, TSysShader is not used too

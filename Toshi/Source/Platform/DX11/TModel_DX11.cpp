@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006afb90
 void* TModel::ResourceCallback(void* pData, TTRB* pTRB, TBOOL bCreated)
 {
 	TModel* pModel = TSTATICCAST(TModel, pData);
@@ -27,6 +28,7 @@ void* TModel::ResourceCallback(void* pData, TTRB* pTRB, TBOOL bCreated)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006b5b20
 TBOOL TModelHAL::Create(TTMDWin::TTRBWinHeader* pTMDHeader)
 {
 	CreateResource(pTMDHeader->m_pTXSModelName);

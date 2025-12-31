@@ -56,6 +56,7 @@ public:
 	TTSFI();
 	~TTSFI() { Close(); }
 
+	// $deBlob: FUNCTION 00688220
 	size_t ReadAlignmentPad()
 	{
 		TASSERT(m_pFile != TNULL, "File is TNULL");
@@ -207,12 +208,14 @@ public:
 		return m_pFile->Write(&value, sizeof(T));
 	}
 
+	// $deBlob: FUNCTION 00688ed0
 	size_t WriteRaw(const void* buffer, size_t size)
 	{
 		TASSERT(m_pFile != TNULL, "TTSFO is not created");
 		return m_pFile->Write(buffer, size);
 	}
 
+	// $deBlob: FUNCTION 00688ee0
 	size_t WriteCompressed(const void* buffer, size_t size)
 	{
 		TASSERT(m_pFile != TNULL, "TTSFO is not created");
@@ -221,11 +224,14 @@ public:
 		return writtenSize;
 	}
 
+	// $deBlob: FUNCTION 00688f10
 	void WriteBool(TBOOL value) { Write(value); }
 	void WriteInt8(int8_t value) { Write(value); }
 	void WriteUInt8(TUINT8 value) { Write(value); }
 	void WriteUInt16(TUINT16 value) { Write(value); }
+	// $deBlob: FUNCTION 00688f30
 	void WriteInt32(TINT32 value) { Write(value); }
+	// $deBlob: FUNCTION 00688f50
 	void WriteUInt32(TUINT32 value) { Write(value); }
 	void WriteFloat(TFLOAT value) { Write(value); }
 	void WriteVector3(TVector3& value) { Write(value); }

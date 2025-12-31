@@ -31,6 +31,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 006a4420
 	TTexture()
 	{
 		m_Unk1         = TNULL;
@@ -63,6 +64,7 @@ public:
 	TTexture* GetPrev() const { return m_pPrevTexture; }
 	TTexture* GetNext() const { return m_pNextTexture; }
 
+	// $deBlob: FUNCTION 00693950
 	TBOOL CheckFormat() { return m_TexInfo->Format == DXGI_FORMAT_R8G8B8A8_UNORM || m_TexInfo->Format == DXGI_FORMAT_BC3_UNORM; }
 	void  SetName(const TCHAR* name) { m_TexName = name; }
 	void  SetSamplerId(TINT iSamplerId) { m_SamplerId = iSamplerId; }

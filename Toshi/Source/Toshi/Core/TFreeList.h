@@ -49,6 +49,7 @@ public:
 	TINT GetCapacity() const { return m_iCapacity; }
 	TINT GetGrowSize() const { return m_iGrowSize; }
 
+	// $deBlob: FUNCTION 006f2e20
 	void  SetGrowSize(TINT a_iGrowSize) { a_iGrowSize < 0 ? m_iGrowSize = 8 : m_iGrowSize = a_iGrowSize; }
 	void* New(TUINT a_uiSize);
 

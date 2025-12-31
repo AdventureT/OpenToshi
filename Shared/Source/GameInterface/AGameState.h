@@ -126,6 +126,7 @@ public:
 
 	void RemoveSelf();
 
+	// $deBlob: FUNCTION 005c9030
 	TBOOL HandleMenuRequestToChangeState(uint32_t menuType)
 	{
 	}

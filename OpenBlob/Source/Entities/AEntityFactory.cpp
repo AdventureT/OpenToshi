@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "AEntityFactory.h"
 
+// $deBlob: FUNCTION 00759690
 void AEntityFactory::CreateEntity(const TCHAR* a_szEntityName, TINT unk)
 {
 	Toshi::TString8 str = "data/entities/";
@@ -10,6 +11,7 @@ void AEntityFactory::CreateEntity(const TCHAR* a_szEntityName, TINT unk)
 	t->CreateObject();*/
 }
 
+// $deBlob: FUNCTION 0075aba0
 AEntityFactory::AEntityTypeData* AEntityFactory::GetEntityTypeData(const TCHAR* a_szEntityName)
 {
 	for (TINT i = 0; i < m_sEntityTypeDatas.Size(); i++)

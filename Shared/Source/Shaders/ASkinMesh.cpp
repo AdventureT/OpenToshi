@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ASkinMesh.h"
 
+// $deBlob: FUNCTION 00600f80
 ASkinMesh::ASkinMesh()
 {
 	m_uiFlags        = 0;
@@ -9,6 +10,7 @@ ASkinMesh::ASkinMesh()
 	m_pVertexPool    = TNULL;
 }
 
+// $deBlob: FUNCTION 00600e40
 TBOOL ASkinMesh::Validate()
 {
 	if (!m_State.IsSet(State::Validated))
@@ -17,6 +19,7 @@ TBOOL ASkinMesh::Validate()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00600e60
 void ASkinMesh::Invalidate()
 {
 	if (m_State.IsSet(State::Validated))

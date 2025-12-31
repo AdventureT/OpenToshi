@@ -54,14 +54,18 @@ public:
 	static TMemoryHeap* dlheapcreatesubheap(TMemoryHeap* heap, size_t size, TMemoryHeapFlags flags, const TCHAR name[HEAP_MAXNAME]);
 	static TMemoryHeap* dlheapcreate(TMemoryHeap* heap, size_t size, TMemoryHeapFlags flags, const TCHAR name[HEAP_MAXNAME]) { return TMemory::dlheapcreatesubheap(heap, size, flags, name); }
 
+	// $deBlob: FUNCTION 006fbb70
 	static TMemoryHeap* CreateHeapInPlace(void* ptr, size_t heapSize, TMemoryHeapFlags flags, const TCHAR name[HEAP_MAXNAME]) { return TMemory::dlheapcreateinplace(ptr, heapSize, flags, name); }
+	// $deBlob: FUNCTION 006fbb60
 	static TMemoryHeap* CreateHeap(size_t size, TMemoryHeapFlags flags, const TCHAR name[HEAP_MAXNAME]) { return TMemory::dlheapcreate(s_GlobalHeap, size, flags, name); }
 	static void         DestroyHeap(TMemoryHeap* heap) { TMemory::dlheapdestroy(heap); }
 
 	static void OutOfMem(TMemoryHeap* heap, size_t size);
 	static void Shutdown();
 
+	// $deBlob: FUNCTION 006fbe10
 	static TMemoryHeap*       GetGlobalHeap() { return s_GlobalHeap; }
+	// $deBlob: FUNCTION 006fbfc0
 	static void               AcquireMutex() { TMemory::s_GlobalMutex.Lock(); }
 	static void               ReleaseMutex() { TMemory::s_GlobalMutex.Unlock(); }
 	static unsigned long long GetNumOfAllocatedBytes() { return s_NumAllocatedBytes; }
@@ -113,6 +117,7 @@ public:
 	void* GetMSpace() const { return m_MSpace; }
 
 private:
+	// $deBlob: FUNCTION 006fbf80
 	void CreateMutex() { m_Mutex.Create(); }
 	void DestroyMutex() { m_Mutex.Destroy(); }
 

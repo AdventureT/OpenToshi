@@ -7,6 +7,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 005cab10
 AMovieState::AMovieState(const char* name, TBOOL a_bUseSoundChannels, TBOOL bUseLocalePostFix, TBOOL unk3, AGameState* gameState)
     : AGameState(), m_stringVector(GetGlobalAllocator(), 1, 0)
 {
@@ -18,6 +19,7 @@ AMovieState::AMovieState(const char* name, TBOOL a_bUseSoundChannels, TBOOL bUse
 	m_stringVector.PushBack(new TString8(name));
 }
 
+// $deBlob: FUNCTION 005cae80
 AGameState::UpdateResult AMovieState::OnUpdate(float deltaTime)
 {
 	TIMPLEMENT();
@@ -44,6 +46,7 @@ AGameState::UpdateResult AMovieState::OnUpdate(float deltaTime)
 	return UpdateResult();
 }
 
+// $deBlob: FUNCTION 005cadb0
 void AMovieState::OnInsertion()
 {
 	auto inputMng = AInputManager2::GetSingleton();
@@ -52,6 +55,7 @@ void AMovieState::OnInsertion()
 	m_InputHelper.Update();
 }
 
+// $deBlob: FUNCTION 005cb140
 void AMovieState::PlayMovie(TUINT8 unk)
 {
 	TString8        str       = **m_stringVector.Begin();

@@ -27,8 +27,10 @@ public:
 	virtual TBOOL OnCreate(TINT argc, TCHAR** argv);
 	virtual TBOOL OnUpdate(TFLOAT deltaTime);
 	virtual TBOOL OnDestroy();
+	// $deBlob: FUNCTION 0056c3b0
 	virtual TBOOL IsConsoleEnabled() { return TTRUE; }
 
+	// $deBlob: FUNCTION 006ef3b0
 	static void OnApplicationExitEvent(void* a_pApp, const TApplicationExitEvent& a_rEvent) { TSTATICCAST(TApplication, a_pApp)->Destroy(); }
 
 	// Returns TTRUE if success

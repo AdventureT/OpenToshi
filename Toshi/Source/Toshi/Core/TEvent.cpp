@@ -7,4 +7,5 @@ void Toshi::TGenericListener::Connect(TGenericEmitter* emitter, void* caller, t_
 	m_pCallback = callback;
 	m_Unk       = unk2;
 	emitter->m_Listeners.Insert(this);
+// $deBlob: FUNCTION 00663240
 }

@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006781f0
 TInputDXDeviceKeyboard::TInputDXDeviceKeyboard()
 {
 	m_iSomeNum        = 0;
@@ -13,6 +14,7 @@ TInputDXDeviceKeyboard::TInputDXDeviceKeyboard()
 	m_aKeys.InitialiseAll({ TNULL });
 }
 
+// $deBlob: FUNCTION 006783e0
 void TInputDXDeviceKeyboard::Release()
 {
 	if (m_poDXInputDevice)
@@ -22,6 +24,7 @@ void TInputDXDeviceKeyboard::Release()
 	}
 }
 
+// $deBlob: FUNCTION 00678380
 TBOOL TInputDXDeviceKeyboard::Acquire()
 {
 	m_bIsUpdating = TFALSE;
@@ -41,6 +44,7 @@ TBOOL TInputDXDeviceKeyboard::Acquire()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006783c0
 TBOOL TInputDXDeviceKeyboard::Unacquire()
 {
 	m_bIsUpdating = TFALSE;
@@ -49,11 +53,13 @@ TBOOL TInputDXDeviceKeyboard::Unacquire()
 	return SUCCEEDED(m_poDXInputDevice->Unacquire());
 }
 
+// $deBlob: FUNCTION 006784d0
 void TInputDXDeviceKeyboard::Update(TFLOAT deltaTime)
 {
 	if (IsAcquired()) m_bIsUpdating = TTRUE;
 }
 
+// $deBlob: FUNCTION 00678400
 TBOOL TInputDXDeviceKeyboard::Flush()
 {
 	if (IsAcquired())
@@ -75,6 +81,7 @@ TBOOL TInputDXDeviceKeyboard::Flush()
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006784e0
 TINT TInputDXDeviceKeyboard::ProcessEvents(EventEmitter& emitter, TFLOAT deltaTime)
 {
 	if (m_bIsUpdating)
@@ -125,11 +132,13 @@ TINT TInputDXDeviceKeyboard::ProcessEvents(EventEmitter& emitter, TFLOAT deltaTi
 	}
 }
 
+// $deBlob: FUNCTION 00678650
 TINT TInputDXDeviceKeyboard::GetButtonCount() const
 {
 	return 0;
 }
 
+// $deBlob: FUNCTION 00678660
 TBOOL TInputDXDeviceKeyboard::IsDown(TINT doodad) const
 {
 	if (!m_bIsUpdating) return TFALSE;
@@ -149,21 +158,25 @@ TBOOL TInputDXDeviceKeyboard::IsEnabled() const
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00678770
 TBOOL TInputDXDeviceKeyboard::IsShiftDown() const
 {
 	return (m_pKeyStates1[DIK_LSHIFT] & 0x80) || (m_pKeyStates1[DIK_RSHIFT] & 0x80);
 }
 
+// $deBlob: FUNCTION 00678790
 TBOOL TInputDXDeviceKeyboard::IsControlDown() const
 {
 	return (m_pKeyStates1[DIK_LCONTROL] & 0x80) || (m_pKeyStates1[DIK_RCONTROL] & 0x80);
 }
 
+// $deBlob: FUNCTION 006787b0
 TBOOL TInputDXDeviceKeyboard::IsAltDown() const
 {
 	return (m_pKeyStates1[DIK_LALT] & 0x80) || (m_pKeyStates1[DIK_RALT] & 0x80);
 }
 
+// $deBlob: FUNCTION 006786e0
 TBOOL TInputDXDeviceKeyboard::WasDown(TINT doodad) const
 {
 	if (!m_bIsUpdating) return TFALSE;
@@ -178,6 +191,7 @@ TBOOL TInputDXDeviceKeyboard::WasDown(TINT doodad) const
 		return m_pKeyStates2[TranslateDXToDoodad(doodad)] & 0x80;
 }
 
+// $deBlob: FUNCTION 006787d0
 TWCHAR* TInputDXDeviceKeyboard::TranslateDoodadToCharacter(TINT doodad) const
 {
 #pragma warning(disable : 4309)
@@ -209,6 +223,7 @@ TWCHAR* TInputDXDeviceKeyboard::TranslateDoodadToCharacter(TINT doodad) const
 	return s_Buffer;
 }
 
+// $deBlob: FUNCTION 00678320
 TBOOL TInputDXDeviceKeyboard::Initialise()
 {
 	m_iSomeNum = 0;
@@ -220,12 +235,14 @@ TBOOL TInputDXDeviceKeyboard::Initialise()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00678370
 TBOOL TInputDXDeviceKeyboard::Deinitialise()
 {
 	Release();
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00678450
 void TInputDXDeviceKeyboard::RefreshDirect()
 {
 	if (!IsAcquired()) return;
@@ -246,6 +263,7 @@ void TInputDXDeviceKeyboard::RefreshDirect()
 	}
 }
 
+// $deBlob: FUNCTION 00679670
 TBOOL TInputDXDeviceKeyboard::HandleKeyChange(TEmitter<TInputInterface, TInputInterface::InputEvent>& a_Emitter, TINT a_iKeyIndex, TUINT8 a_ui8KeyState)
 {
 	TINT iDoodad = TranslateDXToDoodad(a_iKeyIndex);
@@ -274,6 +292,7 @@ TBOOL TInputDXDeviceKeyboard::HandleKeyChange(TEmitter<TInputInterface, TInputIn
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00678ea0
 TINT TInputDXDeviceKeyboard::TranslateDXToDoodad(TINT doodad)
 {
 	switch (doodad)
@@ -405,6 +424,7 @@ TINT TInputDXDeviceKeyboard::TranslateDXToDoodad(TINT doodad)
 	}
 }
 
+// $deBlob: FUNCTION 00678840
 TINT TInputDXDeviceKeyboard::TranslateDoodadToDX(TINT dxkey)
 {
 	switch (dxkey)
@@ -536,6 +556,7 @@ TINT TInputDXDeviceKeyboard::TranslateDoodadToDX(TINT dxkey)
 	}
 }
 
+// $deBlob: FUNCTION 00679730
 const TBOOL TInputDXDeviceKeyboard::BindToDIDevice(HWND a_hMainWindow, LPCDIDEVICEINSTANCEA a_poDeviceInstance, IDirectInputDevice8A* a_poDXInputDevice, TBOOL a_bExclusive)
 {
 	TASSERT(a_poDeviceInstance != NULL);
@@ -569,6 +590,7 @@ const TBOOL TInputDXDeviceKeyboard::BindToDIDevice(HWND a_hMainWindow, LPCDIDEVI
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00679840
 BOOL CALLBACK TInputDXDeviceKeyboard::EnumObjectCallback(LPCDIDEVICEOBJECTINSTANCEA a_poObjectInstance, LPVOID a_pvRef)
 {
 	TInputDXDeviceKeyboard* pKeyboard = TREINTERPRETCAST(TInputDXDeviceKeyboard*, a_pvRef);

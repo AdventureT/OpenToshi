@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006e5560
 TBOOL XURXUISliderBarData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIControlData::Load(resource, a_pData);
@@ -28,6 +29,7 @@ TBOOL XURXUISliderBarData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006e55c0
 TBOOL XURXUISliderBarData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
@@ -36,6 +38,7 @@ TBOOL XURXUISliderBarData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32
 	return XURXUIControlData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006e5630
 TBOOL XURXUISliderBarData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, RangeMin, propType);
@@ -50,6 +53,7 @@ TBOOL XURXUISliderBarData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_u
 	return XURXUIControlData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
+// $deBlob: FUNCTION 006e5740
 TUINT32 XURXUISliderBarData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0)
@@ -66,6 +70,7 @@ TUINT32 XURXUISliderBarData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT3
 	}
 }
 
+// $deBlob: FUNCTION 006e57b0
 TBOOL XURXUISliderBarData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
@@ -74,6 +79,7 @@ TBOOL XURXUISliderBarData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 prop
 	return XURXUIControlData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
+// $deBlob: FUNCTION 006e5810
 TBOOL XURXUISliderBarData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;

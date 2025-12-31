@@ -5,6 +5,7 @@ TOSHI_NAMESPACE_START
 class THPTimer
 {
 public:
+	// $deBlob: FUNCTION 00663050
 	THPTimer() { Reset(); }
 
 	TUINT32 GetRaw32()
@@ -21,6 +22,7 @@ public:
 		return raw64.QuadPart;
 	}
 
+	// $deBlob: FUNCTION 005ac380
 	void Reset()
 	{
 		QueryPerformanceCounter(&m_iCurrentTime);
@@ -29,6 +31,7 @@ public:
 		m_fDelta   = 0;
 	}
 
+	// $deBlob: FUNCTION 00663090
 	void Update()
 	{
 		m_iOldTime = m_iCurrentTime;

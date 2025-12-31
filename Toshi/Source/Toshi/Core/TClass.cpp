@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0065ca80
 TClass::TClass(const TCHAR* a_szName, TClass* a_pParent, TUINT32 a_uiVersion, TUINT32 a_uiSize, t_CreateTObject a_fCreate, t_CreateTObjectInPlace a_fCreateInPlace, t_InitializeStatic a_fInit, t_UninitializeStatic a_fUninit, TUINT32 a_uiAlignment)
 {
 	m_Name          = a_szName;
@@ -116,6 +117,7 @@ const TClass* TClass::FindRecurse(const TCHAR* const& name, const TClass* parent
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 0065ced0
 const TClass* TClass::Find(const TCHAR* a_pcClassName, const TClass* parent)
 {
 	TASSERT(a_pcClassName[1] != 0);
@@ -123,6 +125,7 @@ const TClass* TClass::Find(const TCHAR* a_pcClassName, const TClass* parent)
 	return FindRecurse(a_pcClassName, parent, TFALSE);
 }
 
+// $deBlob: FUNCTION 0065cb20
 TObject* TClass::CreateObject()
 {
 	if (m_Create != TNULL)
@@ -133,6 +136,7 @@ TObject* TClass::CreateObject()
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 0065cd60
 TBOOL TClass::IsA(const TClass* cmpClass) const
 {
 	if (cmpClass->m_LastAttached == TNULL)

@@ -5,6 +5,7 @@ TOSHI_NAMESPACE_START
 class TStringTable
 {
 public:
+	// $deBlob: FUNCTION 00828b80
 	TStringTable(const TCHAR* const* strings, TINT numStrings)
 	{
 		m_Strings    = strings;

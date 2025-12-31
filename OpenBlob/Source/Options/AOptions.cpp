@@ -4,6 +4,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 005e8530
 void AOptions::SoundThings(TBOOL unk, TFLOAT a_fPitch, TFLOAT a_fVolume)
 {
 	if (TSound::GetSingleton()->IsInitialised())

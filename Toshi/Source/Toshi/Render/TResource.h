@@ -25,6 +25,7 @@ public:
 	friend TRender;
 
 public:
+	// $deBlob: FUNCTION 006b5100
 	TResource()
 	{
 		m_State    = 0;

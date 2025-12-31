@@ -50,6 +50,7 @@ class TXUIResource
 	};
 
 public:
+	// $deBlob: FUNCTION 006d78d0
 	TXUIResource()
 	{
 		m_pMemoryHeap   = TNULL;
@@ -68,12 +69,14 @@ public:
 
 	const TWCHAR* GetString(TUINT16 a_uiType) { return m_asStringTable[a_uiType]; }
 
+	// $deBlob: FUNCTION 006d85e0
 	TFLOAT GetZRotation(TINT a_iIndex = 0)
 	{
 		TASSERT(a_iIndex >= -1);
 		return (a_iIndex == -1) ? 0 : m_aqZRotTable[a_iIndex];
 	}
 
+	// $deBlob: FUNCTION 006d8580
 	const TVector2* GetVector(TINT a_iIndex = 0)
 	{
 		TASSERT(a_iIndex >= -1);

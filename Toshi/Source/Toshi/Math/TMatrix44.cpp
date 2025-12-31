@@ -7,6 +7,7 @@ TOSHI_NAMESPACE_START
 
 TMatrix44 TMatrix44::IDENTITY(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 
+// $deBlob: FUNCTION 00665ca0
 void TMatrix44::LookAtTarget(const TVector4& target, const TVector4& up)
 {
 	auto& forward = AsBasisVector3(2);
@@ -22,6 +23,7 @@ void TMatrix44::LookAtTarget(const TVector4& target, const TVector4& up)
 	m_f21 = m_f13 * m_f32 - m_f12 * m_f33;
 }
 
+// $deBlob: FUNCTION 00665d60
 void TMatrix44::LookAtDirection(const Toshi::TVector4& vec, const Toshi::TVector4& vec2)
 {
 	TVector4 v;
@@ -69,6 +71,7 @@ void TMatrix44::Multiply(const TMatrix44& a_rLeft, const TMatrix44& a_rRight)
 	}
 }
 
+// $deBlob: FUNCTION 006640b0
 TBOOL TMatrix44::Invert(TMatrix44& a_rRight)
 {
 	assert(a_rRight.m_f14 == 0.0f);
@@ -112,6 +115,7 @@ TBOOL TMatrix44::Invert(TMatrix44& a_rRight)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00664ae0
 void TMatrix44::InvertOrthogonal(const TMatrix44& a_rRight)
 {
 	TASSERT(a_rRight.m_f14 == 0.0f);
@@ -139,6 +143,7 @@ void TMatrix44::InvertOrthogonal(const TMatrix44& a_rRight)
 	RotateVector(AsBasisVector4(3), *this, AsBasisVector4(0));
 }
 
+// $deBlob: FUNCTION 00665140
 void TMatrix44::InvertOrthonormal()
 {
 	TASSERT(IsOrthonormal());
@@ -155,6 +160,7 @@ void TMatrix44::InvertOrthonormal()
 	m_f41 = m_f42 * m_f21 + m_f41 * m_f11 + m_f43 * m_f31;
 }
 
+// $deBlob: FUNCTION 00666c80
 TMatrix44& TMatrix44::SetFromQuaternion(const TQuaternion& a_rQuaternion)
 {
 	TFLOAT fVal1 = a_rQuaternion.z * 2.0f;
@@ -183,6 +189,7 @@ TMatrix44& TMatrix44::SetFromQuaternion(const TQuaternion& a_rQuaternion)
 	return *this;
 }
 
+// $deBlob: FUNCTION 00666dd0
 TMatrix44& TMatrix44::PushQuaternion(const TQuaternion& a_rQuaternion, const TMatrix44& a_rMatrix, const TVector3& a_rOrigin)
 {
 	TMatrix44 matrix;
@@ -194,6 +201,7 @@ TMatrix44& TMatrix44::PushQuaternion(const TQuaternion& a_rQuaternion, const TMa
 	return *this;
 }
 
+// $deBlob: FUNCTION 00665a30
 void TMatrix44::RotateX(TFLOAT angle)
 {
 	TFLOAT fVar1;
@@ -213,6 +221,7 @@ void TMatrix44::RotateX(TFLOAT angle)
 	m_f33 = m_f33 * fCos - fVar1 * fSin;
 }
 
+// $deBlob: FUNCTION 00665b00
 void TMatrix44::RotateY(TFLOAT angle)
 {
 	TFLOAT fVar1;
@@ -232,6 +241,7 @@ void TMatrix44::RotateY(TFLOAT angle)
 	m_f33 = m_f33 * fCos + fVar1 * fSin;
 }
 
+// $deBlob: FUNCTION 00665bd0
 void TMatrix44::RotateZ(TFLOAT angle)
 {
 	TFLOAT fVar1;

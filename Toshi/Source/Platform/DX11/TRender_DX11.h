@@ -31,6 +31,7 @@ public:
 		};
 
 	public:
+		// $deBlob: FUNCTION 006a9d70
 		Mode()
 		    : m_Devices() {}
 		~Mode() = default;
@@ -46,6 +47,7 @@ public:
 
 		static void GetDisplayMode(IDXGIOutput* dxgiOutput, DXGI_MODE_DESC* modeDesc);
 
+		// $deBlob: FUNCTION 006b35e0
 		DXGI_MODE_DESC* GetDescription() { return &m_Description; }
 
 		void SetDescription(DXGI_MODE_DESC& description) { m_Description = description; }
@@ -70,6 +72,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 006a9e10
 	TD3DAdapter() {}
 
 	void EnumerateOutputs(class TRenderDX11* render, IDXGIAdapter* dxgiAdapter);
@@ -87,6 +90,7 @@ public:
 
 	DXGI_ADAPTER_DESC* GetAdapterDesc() { return &m_AdapterDesc; }
 
+	// $deBlob: FUNCTION 006b39d0
 	Mode* GetMode() { return &m_Mode; }
 
 	const TCHAR* GetDescription() { return m_Description; }
@@ -263,11 +267,14 @@ public:
 	~TRenderDX11() = default;
 
 	virtual TBOOL          CreateDisplay(DisplayParams* params) override;
+	// $deBlob: FUNCTION 006a57e0
 	virtual TBOOL          DestroyDisplay() override { return TTRUE; }
 	virtual void           Update(TFLOAT deltaTime) override;
 	virtual void           BeginScene() override;
 	virtual void           EndScene() override;
+	// $deBlob: FUNCTION 006a5810
 	virtual void*          GetCurrentDevice() override { return TNULL; }
+	// $deBlob: FUNCTION 006a5820
 	virtual DisplayParams* GetCurrentDisplayParams() override { return &m_DisplayParams; }
 	virtual TBOOL          Create() override { return Create("de Blob"); }
 

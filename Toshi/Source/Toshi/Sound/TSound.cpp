@@ -40,6 +40,7 @@ TBOOL TSound::Create(void* poolmem, TINT poollen, TINT maxchannels, TINT filebuf
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00700260
 TBOOL TSound::ErrorCheck(FMOD_RESULT error)
 {
 	if (error != FMOD_OK)

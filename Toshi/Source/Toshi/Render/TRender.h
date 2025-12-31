@@ -74,6 +74,7 @@ protected:
 
 	void  EnableFog(TBOOL enable) { enable ? m_eFlags |= FLAG_FOG : m_eFlags &= ~FLAG_FOG; }
 	TBOOL IsFogEnabled() const { return m_eFlags & FLAG_FOG; }
+	// $deBlob: FUNCTION 00693520
 	TBOOL IsDirty() const { return m_eFlags & FLAG_DIRTY; }
 
 public:
@@ -85,12 +86,14 @@ public:
 
 	void SetProjectionParams(const PROJECTIONPARAMS& params);
 
+	// $deBlob: FUNCTION 00692a50
 	void SetParams(const Params& params)
 	{
 		m_oParams = params;
 		m_eFlags  = (m_eFlags & (~(FLAG_UNK3 | FLAG_UNK4 | FLAG_HAS_WORLDPLANES | FLAG_UNK6))) | FLAG_DIRTY;
 	}
 
+	// $deBlob: FUNCTION 00692ce0
 	void SetCameraMode(CameraMode cameraMode)
 	{
 		m_eCameraMode = cameraMode;
@@ -203,6 +206,7 @@ public:
 	virtual TBOOL          CreateSystemResources();                             // 0x44 at vftable
 	virtual void           DestroySystemResources();                            // 0x44 at vftable
 
+	// $deBlob: FUNCTION 00690bb0
 	TFLOAT GetResolutionScalar()
 	{
 		auto displayParams = GetCurrentDisplayParams();
@@ -222,6 +226,7 @@ public:
 	// Destroys resource recursively
 	void DestroyResourceRecurse(TResource* resource);
 
+	// $deBlob: FUNCTION 00691110
 	// Returns system resource
 	TResource* GetSystemResource(SYSRESOURCE systemResource)
 	{
@@ -229,6 +234,7 @@ public:
 		return m_SystemResources[systemResource];
 	}
 
+	// $deBlob: FUNCTION 00690f50
 	// Sets resource explicit
 	void SetResourceExplicit(TResource* resource, SYSRESOURCE systemResource)
 	{
@@ -240,6 +246,7 @@ public:
 	// Creates resource and returns it
 	TResource* CreateResource(TClass* pClass, TCHAR* name, TNodeTree<TResource>::TNode* parent);
 
+	// $deBlob: FUNCTION 00691180
 	// Sets new render context and returns the old one
 	TRenderContext* SetCurrentRenderContext(TRenderContext* a_pRenderContext)
 	{
@@ -249,9 +256,12 @@ public:
 	}
 
 	TBOOL                      IsInScene() { return m_bInScene; }
+	// $deBlob: FUNCTION 00690c30
 	TBOOL                      IsCreated() { return m_bCreated; }
 	TBOOL                      IsDisplayCreated() { return m_bDisplayCreated; }
+	// $deBlob: FUNCTION 00691170
 	TRenderContext*            GetCurrentRenderContext() const { return m_pRenderContext; }
+	// $deBlob: FUNCTION 00690590
 	TNodeList<TRenderAdapter>* GetAdapterList() { return &m_AdapterList; }
 	TRenderParamTable*         GetParamTable() const { return m_ParamTable; }
 	ASPECT_RATIO               GetAspectRatio() const { return m_eAspectRatio; }
@@ -264,6 +274,7 @@ public:
 	void DeleteResourceRecurse(TResource* resources);
 	void DeleteResourceAtomic(TResource* resources);
 
+	// $deBlob: FUNCTION 00691080
 	void FlushDyingResources()
 	{
 		if (m_HasDyingResources)

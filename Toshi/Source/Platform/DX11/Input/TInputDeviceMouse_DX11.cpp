@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0067f1d0
 void TInputDXDeviceMouse::Release()
 {
 	if (m_poDXInputDevice)
@@ -14,6 +15,7 @@ void TInputDXDeviceMouse::Release()
 	}
 }
 
+// $deBlob: FUNCTION 0067f2e0
 void TInputDXDeviceMouse::Update(TFLOAT deltaTime)
 {
 	if (IsAcquired())
@@ -40,6 +42,7 @@ void TInputDXDeviceMouse::Update(TFLOAT deltaTime)
 	}
 }
 
+// $deBlob: FUNCTION 0067f070
 TBOOL TInputDXDeviceMouse::Initialise()
 {
 	TIMPLEMENT();
@@ -66,12 +69,14 @@ TBOOL TInputDXDeviceMouse::Initialise()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0067f170
 TBOOL TInputDXDeviceMouse::Deinitialise()
 {
 	Release();
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0067f180
 TBOOL TInputDXDeviceMouse::Acquire()
 {
 	HRESULT hr = m_poDXInputDevice->Acquire();
@@ -92,6 +97,7 @@ TBOOL TInputDXDeviceMouse::Acquire()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0067f1b0
 TBOOL TInputDXDeviceMouse::Unacquire()
 {
 	SetAcquired(TFALSE);
@@ -99,6 +105,7 @@ TBOOL TInputDXDeviceMouse::Unacquire()
 	return SUCCEEDED(hr);
 }
 
+// $deBlob: FUNCTION 0067f1f0
 TBOOL TInputDXDeviceMouse::Flush()
 {
 	DWORD dwItems = INFINITE;
@@ -114,6 +121,7 @@ TBOOL TInputDXDeviceMouse::Flush()
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 0067f360
 TINT TInputDXDeviceMouse::ProcessEvents(EventEmitter& emitter, TFLOAT deltaTime)
 {
 	DIDEVICEOBJECTDATA dod[32];
@@ -256,11 +264,13 @@ TINT TInputDXDeviceMouse::ProcessEvents(EventEmitter& emitter, TFLOAT deltaTime)
 	return eventCount;
 }
 
+// $deBlob: FUNCTION 0067f890
 TINT TInputDXDeviceMouse::GetButtonCount() const
 {
 	return m_DIDevCaps.dwButtons;
 }
 
+// $deBlob: FUNCTION 0067f8a0
 TINT TInputDXDeviceMouse::GetAxisCount() const
 {
 	return m_DIDevCaps.dwAxes;
@@ -271,6 +281,7 @@ Platform TInputDXDeviceMouse::GetPlatform() const
 	return Platform::PC;
 }
 
+// $deBlob: FUNCTION 0067f240
 void TInputDXDeviceMouse::RefreshDirect()
 {
 	if (IsAcquired())
@@ -299,6 +310,7 @@ void TInputDXDeviceMouse::RefreshDirect()
 	}
 }
 
+// $deBlob: FUNCTION 0067f8f0
 TBOOL TInputDXDeviceMouse::WasDown(TINT a_iDoodad) const
 {
 	if (a_iDoodad - 0x30001 < 8) return (m_dwButtonPrevious & ((a_iDoodad - 1) & 0x1F));
@@ -306,6 +318,7 @@ TBOOL TInputDXDeviceMouse::WasDown(TINT a_iDoodad) const
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 0067fa30
 TBOOL const TInputDXDeviceMouse::BindToDIDevice(HWND a_mainWindow, LPCDIDEVICEINSTANCEA a_poDeviceInstance, IDirectInputDevice8A* a_poDXInputDevice, TBOOL exclusive)
 {
 	TASSERT(a_poDeviceInstance != NULL);
@@ -337,6 +350,7 @@ TBOOL const TInputDXDeviceMouse::BindToDIDevice(HWND a_mainWindow, LPCDIDEVICEIN
 	return hr == DI_OK;
 }
 
+// $deBlob: FUNCTION 0067f8b0
 TBOOL TInputDXDeviceMouse::IsDown(TINT a_iDoodad) const
 {
 	if (a_iDoodad - 0x30001 < 8) return (m_dwButtonCurrent & ((a_iDoodad - 1) & 0x1F));
@@ -344,6 +358,7 @@ TBOOL TInputDXDeviceMouse::IsDown(TINT a_iDoodad) const
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 0067f930
 TINT TInputDXDeviceMouse::GetAxisInt(TINT doodad, TINT coord) const
 {
 	if (doodad == AXIS_CURSOR)
@@ -358,6 +373,7 @@ TINT TInputDXDeviceMouse::GetAxisInt(TINT doodad, TINT coord) const
 	return 0;
 }
 
+// $deBlob: FUNCTION 0067f960
 TFLOAT TInputDXDeviceMouse::GetAxisFloat(TINT doodad, TINT coord) const
 {
 	if (doodad == AXIS_CURSOR)

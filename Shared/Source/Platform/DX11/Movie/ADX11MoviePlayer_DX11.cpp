@@ -20,6 +20,7 @@ FMOD_RESULT F_CALLBACK pcmsetposcallback(FMOD_SOUND* sound, int subsound, unsign
 	return FMOD_OK;
 }
 
+// $deBlob: FUNCTION 005511c0
 ADX11MoviePlayer::ADX11MoviePlayer()
     : m_CurrentFileName("")
 {
@@ -47,6 +48,7 @@ ADX11MoviePlayer::ADX11MoviePlayer()
 	m_Position       = 0;
 }
 
+// $deBlob: FUNCTION 00551280
 TBOOL ADX11MoviePlayer::PlayMovie(const char* fileName, uint32_t soundChannel, PlayFlags flags)
 {
 	if (IsMoviePlaying())
@@ -171,12 +173,14 @@ TBOOL ADX11MoviePlayer::PlayMovie(const char* fileName, uint32_t soundChannel, P
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 00551610
 void ADX11MoviePlayer::StopMovie()
 {
 	StopMovieImpl();
 	ThrowEvent(AMovieEvent::Type_Stopped);
 }
 
+// $deBlob: FUNCTION 00551e40
 void ADX11MoviePlayer::StopMovieImpl()
 {
 	if (m_bHasAudioStream && m_pChannel != TNULL)
@@ -213,6 +217,7 @@ void ADX11MoviePlayer::StopMovieImpl()
 	m_bIsHidden  = TTRUE;
 }
 
+// $deBlob: FUNCTION 00551630
 void ADX11MoviePlayer::PauseMovie(TBOOL pause)
 {
 	if (pause != m_bIsPaused)
@@ -225,16 +230,19 @@ void ADX11MoviePlayer::PauseMovie(TBOOL pause)
 	}
 }
 
+// $deBlob: FUNCTION 00552090
 TBOOL ADX11MoviePlayer::IsMoviePlaying()
 {
 	return m_bIsPlaying;
 }
 
+// $deBlob: FUNCTION 00552080
 TBOOL ADX11MoviePlayer::IsMoviePaused()
 {
 	return m_bIsPaused;
 }
 
+// $deBlob: FUNCTION 00551930
 void ADX11MoviePlayer::OnRender(float deltaTime)
 {
 	if (IsMoviePlaying())
@@ -279,6 +287,7 @@ void ADX11MoviePlayer::OnRender(float deltaTime)
 	}
 }
 
+// $deBlob: FUNCTION 00551740
 void ADX11MoviePlayer::OnUpdate(float deltaTime)
 {
 	if (IsMoviePlaying() && !IsMoviePaused())
@@ -351,6 +360,7 @@ void ADX11MoviePlayer::OnUpdate(float deltaTime)
 	AMoviePlayer::OnUpdate(deltaTime);
 }
 
+// $deBlob: FUNCTION 005516d0
 void ADX11MoviePlayer::OnCreate()
 {
 	CompileShader();
@@ -358,6 +368,7 @@ void ADX11MoviePlayer::OnCreate()
 	AMoviePlayer::OnCreate();
 }
 
+// $deBlob: FUNCTION 00551be0
 void ADX11MoviePlayer::CreateTextures(UINT width, UINT height)
 {
 	auto pRender = TRenderDX11::Interface();
@@ -370,6 +381,7 @@ void ADX11MoviePlayer::CreateTextures(UINT width, UINT height)
 	}
 }
 
+// $deBlob: FUNCTION 00551c80
 void ADX11MoviePlayer::ReleaseTextures()
 {
 	for (int i = 0; i < 2; i++)
@@ -398,6 +410,7 @@ static FLOAT s_ScreenMesh[8] = {
 	1.0f, 1.0f
 };
 
+// $deBlob: FUNCTION 00551ce0
 void ADX11MoviePlayer::CompileShader()
 {
 	auto pRender = TRenderDX11::Interface();
@@ -441,6 +454,7 @@ void ADX11MoviePlayer::CompileShader()
 	}
 }
 
+// $deBlob: FUNCTION 00551ab0
 void ADX11MoviePlayer::ReadBuffer(void* data, uint32_t datalen)
 {
 	const THEORAPLAY_AudioPacket* audio;

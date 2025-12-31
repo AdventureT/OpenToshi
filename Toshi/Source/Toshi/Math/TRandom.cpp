@@ -55,6 +55,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00673d70
 TRandom::TRandom()
 {
 	THPTimer timer = THPTimer();

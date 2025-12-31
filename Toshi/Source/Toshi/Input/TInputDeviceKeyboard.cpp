@@ -129,6 +129,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0067b670
 TINT TInputDeviceKeyboard::ProcessVirtualButtons(TEmitter<TInputInterface, TInputInterface::InputEvent>& emitter, TFLOAT flt)
 {
 	emitter.Throw(TInputInterface::InputEvent(this, 0x20001, TInputInterface::EVENT_TYPE_UNKNOWN, m_mags[0], m_mags[1]));
@@ -136,11 +137,13 @@ TINT TInputDeviceKeyboard::ProcessVirtualButtons(TEmitter<TInputInterface, TInpu
 	return 0;
 }
 
+// $deBlob: FUNCTION 0067af60
 const TCHAR* TInputDeviceKeyboard::GetButtonFromDoodad(TINT doodad) const
 {
 	return GET_KEY_FROM_DOODAD(doodad);
 }
 
+// $deBlob: FUNCTION 0067ae80
 void TInputDeviceKeyboard::SetVirtStickDoodads(TINT a_iMapID, TINT x, TINT y, TINT z, TINT w)
 {
 	TASSERT(a_iMapID >= 0 && a_iMapID < VIRTSTK_DIRECTIONAL_MAPS);
@@ -150,6 +153,7 @@ void TInputDeviceKeyboard::SetVirtStickDoodads(TINT a_iMapID, TINT x, TINT y, TI
 	m_VirtStickDoodads[a_iMapID][3] = w;
 }
 
+// $deBlob: FUNCTION 0067aef0
 void TInputDeviceKeyboard::GetVirtStickDoodads(TINT a_iMapID, TINT& x, TINT& y, TINT& z, TINT& w)
 {
 	TASSERT(a_iMapID >= 0 && a_iMapID < VIRTSTK_DIRECTIONAL_MAPS);
@@ -159,6 +163,7 @@ void TInputDeviceKeyboard::GetVirtStickDoodads(TINT a_iMapID, TINT& x, TINT& y, 
 	w = m_VirtStickDoodads[a_iMapID][3];
 }
 
+// $deBlob: FUNCTION 0067b5d0
 void TInputDeviceKeyboard::UpdateVirtualButtons()
 {
 	m_mags[2] = m_mags[0];
@@ -169,6 +174,7 @@ void TInputDeviceKeyboard::UpdateVirtualButtons()
 	TIMPLEMENT();
 }
 
+// $deBlob: FUNCTION 0067adf0
 TInputDeviceKeyboard::TInputDeviceKeyboard()
 {
 	m_VirtStickDoodads[0] = TNULL;
@@ -181,6 +187,7 @@ TInputDeviceKeyboard::TInputDeviceKeyboard()
 	m_ipMapArray2[3]      = TNULL;
 }
 
+// $deBlob: FUNCTION 0067ae50
 TBOOL TInputDeviceKeyboard::GetDoodadProperties(TINT doodad, DoodadProperties& doodadProps) const
 {
 	if (doodad - 0x20000 < 0x80)

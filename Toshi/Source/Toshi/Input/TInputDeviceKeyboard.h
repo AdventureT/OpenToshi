@@ -152,11 +152,14 @@ public:
 public:
 	TInputDeviceKeyboard();
 
+	// $deBlob: FUNCTION 0067ae20
 	virtual TINT         GetAxisCount() const override { return 0; }
 	virtual TBOOL        GetDoodadProperties(TINT doodad, DoodadProperties& doodadProps) const override;
 	virtual Platform     GetPlatform() const override { return Platform::PC; }
 	virtual const TCHAR* GetButtonFromDoodad(TINT doodad) const override;
+	// $deBlob: FUNCTION 0067ae30
 	virtual TINT         GetAxisInt(TINT doodad, TINT axis) const override { return 0; }
+	// $deBlob: FUNCTION 0067ae40
 	virtual TFLOAT       GetAxisFloat(TINT doodad, TINT axis) const override { return 0; }
 	virtual TBOOL        IsShiftDown() const                           = 0;
 	virtual TBOOL        IsControlDown() const                         = 0;

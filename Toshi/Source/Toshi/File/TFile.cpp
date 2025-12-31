@@ -15,6 +15,7 @@ TFile::TFile(const TFile& other)
 	m_pFileSystem = other.GetFileSystem();
 }
 
+// $deBlob: FUNCTION 00685e40
 TFile* TFile::Create(const TString8& filename, FileMode mode)
 {
 	TASSERT(filename.IsIndexValid(0), "filename is empty");
@@ -33,6 +34,7 @@ TFile* TFile::Create(const TString8& filename, FileMode mode)
 	return pFile;
 }
 
+// $deBlob: FUNCTION 006861d0
 TString8 TFile::ConcatPath(const TString8& a_rcString, const TString8& a_rcString2)
 {
 	TIMPLEMENT();
@@ -43,6 +45,7 @@ TString8 TFile::ConcatPath(const TString8& a_rcString, const TString8& a_rcStrin
 
 #pragma region TFileManager
 
+// $deBlob: FUNCTION 006875e0
 void TFileManager::Destroy()
 {
 	T2MutexLock mutexLock(m_Mutex);
@@ -70,6 +73,7 @@ void TFileManager::Destroy()
 	DestroyCommon();
 }
 
+// $deBlob: FUNCTION 00685860
 void TFileManager::MountFileSystem(TFileSystem* pFS)
 {
 	// FUN_00685860
@@ -107,6 +111,7 @@ TFileSystem* TFileManager::FindFileSystem(TDList<TFileSystem>& list, const TStri
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006854c0
 TFile* TFileManager::CreateFile(const TString8& a_sName, TUINT32 flags)
 {
 	// FUN_006854c0
@@ -144,6 +149,7 @@ TFile* TFileManager::CreateFile(const TString8& a_sName, TUINT32 flags)
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 00685b10
 void TFileManager::ValidateSystemPath()
 {
 	if (!m_IsValidated)
@@ -201,6 +207,7 @@ TFileSystem::TFileSystem(const TCHAR* name)
 	m_Handle = NULL;
 }
 
+// $deBlob: FUNCTION 00685db0
 void TFileSystem::SetPrefix(const TString8& prefix)
 {
 	m_Prefix = prefix;

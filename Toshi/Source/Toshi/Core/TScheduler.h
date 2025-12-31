@@ -12,6 +12,7 @@ class TScheduler : public TGenericClassDerived<TScheduler, TObject, "TScheduler"
 public:
 	TScheduler();
 
+	// $deBlob: FUNCTION 00660460
 	virtual ~TScheduler() override { DestroyAllTasks(); }
 
 	// Creates task from TClass and binds it to this scheduler
@@ -115,6 +116,7 @@ public:
 		DeleteTaskAtomic(task);
 	}
 
+	// $deBlob: FUNCTION 006608d0
 	void DestroyTask(TTask* task)
 	{
 		TASSERT(task->IsDying());
@@ -125,6 +127,7 @@ public:
 	}
 
 private:
+	// $deBlob: FUNCTION 006609a0
 	static void DestroyTaskRecurse(TTask* task)
 	{
 		TTask* currentTask = task;
@@ -144,6 +147,7 @@ private:
 
 	void DeleteTaskAtomic(TTask* task);
 
+	// $deBlob: FUNCTION 006609e0
 	void DeleteTaskRecurse(TTask* task)
 	{
 		if (task != TNULL)
@@ -159,6 +163,7 @@ private:
 		}
 	}
 
+	// $deBlob: FUNCTION 00660690
 	void DestroyAllTasks()
 	{
 		if (m_TaskTree.AttachedToRoot() != TNULL)

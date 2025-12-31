@@ -6,6 +6,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0065d900
 void TUtil::LogInitialise()
 {
 	TLogFile* logfile                         = new TLogFile();
@@ -75,6 +76,7 @@ void TUtil::Log(TLogFile::Type logtype, const TCHAR* format, ...)
 	}
 }
 
+// $deBlob: FUNCTION 0065d560
 void TUtil::LogConsole(const TCHAR* format, ...)
 {
 	if (GetLog() != TNULL)
@@ -92,6 +94,7 @@ void TUtil::LogConsole(const TCHAR* format, ...)
 	}
 }
 
+// $deBlob: FUNCTION 0065d5d0
 void TUtil::LogSet(TLogFile* a_logFile)
 {
 	Log("Changing log file.");
@@ -100,6 +103,7 @@ void TUtil::LogSet(TLogFile* a_logFile)
 	util->m_pLogFile2 = a_logFile == TNULL ? util->m_pLogFile1 : a_logFile;
 }
 
+// $deBlob: FUNCTION 0065d370
 TBOOL TUtil::ToshiCreate(TINT argc, TCHAR** argv, TMemory& memorySettings)
 {
 	TRegion::LockRegion();
@@ -118,6 +122,7 @@ TBOOL TUtil::ToshiCreate(TINT argc, TCHAR** argv, TMemory& memorySettings)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0065d4b0
 void TUtil::MemSet(void* ptr, size_t value, size_t size)
 {
 	if (size >= sizeof(void*))
@@ -162,6 +167,7 @@ void TUtil::MemSet(void* ptr, size_t value, size_t size)
 	}
 }
 
+// $deBlob: FUNCTION 0065da30
 // Source: https://lentz.com.au/blog/tag/crc-table-generator
 void TUtil::CRCInitialise()
 {
@@ -181,6 +187,7 @@ void TUtil::CRCInitialise()
 	}
 }
 
+// $deBlob: FUNCTION 0065d810
 // Source: https://lentz.com.au/blog/tag/crc-table-generator
 TUINT32 TUtil::CRC32(TUINT8* buffer, TUINT32 len)
 {

@@ -27,6 +27,7 @@ public:
 	virtual TResource* GetVertexPool() const;
 	virtual TResource* GetIndexPool() const;
 	virtual void       SetZBias(TINT zBias) = 0;
+	// $deBlob: FUNCTION 0070a810
 	virtual void       SetAlphaRef() {}
 
 	TBOOL Allocate();

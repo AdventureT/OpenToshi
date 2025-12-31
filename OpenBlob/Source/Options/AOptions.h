@@ -3,6 +3,7 @@ class AOptions : Toshi::TObject
     , public Toshi::TSingleton<AOptions>
 {
 public:
+	// $deBlob: FUNCTION 005e8400
 	AOptions()
 	{
 		TTODO("Actually read it from g_oTheApp, aka safefile");
@@ -36,6 +37,7 @@ public:
 	void   SoundThings(TBOOL unk, TFLOAT fUnk, TFLOAT fUnk2);
 	TFLOAT GetPitch();
 
+	// $deBlob: FUNCTION 005e8660
 	TBOOL GetOptions(void* a_Options, TUINT32 a_iMaxSize)
 	{
 		TASSERT(OPTIONS_MAXSIZE <= a_iMaxSize);

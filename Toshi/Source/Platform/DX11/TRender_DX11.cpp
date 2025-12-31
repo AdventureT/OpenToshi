@@ -18,26 +18,31 @@ TRenderContext* TRender::CreateRenderContext()
 	return new TRenderContextDX11(this);
 }
 
+// $deBlob: FUNCTION 006b3450
 TRenderAdapter* TD3DAdapter::Mode::GetAdapter() const
 {
 	return m_Adapter;
 }
 
+// $deBlob: FUNCTION 006b3460
 size_t TD3DAdapter::Mode::GetModeIndex() const
 {
 	return m_ModeIndex;
 }
 
+// $deBlob: FUNCTION 006b3470
 TUINT32 TD3DAdapter::Mode::GetWidth() const
 {
 	return m_Description.Width;
 }
 
+// $deBlob: FUNCTION 006b3480
 TUINT32 TD3DAdapter::Mode::GetHeight() const
 {
 	return m_Description.Height;
 }
 
+// $deBlob: FUNCTION 006b3490
 TBOOL TD3DAdapter::Mode::SomeCheck1() const
 {
 	DXGI_FORMAT format = m_Description.Format;
@@ -45,6 +50,7 @@ TBOOL TD3DAdapter::Mode::SomeCheck1() const
 	return (format == DXGI_FORMAT_B8G8R8X8_UNORM || format == DXGI_FORMAT_R8G8B8A8_UNORM);
 }
 
+// $deBlob: FUNCTION 006b34b0
 TBOOL TD3DAdapter::Mode::SomeCheck2() const
 {
 	DXGI_FORMAT format = m_Description.Format;
@@ -57,6 +63,7 @@ TFLOAT TD3DAdapter::Mode::GetRefreshRate() const
 	return (TFLOAT)m_Description.RefreshRate.Numerator / m_Description.RefreshRate.Denominator;
 }
 
+// $deBlob: FUNCTION 006b3530
 TRenderAdapter::Mode::Device* TD3DAdapter::Mode::GetDevice(TINT device)
 {
 	TASSERT(device >= 0 && device < NUMSUPPORTEDDEVICES);
@@ -96,6 +103,7 @@ void TD3DAdapter::Mode::GetDisplayMode(IDXGIOutput* dxgiOutput, DXGI_MODE_DESC* 
 	dxgiOutput->FindClosestMatchingMode(&matchMode, modeDesc, NULL);
 }
 
+// $deBlob: FUNCTION 006a46e0
 TRenderDX11::TRenderDX11()
     : m_DisplayParams{ 1280, 720, 32, 3, TTRUE, TFALSE, 1 }, m_Window(), m_CurrentDepth({ 0 }, 0)
 {
@@ -145,6 +153,7 @@ TRenderDX11::TRenderDX11()
 	TTODO("Some other initializations");
 }
 
+// $deBlob: FUNCTION 006a4b00
 TBOOL TRenderDX11::CreateDisplay(DisplayParams* pDisplayParams)
 {
 	TASSERT(IsCreated() == TTRUE);
@@ -465,6 +474,7 @@ TBOOL TRenderDX11::CreateDisplay(DisplayParams* pDisplayParams)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006a5830
 void TRenderDX11::Update(TFLOAT deltaTime)
 {
 	TASSERT(TTRUE == IsCreated());
@@ -472,6 +482,7 @@ void TRenderDX11::Update(TFLOAT deltaTime)
 	TRender::Update(deltaTime);
 }
 
+// $deBlob: FUNCTION 006a58a0
 void TRenderDX11::BeginScene()
 {
 	TASSERT(TTRUE == IsDisplayCreated());
@@ -493,6 +504,7 @@ void TRenderDX11::BeginScene()
 	m_bInScene = TTRUE;
 }
 
+// $deBlob: FUNCTION 006a5a00
 void TRenderDX11::EndScene()
 {
 	TASSERT(TTRUE == IsDisplayCreated());
@@ -595,6 +607,7 @@ void TRenderDX11::EndScene()
 	TRender::EndScene();
 }
 
+// $deBlob: FUNCTION 006a5710
 TBOOL TRenderDX11::RecreateDisplay(DisplayParams* pDisplayParams)
 {
 	TASSERT(TTRUE == IsCreated());
@@ -609,6 +622,7 @@ TBOOL TRenderDX11::RecreateDisplay(DisplayParams* pDisplayParams)
 	return TTRUE == bRes;
 }
 
+// $deBlob: FUNCTION 006a7940
 void TRenderDX11::ShowDeviceError()
 {
 	CHAR caption[1024] = { 0 };
@@ -620,6 +634,7 @@ void TRenderDX11::ShowDeviceError()
 	MessageBoxA(NULL, text, caption, MB_OK);
 }
 
+// $deBlob: FUNCTION 006a79a0
 void TRenderDX11::ShowDisplayError()
 {
 	CHAR caption[1024] = { 0 };
@@ -684,6 +699,7 @@ void TRenderDX11::CreateVSPS()
 	m_pDevice->CreateBuffer(&bufferDesc, &vertexData, &m_pQuarterScreenQuadBuffer);
 }
 
+// $deBlob: FUNCTION 006a5e20
 TBOOL TRenderDX11::Create(LPCSTR a_name)
 {
 	// 006a5e30
@@ -735,6 +751,7 @@ TBOOL TRenderDX11::Create(LPCSTR a_name)
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006a8560
 void TRenderDX11::Initialize()
 {
 	m_SamplerStates[0]  = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_CLAMP, 0.0f, 0, 0.0f, D3D11_FLOAT32_MAX, 1);
@@ -846,11 +863,13 @@ void TRenderDX11::Initialize()
 	m_CurrentRasterizerId.SlopeScaledDepthBias               = 0.0f;
 }
 
+// $deBlob: FUNCTION 00672dd0
 TBOOL TRenderDX11::IsColorEqual(const FLOAT a_Vec41[4], const FLOAT a_Vec42[4])
 {
 	return (a_Vec41[0] == a_Vec42[0]) && (a_Vec41[1] == a_Vec42[1]) && (a_Vec41[2] == a_Vec42[2]) && (a_Vec41[3] == a_Vec42[3]);
 }
 
+// $deBlob: FUNCTION 006a9560
 TINT TRenderDX11::GetTextureRowPitch(DXGI_FORMAT format, TINT width)
 {
 	switch (format)
@@ -875,6 +894,7 @@ TINT TRenderDX11::GetTextureRowPitch(DXGI_FORMAT format, TINT width)
 	return 0;
 }
 
+// $deBlob: FUNCTION 006a9680
 TINT TRenderDX11::GetTextureDepthPitch(DXGI_FORMAT format, TINT width, TINT height)
 {
 	switch (format)
@@ -899,6 +919,7 @@ TINT TRenderDX11::GetTextureDepthPitch(DXGI_FORMAT format, TINT width, TINT heig
 	return 0;
 }
 
+// $deBlob: FUNCTION 006a9470
 const TCHAR* TRenderDX11::GetFeatureLevel(D3D_FEATURE_LEVEL a_featureLevel)
 {
 	// 006a9470
@@ -915,6 +936,7 @@ const TCHAR* TRenderDX11::GetFeatureLevel(D3D_FEATURE_LEVEL a_featureLevel)
 	}
 }
 
+// $deBlob: FUNCTION 006a6280
 ID3DBlob* TRenderDX11::CompileShader(const TCHAR* srcData, LPCSTR pEntrypoint, LPCSTR pTarget, const D3D_SHADER_MACRO* pDefines)
 {
 	size_t srcLength = T2String8::Length(srcData);
@@ -955,6 +977,7 @@ ID3DBlob* TRenderDX11::CompileShaderFromFile(const TCHAR* filepath, LPCSTR pEntr
 	return shader;
 }
 
+// $deBlob: FUNCTION 006a7240
 void TRenderDX11::SetVec4InVSBuffer(BufferOffset index, const void* src, TINT count)
 {
 	TUINT offset = index * 16;
@@ -965,6 +988,7 @@ void TRenderDX11::SetVec4InVSBuffer(BufferOffset index, const void* src, TINT co
 	m_IsVertexConstantBufferSet = TTRUE;
 }
 
+// $deBlob: FUNCTION 006a72b0
 void TRenderDX11::SetVec4InPSBuffer(BufferOffset index, const void* src, TINT count)
 {
 	TUINT offset = index * 16;
@@ -975,6 +999,7 @@ void TRenderDX11::SetVec4InPSBuffer(BufferOffset index, const void* src, TINT co
 	m_IsPixelConstantBufferSet = TTRUE;
 }
 
+// $deBlob: FUNCTION 006a6620
 HRESULT TRenderDX11::CreatePixelShader(const void* pShaderBytecode, SIZE_T BytecodeLength, ID3D11PixelShader** ppPixelShader)
 {
 	HRESULT hRes = m_pDevice->CreatePixelShader(pShaderBytecode, BytecodeLength, NULL, ppPixelShader);
@@ -983,6 +1008,7 @@ HRESULT TRenderDX11::CreatePixelShader(const void* pShaderBytecode, SIZE_T Bytec
 	return hRes;
 }
 
+// $deBlob: FUNCTION 006a64d0
 HRESULT TRenderDX11::CreateVertexShader(const void* pShaderBytecode, SIZE_T BytecodeLength, ID3D11VertexShader** ppVertexShader)
 {
 	HRESULT hRes = m_pDevice->CreateVertexShader(pShaderBytecode, BytecodeLength, NULL, ppVertexShader);
@@ -991,6 +1017,7 @@ HRESULT TRenderDX11::CreateVertexShader(const void* pShaderBytecode, SIZE_T Byte
 	return hRes;
 }
 
+// $deBlob: FUNCTION 006a6b60
 ID3D11ShaderResourceView* TRenderDX11::CreateTexture(UINT width, UINT height, DXGI_FORMAT format, const void* srcData, TUINT8 flags, D3D11_USAGE usage, TUINT32 cpuAccessFlags, TUINT32 sampleDescCount)
 {
 	D3D11_SUBRESOURCE_DATA subResourceData = {};
@@ -1097,6 +1124,7 @@ ID3D11ShaderResourceView* TRenderDX11::CreateTexture(UINT width, UINT height, DX
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006a6f80
 ID3D11RenderTargetView* TRenderDX11::CreateRenderTargetView(ID3D11ShaderResourceView* pShaderResourceView)
 {
 	ID3D11Texture2D* pTexture;
@@ -1116,6 +1144,7 @@ ID3D11RenderTargetView* TRenderDX11::CreateRenderTargetView(ID3D11ShaderResource
 	return pRenderTargetView;
 }
 
+// $deBlob: FUNCTION 006a6940
 ID3D11SamplerState* TRenderDX11::CreateSamplerStateAutoAnisotropy(
     D3D11_FILTER               filter,
     D3D11_TEXTURE_ADDRESS_MODE addressU,
@@ -1180,6 +1209,7 @@ ID3D11SamplerState* TRenderDX11::
 	return pSamplerState;
 }
 
+// $deBlob: FUNCTION 006a7020
 ID3D11Buffer* TRenderDX11::CreateBuffer(UINT flags, UINT dataSize, void* data, D3D11_USAGE usage, UINT cpuAccessFlags)
 {
 	D3D11_BUFFER_DESC bufferDesc;
@@ -1219,6 +1249,7 @@ ID3D11Buffer* TRenderDX11::CreateBuffer(UINT flags, UINT dataSize, void* data, D
 	return pBuffer;
 }
 
+// $deBlob: FUNCTION 006a7b40
 void TRenderDX11::SetDstAlpha(TFLOAT alpha)
 {
 	if (alpha >= 0)
@@ -1236,6 +1267,7 @@ void TRenderDX11::SetDstAlpha(TFLOAT alpha)
 	}
 }
 
+// $deBlob: FUNCTION 006a7d00
 void TRenderDX11::SetBlendMode(TBOOL blendEnabled, D3D11_BLEND_OP blendOp, D3D11_BLEND srcBlendAlpha, D3D11_BLEND destBlendAlpha)
 {
 	m_CurrentBlendState.Parts.BlendOp       = blendOp;
@@ -1251,6 +1283,7 @@ void TRenderDX11::SetBlendMode(TBOOL blendEnabled, D3D11_BLEND_OP blendOp, D3D11
 	}
 }
 
+// $deBlob: FUNCTION 006a6b30
 void TRenderDX11::SetAlphaUpdate(TBOOL update)
 {
 	if (update)
@@ -1263,6 +1296,7 @@ void TRenderDX11::SetAlphaUpdate(TBOOL update)
 	}
 }
 
+// $deBlob: FUNCTION 006a6b00
 void TRenderDX11::SetColorUpdate(TBOOL update)
 {
 	if (update)
@@ -1275,6 +1309,7 @@ void TRenderDX11::SetColorUpdate(TBOOL update)
 	}
 }
 
+// $deBlob: FUNCTION 006a7bc0
 void TRenderDX11::SetZMode(TBOOL depthEnable, D3D11_COMPARISON_FUNC comparisonFunc, D3D11_DEPTH_WRITE_MASK depthWriteMask)
 {
 	m_CurrentDepth.first.Parts.bDepthEnable   = depthEnable;
@@ -1282,6 +1317,7 @@ void TRenderDX11::SetZMode(TBOOL depthEnable, D3D11_COMPARISON_FUNC comparisonFu
 	m_CurrentDepth.first.Parts.DepthFunc      = comparisonFunc;
 }
 
+// $deBlob: FUNCTION 006a74e0
 void TRenderDX11::DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT iIndexCount, void* pIndexData, DXGI_FORMAT eFormat, void* pVertexData, UINT iStrideSize, UINT iStrides)
 {
 	TINT iIndexSize = (eFormat == DXGI_FORMAT_R32_UINT) ? 4 : (eFormat == DXGI_FORMAT_R32_SINT) ? 2 :
@@ -1329,6 +1365,7 @@ void TRenderDX11::DrawImmediately(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT 
 	m_iImmediateVertexCurrentOffset += iVertexBufferSize;
 }
 
+// $deBlob: FUNCTION 006a7470
 void TRenderDX11::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY ePrimitiveType, UINT indexCount, ID3D11Buffer* pIndexBuffer, UINT indexBufferOffset, DXGI_FORMAT indexBufferFormat, ID3D11Buffer* pVertexBuffer, UINT pStrides, UINT pOffsets)
 {
 	UpdateRenderStates();
@@ -1349,6 +1386,7 @@ void TRenderDX11::DrawNonIndexed(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology, ID3
 	m_pDeviceContext->Draw(vertexCount, startVertex);
 }
 
+// $deBlob: FUNCTION 006a7190
 void TRenderDX11::CopyDataToTexture(ID3D11ShaderResourceView* pSRTex, UINT dataSize, void* src, UINT rowSize)
 {
 	UINT                     uVar1;
@@ -1418,6 +1456,7 @@ void TRenderDX11::CopyDataToTexture(ID3D11ShaderResourceView* pSRTex, UINT dataS
 	//pTexture->Release();
 }
 
+// $deBlob: FUNCTION 006a6a90
 void TRenderDX11::SetSamplerState(UINT startSlot, TINT samplerId, BOOL SetForPS)
 {
 	auto pSampler = m_SamplerStates[samplerId];
@@ -1432,6 +1471,7 @@ void TRenderDX11::SetSamplerState(UINT startSlot, TINT samplerId, BOOL SetForPS)
 	}
 }
 
+// $deBlob: FUNCTION 006a4570
 void TRenderDX11::WaitForEndOfRender()
 {
 	D3D11_QUERY_DESC queryDesc = { D3D11_QUERY_EVENT, 0 };
@@ -1453,6 +1493,7 @@ void TRenderDX11::WaitForEndOfRender()
 	}
 }
 
+// $deBlob: FUNCTION 00691190
 void TRenderDX11::FlushShaders()
 {
 	TASSERT(TTRUE == IsInScene());
@@ -1463,11 +1504,13 @@ void TRenderDX11::FlushShaders()
 	}
 }
 
+// $deBlob: FUNCTION 006a6910
 void TRenderDX11::ResolveSubresource()
 {
 	m_pDeviceContext->ResolveSubresource(m_SRView2Texture, 0, m_SRView1Texture, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 }
 
+// $deBlob: FUNCTION 006a8d30
 void TRenderDX11::UpdateRenderStates()
 {
 	// Update depth state if needed
@@ -1612,6 +1655,7 @@ void TRenderDX11::UpdateRenderStates()
 	}
 }
 
+// $deBlob: FUNCTION 006a6700
 void TRenderDX11::RenderOverlay(TFLOAT posX, TFLOAT posY, TFLOAT width, TFLOAT height, ID3D11ShaderResourceView* pShaderResourceView, ID3D11PixelShader* pPixelShader, const TVector4* uvVec)
 {
 	auto pRender        = TRenderDX11::Interface();
@@ -1671,6 +1715,7 @@ void TRenderDX11::RenderOverlay(TFLOAT posX, TFLOAT posY, TFLOAT width, TFLOAT h
 	pDeviceContext->Draw(4, 0);
 }
 
+// $deBlob: FUNCTION 006a92f0
 void TRenderDX11::FlushConstantBuffers()
 {
 	D3D11_MAPPED_SUBRESOURCE mappedSubresources;
@@ -1697,6 +1742,7 @@ void TRenderDX11::FlushConstantBuffers()
 	m_pDeviceContext->PSSetConstantBuffers(0, 1, &m_PixelBuffers[m_PixelBufferIndex]);
 }
 
+// $deBlob: FUNCTION 006a7df0
 void TRenderDX11::BuildAdapterDatabase()
 {
 	// 006a7df0
@@ -1743,6 +1789,7 @@ void TRenderDX11::BuildAdapterDatabase()
 	}
 }
 
+// $deBlob: FUNCTION 006b36d0
 void TD3DAdapter::EnumerateOutputs(TRenderDX11* render, IDXGIAdapter* dxgiAdapter)
 {
 	IDXGIOutput* dxgiOutput;

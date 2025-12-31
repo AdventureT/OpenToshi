@@ -127,6 +127,7 @@ public:
 		node1->m_Next->m_Prev = node1;
 	}
 
+	// $deBlob: FUNCTION 006f3160
 	void RemoveAll()
 	{
 		auto pNode = m_Root.Next();

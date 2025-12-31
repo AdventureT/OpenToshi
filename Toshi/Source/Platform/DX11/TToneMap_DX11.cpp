@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006ba990
 TToneMap::TToneMap()
     : m_pTextureView(TNULL), m_pRenderTarget(TNULL), m_Unk1(0), m_Unk2(0), m_Unk3(0), m_Unk4(0), m_Unk5(0)
 {
@@ -17,6 +18,7 @@ TToneMap::TToneMap()
 	TASSERT(m_pRenderTarget != TNULL);
 }
 
+// $deBlob: FUNCTION 006baa30
 TToneMap::~TToneMap()
 {
 	if (m_pTextureView)

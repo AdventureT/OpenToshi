@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006ae090
 TBOOL TOrderTable::Create(TShader* pShader, TINT priority, TUINT8 index)
 {
 	m_pShader     = pShader;

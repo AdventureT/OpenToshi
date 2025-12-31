@@ -32,6 +32,7 @@ using namespace Toshi;
 	}
 #define BIND_ACTION(...) CALL_OVERLOAD(BIND_ACTION, __VA_ARGS__)
 
+// $deBlob: FUNCTION 005dd960
 void AInputMap::InitialiseButtonMap()
 {
 	BindVector oBinds;
@@ -75,6 +76,7 @@ void AInputMap::InitialiseButtonMap()
 	TIMPLEMENT_D("Init other ActionButtonMaps");
 }
 
+// $deBlob: FUNCTION 005dedf0
 void AInputMap::NamePadDoodads()
 {
 	// Controller
@@ -217,6 +219,7 @@ void AInputMap::NamePadDoodads()
 	TIMPLEMENT();
 }
 
+// $deBlob: FUNCTION 005dd0b0
 AInputMap::ButtonMap* AInputMap::GetButtonMap(INPUTCONTEXT m_eInputContext)
 {
 	switch (m_eInputContext)

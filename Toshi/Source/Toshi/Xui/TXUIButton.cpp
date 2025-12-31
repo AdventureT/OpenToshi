@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006cfd30
 TBOOL TXUIButton::Create(TXUIResource& a_rRes, XURXUIElementData* a_pObjData, TBOOL a_bUnk)
 {
 	TXUIControl::Create(a_rRes, a_pObjData, a_bUnk);

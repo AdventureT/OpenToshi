@@ -12,6 +12,7 @@ public:
 	friend class TGenericEmitter;
 
 public:
+	// $deBlob: FUNCTION 006631c0
 	TGenericListener()
 	    : TNode()
 	{
@@ -24,6 +25,7 @@ public:
 
 	void Connect(TGenericEmitter* emitter, void* caller, t_Callback callback, TINT unk2);
 
+	// $deBlob: FUNCTION 006632a0
 	void Disconnect()
 	{
 		Remove();
@@ -59,6 +61,7 @@ public:
 	}
 
 
+	// $deBlob: FUNCTION 00663190
 	void Throw(void* pData)
 	{
 		for (auto it = m_Listeners.Begin(); it != m_Listeners.End(); it++)
@@ -67,8 +70,10 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 00663130
 	void Create(void* owner) { m_Owner = owner; }
 
+	// $deBlob: FUNCTION 00663140
 	void Destroy()
 	{
 		for (auto it = m_Listeners.Begin(); it != m_Listeners.End(); it++)

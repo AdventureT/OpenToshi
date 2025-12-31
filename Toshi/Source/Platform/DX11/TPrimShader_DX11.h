@@ -46,6 +46,7 @@ public:
 	void StartRendering(PrimType primType);
 	void StopRendering();
 
+	// $deBlob: FUNCTION 007064e0
 	void SetBlendModeAndUnlock(BlendMode blendMode)
 	{
 		if (m_eBlendMode != blendMode && (m_eBlendMode = blendMode, m_bIsLocked))
@@ -54,6 +55,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 00706500
 	void SetImageAndUnlock(TTexture* pTexture)
 	{
 		if (m_pImage != pTexture && (m_pImage = pTexture, m_bIsLocked))

@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006af200
 void TModelManager::AddModel(T2ModelPtr model)
 {
 	TModel* pModel              = model.GetData();
@@ -18,6 +19,7 @@ void TModelManager::AddModel(T2ModelPtr model)
 	m_HeadModel = model;
 }
 
+// $deBlob: FUNCTION 006af2b0
 void TModelManager::RemoveModel(T2ModelPtr model)
 {
 	TModel* pModel = model.GetData();
@@ -41,6 +43,7 @@ void TModelManager::RemoveModel(T2ModelPtr model)
 	}
 }
 
+// $deBlob: FUNCTION 006af0a0
 void TModelManager::FindModel(T2ModelPtr& outModel, const TCHAR* name)
 {
 	TASSERT(T2String8::IsLowerCase(name));

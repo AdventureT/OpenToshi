@@ -95,6 +95,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 006be7e0
 	XURXUIObjectData()
 	{
 		m_Index          = 0;
@@ -111,10 +112,14 @@ public:
 	virtual ~XURXUIObjectData();
 
 	virtual TBOOL   Load(TXUIResource& resource, TUINT8*& a_pData);
+	// $deBlob: FUNCTION 006c2690
 	virtual TBOOL   IsFloatPropType(TUINT32 a_uiObjectIndex, PropType propType) { return TFALSE; };
+	// $deBlob: FUNCTION 006c2680
 	virtual TBOOL   IsColourPropType(TUINT32 a_uiObjectIndex, PropType propType) { return TFALSE; };
+	// $deBlob: FUNCTION 006c25e0
 	virtual TUINT32 GetTimelinePropSize(TUINT32 a_uiObjectIndex, PropType propType) { return 0; };
 	virtual TBOOL   TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType) { return TFALSE; };
+	// $deBlob: FUNCTION 006c2ca0
 	virtual TBOOL   ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex) { return TFALSE; };
 
 	void                     LoadChildren(TXUIResource& resource, TUINT8*& a_pData);
@@ -142,6 +147,7 @@ public:
 	friend XURXUIObjectData;
 
 public:
+	// $deBlob: FUNCTION 006bf230
 	XURXUIElementData()
 	{
 		m_Width    = T2GUIElement::PackFloat(60.0f);
@@ -163,11 +169,14 @@ public:
 
 	TBOOL ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex);
 
+	// $deBlob: FUNCTION 006bf580
 	TBOOL IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) { return propType == PropType_Width || propType == PropType_Height || propType == PropType_Opacity; }
 
+	// $deBlob: FUNCTION 006bf5e0
 	// No it's not
 	TBOOL IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType) { return TFALSE; }
 
+	// $deBlob: FUNCTION 006bf510
 	TUINT32 GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 	{
 		if (propType != 11 && propType != 9 && propType != 14)
@@ -250,6 +259,7 @@ public:
 	virtual void  SetHeight(TFLOAT height) override;
 	virtual void  SetWidth(TFLOAT width) override;
 
+	// $deBlob: FUNCTION 00626310
 	virtual void SetXUIAnchoring(TUINT32 a_flags, TUINT32 a_mask = 0x3F)
 	{
 		TASSERT((a_flags & a_mask) == a_flags);

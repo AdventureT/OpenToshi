@@ -41,6 +41,7 @@ TBOOL TDebugConsole::Toggle()
 	return m_Visible;
 }
 
+// $deBlob: FUNCTION 006ef3c0
 HWND TDebugConsole::FindConsole() const
 {
 	TString8 str = TString8(TDebugConsoleUUID);

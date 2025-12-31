@@ -41,6 +41,7 @@ AApplication AApplication::g_oTheApp;
 
 CVAR_CREATE(testcvar, TFALSE)
 
+// $deBlob: FUNCTION 005747d0
 TBOOL AApplication::OnCreate(TINT argc, TCHAR** argv)
 {
 	TOSHI_INFO("Starting Blob...");
@@ -135,6 +136,7 @@ TBOOL AApplication::OnCreate(TINT argc, TCHAR** argv)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0056aa30
 TBOOL AApplication::OnUpdate(TFLOAT deltaTime)
 {
 	UpdateSound(deltaTime);
@@ -152,6 +154,7 @@ TBOOL AApplication::OnUpdate(TFLOAT deltaTime)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0056b9b0
 TBOOL AApplication::UpdateSound(TFLOAT deltaTime)
 {
 	Toshi::TSound* sound = Toshi::TSound::GetSingletonSafe();

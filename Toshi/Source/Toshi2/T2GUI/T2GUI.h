@@ -11,24 +11,29 @@ public:
 	T2GUI();
 	~T2GUI();
 
+	// $deBlob: FUNCTION 006f4fb0
 	static T2GUI* Open(TMemoryHeap* pMemoryHeap)
 	{
 		s_pMemHeap = pMemoryHeap;
 		return T2GUI::CreateSingleton();
 	}
 
+	// $deBlob: FUNCTION 006f5020
 	static void Close()
 	{
 		T2GUI::DestroySingleton();
 		s_pMemHeap = TNULL;
 	}
 
+	// $deBlob: FUNCTION 006f5070
 	T2GUIRenderer* GetRenderer() const { return m_pRenderer; }
 
+	// $deBlob: FUNCTION 006f5060
 	void SetRenderer(T2GUIRenderer* pRenderer) { m_pRenderer = pRenderer; }
 
 	T2GUIElement* GetRootElement() const { return m_pContext1->GetRootElement(); }
 
+	// $deBlob: FUNCTION 006f5080
 	void Tick(TFLOAT deltaTime)
 	{
 		if (m_pContext1)

@@ -15,6 +15,7 @@ TTRB::t_MemoryFuncDealloc TXUI::AssetTRBDeallocator = [](TTRB::AllocType allocty
 	return ms_pXUITRBMemoryBlock->Free(ptr);
 };
 
+// $deBlob: FUNCTION 006bc9b0
 TXUI::TXUI()
 {
 	m_pHeadTRBResource = TNULL;
@@ -51,6 +52,7 @@ TXUI::TXUI()
 	TTODO("TXUIShapeCache, TGenericListener");
 }
 
+// $deBlob: FUNCTION 006bd280
 TXUIScene* TXUI::CreateScene(TXUIResource* a_pResource, TUINT32 a_uiIndex)
 {
 	TXUIScene* pScene = a_pResource->CreateScene(a_uiIndex);
@@ -58,6 +60,7 @@ TXUIScene* TXUI::CreateScene(TXUIResource* a_pResource, TUINT32 a_uiIndex)
 	return pScene;
 }
 
+// $deBlob: FUNCTION 006bce00
 TXUIResource* TXUI::FindResource(const TCHAR* a_sName)
 {
 	TASSERT(T2String8::IsLowerCase(a_sName));
@@ -96,12 +99,14 @@ void TXUI::RemoveResource(TXUIResourceTRB* a_pResourceTrb)
 	if (a_pResourceTrb == m_pHeadTRBResource) m_pHeadTRBResource = m_pHeadTRBResource->m_pNext;
 }
 
+// $deBlob: FUNCTION 006bd150
 void TXUI::SetDefaultFont(const TCHAR* a_pData)
 {
 	m_FontTRB.Load(a_pData);
 	TAssetInit::InitAssets(m_FontTRB, TTRUE, TFALSE);
 }
 
+// $deBlob: FUNCTION 006bd000
 void TXUI::SetSkin1(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileName)
 {
 	if (m_pSkin1Resource)
@@ -115,6 +120,7 @@ void TXUI::SetSkin1(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileName)
 	m_pSkin1Resource = FindResource(a_szXURFileName);
 }
 
+// $deBlob: FUNCTION 006bd090
 void TXUI::SetSkin2(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileName)
 {
 	if (m_pSkin2Resource)
@@ -128,6 +134,7 @@ void TXUI::SetSkin2(const TCHAR* a_szTRBFileName, const TCHAR* a_szXURFileName)
 	m_pSkin2Resource = FindResource(a_szXURFileName);
 }
 
+// $deBlob: FUNCTION 006bc880
 void TXUIResourceTRB::Init()
 {
 	if (m_pResource == TNULL)
@@ -140,6 +147,7 @@ void TXUIResourceTRB::Init()
 	}
 }
 
+// $deBlob: FUNCTION 006bc950
 void TXUIResourceTRB::Deinit()
 {
 	if (m_pResource) delete m_pResource;

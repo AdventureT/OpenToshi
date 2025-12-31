@@ -47,6 +47,7 @@ public:
 
 	AInputDeviceHandle GetControllerHandle(INPUTDEVICE a_eDevice);
 
+	// $deBlob: FUNCTION 005db730
 	TBOOL CheckIfValidDevice(const AInputDeviceHandle& a_Handle) const
 	{
 		if (m_pSomeDevice == TNULL)
@@ -55,11 +56,13 @@ public:
 		return a_Handle.m_pDevice == m_pSomeDevice;
 	}
 
+	// $deBlob: FUNCTION 005db370
 	void SetContext(AInputMap::INPUTCONTEXT a_eInputContext)
 	{
 		m_inputContextStack.Push(a_eInputContext);
 	}
 
+	// $deBlob: FUNCTION 005db3a0
 	AInputMap::INPUTCONTEXT GetContext()
 	{
 		return m_inputContextStack.IsEmpty() ? AInputMap::INPUTCONTEXT_UNK12 : m_inputContextStack.Top();

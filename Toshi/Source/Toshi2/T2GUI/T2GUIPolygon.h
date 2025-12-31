@@ -7,6 +7,7 @@ TOSHI_NAMESPACE_START
 class T2GUIPolygon : public T2GUIElement
 {
 public:
+	// $deBlob: FUNCTION 006f9630
 	T2GUIPolygon()
 	{
 		m_iNumVerts             = 0;
@@ -16,6 +17,7 @@ public:
 		m_bCalculatedDimensions = TFALSE;
 	}
 
+	// $deBlob: FUNCTION 006f9670
 	~T2GUIPolygon() { T2GUI::DestroyMaterial(m_pMaterial); }
 
 	virtual void Render();

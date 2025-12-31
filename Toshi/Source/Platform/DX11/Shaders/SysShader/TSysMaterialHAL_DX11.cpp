@@ -5,6 +5,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0070a650
 TSysMaterialHAL::~TSysMaterialHAL()
 {
 	if (m_pOrderTable)
@@ -14,6 +15,7 @@ TSysMaterialHAL::~TSysMaterialHAL()
 	}
 }
 
+// $deBlob: FUNCTION 00709f40
 void TSysMaterialHAL::PreRender()
 {
 	auto pShader = TSTATICCAST(TSysShaderHAL, m_pOwnerShader);
@@ -150,6 +152,7 @@ void TSysMaterialHAL::PreRender()
 	}
 }
 
+// $deBlob: FUNCTION 0070a270
 void TSysMaterialHAL::PostRender()
 {
 	if (HASFLAG(m_Flags & Flags_NoDepthTest))
@@ -159,12 +162,14 @@ void TSysMaterialHAL::PostRender()
 	}
 }
 
+// $deBlob: FUNCTION 00709e80
 TBOOL TSysMaterialHAL::Create(BlendMode eBlendMode)
 {
 	TSysMaterialHAL::SetBlendMode(eBlendMode);
 	return TMaterial::Create();
 }
 
+// $deBlob: FUNCTION 00709ea0
 void TSysMaterialHAL::SetBlendMode(BlendMode eBlendMode)
 {
 	auto pShader = TSTATICCAST(TSysShaderHAL, m_pOwnerShader);

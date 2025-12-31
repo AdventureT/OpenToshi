@@ -6,6 +6,7 @@ TOSHI_NAMESPACE_START
 
 TINT TCompress_Compress::usemaxoffset;
 
+// $deBlob: FUNCTION 0068a830
 TINT TCompress_Compress::Write(TUINT32 length, TCHAR*& data, TFile* file)
 {
 	// 0068a830
@@ -37,6 +38,7 @@ TINT TCompress_Compress::Write(TUINT32 length, TCHAR*& data, TFile* file)
 	return writtenSize;
 }
 
+// $deBlob: FUNCTION 0068a8c0
 TINT TCompress_Compress::WriteOffset(TUINT32 length, TINT offset, TCHAR*& data, TFile* file)
 {
 	// 0068a8c0
@@ -80,6 +82,7 @@ TINT TCompress_Compress::WriteOffset(TUINT32 length, TINT offset, TCHAR*& data, 
 	return writtenSize;
 }
 
+// $deBlob: FUNCTION 0068a590
 size_t TCompress_Compress::Compress(TFile* file, TCHAR* buffer, TUINT32 size, TUINT32 unused, TBOOL isBigEndian)
 {
 	BTECCompressor compressor;

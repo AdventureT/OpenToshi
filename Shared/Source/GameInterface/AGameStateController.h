@@ -7,11 +7,13 @@
 class AGameStateController : public Toshi::TSingleton<AGameStateController>
 {
 public:
+	// $deBlob: FUNCTION 005c4ad0
 	AGameStateController()
 	{
 		m_bStatePushing = TFALSE;
 	}
 
+	// $deBlob: FUNCTION 005c51c0
 	AGameState* GetCurrentGameState()
 	{
 		return m_oStateStack.Back();

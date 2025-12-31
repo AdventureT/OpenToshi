@@ -146,6 +146,7 @@ void TTSFI::Close(TBOOL free)
 	m_FileInfoCount = 0;
 }
 
+// $deBlob: FUNCTION 00688270
 void TTSFI::ReadCompressed(void* buffer, TUINT32 size)
 {
 	TCompress::Header header;
@@ -184,6 +185,7 @@ TTSFI::TTSFI()
 	m_Endianess        = Endianess_Little;
 }
 
+// $deBlob: FUNCTION 00688ae0
 TTSFO::ERROR TTSFO::Create(const TCHAR* filepath, const TCHAR* magic, Endianess endianess)
 {
 	m_pFile = TFile::Create(filepath, TFile::FileMode_CreateNew | TFile::FileMode_Write);
@@ -214,6 +216,7 @@ TTSFO::ERROR TTSFO::Create(const TCHAR* filepath, const TCHAR* magic, Endianess 
 	}
 }
 
+// $deBlob: FUNCTION 00688bc0
 void TTSFO::Close()
 {
 	if (m_pFile != TNULL)
@@ -224,6 +227,7 @@ void TTSFO::Close()
 	}
 }
 
+// $deBlob: FUNCTION 00688bf0
 size_t TTSFO::BeginForm(const TCHAR* name)
 {
 	TASSERT(m_pFile != TNULL, "TTSFO is not created");
@@ -245,6 +249,7 @@ size_t TTSFO::BeginForm(const TCHAR* name)
 	return written1 + written2;
 }
 
+// $deBlob: FUNCTION 00688c90
 size_t TTSFO::EndForm()
 {
 	TASSERT(m_pFile != TNULL, "TTSFO is not created");
@@ -271,6 +276,7 @@ size_t TTSFO::EndForm()
 	return 0;
 }
 
+// $deBlob: FUNCTION 00688e30
 TBOOL TTSFO::OpenHunk(HunkMark* hunkMark, const TCHAR* hunkName)
 {
 	TASSERT(hunkMark != TNULL, "HunkMark is TNULL");
@@ -281,6 +287,7 @@ TBOOL TTSFO::OpenHunk(HunkMark* hunkMark, const TCHAR* hunkName)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00688e60
 TBOOL TTSFO::CloseHunk(HunkMark* hunkMark)
 {
 	TASSERT(hunkMark != TNULL, "HunkMark is TNULL");

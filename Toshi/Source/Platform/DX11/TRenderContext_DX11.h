@@ -6,6 +6,7 @@ TOSHI_NAMESPACE_START
 class TRenderContextDX11 : public TRenderContext
 {
 public:
+	// $deBlob: FUNCTION 006b9680
 	TRenderContextDX11(TRender* pRender)
 	    : TRenderContext(pRender) {}
 

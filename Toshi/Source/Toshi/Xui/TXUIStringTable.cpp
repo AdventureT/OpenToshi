@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006eb0f0
 TXUIStringTable::~TXUIStringTable()
 {
 	for (size_t i = 0; i < m_uiCountOfStrings; i++)

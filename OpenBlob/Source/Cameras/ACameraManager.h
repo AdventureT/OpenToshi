@@ -11,6 +11,7 @@ public:
 
 	ACamera* CreateCamera(ACamera::CameraType a_eCamType);
 
+	// $deBlob: FUNCTION 0058e370
 	ACamera* GetCurrentCamera() const
 	{
 		if (m_iCurrentCamera >= 0)

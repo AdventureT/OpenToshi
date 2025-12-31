@@ -1,6 +1,7 @@
 #include "ToshiPCH.h"
 #include "TError.h"
 
+// $deBlob: FUNCTION 00663440
 Toshi::TError::TError(TUINT32 size1, TUINT32 size2)
 {
 	m_size1        = size1;
@@ -11,12 +12,14 @@ Toshi::TError::TError(TUINT32 size1, TUINT32 size2)
 	m_currentSize2 = 0;
 }
 
+// $deBlob: FUNCTION 006634d0
 Toshi::TError::~TError()
 {
 	delete[] m_Buffer1;
 	delete[] m_Buffer2;
 }
 
+// $deBlob: FUNCTION 00663560
 void Toshi::TError::AddError(const TCHAR* error, ...)
 {
 	if (m_currentSize2 < m_size2 && m_currentSize < m_size1)

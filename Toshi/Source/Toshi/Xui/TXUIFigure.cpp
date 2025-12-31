@@ -40,6 +40,7 @@ TBOOL XURXUIFillData::ValidateTimelineProp(TUINT32 param_2)
 	return param_2 < PropType_NUMOF;
 }
 
+// $deBlob: FUNCTION 006c5a00
 TBOOL XURXUIFillData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIObjectData::Load(resource, a_pData);
@@ -117,6 +118,7 @@ TBOOL XURXUIStrokeData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006c5920
 // GradientData
 
 TBOOL XURXUIGradientData::IsColourPropType(TUINT32 propType)
@@ -124,16 +126,19 @@ TBOOL XURXUIGradientData::IsColourPropType(TUINT32 propType)
 	return propType == 2;
 }
 
+// $deBlob: FUNCTION 006c5910
 TBOOL XURXUIGradientData::IsFloatPropType(TUINT32 propType)
 {
 	return propType == 3;
 }
 
+// $deBlob: FUNCTION 006c58f0
 TUINT32 XURXUIGradientData::GetTimelinePropSize(TUINT32 propType)
 {
 	return propType == PropType_FillGradientRadial ? 1 : 4;
 }
 
+// $deBlob: FUNCTION 006c5850
 TBOOL XURXUIGradientData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP_MANUAL(name, "Fill.Gradient.Radial", propType, PropType_FillGradientRadial);
@@ -144,11 +149,13 @@ TBOOL XURXUIGradientData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_ui
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006c5840
 TBOOL XURXUIGradientData::ValidateTimelineProp(TUINT32 param_2)
 {
 	return param_2 < PropType_NUMOF;
 }
 
+// $deBlob: FUNCTION 006c57c0
 TBOOL XURXUIGradientData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIObjectData::Load(resource, a_pData);
@@ -188,6 +195,7 @@ TBOOL XURXUIGradientData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006c6aa0
 TBOOL XURXUIFigureData::IsColourPropType(TUINT32 a_uiObjectIndex, PropType propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
@@ -196,6 +204,7 @@ TBOOL XURXUIFigureData::IsColourPropType(TUINT32 a_uiObjectIndex, PropType propT
 	return XURXUIElementData::IsColourPropType(a_uiObjectIndex - 1, propType);
 }
 
+// $deBlob: FUNCTION 006c6a40
 TBOOL XURXUIFigureData::IsFloatPropType(TUINT32 a_uiObjectIndex, PropType propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
@@ -204,6 +213,7 @@ TBOOL XURXUIFigureData::IsFloatPropType(TUINT32 a_uiObjectIndex, PropType propTy
 	return XURXUIElementData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
+// $deBlob: FUNCTION 006c6990
 TUINT32 XURXUIFigureData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, PropType propType)
 {
 	if (a_uiObjectIndex == 0) return propType == PropType_Closed ? 1 : 4;
@@ -212,6 +222,7 @@ TUINT32 XURXUIFigureData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, PropType 
 	return XURXUIElementData::GetTimelinePropSize(a_uiObjectIndex - 1, propType);
 }
 
+// $deBlob: FUNCTION 006c68f0
 TBOOL XURXUIFigureData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	if (!m_Stroke.TranslateTimelineProp(name, a_uiObjectIndex, propType))
@@ -229,6 +240,7 @@ TBOOL XURXUIFigureData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiOb
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006c6830
 TBOOL XURXUIFigureData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
@@ -237,6 +249,7 @@ TBOOL XURXUIFigureData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_
 	return XURXUIElementData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006c66c0
 TBOOL XURXUIFigureData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIElementData::Load(resource, a_pData);
@@ -271,6 +284,7 @@ TBOOL XURXUIFigureData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006c68a0
 TBOOL XURXUIFigureData::ValidateTimelineSubProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0)
@@ -281,6 +295,7 @@ TBOOL XURXUIFigureData::ValidateTimelineSubProp(TUINT32 a_uiObjectIndex, TUINT32
 		return m_Fill.ValidateTimelineProp(a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006c6a00
 TUINT32 XURXUIFigureData::GetTimelineSubPropSize(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0)
@@ -291,6 +306,7 @@ TUINT32 XURXUIFigureData::GetTimelineSubPropSize(TUINT32 a_uiObjectIndex, TUINT3
 		return m_Fill.GetTimelinePropSize(a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006c6b00
 TBOOL XURXUIFigureData::IsFloatSubPropType(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0)
@@ -301,6 +317,7 @@ TBOOL XURXUIFigureData::IsFloatSubPropType(TUINT32 a_uiObjectIndex, TUINT32 a_ui
 		return m_Fill.IsFloatPropType(a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006c6b50
 TBOOL XURXUIFigureData::IsColourSubPropType(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0)

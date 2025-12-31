@@ -51,6 +51,7 @@ public:
 	void Disconnect() { TGenericGlobalListener<EventType>::DisconnectImpl(); }
 };
 
+// $deBlob: FUNCTION 006ef680
 template <class T> inline void TGenericGlobalListener<T>::ConnectImpl(void* pReceiver, EventCallback fnCallback)
 {
 	TASSERT(TNULL == m_pReceiver);

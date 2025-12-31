@@ -154,6 +154,7 @@ TBOOL TString8::AllocBuffer(TUINT32 a_iLength, TBOOL freeMemory)
 	return hasChanged;
 }
 
+// $deBlob: FUNCTION 006eca20
 TString8 TString8::Format(const TCHAR* a_pcFormat, ...)
 {
 	TCHAR    buffer[0x400];
@@ -222,6 +223,7 @@ TINT TString8::FindReverse(TCHAR a_findChar, TINT pos) const
 	return -1;
 }
 
+// $deBlob: FUNCTION 006ed950
 void TString8::Truncate(TUINT32 length)
 {
 	if (Length() < length)
@@ -329,6 +331,7 @@ TINT TString8::Compare(const TCHAR* a_pcString, TINT param_2) const
 	return bVar4 | 1;
 }
 
+// $deBlob: FUNCTION 006ed070
 TINT TString8::CompareNoCase(const TCHAR* a_pcString, TINT param_2) const
 {
 	TASSERT(a_pcString != TNULL, "TCString::CompareNoCase - Passed string cannot be TNULL");

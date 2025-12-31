@@ -7,6 +7,7 @@ TOSHI_NAMESPACE_START
 class T2GenericDynamicVector
 {
 protected:
+	// $deBlob: FUNCTION 006f3870
 	T2GenericDynamicVector(T2Allocator* a_pAllocator, TINT a_iMaxSize, TINT a_iGrowSize, TINT a_iElementSize)
 	{
 		m_pAllocator   = a_pAllocator;

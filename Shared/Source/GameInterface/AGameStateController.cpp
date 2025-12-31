@@ -2,6 +2,7 @@
 #include "AGameStateController.h"
 #include "AppBoot.h"
 
+// $deBlob: FUNCTION 005c4bb0
 void AGameStateController::Create()
 {
 	TIMPLEMENT();
@@ -10,6 +11,7 @@ void AGameStateController::Create()
 	PushState(pDummyState);
 }
 
+// $deBlob: FUNCTION 005c5140
 void AGameStateController::Update(float deltaTime)
 {
 	AGameState*              pCurrentGameState = GetCurrentGameState();
@@ -26,6 +28,7 @@ void AGameStateController::Update(float deltaTime)
 	TTODO("AGameStateController::FUN_005c62c0(deltaTime);");
 }
 
+// $deBlob: FUNCTION 005c5260
 void AGameStateController::PushState(AGameState* pGameState)
 {
 	TASSERT(m_bStatePushing == TFALSE);
@@ -49,6 +52,7 @@ void AGameStateController::PushState(AGameState* pGameState)
 	m_bStatePushing = TFALSE;
 }
 
+// $deBlob: FUNCTION 005c5480
 void AGameStateController::PopState(AGameState* pState)
 {
 	TASSERT(m_oStateStack.Size() > 1);
@@ -75,6 +79,7 @@ void AGameStateController::PopState(AGameState* pState)
 	delete pOldState;
 }
 
+// $deBlob: FUNCTION 005c5730
 void AGameStateController::ResetStack()
 {
 	TBOOL shouldDeactivate = TTRUE;
@@ -96,6 +101,7 @@ void AGameStateController::ResetStack()
 	TASSERT(m_oStateStack.Size() == 1);
 }
 
+// $deBlob: FUNCTION 005c5240
 void AGameStateController::PopCurrentState()
 {
 	AGameState* pCurrentState = GetCurrentGameState();

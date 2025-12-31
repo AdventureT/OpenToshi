@@ -83,6 +83,7 @@ TString16& TString16::Concat(const TWCHAR* str, TUINT32 size)
 	return *this;
 }
 
+// $deBlob: FUNCTION 006f1650
 TBOOL TString16::AllocBuffer(TUINT32 a_iLength, TBOOL freeMemory)
 {
 	TBOOL   hasChanged    = TFALSE;
@@ -154,6 +155,7 @@ TString16 TString16::Mid(TUINT32 param_1, TUINT32 param_2) const
 	return str;
 }
 
+// $deBlob: FUNCTION 006f0330
 void TString16::Copy(const TString16& src, TUINT32 size)
 {
 	TUINT32 srcLen = src.Length();

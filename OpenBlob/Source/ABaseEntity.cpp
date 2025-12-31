@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ABaseEntity.h"
 
+// $deBlob: FUNCTION 0075eab0
 void ABaseEntity::SetState(TINT a_State)
 {
 	TASSERT(a_State >= 0);

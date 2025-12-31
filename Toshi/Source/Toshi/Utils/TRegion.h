@@ -5,7 +5,9 @@ TOSHI_NAMESPACE_START
 class TRegion
 {
 public:
+	// $deBlob: FUNCTION 00662d20
 	static TINT GetRegion() { return s_ToshiRegion; }
+	// $deBlob: FUNCTION 00662cd0
 	static void SetRegion(TINT region)
 	{
 		TASSERT(!s_bRegionLocked);

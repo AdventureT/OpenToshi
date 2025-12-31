@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00686790
 void TFileStream::Main()
 {
 	TFileStreamJob* pJob;
@@ -21,6 +22,7 @@ void TFileStream::Main()
 	} while (TTRUE);
 }
 
+// $deBlob: FUNCTION 00686770
 void TFileStream::AddStream(TFileStreamJob* job)
 {
 	job->m_bIsProcessed = TFALSE;

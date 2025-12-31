@@ -3,6 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006adf10
 void TOrderTable::CreateStaticData(TUINT32 maxMaterials, TUINT32 maxRenderPackets)
 {
 	s_uiOrigMaxRenderPackets = s_uiMaxRenderPackets = maxRenderPackets;
@@ -21,6 +22,7 @@ void TOrderTable::CreateStaticData(TUINT32 maxMaterials, TUINT32 maxRenderPacket
 	}
 }
 
+// $deBlob: FUNCTION 006ae430
 void TOrderTable::Render()
 {
 	for (auto it = m_pLastRegMat; it != TNULL; it = m_pLastRegMat->Next())
@@ -32,6 +34,7 @@ void TOrderTable::Render()
 	m_pLastRegMat        = TNULL;
 }
 
+// $deBlob: FUNCTION 006ae4a0
 void TOrderTable::Flush()
 {
 	if (m_fnPreFlushCallback) m_fnPreFlushCallback(m_pPreFlushCallbackData);
@@ -54,6 +57,7 @@ void TOrderTable::Flush()
 	m_pLastRegMat        = TNULL;
 }
 
+// $deBlob: FUNCTION 006ae160
 TRegMaterial* TOrderTable::RegisterMaterial(TMaterial* pMat)
 {
 	TASSERT(s_uiNumRenderPackets == 0);
@@ -77,6 +81,7 @@ TRegMaterial* TOrderTable::RegisterMaterial(TMaterial* pMat)
 	return pRegMat;
 }
 
+// $deBlob: FUNCTION 006ae230
 void TOrderTable::DeregisterMaterial(TRegMaterial* pRegMat)
 {
 	if (HASFLAG(pRegMat->GetFlags() & TRegMaterial::State_Registered))
@@ -96,6 +101,7 @@ void TOrderTable::DeregisterMaterial(TRegMaterial* pRegMat)
 	}
 }
 
+// $deBlob: FUNCTION 006ae7f0
 void TRegMaterial::Render()
 {
 	m_pMaterial->PreRender();
@@ -107,6 +113,7 @@ void TRegMaterial::Render()
 	m_pMaterial->PostRender();
 }
 
+// $deBlob: FUNCTION 006ae770
 TRenderPacket* TRegMaterial::AddRenderPacket(TMesh* pMesh)
 {
 	auto pPreviousPacket = m_pLastRenderPacket;

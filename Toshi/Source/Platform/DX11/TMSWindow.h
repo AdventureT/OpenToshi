@@ -29,12 +29,14 @@ public:
 
 	void SetPosition(UINT x, UINT y, UINT width, UINT height);
 
+	// $deBlob: FUNCTION 006b0d20
 	void SetWindowed()
 	{
 		TASSERT(GetHWND() != TNULL);
 		m_IsWindowed = TTRUE;
 	}
 
+	// $deBlob: FUNCTION 006b0d60
 	void SetFullscreen()
 	{
 		TASSERT(GetHWND() != TNULL);

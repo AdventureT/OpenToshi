@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006b45f0
 TGlow::TGlow()
 {
 	m_pTexture      = TNULL;
@@ -51,6 +52,7 @@ TGlow::TGlow()
 	renderer->CreatePixelShader(shader->GetBufferPointer(), shader->GetBufferSize(), &m_pPixelShader);
 }
 
+// $deBlob: FUNCTION 006b4840
 void TGlow::Render(ID3D11ShaderResourceView* srv, ID3D11ShaderResourceView* srv2)
 {
 	if (m_fIntensity > 0.0f)

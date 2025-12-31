@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006e0a60
 TBOOL XURXUINineGridData::Load(TXUIResource& resource, TUINT8*& a_pData)
 {
 	XURXUIElementData::Load(resource, a_pData);
@@ -24,6 +25,7 @@ TBOOL XURXUINineGridData::Load(TXUIResource& resource, TUINT8*& a_pData)
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 006e0ac0
 TBOOL XURXUINineGridData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 a_uiPropIndex)
 {
 	if (a_uiObjectIndex == 0) return a_uiPropIndex < PropType_NUMOF;
@@ -32,6 +34,7 @@ TBOOL XURXUINineGridData::ValidateTimelineProp(TUINT32 a_uiObjectIndex, TUINT32 
 	return XURXUIElementData::ValidateTimelineProp(a_uiObjectIndex - 1, a_uiPropIndex);
 }
 
+// $deBlob: FUNCTION 006e0b30
 TBOOL XURXUINineGridData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_uiObjectIndex, PropType& propType)
 {
 	TXUI_TRANSLATE_TIMELINE_PROP(name, TextureFileName, propType);
@@ -45,6 +48,7 @@ TBOOL XURXUINineGridData::TranslateTimelineProp(const TCHAR* name, TUINT32& a_ui
 	return XURXUIElementData::TranslateTimelineProp(name, a_uiObjectIndex, propType);
 }
 
+// $deBlob: FUNCTION 006e0c20
 TUINT32 XURXUINineGridData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0)
@@ -62,6 +66,7 @@ TUINT32 XURXUINineGridData::GetTimelinePropSize(TUINT32 a_uiObjectIndex, TUINT32
 	}
 }
 
+// $deBlob: FUNCTION 006e0ca0
 TBOOL XURXUINineGridData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;
@@ -70,6 +75,7 @@ TBOOL XURXUINineGridData::IsFloatPropType(TUINT32 a_uiObjectIndex, TUINT32 propT
 	return XURXUIElementData::IsFloatPropType(a_uiObjectIndex - 1, propType);
 }
 
+// $deBlob: FUNCTION 006e0cc0
 TBOOL XURXUINineGridData::IsColourPropType(TUINT32 a_uiObjectIndex, TUINT32 propType)
 {
 	if (a_uiObjectIndex == 0) return TFALSE;

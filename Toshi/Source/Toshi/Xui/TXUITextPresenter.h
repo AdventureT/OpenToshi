@@ -25,6 +25,7 @@ class XURXUITextPresenterData : public XURXUIElementData
 	};
 
 public:
+	// $deBlob: FUNCTION 006dfbc0
 	XURXUITextPresenterData()
 	{
 		m_TextColor         = 0xFF000000;

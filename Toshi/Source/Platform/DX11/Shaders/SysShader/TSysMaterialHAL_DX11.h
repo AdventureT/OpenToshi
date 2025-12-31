@@ -8,6 +8,7 @@ class TOrderTable;
 class TSysMaterialHAL : public TGenericClassDerived<TSysMaterialHAL, TSysMaterial, "TSysMaterialHAL", TMAKEVERSION(1, 0), TFALSE>
 {
 public:
+	// $deBlob: FUNCTION 00709e30
 	TSysMaterialHAL() { m_pOrderTable = TNULL; }
 
 	virtual ~TSysMaterialHAL();

@@ -8,6 +8,7 @@ TOSHI_NAMESPACE_START
 TFLOAT TScheduler::s_MaxTimeDeltaAllowed          = 0.25f;
 TFLOAT TScheduler::s_DebugSlowMaxTimeDeltaAllowed = 1.0f;
 
+// $deBlob: FUNCTION 006603d0
 TScheduler::TScheduler()
 {
 	m_DeltaTime          = 0.0;
@@ -22,6 +23,7 @@ TScheduler::TScheduler()
 	m_DebugDeltaTimeMult = 1.0f;
 }
 
+// $deBlob: FUNCTION 00660580
 TTask* TScheduler::CreateTask(TClass* pClass, TTask* pParent)
 {
 	TASSERT(pClass->IsA(TGetClass(TTask)));
@@ -41,6 +43,7 @@ TTask* TScheduler::CreateTask(TClass* pClass, TTask* pParent)
 	return pTask;
 }
 
+// $deBlob: FUNCTION 00660b00
 void TScheduler::DeleteTaskAtomic(TTask* task)
 {
 	if (task != TNULL)
@@ -82,6 +85,7 @@ void TScheduler::DeleteTaskAtomic(TTask* task)
 	}
 }
 
+// $deBlob: FUNCTION 00660870
 void TScheduler::DestroyDyingTasks(TTask* task)
 {
 	if (task != TNULL)
@@ -109,6 +113,7 @@ void TScheduler::DestroyDyingTasks(TTask* task)
 	}
 }
 
+// $deBlob: FUNCTION 00660930
 void TScheduler::UpdateActiveTasks(TTask* task)
 {
 	TTask* currentTask = task;

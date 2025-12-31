@@ -6,6 +6,7 @@
 class AApplication : public Toshi::TApplication
 {
 public:
+	// $deBlob: FUNCTION 0056a990
 	AApplication()
 	    : m_Renderer(TNULL), m_bRenderWorld(TTRUE), m_bUnk3(TFALSE)
 	{
@@ -22,6 +23,7 @@ public:
 		return m_bLoadModelViewState;
 	}
 
+	// $deBlob: FUNCTION 0056b530
 	void SetRenderWorld(TBOOL render)
 	{
 		m_bRenderWorld = render;
@@ -32,6 +34,7 @@ public:
 		return m_bRenderWorld;
 	}
 
+	// $deBlob: FUNCTION 0056b580
 	const TCHAR* GetLevelInformationFileName() const
 	{
 		return m_szLevelPropertiesFileName;

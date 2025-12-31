@@ -3,37 +3,44 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00692200
 TShader::TShader()
 {
 	m_State = State::None;
 	sm_oShaderList.AddShader(this);
 }
 
+// $deBlob: FUNCTION 00692290
 TShader::~TShader()
 {
 	sm_oShaderList.RemoveShader(this);
 }
 
+// $deBlob: FUNCTION 006921f0
 void TShader::OnDestroy()
 {
 	m_State.Unset(State::Created);
 }
 
+// $deBlob: FUNCTION 00692250
 void TShader::Flush()
 {}
 
+// $deBlob: FUNCTION 00692260
 TBOOL TShader::Create()
 {
 	m_State.Set(State::Created);
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00692270
 TBOOL TShader::Validate()
 {
 	m_State.Set(State::Validated);
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00692280
 void TShader::Invalidate()
 {
 	m_State.Unset(State::Validated);

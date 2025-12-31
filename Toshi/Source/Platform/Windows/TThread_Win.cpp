@@ -13,6 +13,7 @@ unsigned long __stdcall ThreadEntry(void* userParam)
 	return 0;
 }
 
+// $deBlob: FUNCTION 006622e0
 TBOOL TThread::Create(size_t a_iStackSize, PRIORITY a_ePriority, TUINT8 flag)
 {
 	m_iThreadID  = -1;
@@ -33,6 +34,7 @@ TBOOL TThread::Create(size_t a_iStackSize, PRIORITY a_ePriority, TUINT8 flag)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00662660
 void TThread::Exit(TThread* a_pThread)
 {
 	TASSERT(a_pThread->m_iThreadID == GetCurrentThreadId(), "Thread cannot be closed outside");

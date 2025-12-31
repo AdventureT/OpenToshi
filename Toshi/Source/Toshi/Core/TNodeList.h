@@ -81,6 +81,7 @@ public:
 		m_Count++;
 	}
 
+	// $deBlob: FUNCTION 006aab50
 	TNode* Remove(TNode& rNode)
 	{
 		TASSERT(rNode.GetList() == this);
@@ -94,6 +95,7 @@ public:
 		return &rNode;
 	}
 
+	// $deBlob: FUNCTION 006aef10
 	void RemoveAll()
 	{
 		while (!IsEmpty()) return Remove(*m_Head.Next());
@@ -123,6 +125,7 @@ public:
 
 	void DeleteTail() { Delete(Tail()); }
 
+	// $deBlob: FUNCTION 006aabc0
 	void DeleteAll()
 	{
 		while (!IsEmpty())
@@ -131,6 +134,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 00603120
 	void Delete(TNode& node)
 	{
 		Remove(node);
@@ -142,6 +146,7 @@ public:
 
 	void InsertTail(TNode& node) { InsertBefore(m_Head, node); }
 
+	// $deBlob: FUNCTION 006ab6c0
 	TBOOL IsEmpty() const { return m_Head.Next() == &m_Head; }
 
 	TBOOL IsValid(const TNode* node) const { return node != TNULL && node->m_List == this; }

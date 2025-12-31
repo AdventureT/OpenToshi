@@ -45,6 +45,7 @@ public:
 	TUINT16 m_Command;
 	TUINT8  m_CommandParams;
 
+	// $deBlob: FUNCTION 006e86c0
 	XURXUINamedFrameData()
 	{
 		m_Name          = 0;

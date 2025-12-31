@@ -6,6 +6,7 @@ TOSHI_NAMESPACE_START
 class TInputDeviceController : public TInputDevice
 {
 public:
+	// $deBlob: FUNCTION 0067c9b0
 	TInputDeviceController()
 	{
 		m_things  = (TUINT8*)TMalloc(8);

@@ -2,6 +2,7 @@
 #include "AAssetStreaming.h"
 #include "AAssetStreamingJobs.h"
 
+// $deBlob: FUNCTION 0056c960
 AAssetStreaming::AAssetStreaming()
 {
 	// Create thread and run it
@@ -18,6 +19,7 @@ AAssetStreaming::AAssetStreaming()
 	}
 }
 
+// $deBlob: FUNCTION 0056cb70
 void AAssetStreaming::Update()
 {
 	if (m_pCurrentJob == TNULL)
@@ -33,6 +35,7 @@ void AAssetStreaming::Update()
 	}
 }
 
+// $deBlob: FUNCTION 0056ca70
 void AAssetStreaming::ReleaseJob(AMainThreadJob2* a_pJob)
 {
 	a_pJob->m_StreamJob = Toshi::TTRBStreamJob();

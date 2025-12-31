@@ -8,6 +8,7 @@ TOSHI_NAMESPACE_START
 class TModelManager : public TSingleton<TModelManager>
 {
 public:
+	// $deBlob: FUNCTION 006aefe0
 	TModelManager() {}
 
 	void AddModel(T2ModelPtr model);

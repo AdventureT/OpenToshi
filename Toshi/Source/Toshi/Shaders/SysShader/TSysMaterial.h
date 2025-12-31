@@ -20,6 +20,7 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 0070aa30
 	TSysMaterial() { m_eBlendMode = BlendMode::Default; }
 
 	virtual TBOOL Create(BlendMode eBlendMode);

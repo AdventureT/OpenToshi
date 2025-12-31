@@ -138,6 +138,7 @@ public:
 		m_iNumElements = 0;
 	}
 
+	// $deBlob: FUNCTION 005eb7a0
 	Iterator Find(const T& a_rValue)
 	{
 		for (auto it = Begin(); it != End(); it++)
@@ -191,8 +192,10 @@ public:
 		return m_Items[m_iNumElements - 1];
 	}
 
+	// $deBlob: FUNCTION 005ebc30
 	Iterator Begin() { return Iterator(this); }
 
+	// $deBlob: FUNCTION 005ebc70
 	Iterator End() { return Iterator(m_iNumElements, this); }
 
 	constexpr T& ValueAt(size_t a_uiIndex)

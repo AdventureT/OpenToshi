@@ -62,6 +62,7 @@ public:
 	void Delete();
 	void Unload();
 
+	// $deBlob: FUNCTION 006af440
 	void SetTRB(TTRB* pTRB, TBOOL bFreeOnUnload)
 	{
 		m_pTRB          = pTRB;
@@ -96,6 +97,7 @@ public:
 	static void*        ResourceCallback(void* pData, TTRB* pTRB, TBOOL flag);
 	static const TCHAR* TranslateSymbolName(const TCHAR* symbolName);
 
+	// $deBlob: FUNCTION 005f9ae0
 	static void SetTRBLoadCallback(t_TRBLoadCallback fnCallback) { sm_pTRBLoadCallback = fnCallback; }
 
 protected:

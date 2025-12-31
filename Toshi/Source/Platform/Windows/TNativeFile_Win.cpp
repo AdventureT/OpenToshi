@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00687430
 TBOOL TFileManager::Create()
 {
 	CreateCommon();
@@ -27,6 +28,7 @@ TBOOL TFileManager::Create()
 
 #pragma region TNativeFileSystem
 
+// $deBlob: FUNCTION 006892c0
 TNativeFileSystem::TNativeFileSystem(const TCHAR* name)
     : TFileSystem(name)
 {
@@ -47,6 +49,7 @@ TFile* TNativeFileSystem::CreateFile(TString8 const& fn, TUINT32 flags)
 	return nativeFile;
 }
 
+// $deBlob: FUNCTION 006893a0
 void TNativeFileSystem::DestroyFile(TFile* file)
 {
 	if (file != TNULL)
@@ -56,6 +59,7 @@ void TNativeFileSystem::DestroyFile(TFile* file)
 	}
 }
 
+// $deBlob: FUNCTION 00689770
 TBOOL TNativeFileSystem::MakeDirectory(TString8 const& string)
 {
 	return CreateDirectoryA(string, TNULL);
@@ -120,6 +124,7 @@ TNativeFile::TNativeFile(const TNativeFile& other)
 	m_WriteBuffered   = other.m_WriteBuffered;
 }
 
+// $deBlob: FUNCTION 00689ff0
 TBOOL TNativeFile::LoadBuffer(DWORD bufferPos)
 {
 	// FUN_00689ff0
@@ -147,6 +152,7 @@ TBOOL TNativeFile::LoadBuffer(DWORD bufferPos)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0068a090
 TINT TNativeFile::FlushWriteBuffer()
 {
 	DWORD lpNumberOfBytesWritten;
@@ -175,6 +181,7 @@ TINT TNativeFile::FlushWriteBuffer()
 	return lpNumberOfBytesWritten;
 }
 
+// $deBlob: FUNCTION 00689f80
 TINT TNativeFile::ReadUnbuffered(LPVOID dst, size_t size)
 {
 	DWORD lpNumberOfBytesRead;
@@ -203,6 +210,7 @@ TINT TNativeFile::ReadUnbuffered(LPVOID dst, size_t size)
 	return lpNumberOfBytesRead;
 }
 
+// $deBlob: FUNCTION 008289a0
 TCHAR* TNativeFile::SplitPath(const TString8& a_rsFullPath, TString8& a_rsDrive, TString8& a_rsDir)
 {
 	// Move this from TNativeFile to TLogFile?
@@ -247,6 +255,7 @@ TBOOL TNativeFile::DirExists(TCHAR* a_pcStr)
 	return dirExists == TRUE;
 }
 
+// $deBlob: FUNCTION 006897d0
 size_t TNativeFile::Read(void* dst, size_t size)
 {
 	FlushWriteBuffer();
@@ -319,6 +328,7 @@ size_t TNativeFile::Read(void* dst, size_t size)
 	;
 }
 
+// $deBlob: FUNCTION 006898f0
 size_t TNativeFile::Write(const void* buffer, size_t size)
 {
 	if (m_RBufferPosition != m_Position)
@@ -379,12 +389,14 @@ size_t TNativeFile::Write(const void* buffer, size_t size)
 	return 0;
 }
 
+// $deBlob: FUNCTION 00689aa0
 TUINT32 TNativeFile::Tell()
 {
 	FlushWriteBuffer();
 	return m_Position;
 }
 
+// $deBlob: FUNCTION 00689a20
 TBOOL TNativeFile::Seek(TINT offset, TFile::TSEEK origin)
 {
 	FlushWriteBuffer();
@@ -414,6 +426,7 @@ TBOOL TNativeFile::Seek(TINT offset, TFile::TSEEK origin)
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00689b40
 TINT TNativeFile::GetCChar()
 {
 	FlushWriteBuffer();
@@ -435,6 +448,7 @@ TINT TNativeFile::GetCChar()
 	return result;
 }
 
+// $deBlob: FUNCTION 00689bb0
 TWCHAR TNativeFile::GetWChar()
 {
 	FlushWriteBuffer();
@@ -499,6 +513,7 @@ TINT TNativeFile::VCPrintf(const TCHAR* format, va_list vargs)
 	return iResult;
 }
 
+// $deBlob: FUNCTION 00689ac0
 DWORD TNativeFile::GetSize()
 {
 	m_RBufferPosition = SetFilePointer(m_Handle, 0, TNULL, TSEEK_END);
@@ -511,6 +526,7 @@ DWORD TNativeFile::GetSize()
 	return m_RBufferPosition;
 }
 
+// $deBlob: FUNCTION 00689b00
 _FILETIME TNativeFile::GetDate()
 {
 	_FILETIME fLastWriteTime;
@@ -525,6 +541,7 @@ _FILETIME TNativeFile::GetDate()
 	return fLastWriteTime;
 }
 
+// $deBlob: FUNCTION 00689dd0
 TBOOL TNativeFile::Open(const TString8& a_FileName, FileMode a_Mode)
 {
 	TASSERT(a_FileName.IsIndexValid(0), "TNativeFile::Open - wrong filename");

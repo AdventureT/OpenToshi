@@ -20,11 +20,13 @@ public:
 		m_pInputDevice = TNULL;
 	}
 
+	// $deBlob: FUNCTION 005daad0
 	~AInputHelperSimple()
 	{
 		delete m_pArray;
 	}
 
+	// $deBlob: FUNCTION 005daae0
 	void Initialise(size_t a_iDoodadCount, Toshi::TInputDevice* pInputDevice)
 	{
 		TASSERT(0 != a_iDoodadCount, "ERROR: Initialising with zero array size");

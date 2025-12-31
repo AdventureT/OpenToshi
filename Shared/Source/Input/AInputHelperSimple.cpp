@@ -4,6 +4,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 005dab60
 void AInputHelperSimple::AddDoodad(size_t doodad)
 {
 	TASSERT(0 != m_iArraySize);
@@ -13,6 +14,7 @@ void AInputHelperSimple::AddDoodad(size_t doodad)
 	m_iArrayIndex++;
 }
 
+// $deBlob: FUNCTION 005dace0
 TBOOL AInputHelperSimple::IsHeld(size_t doodad)
 {
 	for (size_t i = 0; i < m_iArrayIndex; i++)
@@ -25,6 +27,7 @@ TBOOL AInputHelperSimple::IsHeld(size_t doodad)
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 005daca0
 TBOOL AInputHelperSimple::WasPressed(size_t doodad)
 {
 	for (size_t i = 0; i < m_iArrayIndex; i++)
@@ -37,6 +40,7 @@ TBOOL AInputHelperSimple::WasPressed(size_t doodad)
 	return TFALSE;
 }
 
+// $deBlob: FUNCTION 005dabe0
 void AInputHelperSimple::Update()
 {
 	if (m_pInputDevice != TNULL)

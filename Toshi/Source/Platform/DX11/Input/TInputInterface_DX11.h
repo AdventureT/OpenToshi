@@ -10,6 +10,7 @@ public:
 	static constexpr size_t MAXDEVICESNUM = 127;
 
 public:
+	// $deBlob: FUNCTION 0067fc00
 	TInputDXInterface()
 	{
 		m_poDirectInput8 = NULL;
@@ -20,12 +21,14 @@ public:
 
 	virtual TBOOL Initialise();
 	virtual TBOOL Deinitialise();
+	// $deBlob: FUNCTION 00680520
 	virtual void  RefreshDirect() {}
 
 	TBOOL LostDevice();
 
 	HWND GetMainWindow() const { return m_hMainWindow; }
 
+	// $deBlob: FUNCTION 00680530
 	void SetMainWindow(HWND a_hMainWindow) { m_hMainWindow = a_hMainWindow; }
 
 	static TInputDXInterface* GetInterface() { return ms_pTheInterface; }

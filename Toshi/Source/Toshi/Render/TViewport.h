@@ -25,14 +25,19 @@ public:
 	TViewport();
 	~TViewport();
 
+	// $deBlob: FUNCTION 006b2ac0
 	TFLOAT GetX() const { return m_pRenderCtx->GetX(); }
 
+	// $deBlob: FUNCTION 006b2ad0
 	TFLOAT GetY() const { return m_pRenderCtx->GetY(); }
 
+	// $deBlob: FUNCTION 006b2ae0
 	TFLOAT GetWidth() const { return m_pRenderCtx->GetWidth(); }
 
+	// $deBlob: FUNCTION 006b2af0
 	TFLOAT GetHeight() const { return m_pRenderCtx->GetHeight(); }
 
+	// $deBlob: FUNCTION 006b2650
 	void Begin()
 	{
 		TASSERT(m_bInViewport == TFALSE);
@@ -40,6 +45,7 @@ public:
 		BeginSKU();
 	}
 
+	// $deBlob: FUNCTION 006b26a0
 	void End()
 	{
 		EndSKU();
@@ -47,6 +53,7 @@ public:
 		m_bInViewport = TFALSE;
 	}
 
+	// $deBlob: FUNCTION 006b2b50
 	TBOOL AllowBackgroundClear(TBOOL allow)
 	{
 		TBOOL oldState          = m_bAllowBackgroundClear;
@@ -55,6 +62,7 @@ public:
 		return oldState;
 	}
 
+	// $deBlob: FUNCTION 006b2b80
 	TBOOL AllowDepthClear(TBOOL allow)
 	{
 		TBOOL oldState     = m_bAllowDepthClear;
@@ -65,6 +73,7 @@ public:
 
 	void Enable(TBOOL enable) { m_bEnable = enable; }
 
+	// $deBlob: FUNCTION 006b2bb0
 	TBOOL EnableDefaultBeginRender(TBOOL enable)
 	{
 		TBOOL oldState        = m_bDefaultBeginRender;
@@ -72,12 +81,14 @@ public:
 		return oldState;
 	}
 
+	// $deBlob: FUNCTION 006b2aa0
 	void SetMemoryAllocatorBlock(TMemoryHeap* pHeap)
 	{
 		m_MemAllocatorBlock = pHeap;
 		ChangeSKU(ChangeEvent_AllocatorBlock);
 	}
 
+	// $deBlob: FUNCTION 006b26f0
 	void SetX(TFLOAT value)
 	{
 		TRenderContext::Params params = m_pRenderCtx->GetParams();
@@ -90,6 +101,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 006b2780
 	void SetY(TFLOAT value)
 	{
 		TRenderContext::Params params = m_pRenderCtx->GetParams();
@@ -102,6 +114,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 006b2810
 	void SetWidth(TFLOAT value)
 	{
 		TRenderContext::Params params = m_pRenderCtx->GetParams();
@@ -114,6 +127,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 006b28a0
 	void SetHeight(TFLOAT value)
 	{
 		TRenderContext::Params params = m_pRenderCtx->GetParams();
@@ -126,6 +140,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 006b2930
 	void SetMinZ(TFLOAT value)
 	{
 		TRenderContext::Params params = m_pRenderCtx->GetParams();
@@ -138,6 +153,7 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 006b29c0
 	void SetMaxZ(TFLOAT value)
 	{
 		TRenderContext::Params params = m_pRenderCtx->GetParams();

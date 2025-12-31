@@ -22,6 +22,7 @@
 
 using namespace Toshi;
 
+// $deBlob: FUNCTION 005c1690
 AGameState::UpdateResult AAppInitState::OnUpdate(TFLOAT deltaTime)
 {
 	TIMPLEMENT();
@@ -46,12 +47,14 @@ AGameState::UpdateResult AAppInitState::OnUpdate(TFLOAT deltaTime)
 	return UpdateResult_Remove;
 }
 
+// $deBlob: FUNCTION 005c1bd0
 void AAppInitState::OnInsertion()
 {
 	TIMPLEMENT();
 	AGameState::OnInsertion();
 }
 
+// $deBlob: FUNCTION 005c1bf0
 void AAppInitState::OnRemoval()
 {
 	AGameState::OnRemoval();

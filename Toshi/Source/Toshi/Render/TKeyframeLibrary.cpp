@@ -19,6 +19,7 @@ TKeyframeLibrary::TKeyframeLibrary()
 	m_pTRB             = TNULL;
 }
 
+// $deBlob: FUNCTION 0068e4c0
 void TKeyframeLibrary::Delete()
 {
 	TASSERT(m_iReferenceCount == 0);
@@ -33,6 +34,7 @@ void TKeyframeLibrary::Delete()
 	delete this;
 }
 
+// $deBlob: FUNCTION 0068e3e0
 TKeyframeLibrary* TKeyframeLibrary::Create(TRBHeader* a_pTRBHeader)
 {
 	TKeyframeLibrary* pLibrary = TMEMORY_NEW(TKeyframeLibrary, s_pAnimMemHeap);

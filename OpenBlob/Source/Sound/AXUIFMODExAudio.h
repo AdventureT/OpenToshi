@@ -6,6 +6,7 @@
 class AXUIFMODExAudio : public Toshi::TXUIAudio
 {
 public:
+	// $deBlob: FUNCTION 00617f70
 	AXUIFMODExAudio()
 	{
 		m_iNumSubSounds = 0;
@@ -17,10 +18,12 @@ public:
 	virtual FMOD::Sound* GetSubSound(TCHAR* a_pSubSoundName);
 	virtual TBOOL        PlaySound(FMOD::Sound* a_pSound, TFLOAT a_fVolume, FMOD::Channel* a_pChannel);
 
+	// $deBlob: FUNCTION 00618260
 	virtual void Stop(FMOD::Channel* a_pChannel)
 	{
 		if (a_pChannel) a_pChannel->stop();
 	}
+	// $deBlob: FUNCTION 00618280
 	virtual void SetVolume(FMOD::Channel* a_pChannel, TFLOAT a_fVolume)
 	{
 		if (a_pChannel) a_pChannel->setVolume(AOptions::GetSingleton()->GetPitch() * a_fVolume);

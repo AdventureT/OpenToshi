@@ -4,6 +4,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006ebbd0
 TWCHAR* TStringManager::StringCharToUnicode(TWCHAR* a_UnicodeString, const TCHAR* a_CharString, TUINT32 a_iLength)
 {
 	TASSERT((a_UnicodeString != TNULL) && (a_CharString != TNULL));
@@ -18,6 +19,7 @@ TWCHAR* TStringManager::StringCharToUnicode(TWCHAR* a_UnicodeString, const TCHAR
 	return a_UnicodeString;
 }
 
+// $deBlob: FUNCTION 006ebc50
 TCHAR* TStringManager::StringUnicodeToChar(TCHAR* a_CharString, const TWCHAR* const& a_UnicodeString, TUINT32 a_iLength)
 {
 	TASSERT((a_UnicodeString != TNULL) && (a_CharString != TNULL));

@@ -6,6 +6,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006e8700
 XURXUITimelineData::XURXUITimelineData()
 {
 	m_pOwnerData               = TNULL;
@@ -18,12 +19,14 @@ XURXUITimelineData::XURXUITimelineData()
 	m_aTimelineProps           = TNULL;
 }
 
+// $deBlob: FUNCTION 006e8730
 XURXUITimelineData::~XURXUITimelineData()
 {
 	delete[] m_aTimelineProps;
 	delete[] m_aTimelineValues;
 }
 
+// $deBlob: FUNCTION 006e8760
 TBOOL XURXUITimelineData::Load(TXUIResource& a_rXur, TUINT8*& a_pData)
 {
 	XURReader reader(a_pData);

@@ -170,6 +170,7 @@ public:
 	void       UpdateState(TBOOL a_bForceUpdate);
 	TMatrix44* GetBoneTransformCurrent(TINT a_iBone, TMatrix44& a_rMatrix);
 
+	// $deBlob: FUNCTION 0068c600
 	TAnimation* AddAnimation(TINT16 a_iSequenceIndex, TFLOAT a_fDestWeight, TFLOAT a_fBlendInSpeed) { return AddAnimationFull(a_iSequenceIndex, a_fDestWeight, a_fBlendInSpeed, 0.0f, 0); }
 
 	TAnimation* AddAnimationFull(TINT16 a_iSequenceIndex, TFLOAT a_fDestWeight, TFLOAT a_fBlendInSpeed, TFLOAT a_fBlendOutSpeed, TAnimation::Flags a_eAnimFlags);
