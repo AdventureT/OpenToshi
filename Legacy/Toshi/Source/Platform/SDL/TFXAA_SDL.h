@@ -1,0 +1,7 @@
+#pragma once
+
+TOSHI_NAMESPACE_START
+
+class TFXAA;
+
+TOSHI_NAMESPACE_END
