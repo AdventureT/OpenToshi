@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 #undef THREAD_MODE_BACKGROUND_BEGIN
 #undef THREAD_MODE_BACKGROUND_END
 #undef THREAD_PRIORITY_ABOVE_NORMAL
@@ -9,11 +11,17 @@
 #undef THREAD_PRIORITY_LOWEST
 #undef THREAD_PRIORITY_NORMAL
 #undef THREAD_PRIORITY_TIME_CRITICAL
+#undef Yield
 
-#include "Toshi/Core/TDList.h"
+#include "Toshi/TDList.h"
 
 TOSHI_NAMESPACE_START
 
+//-----------------------------------------------------------------------------
+// Purpose: a Win32 thread (_beginthreadex) running Main(); every thread is linked into the thread manager.
+// NOTE: in de Blob's branch TThread/TThreadManager use TDList (Barnyard: T2DList) and the manager is a static object
+// with s_pThreadManager (Barnyard: a TSingleton).
+//-----------------------------------------------------------------------------
 class TThread : public TDList<TThread>::TNode
 {
 public:
@@ -31,64 +39,72 @@ public:
 		THREAD_PRIORITY_TIME_CRITICAL = 15
 	};
 
+	using FLAGS = TUINT;
+	enum FLAGS_ : FLAGS
+	{
+		FLAGS_NONE      = 0,
+		FLAGS_SUSPENDED = BITFLAG( 0 ), // don't resume the thread after creating it
+	};
+
 public:
-	virtual ~TThread(){};
 	virtual void Main() = 0;
+	virtual ~TThread() {}
 
-	TBOOL Create(size_t a_iStackSize, PRIORITY a_ePriority, TUINT8 flag);
+	TBOOL Create( TSIZE a_iStackSize, PRIORITY a_ePriority, FLAGS a_eFlags );
+	TBOOL Destroy();
 
-	static TBOOL GetPriority(void* a_hThreadHnd, PRIORITY& a_ePriority)
-	{
-		TASSERT(a_hThreadHnd != NULL, "Thread doesn't exist");
-		TINT iPriority = GetThreadPriority(a_hThreadHnd);
-		TASSERT(iPriority != THREAD_PRIORITY_ERROR_RETURN, "Couldn't get thread priority");
-		a_ePriority = iPriority;
-		return TTRUE;
-	}
+	TBOOL Suspend();
+	TBOOL Resume();
 
-	static TBOOL SetPriority(void* a_hThreadHnd, PRIORITY a_ePriority)
-	{
-		TASSERT(a_hThreadHnd != NULL, "Thread doesn't exist");
-		BOOL bResult = SetThreadPriority(a_hThreadHnd, a_ePriority);
-		TASSERT(bResult != FALSE, "Couldn't set priority");
-		return TTRUE;
-	}
+	TBOOL SetPriority( PRIORITY a_ePriority );
+	TBOOL GetPriority( PRIORITY& a_rePriority );
 
-	static void Exit(TThread* a_pThread);
-	//static void Sleep(TINT milliSeconds) { usleep(100); }
+	TBOOL IsCreated() const { return m_hThreadHnd != NULL; }
 
-	void* m_hThreadHnd; // 0xC
-	DWORD m_iThreadID;  // 0x10
-};
+	static unsigned int __stdcall Entry( void* a_pThread );
 
-class TThreadManager : public TSingleton<TThreadManager>
+	// Closes a_pThread (must be the current thread) and ends it
+	static void Exit( TThread* a_pThread );
+
+	// Ends the current thread
+	static void Exit();
+
+	static TBOOL Yield();
+	static void  Sleep( TINT a_iMilliseconds );
+
+	static TBOOL SetCurrentPriority( PRIORITY a_ePriority );
+	static TBOOL GetCurrentPriority( PRIORITY& a_rePriority );
+
+	static TBOOL SetPriority( void* a_hThreadHnd, PRIORITY a_ePriority );
+	static TBOOL GetPriority( void* a_hThreadHnd, PRIORITY& a_rePriority );
+
+public:
+	void*         m_hThreadHnd = NULL; // 0x0C
+	unsigned long m_iThreadID  = -1;   // 0x10
+}; // 0x14
+
+class TThreadManager
 {
 public:
-	TThreadManager() { Create(); }
+	TThreadManager();
+	~TThreadManager();
 
-	void Create() { InitializeCriticalSection(&m_CriticalSection); }
-	void Delete() { DeleteCriticalSection(&m_CriticalSection); }
+	void Create();
+	void Destroy();
 
-	void RemoveThread(TThread* a_pThread)
-	{
-		EnterCriticalSection(&m_CriticalSection);
-		a_pThread->Remove();
-		LeaveCriticalSection(&m_CriticalSection);
-	}
+	void     InsertThread( TThread* a_pThread );
+	void     RemoveThread( TThread* a_pThread );
+	TThread* FindThread( unsigned long a_iThreadID );
 
-	// $deBlob: FUNCTION 006628f0
-	void InsertThread(TThread* a_pThread)
-	{
-		EnterCriticalSection(&m_CriticalSection);
-		a_pThread->InsertAfter(m_Threads.Begin());
-		LeaveCriticalSection(&m_CriticalSection);
-	}
-
-	friend class TThread;
+	// $deBlob: FUNCTION 00662b50
+	static TThreadManager* GetThreadManager() { return s_pThreadManager; }
 
 private:
-	CRITICAL_SECTION m_CriticalSection;
-	TDList<TThread>  m_Threads;
-};
+	inline static TThreadManager* s_pThreadManager;
+
+private:
+	CRITICAL_SECTION m_CriticalSection; // 0x00
+	TDList<TThread>  m_Threads;         // 0x18
+}; // 0x20
 
 TOSHI_NAMESPACE_END

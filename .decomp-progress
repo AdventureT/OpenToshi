@@ -14,7 +14,6 @@ projects
             "extension" ".h"
             "directory" "OpenBlob/Source"
             "directory" "Toshi/Source"
-            "directory" "Shared/Source"
         }
     }
 }

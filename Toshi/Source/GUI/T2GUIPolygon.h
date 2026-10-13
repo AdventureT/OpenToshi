@@ -1,0 +1,41 @@
+#pragma once
+#include "T2GUIElement.h"
+
+TOSHI_NAMESPACE_START
+
+class T2GUIPolygon : public T2GUIElement
+{
+public:
+	T2GUIPolygon();
+	~T2GUIPolygon();
+
+	//-----------------------------------------------------------------------------
+	// T2GUIElement
+	//-----------------------------------------------------------------------------
+	virtual void Render() override;
+	virtual void GetDimensions( TFLOAT& a_rWidth, TFLOAT& a_rHeight ) override;
+	virtual void SetDimensions( TFLOAT a_fWidth, TFLOAT a_fHeight ) override {} // +0x28, DOES_NOTHING
+
+	//-----------------------------------------------------------------------------
+	// Own methods
+	//-----------------------------------------------------------------------------
+	void CreateBuffers( TINT a_iNumVertices );
+
+	void InvalidateBounds();
+	void SetMaterial( T2GUIMaterial* a_pMaterial ) { m_pMaterial = a_pMaterial; }
+
+	TINT            GetNumVertices() const { return m_iNumVertices; }
+	TVector2*       GetVertices() { return m_pVertices; }
+	const TVector2* GetVertices() const { return m_pVertices; }
+	TVector2*       GetUVs() { return m_pUVs; }
+	const TVector2* GetUVs() const { return m_pUVs; }
+
+private:
+	T2GUIMaterial* m_pMaterial;    // 0x54
+	TINT           m_iNumVertices; // 0x58
+	TVector2*      m_pVertices;    // 0x5C
+	TVector2*      m_pUVs;         // 0x60
+	TBOOL          m_bBoundsValid; // 0x64
+};
+
+TOSHI_NAMESPACE_END

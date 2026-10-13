@@ -367,3 +367,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 Tools/Vendor/Catch2/lib/*/*.lib
+*.slnx

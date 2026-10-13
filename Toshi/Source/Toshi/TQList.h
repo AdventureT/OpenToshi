@@ -1,0 +1,167 @@
+#pragma once
+#include "Toshi/T2Iterator.h"
+
+TOSHI_NAMESPACE_START
+
+template <class T>
+class TQList
+{
+public:
+	class TNode
+	{
+	public:
+		friend TQList;
+		T2_DEFINE_ITERATOR_FRIEND();
+		T2_DEFINE_ITERATOR( T, TNode );
+
+	public:
+		TNode()
+		{
+			m_pNext = TSTATICCAST( T, this );
+			m_pPrev = TSTATICCAST( T, this );
+		}
+
+		~TNode()
+		{
+			m_pPrev->m_pNext = m_pNext;
+			m_pNext->m_pPrev = m_pPrev;
+			m_pNext          = TSTATICCAST( T, this );
+			m_pPrev          = TSTATICCAST( T, this );
+		}
+
+		TBOOL IsLinked() const
+		{
+			return this != m_pNext;
+		}
+
+		T* Next() const
+		{
+			return m_pNext;
+		}
+
+		T* Prev() const
+		{
+			return m_pPrev;
+		}
+
+		void Remove()
+		{
+			m_pPrev->m_pNext = m_pNext;
+			m_pNext->m_pPrev = m_pPrev;
+			m_pNext          = TSTATICCAST( T, this );
+			m_pPrev          = TSTATICCAST( T, this );
+		}
+
+	private:
+		// Out-of-line instances:
+		// $deBlob: FUNCTION 0068f850
+		// $deBlob: FUNCTION 0068f8a0
+		void InsertAfter( TNode* a_pNode )
+		{
+			TASSERT( TFALSE == IsLinked() );
+			m_pPrev          = TSTATICCAST( T, a_pNode );
+			m_pNext          = a_pNode->m_pNext;
+			a_pNode->m_pNext = TSTATICCAST( T, this );
+			m_pNext->m_pPrev = TSTATICCAST( T, this );
+		}
+
+		// $deBlob: FUNCTION 006ef5d0
+		// $deBlob: FUNCTION 0068f8f0
+		void InsertBefore( TNode* a_pNode )
+		{
+			TASSERT( TFALSE == IsLinked() );
+			m_pNext          = TSTATICCAST( T, a_pNode );
+			m_pPrev          = a_pNode->m_pPrev;
+			a_pNode->m_pPrev = TSTATICCAST( T, this );
+			m_pPrev->m_pNext = TSTATICCAST( T, this );
+		}
+
+	private:
+		T* m_pNext;
+		T* m_pPrev;
+	};
+
+public:
+	TQList()  = default;
+	~TQList() = default;
+
+	// Out-of-line instances:
+	// $deBlob: FUNCTION 0068f940
+	// $deBlob: FUNCTION 0068f990
+	void PushFront( T* a_pNode )
+	{
+		a_pNode->InsertAfter( &m_oRoot );
+	}
+
+	// $deBlob: FUNCTION 006ef620
+	// $deBlob: FUNCTION 0068f9e0
+	void Push( T* a_pNode )
+	{
+		a_pNode->InsertBefore( &m_oRoot );
+	}
+
+	T* Pop()
+	{
+		auto pFirstElement = m_oRoot.m_pNext;
+		pFirstElement->Remove();
+		return pFirstElement;
+	}
+
+	TNode::Iterator Head() const
+	{
+		return m_oRoot.m_pNext;
+	}
+
+	// NOTE: retail folds every instantiation whose node follows the vtable (GetHead 0052cc70)
+	// $Barnyard: FUNCTION 0052cc70
+	TNode::Iterator Begin() const
+	{
+		return m_oRoot.m_pNext;
+	}
+
+	const TNode* End() const
+	{
+		return &m_oRoot;
+	}
+
+	// NOTE: retail folds every instantiation whose node follows the vtable (AFade, ...): 0045c640
+	// $Barnyard: FUNCTION 0045c640
+	void Clear()
+	{
+		while ( !IsEmpty() )
+		{
+			Remove( Begin() );
+		}
+	}
+
+	void DeleteAll()
+	{
+		while ( !IsEmpty() )
+		{
+			Delete( Begin() );
+		}
+	}
+
+	void Remove( T* a_pNode )
+	{
+		a_pNode->Remove();
+	}
+
+	void Delete( T* a_pNode )
+	{
+		a_pNode->Remove();
+		delete a_pNode;
+	}
+
+	// NOTE: retail compares Begin() with End() (005fd4f0, TQList<AFSMInstruction>)
+	// $Barnyard: FUNCTION 005fd4f0
+	TBOOL IsEmpty() const
+	{
+		return !m_oRoot.IsLinked();
+	}
+
+private:
+	TNode m_oRoot;
+};
+
+TOSHI_NAMESPACE_END

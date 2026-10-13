@@ -1,0 +1,68 @@
+#pragma once
+#include "Toshi/Typedefs.h"
+
+#define TCOLOR( R, G, B )          ( ( ( ( R & 0xff ) << 8 | G & 0xff ) << 8 | B & 0xff ) | 0xFF000000 )
+#define TCOLOR3( R, G, B )         ( TCOLOR( R, G, B ) )
+#define TCOLOR4( R, G, B, A )      ( ( ( ( R & 0xff ) << 8 | G & 0xff ) << 8 | B & 0xff ) | ( TUINT32( A ) << 24 ) )
+#define TCOLOR_GET_ALPHA( COLOR )  ( ( COLOR >> 24 ) & 0xff )
+#define TCOLOR_GET_RED( COLOR )    ( ( COLOR >> 16 ) & 0xff )
+#define TCOLOR_GET_GREEN( COLOR )  ( ( COLOR >> 8 ) & 0xff )
+#define TCOLOR_GET_BLUE( COLOR )   ( COLOR & 0xff )
+#define TCOLOR_GET_A( COLOR )      TCOLOR_GET_ALPHA( COLOR )
+#define TCOLOR_GET_R( COLOR )      TCOLOR_GET_RED( COLOR )
+#define TCOLOR_GET_G( COLOR )      TCOLOR_GET_GREEN( COLOR )
+#define TCOLOR_GET_B( COLOR )      TCOLOR_GET_BLUE( COLOR )
+
+#define COLOR_WHITE3 TCOLOR3( 255, 255, 255 )
+#define COLOR_BLACK3 TCOLOR3( 0, 0, 0 )
+
+#define COLOR_WHITE4 TCOLOR4( 255, 255, 255, 255 )
+#define COLOR_BLACK4 TCOLOR4( 0, 0, 0, 255 )
+
+#define COLOR_WHITE  COLOR_WHITE4
+#define COLOR_BLACK  COLOR_BLACK4
+
+TOSHI_NAMESPACE_START
+
+struct TColor
+{
+	union
+	{
+		struct
+		{
+			TUINT8 B;
+			TUINT8 G;
+			TUINT8 R;
+			TUINT8 A;
+		};
+
+		TUINT32 Value32;
+	};
+
+	TColor() = default;
+
+	TFORCEINLINE constexpr TColor( TUINT32 a_uiColor )
+	    : Value32( a_uiColor ) {}
+
+	TFORCEINLINE constexpr TColor( TUINT8 a_uiR, TUINT8 a_uiG, TUINT8 a_uiB, TUINT8 a_uiA = 255 )
+	    : R( a_uiR ), G( a_uiG ), B( a_uiB ), A( a_uiA ) {}
+
+	TFORCEINLINE TColor& operator=( TUINT32 a_uiColor )
+	{
+		Value32 = a_uiColor;
+		return *this;
+	}
+
+	// $Barnyard: FUNCTION 00404870
+	static TFORCEINLINE void GetComponents( TUINT32 uiColor, TUINT& a_rAlpha, TUINT& a_rRed, TUINT& a_rGreen, TUINT& a_rBlue )
+	{
+		a_rBlue  = TCOLOR_GET_BLUE( uiColor );
+		a_rGreen = TCOLOR_GET_GREEN( uiColor );
+		a_rRed   = TCOLOR_GET_RED( uiColor );
+		a_rAlpha = TCOLOR_GET_ALPHA( uiColor );
+	}
+};
+
+TSTATICASSERT( sizeof( TColor ) == 4 );
+
+TOSHI_NAMESPACE_END

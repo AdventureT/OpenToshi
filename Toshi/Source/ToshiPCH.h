@@ -9,27 +9,20 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include <cstdarg>
 
-/* Toshi Header Files */
-#include "Toshi/Core/Core.h"
-#include "Toshi/Memory/TMemory.h"
-#include "Toshi/Core/STL.h"
-#include "Toshi/Core/Endianness.h"
-#include "Toshi/Core/TObject.h"
-#include "Toshi/Math/Math.h"
-#include "Toshi/Utils/TLog.h"
-#include "Toshi/Utils/TSingleton.h"
-#include "Toshi/Utils/TUtil.h"
-#include "Toshi/Thread/TMutexLock.h"
-#include "Toshi/Strings/TStringManager.h"
-
-/* Toshi 2.0 Header Files */
-#include "Toshi2/Thread/T2MutexLock.h"
-#include "Toshi2/T2Flags.h"
+#include "Toshi/Toshi.h"
 
 /* Platform specific headers */
 #ifdef TOSHI_SKU_WINDOWS
-#  include <d3d11.h>
-#  include <dinput.h>
+#  include <WinSock2.h>
 #  include <Windows.h>
+#endif
+
+#ifdef TRENDERINTERFACE_GL
+#  include "Platform/GL/T2Render_GL.h"
+#  include "Platform/GL/T2GLTexture_GL.h"
+#  include "Platform/GL/T2FrameBuffer_GL.h"
+#  include "Platform/GL/T2RenderBuffer_GL.h"
+#  include "Platform/GL/T2RenderContext_GL.h"
 #endif

@@ -1,32 +1,45 @@
-project (TOSHI_PROJECT_NAME)
+project "Toshi"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 	characterset "ASCII"
 
 	pchheader "ToshiPCH.h"
 	pchsource "Source/ToshiPCH.cpp"
 	
-	links
+	files
 	{
-		"fmod_vc.lib",
-		"fmodstudio_vc.lib",
-		"fsbank_vc.lib",
-		"d3d11.lib",
-		"d3dcompiler.lib",
-		"dxguid.lib",
-		"dxgi.lib",
-		"winmm.lib",
-		"dinput8.lib",
-		"dbghelp.lib"
+		"Source/ToshiPCH.cpp",
+		"Source/Core/**.h",
+		"Source/Core/**.cpp",
+		"Source/Toshi/**.h",
+		"Source/Toshi/**.cpp",
+		"Source/ToshiTools/**.h",
+		"Source/ToshiTools/**.cpp",
+		"Source/File/**.h",
+		"Source/File/**.cpp",
+		"Source/Math/**.h",
+		"Source/Math/**.cpp",
+		"Source/Input/**.h",
+		"Source/Input/**.cpp",
+		"Source/Render/**.h",
+		"Source/Render/**.cpp",
+		"Source/T2Locale/**.h",
+		"Source/T2Locale/**.cpp",
+		"Source/Thread/**.h",
+		"Source/Thread/**.cpp",
+		"Source/Plugins/**.h",
+		"Source/Plugins/**.cpp",
+		"Source/GUI/**.h",
+		"Source/GUI/**.cpp"
 	}
 
 	includedirs
 	{
 		"Source",
 		"Icons",
-		"%{IncludeDir.spdlog}",
+		"Resources",
 		"%{IncludeDir.fmod}",
 		"%{IncludeDir.stb}"
 	}
@@ -39,76 +52,50 @@ project (TOSHI_PROJECT_NAME)
 	defines
 	{
 		"TOSHI_USER_ENGINE",
-		"SPDLOG_WCHAR_TO_UTF8_SUPPORT",
 		"_CRT_SECURE_NO_WARNINGS"
 	}
 	
 	filter "files:**.c"
-		flags { "NoPCH" }
+		enablepch "Off"
+		
+	filter "files:Source/Profiler/**.*"
+		enablepch "Off"
 
 	filter "system:windows"
 		systemversion "latest"
 		
 		files
 		{
-			"Source/ToshiPCH.h",
-			"Source/ToshiPCH.cpp",
-			"Source/Platform/Windows/**.h",
 			"Source/Platform/Windows/**.cpp",
 			"Source/Platform/Windows/**.c",
-			"Source/Plugins**/**.h",
-			"Source/Plugins**/**.cpp",
-			"Source/Toshi**/**.h",
-			"Source/Toshi**/**.cpp",
-			"Source/Toshi**/**.c",
+			"Source/Platform/Windows/**.h",
 			"Icons/*.ico",
-			"*.h",
-			"*.aps",
-			"*.rc"
+			"Resources/*.h",
+			"Resources/*.aps",
+			"Resources/*.rc"
 		}
+		
+		filter "options:renderer=DX11"
+			links
+			{
+				"d3d11.lib",
+				"dxgi.lib",
+				"d3dcompiler.lib",
+				"dxguid.lib",
+				"winmm.lib",
+				"dinput8.lib"
+			}
+
+			files
+			{
+				"Source/Platform/DX11/**.cpp",
+				"Source/Platform/DX11/**.c",
+				"Source/Platform/DX11/**.h"
+			}
 
 		defines
 		{
 			"TOSHI_SKU_WINDOWS"
-		}
-	
-	filter "options:renderer=DX11"
-		defines
-		{
-			"TOSHI_RENDERER_DX11"
-		}
-		
-		files
-		{
-			"Source/Platform/DX11/**.h",
-			"Source/Platform/DX11/**.cpp",
-			"Source/Platform/DX11/**.c",
-		}
-		
-	filter "options:renderer=OpenGL"
-		defines
-		{
-			"TOSHI_RENDERER_OPENGL",
-			"GLEW_STATIC"
-		}
-		
-		libdirs
-		{
-			"%{LibDir.glew}"
-		}
-		
-		files
-		{
-			"Source/Platform/SDL/**.h",
-			"Source/Platform/SDL/**.cpp",
-			"Source/Platform/SDL/**.c",
-		}
-		
-		includedirs
-		{
-			"%{IncludeDir.sdl2}",
-			"%{IncludeDir.glm}",
-			"%{IncludeDir.glew}"
 		}
 
 	filter "configurations:Debug"
@@ -121,7 +108,7 @@ project (TOSHI_PROJECT_NAME)
 		runtime "Release"
 		optimize "On"
 
-	filter "configurations:Dist"
-		defines "TOSHI_DIST"
+	filter "configurations:Final"
+		defines "TOSHI_FINAL"
 		runtime "Release"
 		optimize "On"
