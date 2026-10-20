@@ -5,7 +5,7 @@ on: [push]
 jobs:
   win:
     env:
-      PREMAKE_VERSION: 5.0.0-beta1
+      PREMAKE_VERSION: 5.0.0-beta8
 
     runs-on: windows-latest
     steps:
@@ -13,26 +13,35 @@ jobs:
       uses: actions/checkout@master
       with:
         submodules: recursive
-    
+
     - name: Setup premake
       uses: abel0b/setup-premake@v2.3
       with:
         version: ${{ env.PREMAKE_VERSION }}
 
     - name: Premake
-      run: premake5 vs2022 --arch=x86 --renderer=DX11
-    
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.1
-    
-    - name: Build OpenToshi for release
-      run: msbuild './Toshi (DX11).sln' -property:Configuration=Release
+      run: premake5 vs2026 --arch=x86 --renderer=DX11
 
-    - name: Run UnitTests
-      run: .\bin\Release_Windows_x86\UnitTests\UnitTests.exe
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build the whole solution for Debug
+      run: msbuild './OpenBlob.slnx' /p:Configuration=Debug /p:PlatformToolset=v143
 
     - name: Publish Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Toshi Binaries
         path: bin
+
+    - name: Update Auto Release
+      uses: andelf/nightly-release@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: nightly
+        name: 'OpenBlob Automatic Release $$'
+        prerelease: true
+        body: 'Automatic releases are being uploaded after any new commit.'
+        files: |
+          ./bin/Debug_Win32_x86_DX11/OpenBlob/OpenBlob.exe
