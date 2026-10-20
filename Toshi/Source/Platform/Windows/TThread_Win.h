@@ -100,7 +100,7 @@ public:
 	static TThreadManager* GetThreadManager() { return s_pThreadManager; }
 
 private:
-	inline static TThreadManager* s_pThreadManager;
+	static TThreadManager* s_pThreadManager;
 
 private:
 	CRITICAL_SECTION m_CriticalSection; // 0x00

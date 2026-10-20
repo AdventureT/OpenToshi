@@ -9,6 +9,9 @@
 
 TOSHI_NAMESPACE_START
 
+T2Locale::t_FixStringIdPlatform        T2Locale::ms_fnFixStringIdPlatform        = TNULL;
+T2Locale::t_GetOverwrittenLocaleString T2Locale::ms_fnGetOverwrittenLocaleString = TNULL;
+
 // $deBlob: FUNCTION 00662d40
 // $Barnyard: FUNCTION 006be7f0
 T2Locale::T2Locale( TINT langCount, TSIZE bufferSize, void* buffer )
@@ -49,14 +52,14 @@ T2Locale::~T2Locale()
 
 // $deBlob: FUNCTION 00662fd0
 // $Barnyard: FUNCTION 006be7d0
-void* __stdcall T2Locale::TRBAllocator( TTRB::AllocType alloctype, TSIZE size, short unk, TSIZE unk2, void* userData )
+void* __stdcall T2Locale::TRBAllocator( TTRB::AllocType alloctype, TSIZE size, short alignment, TSIZE unk2, void* userData )
 {
 	return TSTATICCAST( T2Locale, userData )->TRBAlloc( size );
 }
 
 // $deBlob: FUNCTION 00662ff0
 // $Barnyard: FUNCTION 00539d40
-void __stdcall T2Locale::TRBDeallocator( TTRB::AllocType alloctype, void* ptr, short unk, TSIZE unk2, void* userData )
+void __stdcall T2Locale::TRBDeallocator( TTRB::AllocType alloctype, void* ptr, short alignment, TSIZE unk2, void* userData )
 {
 	// T2Locale doesn't have deallocator
 }
@@ -65,7 +68,7 @@ void __stdcall T2Locale::TRBDeallocator( TTRB::AllocType alloctype, void* ptr, s
 // $Barnyard: FUNCTION 006be750
 void T2Locale::SetLanguage( Lang langid )
 {
-	if ( langid != m_LangId && ( m_Locale.Close(), -1 < langid ) )
+	if ( langid != m_LangId && ( m_Locale.Close(), langid >= 0 ) )
 	{
 		const TCHAR* szFileName = GetLanguageFilename( langid );
 
@@ -104,7 +107,6 @@ T2LocalisedString T2Locale::GetString( TINT a_iNumString )
 }
 
 // $deBlob: FUNCTION 00662ef0
-// $deBlob: FUNCTION 00662f60
 TWCHAR* T2Locale::GetString( TWCHAR* a_pDst, TINT a_iDstSize, TINT a_iNumString )
 {
 	TINT stringid = a_iNumString;

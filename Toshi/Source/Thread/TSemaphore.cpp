@@ -41,7 +41,7 @@ TBOOL TSemaphore::Destroy()
 	BOOL bResult = CloseHandle( m_hSemaHnd );
 	m_hSemaHnd   = NULL;
 
-	return bResult;
+	return bResult != 0;
 #endif // USE_WIN32_SEMAPHORE
 }
 
@@ -55,7 +55,7 @@ TBOOL TSemaphore::Signal()
 	return TTRUE;
 #else  // !USE_WIN32_SEMAPHORE
 	TASSERT( m_hSemaHnd != NULL );
-	return ReleaseSemaphore( m_hSemaHnd, 1, NULL );
+	return ReleaseSemaphore( m_hSemaHnd, 1, NULL ) != 0;
 #endif // USE_WIN32_SEMAPHORE
 }
 

@@ -37,7 +37,7 @@ protected:
 
 	// $deBlob: FUNCTION 006f2180
 	// The nil node: links to itself
-	constexpr T2GenericRedBlackTreeNode( Nil )
+	TCONSTEXPR T2GenericRedBlackTreeNode( Nil )
 	{
 		red       = 0;
 		m_pLeft   = this;
@@ -63,7 +63,7 @@ protected:
 	T2GenericRedBlackTreeNode* m_pLeft;   // 0x08
 	T2GenericRedBlackTreeNode* m_pRight;  // 0x0C
 	T2GenericRedBlackTreeNode* m_pParent; // 0x10
-}; // 0x14
+};                                        // 0x14
 
 class T2GenericRedBlackTree
 {
@@ -103,13 +103,13 @@ private:
 	void CheckValid();
 
 protected:
-	static constinit T2GenericRedBlackTreeNode ms_oNil;
+	static TCONSTINIT T2GenericRedBlackTreeNode ms_oNil;
 
 protected:
 	T2Allocator*                      m_pAllocator;   // 0x00
 	mutable T2GenericRedBlackTreeNode m_oRoot;        // 0x04
 	size_t                            m_iNumElements; // 0x18
-}; // 0x1C
+};                                                    // 0x1C
 
 template <class T>
 class T2RedBlackTreeNode : public T2GenericRedBlackTreeNode
@@ -119,25 +119,20 @@ public:
 	friend class T2RedBlackTree;
 
 public:
-	// ANamedAnimationSet map (T2Map<TPString8, ANamedAnimation*>) 00581330, ANamedAnimationTransitionSet map (T2Map<TPString8, ANamedAnimationTransition>) 00581d40
 	// $Barnyard: FUNCTION 00581330
 	// $Barnyard: FUNCTION 00581d40
-	// AInputMapManager maps (<AInputCommand, Command> 00597520, <Doodad, TPString8> 00597580)
+	// AInputMapManager maps
 	// $Barnyard: FUNCTION 00597520
 	// $Barnyard: FUNCTION 00597580
 	// $Barnyard: FUNCTION 00606d70
-	// Instantiations: T2Map<TPString8, TINT/TKeyframeLibrary*> 00606d70 (AKeyFrameLibraryManager, AMaterialLibraryManager),
-	// T2Map<TPString8, TINT/TSIZE> 005a3b70 (AInteractionManager, ASoundManager), T2Map<TPString8, TUINT> 005d1a50 (AUnitFlagSetsManager), T2Map<TPString8, AWaveBank*> 005dc7c0 (ASoundManager::ms_WaveBanks)
 	// $Barnyard: FUNCTION 005a3b70
 	// $Barnyard: FUNCTION 005d1a50
 	// $Barnyard: FUNCTION 005dc7c0
-	// Instantiations: T2Map<TPString8, TINT/TKeyframeLibrary*> 00606d70 (AKeyFrameLibraryManager, AMaterialLibraryManager)
-	// T2Map<TPString8, AModel*> 006128b0 (AModelRepos), T2Map<TPString8, ...> 006147f0 (AMaterialLibraryManager)
 	// $Barnyard: FUNCTION 006128b0
 	// $Barnyard: FUNCTION 006147f0
-	// Instantiations: T2Map<TPString8, TINT/TKeyframeLibrary*> 00606d70 (AKeyFrameLibraryManager, AMaterialLibraryManager)
-	// T2Map<TPString8, AInteriorNetwork::LookupList>: 00553bc0
 	// $Barnyard: FUNCTION 00553bc0
+	// $deBlob: FUNCTION 0075ef70
+	// $deBlob: FUNCTION 007e4000
 	T2RedBlackTreeNode( const T& value )
 	    : m_Value( value )
 	{
@@ -148,18 +143,25 @@ public:
 	{
 	}
 
-	// Instantiations: T2Map<TPString8, TINT/TKeyframeLibrary*> 00606d00 (AKeyFrameLibraryManager), T2Map<TPString8, AMaterialLibrary*> 00614180 (AMaterialLibraryManager)
-	// ANamedAnimationTransitionSet map (T2Map<TPString8, ANamedAnimationTransition>) 00581c90
 	// $Barnyard: FUNCTION 00581c90
 	// $Barnyard: FUNCTION 00606d00
 	// $Barnyard: FUNCTION 00614180
-	// AInputMapManager maps (<Doodad, TPString8> 005974b0)
+	// AInputMapManager maps
 	// $Barnyard: FUNCTION 005974b0
 	// $Barnyard: FUNCTION 005a3b00
 	// $Barnyard: FUNCTION 005d19e0
 	// $Barnyard: FUNCTION 005dc750
-	// T2Map<TPString8, AModel*> 00612840 (AModelRepos)
 	// $Barnyard: FUNCTION 00612840
+	// $deBlob: FUNCTION 005da460
+	// $deBlob: FUNCTION 005e0230
+	// $deBlob: FUNCTION 005e0260
+	// $deBlob: FUNCTION 006aa620
+	// $deBlob: FUNCTION 006aa650
+	// $deBlob: FUNCTION 006aa680
+	// $deBlob: FUNCTION 006dd1e0
+	// $deBlob: FUNCTION 0075f390
+	// $deBlob: FUNCTION 007e42d0
+	// $deBlob: FUNCTION 0075f0c0
 	~T2RedBlackTreeNode()
 	{
 	}
@@ -347,7 +349,24 @@ public:
 	};
 
 public:
-	// Instantiations: unreferenced instance next to AWaveBank 005dc290
+	// $deBlob: FUNCTION 005da020
+	// $deBlob: FUNCTION 005da0a0
+	// $deBlob: FUNCTION 005dd380
+	// $deBlob: FUNCTION 005dd3a0
+	// $deBlob: FUNCTION 005dd3c0
+	// $deBlob: FUNCTION 005dd3e0
+	// $deBlob: FUNCTION 006a9ab0
+	// $deBlob: FUNCTION 006a9ad0
+	// $deBlob: FUNCTION 006a9af0
+	// $deBlob: FUNCTION 006a9be0
+	// $deBlob: FUNCTION 006a9c00
+	// $deBlob: FUNCTION 006a9c20
+	// $deBlob: FUNCTION 006dcbc0
+	// $deBlob: FUNCTION 006dcc20
+	// $deBlob: FUNCTION 0075eef0
+	// $deBlob: FUNCTION 0075ef50
+	// $deBlob: FUNCTION 007e3f20
+	// $deBlob: FUNCTION 007e3fe0
 	// $Barnyard: FUNCTION 005dc290
 	T2RedBlackTree( T2Allocator* pAllocator = GetGlobalAllocator() )
 	    : T2GenericRedBlackTree( pAllocator )
@@ -360,6 +379,16 @@ public:
 	}
 
 	// NOTE: every instantiation is folded into one function
+	// de Blob instances (T2Map::Begin compiles to the same code)
+	// $deBlob: FUNCTION 006aaab0
+	// $deBlob: FUNCTION 006dd240
+	// $deBlob: FUNCTION 005da530
+	// $deBlob: FUNCTION 005dd530
+	// $deBlob: FUNCTION 005dd550
+	// $deBlob: FUNCTION 006aaa70
+	// $deBlob: FUNCTION 006aaa90
+	// $deBlob: FUNCTION 0075f460
+	// $deBlob: FUNCTION 007e4360
 	// $Barnyard: FUNCTION 005a22e0
 	Iterator Begin()
 	{
@@ -367,6 +396,16 @@ public:
 	}
 
 	// NOTE: every instantiation is folded into one function
+	// de Blob instances (T2Map::End compiles to the same code)
+	// $deBlob: FUNCTION 006aac60
+	// $deBlob: FUNCTION 005da5e0
+	// $deBlob: FUNCTION 005da5f0
+	// $deBlob: FUNCTION 005dd650
+	// $deBlob: FUNCTION 006aac40
+	// $deBlob: FUNCTION 006aac50
+	// $deBlob: FUNCTION 006dd280
+	// $deBlob: FUNCTION 0075f480
+	// $deBlob: FUNCTION 007e43f0
 	// $Barnyard: FUNCTION 00596830
 	Iterator End()
 	{
@@ -383,6 +422,16 @@ public:
 		return CIterator( TSTATICCAST( const Node, &m_oRoot ) );
 	}
 
+	// Deletes every node (Erase from Begin to End)
+	// $deBlob: FUNCTION 005da570
+	// $deBlob: FUNCTION 005dd570
+	// $deBlob: FUNCTION 005dd5e0
+	// $deBlob: FUNCTION 007e4380
+	void Clear()
+	{
+		Erase( Begin().GetNode(), End().GetNode() );
+	}
+
 	void DeleteAll()
 	{
 		while ( GetNumElements() > 0 )
@@ -396,19 +445,38 @@ public:
 		m_pAllocator->Delete( TSTATICCAST( Node, DeleteNode( a_pNode ) ) );
 	}
 
-	// Instantiations: T2Map<TPString8, TINT/TKeyframeLibrary*> 00606f80 (AKeyFrameLibraryManager), T2Map<TPString8, AMaterialLibrary*> 006141f0 (AMaterialLibraryManager)
+	// $deBlob: FUNCTION 006dd2f0
+	void Erase( Iterator a_oIter )
+	{
+		TASSERT( a_oIter.GetNode() != TNULL );
+		TASSERT( a_oIter.GetNode() != &m_oRoot );
+		TASSERT( a_oIter.GetNode() != &ms_oNil );
+		Delete( a_oIter.GetNode() );
+	}
+
 	// $Barnyard: FUNCTION 00606f80
 	// $Barnyard: FUNCTION 006141f0
-	// ANamedAnimationTransitionSet map (T2Map<TPString8, ANamedAnimationTransition>) 00581fa0
 	// $Barnyard: FUNCTION 00581fa0
-	// AInputMap (T2Map<Doodad, CommandBinding>) 00596b20
 	// $Barnyard: FUNCTION 00596b20
 	// $Barnyard: FUNCTION 005a55f0
 	// $Barnyard: FUNCTION 005d1cf0
-	// T2Map<TPString8, AModel*> 00612ac0 (AModelRepos)
 	// $Barnyard: FUNCTION 00612ac0
+	// de Blob: retail takes iterators (first, last) and asserts them
+	// $deBlob: FUNCTION 005da620
+	// $deBlob: FUNCTION 005dd660
+	// $deBlob: FUNCTION 005dd7d0
+	// $deBlob: FUNCTION 006aac80
+	// $deBlob: FUNCTION 006aadf0
+	// $deBlob: FUNCTION 006aaf90
+	// $deBlob: FUNCTION 007e4400
 	void Erase( Node* a_pFrom, Node* a_pTo )
 	{
+		TASSERT( a_pFrom != TNULL );
+		TASSERT( a_pFrom != &m_oRoot || a_pTo == &m_oRoot );
+		TASSERT( a_pFrom != &ms_oNil );
+		TASSERT( a_pTo != TNULL );
+		TASSERT( a_pTo != &ms_oNil );
+
 		Node* pNode = a_pFrom;
 
 		while ( pNode != a_pTo )
@@ -420,20 +488,15 @@ public:
 	}
 
 	// NOTE: retail takes the value by copy and destroys it after constructing the node
-	// Instantiations: T2Map<TPString8, TINT/TKeyframeLibrary*> 00606dc0 (AKeyFrameLibraryManager, AMaterialLibraryManager),
-	// T2Map<TINT, ASound*/ASoundLegacy*> 005d7110 (ASoundManager)
 	// $Barnyard: FUNCTION 00606dc0
 	// $Barnyard: FUNCTION 005d7110
-	// ANamedAnimationSet map (T2Map<TPString8, ANamedAnimation*>) 00581420, ANamedAnimationTransitionSet map (T2Map<TPString8, ANamedAnimationTransition>) 00581e20
 	// $Barnyard: FUNCTION 00581420
 	// $Barnyard: FUNCTION 00581e20
-	// AInputMap (T2Map<Doodad, CommandBinding>) 00596840, AInputMapManager maps (<Doodad, ActionId>) 00596e80
 	// $Barnyard: FUNCTION 00596840
 	// $Barnyard: FUNCTION 00596e80
 	// $Barnyard: FUNCTION 005a4480
 	// $Barnyard: FUNCTION 005d1b30
 	// $Barnyard: FUNCTION 005dcbd0
-	// T2Map<TPString8, AModel*> 00612900 (AModelRepos), T2Map<TPString8, ...> 00614840 (AMaterialLibraryManager)
 	// $Barnyard: FUNCTION 00612900
 	// $Barnyard: FUNCTION 00614840
 	Node* CreateNode( const T& a_rValue )
@@ -441,6 +504,15 @@ public:
 		return m_pAllocator->New<Node>( a_rValue );
 	}
 
+	// $deBlob: FUNCTION 005da850
+	// $deBlob: FUNCTION 005e0330
+	// $deBlob: FUNCTION 005e0460
+	// $deBlob: FUNCTION 006ab280
+	// $deBlob: FUNCTION 006ab370
+	// $deBlob: FUNCTION 006ab4b0
+	// $deBlob: FUNCTION 006dd420
+	// $deBlob: FUNCTION 0075f5f0
+	// $deBlob: FUNCTION 007e4670
 	Iterator Insert( const T& value )
 	{
 		Node* pNode     = CreateNode( value );
@@ -450,21 +522,16 @@ public:
 		return InsertImpl( pNode );
 	}
 
-	// Instantiations: T2Map<TPString8, TINT/TKeyframeLibrary*> 00606e40 (AKeyFrameLibraryManager, AMaterialLibraryManager)
 	// $Barnyard: FUNCTION 00606e40
-	// ANamedAnimationSet map (T2Map<TPString8, ANamedAnimation*>) 005814a0, ANamedAnimationTransitionSet map (T2Map<TPString8, ANamedAnimationTransition>) 00581e90
 	// $Barnyard: FUNCTION 005814a0
 	// $Barnyard: FUNCTION 00581e90
-	// AInputMap (T2Map<Doodad, CommandBinding>) 00596990, AInputMapManager maps (<Doodad, ActionId>) 00597080
 	// $Barnyard: FUNCTION 00596990
 	// $Barnyard: FUNCTION 00597080
 	// $Barnyard: FUNCTION 006bc250
 	// $Barnyard: FUNCTION 005a5210
 	// $Barnyard: FUNCTION 005d1bb0
 	// $Barnyard: FUNCTION 005dcc50
-	// T2Map<TINT, ASound*/ASoundLegacy*> 005d7af0 (ASoundManager)
 	// $Barnyard: FUNCTION 005d7af0
-	// T2Map<TPString8, AModel*> 00612980 (AModelRepos), T2Map<TPString8, ...> 006148c0 (AMaterialLibraryManager)
 	// $Barnyard: FUNCTION 00612980
 	// $Barnyard: FUNCTION 006148c0
 	Iterator Insert( T&& value )
@@ -476,12 +543,17 @@ public:
 		return InsertImpl( pNode );
 	}
 
-	// AInputMapManager maps (folded int-keyed instantiations) 00596f80
 	// $Barnyard: FUNCTION 00596f80
-	// Instantiations: TPString8-keyed maps (folded, used by ASoundManager, AInteractionManager, AInteriorNetwork, ...) 005dc2b0
 	// $Barnyard: FUNCTION 005dc2b0
-	// de Blob: an int-keyed instance 005d9f30
 	// $deBlob: FUNCTION 005d9f30
+	// $deBlob: FUNCTION 006dcb10
+	// $deBlob: FUNCTION 005d9ee0
+	// $deBlob: FUNCTION 005dd330
+	// $deBlob: FUNCTION 006a9870
+	// $deBlob: FUNCTION 006a98c0
+	// $deBlob: FUNCTION 006a9930
+	// $deBlob: FUNCTION 0075edf0
+	// $deBlob: FUNCTION 007e3e10
 	Iterator Find( const T& value ) const
 	{
 		Node* pCurrentNode = TSTATICCAST( Node, m_oRoot.m_pLeft );
@@ -493,13 +565,12 @@ public:
 			if ( TComparatorHelper::IsEqual( iCmpResult ) )
 				return pCurrentNode;
 
-			pCurrentNode = TSTATICCAST( Node, ( TComparatorHelper::IsLessOrEqual( iCmpResult ) ? pCurrentNode->m_pRight : pCurrentNode->m_pLeft ) );
+			pCurrentNode = TSTATICCAST( Node, ( TComparatorHelper::IsGreater( iCmpResult ) ? pCurrentNode->m_pLeft : pCurrentNode->m_pRight ) );
 		}
 
 		return TSTATICCAST( Node, &m_oRoot );
 	}
 
-	// AInputMapManager maps (folded int-keyed instantiations) 00596fd0
 	// $Barnyard: FUNCTION 00596fd0
 	// $Barnyard: FUNCTION 006bc1d0
 	Iterator FindLast( const T& value ) const
@@ -529,7 +600,6 @@ public:
 		return TSTATICCAST( Node, &m_oRoot );
 	}
 
-	// AInputMapManager maps (folded int-keyed instantiations) 00597040
 	// $Barnyard: FUNCTION 00597040
 	Iterator FindNext( const Node* a_pNextAfter, const T& value ) const
 	{
@@ -575,7 +645,7 @@ private:
 			pInsertTo->m_pRight = pNode;
 		}
 
-		TASSERT( ms_oNil.red == 0, "ms_oNil not red in T2GenericRedBlackTree::TreeInsertHelp" ); // TreeInsertHelp????
+		TASSERT( ms_oNil.red == 0, "ms_oNil not red in T2GenericRedBlackTree::TreeInsertHelp" );
 		T2GenericRedBlackTree::Insert( pNode );
 
 		return pNode;

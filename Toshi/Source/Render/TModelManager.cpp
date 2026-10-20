@@ -1,8 +1,5 @@
 #include "ToshiPCH.h"
 #include "TModelManager.h"
-#include "TRender.h"
-
-#include "Toshi/TSceneObject.h"
 
 //-----------------------------------------------------------------------------
 // Enables memory debugging.
@@ -12,148 +9,74 @@
 
 TOSHI_NAMESPACE_START
 
-// $Barnyard: FUNCTION 006c1c90
-TManagedModel::TManagedModel()
-    : m_pModel( TNULL )
+TModelManager* TModelManager::s_pSingleton;
+
+// $deBlob: FUNCTION 006aefe0
+TModelManager::TModelManager()
+    : m_pHeadModel( T2ResourcePtr::IDINVALID )
 {
-	static TBOOL s_bFilledList = TFALSE;
-
-	if ( !s_bFilledList )
-	{
-		for ( TUINT i = 0; i < TModelManager::MAX_NUM_MODELS; i++ )
-		{
-			TModelManager::ms_oFreeList.PushBack( &TModelManager::ms_pEntries[ i ] );
-		}
-
-		s_bFilledList = TTRUE;
-	}
-
-	m_pEntry = TNULL;
+	TASSERT( TNULL == s_pSingleton );
+	s_pSingleton = this;
 }
 
-// $Barnyard: FUNCTION 006c1ce0
-TManagedModel::~TManagedModel()
+// $deBlob: FUNCTION 006af040
+// $deBlob: FUNCTION 00691740
+TModelManager::~TModelManager()
 {
-	if ( m_pModel )
-	{
-		if ( m_pEntry )
-		{
-			if ( m_pEntry->GetRefCount() == 1 )
-			{
-				m_pModel->Delete();
-				m_pEntry->Remove();
-				TModelManager::ms_oFreeList.PushBack( m_pEntry );
-
-				m_pModel = TNULL;
-				m_pEntry = TNULL;
-			}
-			else
-			{
-				m_pEntry->DecRefCount();
-				m_pModel = TNULL;
-				m_pEntry = TNULL;
-			}
-		}
-		else
-		{
-			m_pModel->Delete();
-			m_pModel = TNULL;
-			m_pEntry = TNULL;
-		}
-	}
+	TASSERT( TNULL != s_pSingleton );
+	s_pSingleton = TNULL;
 }
 
-// $Barnyard: FUNCTION 006c1c00
-void TModelManager::Initialise()
+// $deBlob: FUNCTION 006af0a0
+T2ModelPtr TModelManager::FindModel( const TCHAR* a_szName )
 {
-	TASSERT( ms_pEntries == TNULL );
-	ms_pEntries = new ModelNode[ MAX_NUM_MODELS ];
-}
+	TASSERT( T2String8::IsLowerCase( a_szName ) );
 
-// $Barnyard: FUNCTION 006c1c50
-void TModelManager::Uninitialise()
-{
-	TASSERT( ms_pEntries != TNULL );
-	ms_oUsedList.Clear();
-	ms_oFreeList.Clear();
+	T2ModelPtr pModel = m_pHeadModel;
 
-	delete[] ms_pEntries;
-	ms_pEntries = TNULL;
-}
-
-// $Barnyard: FUNCTION 006c1d40
-TModelManager::ModelNode* TModelManager::CreateModel( const TCHAR* a_szFileName, TManagedModel& a_rModelRef, TTRB* a_pAssetTRB )
-{
-	if ( ms_oFreeList.IsEmpty() )
+	while ( pModel )
 	{
-		TASSERT( TFALSE, "Couldn't create new model since the registry is all used" );
-		return TNULL;
+		if ( TStringManager::String8CompareNoCase( pModel->GetName(), a_szName ) == 0 )
+			return pModel;
+
+		pModel = pModel->m_pNextModel;
 	}
 
-	TCHAR filepath[ 248 ];
-	auto  iFileNameLen = TStringManager::String8Length( a_szFileName );
-	TStringManager::String8Copy( filepath, a_szFileName );
-
-	for ( TUINT i = 0; i < iFileNameLen; i++ )
-	{
-		if ( filepath[ i ] == '/' )
-		{
-			filepath[ i ] = '\\';
-		}
-	}
-
-	auto crc32 = TUtil::CRC32( TREINTERPRETCAST( TBYTE*, filepath ), iFileNameLen );
-
-	for ( auto it = ms_oUsedList.Begin(); it != ms_oUsedList.End(); ++it )
-	{
-		if ( it->GetCRC32() == crc32 )
-		{
-			a_rModelRef.m_pModel = it->GetModel();
-			it->IncRefCount();
-
-			return it;
-		}
-	}
-
-	auto pEntry = ms_oFreeList.PopBack();
-	ms_oUsedList.PushFront( pEntry );
-
-	const TCHAR* szFileName;
-	TUINT8       ui8NameLen = 0;
-
-	if ( !a_pAssetTRB || !TModel::GetSkeletonAssetSymbolName( filepath, szFileName, ui8NameLen, a_pAssetTRB ) )
-	{
-		a_pAssetTRB = TNULL;
-		szFileName  = filepath;
-		ui8NameLen  = -1;
-	}
-
-	// NOTE: Barnyard's TRenderInterface::CreateModelTRB, de Blob's TRender has no model factory (TModelManager 006aefe0 isn't ported)
-	TTODO( "de Blob's TModelManager" );
-	TModel* pModel = TNULL;
-	pEntry->Create( crc32, pModel );
-	pEntry->IncRefCount();
-	a_rModelRef.m_pModel = pModel;
-
-	return pEntry;
+	return T2ModelPtr( T2ResourcePtr::IDINVALID );
 }
 
-// $Barnyard: FUNCTION 006c1fd0
-TBOOL TManagedModel::Create( const TCHAR* a_szFileName, TTRB* a_pTRB )
+// $deBlob: FUNCTION 006af190
+T2ModelPtr TModelManager::GetNextModel( T2ModelPtr a_pModel )
 {
-	m_pModel = TNULL;
-	m_pEntry = TModelManager::CreateModel( a_szFileName, *this, a_pTRB );
+	if ( a_pModel )
+		return a_pModel->m_pNextModel;
 
-	return m_pModel != TNULL;
+	return T2ModelPtr( T2ResourcePtr::IDINVALID );
 }
 
-// $Barnyard: FUNCTION 006c1af0
-TSceneObject* TManagedModel::CreateSceneObject( const TCHAR* a_szName )
+// $deBlob: FUNCTION 006af200
+void TModelManager::AddModel( T2ModelPtr a_pModel )
 {
-	TSceneObject* pSceneObject = new TSceneObject();
-	pSceneObject->Create( this );
+	a_pModel->m_pNextModel = m_pHeadModel;
+	a_pModel->m_pPrevModel = T2ModelPtr( T2ResourcePtr::IDINVALID );
 
-	return pSceneObject;
+	if ( m_pHeadModel )
+		m_pHeadModel->m_pPrevModel = a_pModel;
+
+	m_pHeadModel = a_pModel;
+}
+
+// $deBlob: FUNCTION 006af2b0
+void TModelManager::RemoveModel( T2ModelPtr a_pModel )
+{
+	if ( a_pModel->m_pNextModel )
+		a_pModel->m_pNextModel->m_pPrevModel = a_pModel->m_pPrevModel;
+
+	if ( a_pModel->m_pPrevModel )
+		a_pModel->m_pPrevModel->m_pNextModel = a_pModel->m_pNextModel;
+
+	if ( a_pModel == m_pHeadModel )
+		m_pHeadModel = m_pHeadModel->m_pNextModel;
 }
 
 TOSHI_NAMESPACE_END

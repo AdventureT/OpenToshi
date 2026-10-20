@@ -1,68 +1,74 @@
 #pragma once
 #include "T2GUITransform.h"
 #include "Toshi/Typedefs.h"
-#include "Toshi/T2DList.h"
 #include "Math/TVector2.h"
 
 TOSHI_NAMESPACE_START
 
 class T2GUIElement;
 
+// NOTE: retail's compiler sees FLOAT_QUALITY (6.0f) as a constant in every user of PackFloat
+static const TFLOAT s_fPackQuality = 6.0f;
+
+// NOTE: de Blob: m_pPrev is at +0x4 and m_pNext at +0x8 (Barnyard has them the other way around)
 class T2GUIElementNode
 {
 public:
 	friend T2GUIElement;
 
 public:
+	// $deBlob: FUNCTION 006f5fb0
 	T2GUIElementNode()
 	{
-		m_pNext = this;
 		m_pPrev = this;
+		m_pNext = this;
 	}
 
-	// $Barnyard: FUNCTION 006c2c40
+	// $deBlob: FUNCTION 006f5fc0
+	// $deBlob: FUNCTION 006f6d80
 	virtual ~T2GUIElementNode()
 	{
 		Unlink();
 	}
 
-	// $Barnyard: FUNCTION 006c2240
 	void Unlink()
 	{
-		m_pNext->m_pPrev = m_pPrev;
 		m_pPrev->m_pNext = m_pNext;
-		m_pNext          = this;
+		m_pNext->m_pPrev = m_pPrev;
 		m_pPrev          = this;
+		m_pNext          = this;
 	}
 
-	// Sets a_rNode to be next after this
-	void LinkAfter( T2GUIElementNode& a_rNode )
+	// Inserts this node after a_pNode
+	// $deBlob: FUNCTION 006f6dc0
+	void LinkAfter( T2GUIElementNode* a_pNode )
 	{
-		m_pNext          = &a_rNode;
-		m_pPrev          = a_rNode.m_pPrev;
-		a_rNode.m_pPrev  = this;
+		m_pPrev          = a_pNode;
+		m_pNext          = a_pNode->m_pNext;
+		a_pNode->m_pNext = this;
+		m_pNext->m_pPrev = this;
+	}
+
+	// Inserts this node before a_pNode
+	// $deBlob: FUNCTION 006f6de0
+	void LinkBefore( T2GUIElementNode* a_pNode )
+	{
+		m_pPrev          = a_pNode->m_pPrev;
+		m_pNext          = a_pNode;
 		m_pPrev->m_pNext = this;
-	}
-
-	// Sets a_rNode to be previous to this
-	void LinkBefore( T2GUIElementNode& a_rNode )
-	{
-		m_pNext                  = a_rNode.m_pNext;
-		m_pPrev                  = &a_rNode;
-		a_rNode.m_pNext->m_pPrev = this;
-		a_rNode.m_pNext          = this;
+		m_pNext->m_pPrev = this;
 	}
 
 	TBOOL             IsLinked() const { return this != m_pNext; }
 	T2GUIElementNode* GetNext() const { return m_pNext; }
 	T2GUIElementNode* GetPrev() const { return m_pPrev; }
 
-protected:
-	T2GUIElementNode* m_pNext;
-	T2GUIElementNode* m_pPrev;
+public:
+	T2GUIElementNode* m_pPrev; // 0x04
+	T2GUIElementNode* m_pNext; // 0x08
 };
 
-enum T2GUIATTACHMENT
+enum T2GUIATTACHMENT : TUINT8
 {
 	T2GUIATTACHMENT_TOPLEFT,
 	T2GUIATTACHMENT_TOPCENTER,
@@ -76,172 +82,112 @@ enum T2GUIATTACHMENT
 	T2GUIATTACHMENT_NUMOF,
 };
 
+// de Blob's T2GUIElement (0x3C bytes, 23 virtuals): the dimensions are packed shorts (value * 6), the colour, state
+// (visibility mask), anchor, pivot and flags are kept in 8 bytes. Compared to Barnyard it adds IsPaused, SkipRender,
+// GetAlpha, SetVisible, GetScreenTransform and GetPivot as virtuals (used by XUI) and has no SetShadowAlpha.
 class T2GUIElement : public T2GUIElementNode
 {
 public:
+	static const TFLOAT FLOAT_QUALITY;
+	static const TFLOAT FLOAT_SCALE;
+
+	using Float        = TINT16;
 	using t_PostRender = void ( * )();
 
-	using FLAGS = TUINT32;
+	using FLAGS = TUINT8;
 	enum FLAGS_ : FLAGS
 	{
-		FLAGS_NONE                   = 0,
-		FLAGS_VISIBLE                = BITFLAG( 0 ),
-		FLAGS_FOCUSED                = BITFLAG( 1 ),
-		FLAGS_XUIELEMENT             = BITFLAG( 2 ), // set by AGUI2XUIElement
-		FLAGS_RENDER_BEFORE_CHILDREN = BITFLAG( 3 ),
-		FLAGS_INFRONT                = BITFLAG( 4 ),
+		FLAGS_NONE       = 0,
+		FLAGS_VISIBLE    = BITFLAG( 0 ),
+		FLAGS_FOCUSED    = BITFLAG( 1 ),
+		FLAGS_XUIELEMENT = BITFLAG( 2 ),
+	};
+
+	// The bits of m_uiState: an element is shown while one of them is set in s_uiGlobalVisMask, which the game sets for
+	// each of its states
+	enum STATE_ : TUINT8
+	{
+		STATE_NONE      = 0,
+		STATE_INGAME    = BITFLAG( 0 ), // only in the mask of the game itself
+		STATE_UNK1      = BITFLAG( 1 ),
+		STATE_MENU      = BITFLAG( 2 ), // the default mask: the XUI scenes
+		STATE_UNK3      = BITFLAG( 3 ), // in the masks of the game and of the flythrough
+		STATE_SUBTITLES = BITFLAG( 4 ), // the only bit of the mask of a movie
+		STATE_ALL       = 0xFF,
 	};
 
 public:
 	T2GUIElement();
-	// $Barnyard: FUNCTION 006c2b70
-	// $Barnyard: FUNCTION 006c2c80
-	virtual ~T2GUIElement() {}
+	virtual ~T2GUIElement();                                                // +0x00
 
-	virtual void   Tick( TFLOAT a_fDeltaTime );
-	virtual void   PreRender();
-	virtual void   Render();
-	virtual void   PostRender();
-	virtual void   GetDimensions( TFLOAT& a_rWidth, TFLOAT& a_rHeight );
-	virtual TFLOAT GetWidth();
-	virtual TFLOAT GetHeight();
-	virtual void   SetWidth( TFLOAT a_fWidth );
-	virtual void   SetHeight( TFLOAT a_fHeight );
-	virtual void   SetDimensions( TFLOAT a_fWidth, TFLOAT a_fHeight );
-	virtual void   GetMins( TFLOAT& a_fX, TFLOAT& a_fY );
-	virtual void   GetMaxs( TFLOAT& a_fX, TFLOAT& a_fY );
-	virtual void   SetColour( TUINT32 a_uiColour );
-	virtual void   SetAlpha( TFLOAT a_fAlpha );
-	virtual void   SetShadowAlpha( TFLOAT a_fAlpha );
-	virtual void   SetFocus( TBOOL a_bFocused );
-	virtual TBOOL  IsPointInside( TFLOAT a_fX, TFLOAT a_fY );
-#ifdef BARNYARD_LATEST
-	// Offset added to the pivot of elements that have FLAGS_XUIELEMENT, see PreRender
-	// $BarnyardWiiJP: FUNCTION 80154230
-	virtual const TVector2& GetPivot() { return TVector2::VEC_ZERO; } // +0x48
-#endif
+	virtual void            Tick( TFLOAT a_fDeltaTime );                    // +0x04
+	virtual TBOOL           IsPaused();                                     // +0x08
+	virtual TBOOL           SkipRender();                                   // +0x0C
+	virtual void            PreRender();                                    // +0x10
+	virtual void            Render();                                       // +0x14
+	virtual void            PostRender();                                   // +0x18
+	virtual void            GetDimensions( TFLOAT& a_rWidth, TFLOAT& a_rHeight ); // +0x1C
+	virtual TFLOAT          GetWidth();                                     // +0x20
+	virtual TFLOAT          GetHeight();                                    // +0x24
+	virtual void            SetWidth( TFLOAT a_fWidth );                    // +0x28
+	virtual void            SetHeight( TFLOAT a_fHeight );                  // +0x2C
+	virtual void            SetDimensions( TFLOAT a_fWidth, TFLOAT a_fHeight ); // +0x30
+	virtual void            GetMins( TFLOAT& a_rX, TFLOAT& a_rY );          // +0x34
+	virtual void            GetMaxs( TFLOAT& a_rX, TFLOAT& a_rY );          // +0x38
+	virtual void            SetColour( TUINT32 a_uiColour );                // +0x3C
+	virtual void            SetAlpha( TFLOAT a_fAlpha );                    // +0x40
+	virtual TFLOAT          GetAlpha();                                     // +0x44
+	virtual void            SetVisible( TBOOL a_bVisible );                 // +0x48
+	virtual void            SetFocus( TBOOL a_bFocused );                   // +0x4C
+	virtual void            GetScreenTransform( T2GUITransform& a_rOutTransform ); // +0x50
+	virtual TBOOL           IsPointInside( const TVector2& a_rPoint );      // +0x54
+	virtual const TVector2& GetPivot();                                     // +0x58
 
-	void AnchorPos( TFLOAT& a_rX, TFLOAT& a_rY, TFLOAT a_fWidth, TFLOAT a_fHeight );
-	void PivotPos( TFLOAT& a_rX, TFLOAT& a_rY, TFLOAT a_fWidth, TFLOAT a_fHeight );
+	// Offsets a_rX/a_rY by the pivot point of an element of the given size
+	void ApplyPivot( TFLOAT& a_rX, TFLOAT& a_rY, TFLOAT a_fWidth, TFLOAT a_fHeight );
 
-	void GetScreenTransform( T2GUITransform& a_rOutTransform );
 	void GetInvScreenTransform( T2GUITransform& a_rOutTransform );
 
-	void Show()
+	void AddChildBefore( T2GUIElement* a_pElement, T2GUIElement* a_pNext, TBOOL a_bUnlink );
+	void AddChildAfter( T2GUIElement* a_pElement, T2GUIElement* a_pPrevious, TBOOL a_bUnlink );
+
+	void AddChildTail( T2GUIElement* a_pElement );
+
+	void AddChildHead( T2GUIElement* a_pElement );
+
+	// $deBlob: FUNCTION 006f65b0
+	void SetTransform( TFLOAT a_fX, TFLOAT a_fY, TFLOAT a_fAngle = 0.0f )
 	{
-		m_eFlags |= FLAGS_VISIBLE;
+		m_oTransform.SetIdentity();
+		m_oTransform.Rotate( a_fAngle );
+		m_oTransform.m_Pos.x = a_fX;
+		m_oTransform.m_Pos.y = a_fY;
 	}
 
-	void Hide()
+	// $deBlob: FUNCTION 005a2b00
+	void RemoveSelf()
 	{
-		m_eFlags &= ~FLAGS_VISIBLE;
+		T2GUIElementNode::Unlink();
+		m_pParent = TNULL;
 	}
 
-	// NOTE: the out of line copy is also the last slot (+0x50) of the AGUI2Feathers vtable (00739dc0)
-	// $Barnyard: FUNCTION 004048d0
-	void SetVisible( TBOOL a_bVisible )
-	{
-		if ( a_bVisible ) Show();
-		else Hide();
-	}
+	void Show() { m_eFlags |= FLAGS_VISIBLE; }
+	void Hide() { m_eFlags &= ~FLAGS_VISIBLE; }
 
-	// $Barnyard: FUNCTION 006c3ad0
-	void SetInFront()
-	{
-		m_eFlags |= FLAGS_INFRONT;
-	}
+	TBOOL GetFlag( FLAGS a_eFlag ) const { return ( m_eFlags & a_eFlag ) != 0; }
+	void  SetFlag( FLAGS a_eFlag ) { m_eFlags |= a_eFlag; }
+	void  ClearFlag( FLAGS a_eFlag ) { m_eFlags &= ~a_eFlag; }
 
-	// $Barnyard: FUNCTION 006c2aa0
-	void SetFlags( FLAGS a_uiFlags )
-	{
-		m_eFlags |= a_uiFlags;
-	}
+	// NOTE: an instance lives in the game code
+	// $deBlob: FUNCTION 005805f0
+	TBOOL IsVisible() const { return ( m_eFlags & FLAGS_VISIBLE ) && ( m_uiState & s_uiGlobalVisMask ) != 0; }
+	TBOOL IsFocused() const { return ( m_eFlags & FLAGS_FOCUSED ) != 0; }
 
-	void SetRenderBeforeChildren()
-	{
-		m_eFlags |= FLAGS_RENDER_BEFORE_CHILDREN;
-	}
+	TUINT8 GetState() const { return m_uiState; }
+	void   SetState( TUINT8 a_uiState ) { m_uiState = a_uiState; }
 
-	// $Barnyard: FUNCTION 006c2ab0
-	// $BarnyardWiiJP: FUNCTION 8049feb4
-	TBOOL HasFlags( FLAGS a_uiFlags ) const
-	{
-		return ( m_eFlags & a_uiFlags ) == a_uiFlags;
-	}
-
-	// $Barnyard: FUNCTION 00406c80
-	TBOOL IsVisible() const
-	{
-		return ( m_eFlags & FLAGS_VISIBLE ) && ( m_uiVisibilityMask & s_uiVisibilityMask ) != 0;
-	}
-
-	TBOOL IsFocused() const
-	{
-		return m_eFlags & FLAGS_FOCUSED;
-	}
-
-	TBOOL ShouldRenderBeforeChildren()
-	{
-		return m_eFlags & FLAGS_RENDER_BEFORE_CHILDREN;
-	}
-
-	TBOOL IsInFront() const
-	{
-		return m_eFlags & FLAGS_INFRONT;
-	}
-
-	TFLOAT GetAlpha() const
-	{
-		return ( ( m_uiColour & 0xFF000000 ) >> 24 ) * ( 1.0f / 255.0f );
-	}
-
-	// $Barnyard: FUNCTION 006c2c00
-	void AddChildTail( T2GUIElement& a_rElement )
-	{
-		a_rElement.Unlink();
-		a_rElement.m_pParent = this;
-		a_rElement.LinkBefore( m_Children );
-	}
-
-	// $Barnyard: FUNCTION 006c2bc0
-	void AddChildHead( T2GUIElement& a_rElement )
-	{
-		a_rElement.Unlink();
-		a_rElement.m_pParent = this;
-		a_rElement.LinkAfter( m_Children );
-	}
-
-	void SetTranslation( TFLOAT a_fX, TFLOAT a_fY )
-	{
-		m_oTransform.SetTranslation( a_fX, a_fY );
-	}
-
-	void SetTranslation( const Toshi::TVector2& a_rTranslation )
-	{
-		m_oTransform.SetTranslation( a_rTranslation );
-	}
-
-	// NOTE: an instance of it lives in the game code
-	// $Barnyard: FUNCTION 0045a9d0
-	void SetTransform( const T2GUITransform& a_rcTransform ) { m_oTransform = a_rcTransform; }
-
-	// $Barnyard: FUNCTION 006c2590
-	void SetTransform( TFLOAT a_fX, TFLOAT a_fY, float a_fRotAngle = 0.0f )
-	{
-		m_oTransform = T2GUITransform();
-		m_oTransform.Rotate( a_fRotAngle );
-		m_oTransform.SetTranslation( a_fX, a_fY );
-	}
-
-	void SetAnchor( T2GUIATTACHMENT a_eAnchor )
-	{
-		m_eAnchor = a_eAnchor;
-	}
-
-	void SetPivot( T2GUIATTACHMENT a_ePivot )
-	{
-		m_ePivot = a_ePivot;
-	}
+	void SetAnchor( T2GUIATTACHMENT a_eAnchor ) { m_eAnchor = a_eAnchor; }
+	void SetPivot( T2GUIATTACHMENT a_ePivot ) { m_ePivot = a_ePivot; }
 
 	void SetAttachment( T2GUIATTACHMENT a_eAnchor, T2GUIATTACHMENT a_ePivot )
 	{
@@ -249,79 +195,61 @@ public:
 		m_ePivot  = a_ePivot;
 	}
 
-	// $Barnyard: FUNCTION 006c2b00
 	t_PostRender SetPostRenderCallback( t_PostRender a_cbNewCallback )
 	{
-		return std::exchange( m_cbPostRender, a_cbNewCallback );
+		t_PostRender cbOld = m_cbPostRender;
+		m_cbPostRender     = a_cbNewCallback;
+		return cbOld;
 	}
 
-	T2GUITransform& GetTransform()
-	{
-		return m_oTransform;
-	}
+	T2GUIElement*   GetParent() const { return m_pParent; }
+	T2GUITransform& GetTransform() { return m_oTransform; }
+	TUINT32         GetColour() const { return m_uiColour; }
 
-	// Returns first children or TNULL
-	T2GUIElement* ChildBegin() const
-	{
-		return ( m_Children.IsLinked() ) ? (T2GUIElement*)m_Children.GetNext() : TNULL;
-	}
+	// Returns the first child or TNULL
+	T2GUIElement* ChildBegin() const { return ( m_Children.IsLinked() ) ? TSTATICCAST( T2GUIElement, m_Children.m_pNext ) : TNULL; }
 
-	// $Barnyard: FUNCTION 006c2280
-	// Returns last children or TNULL
-	T2GUIElement* ChildRBegin() const
-	{
-		return ( m_Children.IsLinked() ) ? (T2GUIElement*)m_Children.GetPrev() : TNULL;
-	}
+	// Returns the last child or TNULL
+	T2GUIElement* ChildRBegin() const { return ( m_Children.IsLinked() ) ? TSTATICCAST( T2GUIElement, m_Children.m_pPrev ) : TNULL; }
 
-	// Returns next children or TNULL
-	T2GUIElement* GetNextChild( T2GUIElement* a_pCurrentChild )
+	// Returns the next child or TNULL
+	T2GUIElement* GetNextChild( T2GUIElement* a_pCurrentChild ) const
 	{
-		if ( a_pCurrentChild->GetNext() == &m_Children || a_pCurrentChild->GetNext() == a_pCurrentChild )
+		if ( a_pCurrentChild->m_pNext == &m_Children || a_pCurrentChild->m_pNext == a_pCurrentChild )
 			return TNULL;
 
-		return (T2GUIElement*)a_pCurrentChild->GetNext();
+		return TSTATICCAST( T2GUIElement, a_pCurrentChild->m_pNext );
 	}
 
-	// Returns previous children or TNULL
-	// $Barnyard: FUNCTION 006c22a0
-	T2GUIElement* GetPrevChild( T2GUIElement* a_pCurrentChild )
+	// Returns the previous child or TNULL
+	T2GUIElement* GetPrevChild( T2GUIElement* a_pCurrentChild ) const
 	{
-		if ( a_pCurrentChild->GetPrev() == &m_Children || a_pCurrentChild->GetPrev() == a_pCurrentChild )
+		if ( a_pCurrentChild->m_pPrev == &m_Children || a_pCurrentChild->m_pPrev == a_pCurrentChild )
 			return TNULL;
 
-		return (T2GUIElement*)a_pCurrentChild->GetPrev();
+		return TSTATICCAST( T2GUIElement, a_pCurrentChild->m_pPrev );
 	}
 
-	// $Barnyard: FUNCTION 004048b0
-	void RemoveSelf()
-	{
-		T2GUIElementNode::Unlink();
-		m_pParent = TNULL;
-	}
+	const T2GUIElementNode* GetChildrenEnd() const { return &m_Children; }
 
-	// $Barnyard: FUNCTION 006c2260
-	void LinkChildBefore( T2GUIElement& a_rNewChildren, T2GUIElement& a_rInsertAfter )
-	{
-		a_rNewChildren.LinkBefore( a_rInsertAfter );
-	}
-
-	TUINT32 GetColour() const { return m_uiColour; }
+	static TFLOAT UnpackFloat( Float a_iValue ) { return a_iValue * FLOAT_SCALE; }
+	static Float  PackFloat( TFLOAT a_fValue ) { return Float( TINT( a_fValue * s_fPackQuality ) ); }
 
 public:
-	inline static TUINT32 s_uiVisibilityMask = 0xFFFFFFFF;
+	static TUINT8 s_uiGlobalVisMask;
 
 protected:
-	T2GUIElement*    m_pParent;
-	T2GUITransform   m_oTransform;
-	T2GUIElementNode m_Children;
-	T2GUIATTACHMENT  m_eAnchor;
-	T2GUIATTACHMENT  m_ePivot;
-	TFLOAT           m_fWidth;
-	TFLOAT           m_fHeight;
-	TUINT32          m_uiColour;
-	FLAGS            m_eFlags;
-	t_PostRender     m_cbPostRender;
-	TUINT32          m_uiVisibilityMask;
+	T2GUIElement*    m_pParent;      // 0x0C
+	T2GUITransform   m_oTransform;   // 0x10
+	T2GUIElementNode m_Children;     // 0x20
+	Float            m_iWidth;       // 0x2C
+	Float            m_iHeight;      // 0x2E
+	TUINT32          m_uiColour;     // 0x30
+	t_PostRender     m_cbPostRender; // 0x34
+	TUINT8           m_uiState;      // 0x38 visibility mask, tested against s_uiGlobalVisMask
+	T2GUIATTACHMENT  m_eAnchor;      // 0x39
+	T2GUIATTACHMENT  m_ePivot;       // 0x3A
+	FLAGS            m_eFlags;       // 0x3B
 };
 
 TOSHI_NAMESPACE_END

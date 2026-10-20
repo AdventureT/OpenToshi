@@ -29,7 +29,7 @@ TUINT32 THashTable::DefaultItemHashFunc( void* a_pMem, TINT a_iSize, TINT a_iMax
 // $deBlob: FUNCTION 006efd70
 TBOOL THashTable::DefaultItemCompareFunc( void* a_pMem1, void* a_pMem2, TINT a_iSize )
 {
-	return TUtil::MemCompare( a_pMem1, a_pMem2, a_iSize ) == 0;
+	return TUtil::MemCompare( a_pMem1, a_pMem2, a_iSize ) ? TFALSE : TTRUE;
 }
 
 // $deBlob: FUNCTION 006efd90
@@ -45,8 +45,8 @@ THashTable::THashTable()
 	m_iItemSize           = 0;
 	m_iItemCount          = 0;
 	m_iItemCountTotal     = 0;
-	m_iHashNodeCount      = 0;
-	m_iHashNodeCountTotal = 0;
+	m_iHashNodeCountTotal      = 0;
+	m_iHashNodeCount = 0;
 	m_pBuckets            = TNULL;
 	m_pHashNodes          = TNULL;
 	m_pItems              = TNULL;
@@ -73,9 +73,9 @@ TBOOL THashTable::Create( TINT a_iItemCountTotal, TINT a_iItemSize, TINT a_iBuck
 	m_iItemCountTotal = a_iItemCountTotal;
 	m_iBucketSize     = a_iBucketSize;
 	m_iItemCount      = 0;
-	m_iHashNodeCount  = ( a_iItemCountTotal > a_iHashNodeCount ) ? a_iItemCountTotal : a_iHashNodeCount;
+	m_iHashNodeCountTotal  = ( a_iItemCountTotal > a_iHashNodeCount ) ? a_iItemCountTotal : a_iHashNodeCount;
 	m_pBuckets        = new TINT[ m_iBucketSize ];
-	m_pHashNodes      = new HashNode[ m_iHashNodeCount ];
+	m_pHashNodes      = new HashNode[ m_iHashNodeCountTotal ];
 	m_pItems          = new TBYTE[ m_iItemSize * m_iItemCountTotal ];
 	m_ItemHashFunc    = DefaultItemHashFunc;
 	m_ItemCompareFunc = DefaultItemCompareFunc;
@@ -148,17 +148,17 @@ THashTable::HashNode* THashTable::Append( void* a_pData )
 
 	TASSERT( !( ( m_iHashNodeCount == m_iHashNodeCountTotal ) || ( m_iItemCount == m_iItemCountTotal ) ) );
 
-	if ( ( m_iHashNodeCountTotal == m_iHashNodeCount ) || ( m_iItemCount == m_iItemCountTotal ) )
+	if ( ( m_iHashNodeCount == m_iHashNodeCountTotal ) || ( m_iItemCount == m_iItemCountTotal ) )
 		return TNULL;
 
 	TUINT32   uiBucket = m_ItemHashFunc( a_pData, m_iItemSize, m_iBucketSize );
-	HashNode* pNode    = &m_pHashNodes[ m_iHashNodeCountTotal ];
+	HashNode* pNode    = &m_pHashNodes[ m_iHashNodeCount ];
 
 	pNode->iNext      = m_pBuckets[ uiBucket ];
 	pNode->iItemIndex = m_iItemCount;
 	TUtil::MemCopy( m_pItems + m_iItemSize * m_iItemCount, a_pData, m_iItemSize );
 
-	m_pBuckets[ uiBucket ] = m_iHashNodeCountTotal++;
+	m_pBuckets[ uiBucket ] = m_iHashNodeCount++;
 	m_iItemCount++;
 
 	return pNode;

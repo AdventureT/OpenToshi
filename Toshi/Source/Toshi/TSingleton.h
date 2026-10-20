@@ -4,14 +4,14 @@
 TOSHI_NAMESPACE_START
 
 #define TSINGLETON_DECLARE_ALIAS( CLASS, NAME )               \
-	inline static struct SingletonHelper_##NAME               \
+	static struct SingletonHelper_##NAME                      \
 	{                                                         \
 		CLASS* operator->() { return CLASS::GetSingleton(); } \
 		operator CLASS*() { return CLASS::GetSingleton(); }   \
 	} g_p##NAME
 
 #define TSINGLETON_DECLARE_INHERITED_ALIAS( PARENT, CLASS, NAME )                    \
-	inline static struct SingletonHelper_##NAME                                      \
+	static struct SingletonHelper_##NAME                                             \
 	{                                                                                \
 		CLASS* operator->() { return TSTATICCAST( CLASS, PARENT::GetSingleton() ); } \
 		operator CLASS*() { return TSTATICCAST( CLASS, PARENT::GetSingleton() ); }   \
@@ -26,18 +26,16 @@ public:
 	TSingleton& operator=( const TSingleton& )  = delete;
 	TSingleton& operator=( const TSingleton&& ) = delete;
 
-	// Creates Singleton instance and returns it
 	template <typename... Args>
 	TFORCEINLINE static T* CreateSingleton( Args&&... args )
 	{
 		return new T( std::forward<Args>( args )... );
 	}
 
-	// Creates Singleton instance for a derived class and returns it
 	template <typename D, typename... Args>
 	TFORCEINLINE static D* CreateSingleton( Args&&... args )
 	{
-		TSTATICASSERT( std::is_base_of_v<T, D> == TTRUE );
+		TSTATICASSERT( std::is_base_of<T, D>::value == TTRUE );
 		return new D( std::forward<Args>( args )... );
 	}
 
@@ -54,12 +52,123 @@ public:
 		return ms_pSingleton;
 	}
 
+	// $deBlob: FUNCTION 0055e1f0
+	// $deBlob: FUNCTION 005610c0
+	// $deBlob: FUNCTION 0056c7c0
+	// $deBlob: FUNCTION 0056c7d0
+	// $deBlob: FUNCTION 0056c7e0
+	// $deBlob: FUNCTION 0056c7f0
+	// $deBlob: FUNCTION 0056c800
+	// $deBlob: FUNCTION 0056c810
+	// $deBlob: FUNCTION 0056c820
+	// $deBlob: FUNCTION 0056c830
+	// $deBlob: FUNCTION 0056c840
+	// $deBlob: FUNCTION 0056c850
+	// $deBlob: FUNCTION 0056c860
+	// $deBlob: FUNCTION 0056c870
+	// $deBlob: FUNCTION 0056c880
+	// $deBlob: FUNCTION 0056c890
+	// $deBlob: FUNCTION 0056c8a0
+	// $deBlob: FUNCTION 0056c8b0
+	// $deBlob: FUNCTION 00576140
+	// $deBlob: FUNCTION 0058eb90
+	// $deBlob: FUNCTION 005a2af0
+	// $deBlob: FUNCTION 005acfe0
+	// $deBlob: FUNCTION 005c8940
+	// $deBlob: FUNCTION 005c8950
+	// $deBlob: FUNCTION 005c8960
+	// $deBlob: FUNCTION 005c8970
+	// $deBlob: FUNCTION 005ca6e0
+	// $deBlob: FUNCTION 005e5660
+	// $deBlob: FUNCTION 005f0520
+	// $deBlob: FUNCTION 005f0530
+	// $deBlob: FUNCTION 005f0540
+	// $deBlob: FUNCTION 0060c360
+	// $deBlob: FUNCTION 0061daa0
+	// $deBlob: FUNCTION 00626ec0
+	// $deBlob: FUNCTION 006310b0
+	// $deBlob: FUNCTION 0065f4c0
+	// $deBlob: FUNCTION 00687720
+	// $deBlob: FUNCTION 006b16b0
+	// $deBlob: FUNCTION 007b9f70
 	TFORCEINLINE static TBOOL IsSingletonCreated()
 	{
 		return ms_pSingleton != TNULL;
 	}
 
-	// Returns pointer even if it's not allocated
+	// $deBlob: FUNCTION 0054f100
+	// $deBlob: FUNCTION 00552040
+	// $deBlob: FUNCTION 00552050
+	// $deBlob: FUNCTION 005532c0
+	// $deBlob: FUNCTION 005532d0
+	// $deBlob: FUNCTION 00554e60
+	// $deBlob: FUNCTION 00555af0
+	// $deBlob: FUNCTION 00558220
+	// $deBlob: FUNCTION 0055def0
+	// $deBlob: FUNCTION 0055df00
+	// $deBlob: FUNCTION 0055df10
+	// $deBlob: FUNCTION 0055df20
+	// $deBlob: FUNCTION 0055df30
+	// $deBlob: FUNCTION 0055df40
+	// $deBlob: FUNCTION 00561010
+	// $deBlob: FUNCTION 00567530
+	// $deBlob: FUNCTION 0056c460
+	// $deBlob: FUNCTION 0056c470
+	// $deBlob: FUNCTION 0056c480
+	// $deBlob: FUNCTION 0056c490
+	// $deBlob: FUNCTION 0056c4a0
+	// $deBlob: FUNCTION 0056c4b0
+	// $deBlob: FUNCTION 0056c4c0
+	// $deBlob: FUNCTION 0056c4d0
+	// $deBlob: FUNCTION 0056c4e0
+	// $deBlob: FUNCTION 0056c4f0
+	// $deBlob: FUNCTION 0056c500
+	// $deBlob: FUNCTION 0056c510
+	// $deBlob: FUNCTION 0056c520
+	// $deBlob: FUNCTION 0056c530
+	// $deBlob: FUNCTION 0056c540
+	// $deBlob: FUNCTION 0056c550
+	// $deBlob: FUNCTION 0056c560
+	// $deBlob: FUNCTION 0056c570
+	// $deBlob: FUNCTION 0056c580
+	// $deBlob: FUNCTION 0056c590
+	// $deBlob: FUNCTION 0056c5a0
+	// $deBlob: FUNCTION 0056c5b0
+	// $deBlob: FUNCTION 0056c5c0
+	// $deBlob: FUNCTION 0056c5d0
+	// $deBlob: FUNCTION 0056c5e0
+	// $deBlob: FUNCTION 0056c5f0
+	// $deBlob: FUNCTION 0056c600
+	// $deBlob: FUNCTION 0056c610
+	// $deBlob: FUNCTION 0056c620
+	// $deBlob: FUNCTION 00575020
+	// $deBlob: FUNCTION 0057b5a0
+	// $deBlob: FUNCTION 005804c0
+	// $deBlob: FUNCTION 00581100
+	// $deBlob: FUNCTION 00593340
+	// $deBlob: FUNCTION 0059fef0
+	// $deBlob: FUNCTION 005a0770
+	// $deBlob: FUNCTION 005b0970
+	// $deBlob: FUNCTION 005c2ed0
+	// $deBlob: FUNCTION 005c2ee0
+	// $deBlob: FUNCTION 005c3cf0
+	// $deBlob: FUNCTION 005c88b0
+	// $deBlob: FUNCTION 005c88c0
+	// $deBlob: FUNCTION 005c88d0
+	// $deBlob: FUNCTION 005c88e0
+	// $deBlob: FUNCTION 005e5650
+	// $deBlob: FUNCTION 005e72f0
+	// $deBlob: FUNCTION 005f04d0
+	// $deBlob: FUNCTION 005f04e0
+	// $deBlob: FUNCTION 005f7150
+	// $deBlob: FUNCTION 0065f4a0
+	// $deBlob: FUNCTION 0065f4b0
+	// $deBlob: FUNCTION 006b6200
+	// $deBlob: FUNCTION 006be710
+	// $deBlob: FUNCTION 00707270
+	// $deBlob: FUNCTION 00786c00
+	// $deBlob: FUNCTION 0078dc00
+	// $deBlob: FUNCTION 007e01c0
 	TFORCEINLINE static T* GetSingleton()
 	{
 		return ms_pSingleton;
@@ -74,7 +183,6 @@ public:
 #endif
 
 protected:
-	// de Blob: out-of-line instances (TASSERT( ms_pSingleton == TNULL ); ms_pSingleton = this), 77 classes
 	// $deBlob: FUNCTION 00553e10
 	// $deBlob: FUNCTION 0055d860
 	// $deBlob: FUNCTION 00560bc0
@@ -158,16 +266,7 @@ protected:
 		ms_pSingleton = TSTATICCAST( T, this );
 	}
 
-	// NOTE: retail keeps out-of-line instances of this destructor (mov ms_pSingleton, 0; ret), called from the derived
-	// destructors and constructor unwind code. Instances in 0x560000-0x6dd6ff, in marker order:
-	// ASteerPool, AKinematicsObstructionManager, AKinematicsPool, AAnimatableObjectManager, AControlComponentManager,
-	// AInputHandler, AInputMapManager, AGUISystem, AInteractionComponentManager, AInteractionManager, AInteractionEventManager,
-	// AQuestManager, AUnitFlagSetsManager, APlayerKnowledgeManager, AMultiplexStream, AMusicManager, ASoundManager, AGateManager,
-	// AInstanceManager, ARegrowthManager, ATerrainInterface, ATreeManager, AFSMManager, AMoviePlayer, AAssetStreaming,
-	// AKeyFrameLibraryManager, AInstanceLightingHelper, AGlowViewport, ARenderer, AShadowManager, ASkinLightingManager,
-	// AModelRepos, AMaterialLibraryManager, APlayerManager, APlayerProfileManager, ASSeqController, AHackedQuickSave,
-	// AAniEffectManager, ANPCBehaviourManager, AGUI2, AGUI2ModelRendererScreen, AParticleEffectLocatorManager,
-	// AParticleEffectManager, APlayerProgress, AVehicleSkidManager, AOptions, ASimpleProjectileManager, ASubtitleManager
+	// NOTE: retail keeps out-of-line copies of this destructor (mov ms_pSingleton, 0; ret), called from the derived destructors
 	// $Barnyard: FUNCTION 00572110
 	// $Barnyard: FUNCTION 00573860
 	// $Barnyard: FUNCTION 00574020
@@ -216,13 +315,6 @@ protected:
 	// $Barnyard: FUNCTION 00662e60
 	// $Barnyard: FUNCTION 0066d160
 	// $Barnyard: FUNCTION 0066e350
-	// Out-of-line instantiations of the destructor (mov ms_pSingleton, 0; ret) in 0x401000-0x55ffff:
-	// ALoadTimeProfiler 004024b0, ARandom 004029c0, ARootTask 00402bc0, AUnitManager 0040f600, AUnitNameManager 00411d90,
-	// AHighScoreManager 0041c3b0, AHintManager 0041d280, ACheatActivator 00421c30, AGameStateController 00428b90,
-	// ACameraManager 0045b950, AFadeManager 0045c580, AMiniGameManager 00469140, ACowTippingMiniGameState 004a7c20,
-	// ATapperMiniGameState 004df320, ATreasureManager 00530dd0, AAnimalPopulationManager 0053a070, ABikeManager 005401c0,
-	// AConversationManager 00543ed0, AGameTimeFXManager 00544650, AGameTimeManager 005462a0, AReplayManager 00547080,
-	// ASimPersistData 0054b4d0, ASpeechDialogManager 0054ba20, AWeatherManager 0054c5b0, AInteriorNetworkManager 00555220
 	// $Barnyard: FUNCTION 004024b0
 	// $Barnyard: FUNCTION 004029c0
 	// $Barnyard: FUNCTION 00402bc0
@@ -248,7 +340,6 @@ protected:
 	// $Barnyard: FUNCTION 0054ba20
 	// $Barnyard: FUNCTION 0054c5b0
 	// $Barnyard: FUNCTION 00555220
-	// de Blob: out-of-line instances (TASSERT( ms_pSingleton == this ); ms_pSingleton = TNULL)
 	// $deBlob: FUNCTION 005a8320
 	// $deBlob: FUNCTION 005a9b60
 	// $deBlob: FUNCTION 005abf00

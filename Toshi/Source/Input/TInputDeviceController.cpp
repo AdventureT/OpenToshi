@@ -9,17 +9,32 @@
 
 TOSHI_NAMESPACE_START
 
+// NOTE: TDEFINE_CLASS generates GetClass, CreateObject, CreateObjectInPlace (abstract: both return TNULL)
+// $deBlob: FUNCTION 0067c960
+// $deBlob: FUNCTION 0067c970
+// $deBlob: FUNCTION 0067c980
+// $deBlob: FUNCTION 0067c990
+// $deBlob: FUNCTION 0067c9a0
+// $deBlob: FUNCTION 0053e990
+// $deBlob: FUNCTION 00858e50
 TDEFINE_CLASS_NORUNTIME( TInputDeviceController );
 
+// $deBlob: FUNCTION 0067c9b0
 // $Barnyard: FUNCTION 006c48d0
 TInputDeviceController::TInputDeviceController()
 {
 	m_CurrentState = new TBOOL[ NUM_BUTTONS ];
 	m_OldState     = new TBOOL[ NUM_BUTTONS ];
-	TUtil::MemClear( m_CurrentState, sizeof( *m_CurrentState ) * NUM_BUTTONS );
-	TUtil::MemClear( m_OldState, sizeof( *m_OldState ) * NUM_BUTTONS );
+
+	for ( TINT i = 0; i < NUM_BUTTONS; i++ )
+	{
+		m_CurrentState[ i ] = TFALSE;
+		m_OldState[ i ]     = TFALSE;
+	}
 }
 
+// $deBlob: FUNCTION 0067ca50
+// $deBlob: FUNCTION 0067d150
 // $Barnyard: FUNCTION 006c4960
 // $Barnyard: FUNCTION 006c4ea0
 TInputDeviceController::~TInputDeviceController()
@@ -28,6 +43,7 @@ TInputDeviceController::~TInputDeviceController()
 	delete[] m_OldState;
 }
 
+// $deBlob: FUNCTION 0067ce90
 // $Barnyard: FUNCTION 006c4b10
 void TInputDeviceController::UpdateVirtualButtons()
 {
@@ -96,6 +112,7 @@ void TInputDeviceController::UpdateVirtualButtons()
 		m_fMag2 = 0.0f;
 }
 
+// $deBlob: FUNCTION 0067ca80
 // $Barnyard: FUNCTION 006c4990
 TBOOL TInputDeviceController::GetDoodadProperties( Doodad a_iDoodad, DoodadProperties& a_rProperties ) const
 {
@@ -116,6 +133,7 @@ TBOOL TInputDeviceController::GetDoodadProperties( Doodad a_iDoodad, DoodadPrope
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0067cae0
 // $Barnyard: FUNCTION 006c4d30
 const TCHAR* TInputDeviceController::GetButtonFromDoodad( Doodad a_iDoodad ) const
 {
@@ -180,6 +198,7 @@ const TCHAR* TInputDeviceController::GetButtonFromDoodad( Doodad a_iDoodad ) con
 	}
 }
 
+// $deBlob: FUNCTION 0067cc70
 // $Barnyard: FUNCTION 006c49f0
 TBOOL TInputDeviceController::IsDown( Doodad a_iDoodad ) const
 {
@@ -206,11 +225,13 @@ TBOOL TInputDeviceController::IsDown( Doodad a_iDoodad ) const
 	}
 }
 
-void TInputDeviceController::SetVibration( VIBRATION_ACTUATOR a_eActuator, TFLOAT a_fValue, TBOOL a_bUnknown )
+// $deBlob: FUNCTION 0067c760
+void TInputDeviceController::SetVibration( VIBRATION_ACTUATOR a_eActuator, TFLOAT a_fValue )
 {
 	// DOES_NOTHING
 }
 
+// $deBlob: FUNCTION 0067cd00
 // $Barnyard: FUNCTION 006c4a80
 TBOOL TInputDeviceController::WasDown( Doodad a_iDoodad ) const
 {
@@ -237,11 +258,13 @@ TBOOL TInputDeviceController::WasDown( Doodad a_iDoodad ) const
 	}
 }
 
+// $deBlob: FUNCTION 0067c750
 TBOOL TInputDeviceController::Unknown2()
 {
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0067d0a0
 // $Barnyard: FUNCTION 006c4ee0
 TINT TInputDeviceController::ProcessVirtualButtons( EventEmitter& a_rEmitter, TFLOAT a_fDeltaTime )
 {
@@ -276,6 +299,47 @@ TINT TInputDeviceController::ProcessVirtualButtons( EventEmitter& a_rEmitter, TF
 	);
 
 	return iNumProcessed + 1;
+}
+
+// $deBlob: FUNCTION 0067cd90
+TINT TInputDeviceController::RemapButtonIndex( TINT a_iButton, TBOOL a_bPSLayout )
+{
+	if ( a_bPSLayout )
+	{
+		switch ( a_iButton )
+		{
+			case 0: return 1;
+			case 1: return 2;
+			case 2: return 0;
+			case 3: return 3;
+			case 4: return 4;
+			case 5: return 5;
+			case 6: return 8;
+			case 7: return 9;
+			case 8: return 10;
+			case 9: return 11;
+			case 10: return 6;
+			case 11: return 7;
+			default: return -1;
+		}
+	}
+
+	switch ( a_iButton )
+	{
+		case 0: return 0;
+		case 1: return 1;
+		case 2: return 2;
+		case 3: return 3;
+		case 4: return 4;
+		case 5: return 5;
+		case 6: return 6;
+		case 7: return 7;
+		case 8: return 8;
+		case 9: return 9;
+		case 10: return 10;
+		case 11: return 11;
+		default: return -1;
+	}
 }
 
 TOSHI_NAMESPACE_END

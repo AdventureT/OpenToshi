@@ -18,7 +18,11 @@ class TFile;
 class TLogFile
 {
 private:
-	static constexpr TUINT32 cLevelMax = 30;
+	static const TINT cLevelMax = 30;
+
+	// NOTE: de Blob's TLogFile knows 3 log types (Info, Warning, Error): no Critical (Barnyard's 4th) in its counters
+	static TCONSTEXPR_VAR TINT cTypeCount = 3;
+	static const TCHAR* const cTypeStrings[ cTypeCount ]; // 0x981b60
 
 public:
 	enum class Error
@@ -43,19 +47,10 @@ public:
 
 	void Flush();
 
-	// $deBlob: FUNCTION 00687b60
-	void Down()
-	{
-		m_curLevel--;
-		RecalcLevel();
-	}
-
-	// $deBlob: FUNCTION 00687b50
-	void Up()
-	{
-		m_curLevel++;
-		RecalcLevel();
-	}
+	void Down();
+	void Up();
+	void Indent();
+	void UnIndent();
 
 	// $deBlob: FUNCTION 00687950
 	TBOOL AllowIndentation( TBOOL a_bAllow )
@@ -89,11 +84,9 @@ private:
 	TINT    m_iTotalLogCount;                     // 0x04
 	TBOOL   m_bIsSimpleMode;                      // 0x08
 	TBOOL   m_bAllowIndentation;                  // 0x09
-	TCHAR   m_LevelString[ cLevelMax ];           // 0x0A
+	TCHAR   m_LevelString[ cLevelMax + 1 ];       // 0x0A
 	TINT    m_curLevel;                           // 0x2C
-	TINT    m_typeCounts[ TUtil::LogType_NUMOF ]; // 0x30
-	TINT*   m_unk2;                               // 0x34
-	TINT    m_unk3;                               // 0x38
+	TINT    m_typeCounts[ cTypeCount ];           // 0x30
 };
 
 TOSHI_NAMESPACE_END

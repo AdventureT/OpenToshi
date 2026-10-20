@@ -1,0 +1,6 @@
+LIBRARY hctFilterTutorial
+EXPORTS
+	getFilterDll	@1
+
+SECTIONS
+	.data READ WRITE

@@ -1,6 +1,7 @@
 #include "ToshiPCH.h"
 #include "TTask.h"
 #include "TScheduler.h"
+#include "TSystem.h"
 
 //-----------------------------------------------------------------------------
 // Enables memory debugging.
@@ -10,13 +11,13 @@
 
 TOSHI_NAMESPACE_START
 
-// de Blob: GetClass 006f2e40, CreateTObject 006f2e50, CreateTObjectInPlace 006f2e60, InitialiseClass 006f2e70,
-// DeinitialiseClass 006f2e80
 // $deBlob: FUNCTION 006f2e40
 // $deBlob: FUNCTION 006f2e50
 // $deBlob: FUNCTION 006f2e60
 // $deBlob: FUNCTION 006f2e70
 // $deBlob: FUNCTION 006f2e80
+// $deBlob: FUNCTION 0053f910
+// $deBlob: FUNCTION 008594a0
 TDEFINE_CLASS_NORUNTIME( TTask );
 
 // $deBlob: FUNCTION 006f2e90
@@ -31,6 +32,12 @@ TTask::TTask()
 TTask::~TTask()
 {
 	TASSERT( IsLinked() == TFALSE );
+}
+
+// $deBlob: FUNCTION 006f2f20
+TScheduler* TTask::GetScheduler()
+{
+	return TSystemManager::GetSingleton()->GetScheduler();
 }
 
 // $deBlob: FUNCTION 006f2f30
@@ -143,13 +150,13 @@ void TTask::OnDeactivate()
 void TTask::Activate( TBOOL activate )
 {
 	TUINT32 oldState = m_ulFlags;
-	TUINT32 newFlags = activate ? FLAGS_ACTIVE : 0;
+	TUINT32 newFlags = activate == TTRUE ? FLAGS_ACTIVE : 0;
 
 	m_ulFlags = ( m_ulFlags & ~FLAGS_ACTIVE ) | newFlags;
 
 	if ( oldState != m_ulFlags )
 	{
-		if ( activate )
+		if ( activate == TTRUE )
 		{
 			OnActivate();
 		}
@@ -163,7 +170,7 @@ void TTask::Activate( TBOOL activate )
 // $deBlob: FUNCTION 006f30a0
 void TTask::Destroy()
 {
-	TScheduler::KillTask( this );
+	TSystemManager::GetSingleton()->GetScheduler()->KillTask( this );
 }
 
 void TTask::SetParent( TTask* a_pAttachTo )

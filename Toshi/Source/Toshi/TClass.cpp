@@ -14,8 +14,8 @@ TOSHI_NAMESPACE_START
 
 // $deBlob: FUNCTION 0065ca80
 // $Barnyard: FUNCTION 006bbf30
-TClass::TClass( const TCHAR* a_szName, TClass* a_pParentClass, CreateObject_t a_fnCreate, CreateObjectInPlace_t a_fnCreateInPlace, Initialise_t a_fnInitialise, Deinitialise_t a_fnUnitialise, TUINT16 a_uiVersionMajor, TUINT16 a_uiVersionMinor, TUINT32 a_uiClassSize, TUINT32 a_uiClassAlignment )
-    : m_szName( a_szName ), m_pParent( a_pParentClass ), m_fnCreate( a_fnCreate ), m_fnCreateInPlace( a_fnCreateInPlace ), m_fnInitialise( a_fnInitialise ), m_fnDeinitialise( a_fnUnitialise ), m_uiVersionMajor( a_uiVersionMajor ), m_uiVersionMinor( a_uiVersionMinor ), m_uiClassSize( a_uiClassSize ), m_uiClassAlignment( a_uiClassAlignment ), m_bInitialised( TFALSE )
+TClass::TClass( const TCHAR* a_szName, TClass* a_pParentClass, CreateObject_t a_fnCreate, CreateObjectInPlace_t a_fnCreateInPlace, Initialise_t a_fnInitialise, Deinitialise_t a_fnUnitialise, TUINT32 a_uiVersion, TUINT32 a_uiClassSize, TUINT32 a_uiClassAlignment )
+    : m_szName( a_szName ), m_pParent( a_pParentClass ), m_fnCreate( a_fnCreate ), m_fnCreateInPlace( a_fnCreateInPlace ), m_fnInitialise( a_fnInitialise ), m_fnDeinitialise( a_fnUnitialise ), m_uiVersion( a_uiVersion ), m_uiClassSize( a_uiClassSize ), m_uiClassAlignment( a_uiClassAlignment ), m_bInitialised( TFALSE )
 {
 	if ( m_pParent )
 	{
@@ -41,7 +41,7 @@ TClass::~TClass()
 	m_pParent       = TNULL;
 
 	// Uninitialize static
-	if ( m_bInitialised && m_fnDeinitialise )
+	if ( m_bInitialised == TTRUE && m_fnDeinitialise )
 	{
 		m_bInitialised = TFALSE;
 		m_fnDeinitialise();
@@ -76,9 +76,7 @@ void TClass::Initialize()
 // $Barnyard: FUNCTION 006bbfe0
 void TClass::RecurseTree( RecurseTreeBaseBeginCb_t fBaseBegin, RecurseTreeBaseEndCb_t fBaseEnd, RecurseTreeCheck_t fCheck, void* custom )
 {
-	TBOOL valid = fCheck( this, custom );
-
-	if ( valid )
+	if ( fCheck( this, custom ) == TTRUE )
 	{
 		if ( fBaseBegin ) fBaseBegin( this, custom );
 		RecurseTree2( fBaseBegin, fBaseEnd, fCheck, custom );
@@ -106,11 +104,11 @@ void TClass::RecurseTree2( RecurseTreeBaseBeginCb_t fBaseBegin, RecurseTreeBaseE
 
 // $deBlob: FUNCTION 0065d090
 // $Barnyard: FUNCTION 006bbdb0
-const TClass* TClass::FindRecurse( const TCHAR* const& name, const TClass* parent, TBOOL hasPrevious )
+const TClass* TClass::FindRecurse( const TCHAR* name, const TClass* parent, TBOOL hasPrevious )
 {
 	while ( parent )
 	{
-		const TClass* previous   = hasPrevious ? parent->m_pPrevious : TNULL;
+		const TClass* previous   = hasPrevious == TTRUE ? parent->m_pPrevious : TNULL;
 		TINT          difference = Toshi::TStringManager::String8CompareNoCase( parent->m_szName, name, -1 );
 
 		if ( difference == 0 )
@@ -136,13 +134,12 @@ const TClass* TClass::FindRecurse( const TCHAR* const& name, const TClass* paren
 
 // $deBlob: FUNCTION 0065ced0
 // $Barnyard: FUNCTION 006bbfc0
-const TClass* TClass::Find( const TCHAR* name, const TClass* parent )
+const TClass* TClass::Find( const TCHAR* a_pcClassName, const TClass* parent )
 {
-	const TCHAR* a_pcClassName = name;
 	TASSERT( a_pcClassName[ 1 ] != 0 );
 
 	if ( parent == TNULL ) parent = &TObject::TClassObjectName;
-	return FindRecurse( name, parent, TFALSE );
+	return FindRecurse( a_pcClassName, parent, TFALSE );
 }
 
 // $deBlob: FUNCTION 0065cb20
@@ -190,7 +187,8 @@ TUINT32 TClass::GetMaxSizeOfDerivedClasses()
 	// $deBlob: FUNCTION 0065d190
 	// $Barnyard: FUNCTION 006bbe80
 	auto GetMaxSizeOfClass = []( TClass* a_pClass, void* a_pSize ) -> TBOOL {
-		if ( *(TUINT32*)a_pSize < a_pClass->m_uiClassSize )
+		// NOTE: a signed comparison in retail
+		if ( TINT( a_pClass->m_uiClassSize ) > *(TINT*)a_pSize )
 		{
 			*(TUINT32*)a_pSize = a_pClass->m_uiClassSize;
 		}
@@ -214,7 +212,8 @@ TUINT32 TClass::GetMaxAlignmentOfDerivedClasses()
 	// $deBlob: FUNCTION 0065d1b0
 	// $Barnyard: FUNCTION 006bbea0
 	auto GetMaxAlignmentOfClass = []( TClass* a_pClass, void* a_pAlignment ) -> TBOOL {
-		if ( *(TUINT32*)a_pAlignment < a_pClass->m_uiClassAlignment )
+		// NOTE: a signed comparison in retail
+		if ( TINT( a_pClass->m_uiClassAlignment ) > *(TINT*)a_pAlignment )
 		{
 			*(TUINT32*)a_pAlignment = a_pClass->m_uiClassAlignment;
 		}
@@ -249,18 +248,24 @@ TBOOL TClass::IsAttached() const
 // $deBlob: FUNCTION 0065cde0
 TBOOL TClass::AttachClassToParent()
 {
-	if ( m_pParent == TNULL )
-		return TFALSE;
-
-	for ( TClass* pClass = m_pParent->m_pLastChildren; pClass != TNULL; pClass = pClass->m_pPrevious )
+	if ( m_pParent != TNULL )
 	{
-		if ( pClass == this )
-			return TFALSE;
+		TClass* pClass = m_pParent->m_pLastChildren;
+
+		while ( pClass != TNULL )
+		{
+			if ( pClass == this )
+				return TFALSE;
+
+			pClass = pClass->m_pPrevious;
+		}
+
+		m_pPrevious                = m_pParent->m_pLastChildren;
+		m_pParent->m_pLastChildren = this;
+		return TTRUE;
 	}
 
-	m_pPrevious                = m_pParent->m_pLastChildren;
-	m_pParent->m_pLastChildren = this;
-	return TTRUE;
+	return TFALSE;
 }
 
 // $deBlob: FUNCTION 0065ce20
@@ -293,19 +298,21 @@ const TClass* TClass::FindCommonBaseClass( const TClass* a_pClass1, const TClass
 	return pCommon;
 }
 
-static TINT s_iClassTreeDepth; // 0x009a42a0
+static TINT s_iClassTreeDepth;
 
 // $deBlob: FUNCTION 0065cf30
 void TClass::DumpObjectClassTree()
 {
 	// $deBlob: FUNCTION 0065d1d0
-	auto BaseBegin = []( TClass* a_pClass, void* a_pUserData ) {
+	auto BaseBegin = []( TClass* a_pClass, void* a_pUserData ) -> TBOOL {
 		s_iClassTreeDepth++;
+		return TTRUE;
 	};
 
 	// $deBlob: FUNCTION 0065d1f0
-	auto BaseEnd = []( TClass* a_pClass, void* a_pUserData ) {
+	auto BaseEnd = []( TClass* a_pClass, void* a_pUserData ) -> TBOOL {
 		s_iClassTreeDepth--;
+		return TTRUE;
 	};
 
 	// $deBlob: FUNCTION 0065d1e0

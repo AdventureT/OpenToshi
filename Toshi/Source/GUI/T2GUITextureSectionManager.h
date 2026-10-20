@@ -12,13 +12,12 @@ public:
 		TUINT32              m_uiNumSections;
 	};
 
-	inline static TBOOL                g_providedtrb = TFALSE;
-	inline static TTRB*                g_trb         = TNULL;
-	inline static TRBHeader*           g_defblock    = TNULL;
-	inline static T2GUITextureSection* g_sections    = TNULL;
+	static TTRB*                g_trb;
+	static TRBHeader*           g_defblock;
+	static T2GUITextureSection* g_sections;
 
 public:
-	static TBOOL Open( const TCHAR* a_szFileName, TTRB* a_pTRB );
+	static TBOOL Open( const TCHAR* a_szFileName );
 	static void  Close();
 
 	static T2GUITextureSection* GetTextureSection( const TCHAR* a_szSectionName );

@@ -13,6 +13,10 @@
 
 TOSHI_NAMESPACE_START
 
+TThreadManager* TThreadManager::s_pThreadManager;
+
+// $deBlob: FUNCTION 00858d90
+// $deBlob: FUNCTION 0053e700
 static TThreadManager oThreadManager;
 
 // $deBlob: FUNCTION 006622e0

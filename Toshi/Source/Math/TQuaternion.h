@@ -59,11 +59,15 @@ public:
 	static void RotateVector( TVector4& a_rOut, const TQuaternion& a_rcQuat, const TVector4& a_rcVec );
 	void        RotateAroundAxis( const TVector3& param_1, TFLOAT param_2 );
 
-	// $deBlob: FUNCTION 00674cc0
-	void Negate() { Set( -x, -y, -z, -w ); }
+	void Negate();
 	void GetEulerXYZ( TVector3& outVec ) const;
 
-	TFLOAT Magnitude() const { return TMath::Sqrt( w * w + z * z + y * y + x * x ); }
+	// NOTE: retail sums x, y, z, w in this order
+	// $deBlob: FUNCTION 0058cdd0
+	TFLOAT Magnitude() const { return TMath::Sqrt( x * x + y * y + z * z + w * w ); }
+
+	// $deBlob: FUNCTION 0058ce70
+	void   Normalise() { *this /= Magnitude(); }
 	TFLOAT MagnitudeSq() const { return w * w + z * z + y * y + x * x; }
 
 	// $deBlob: FUNCTION 00676280
@@ -95,20 +99,7 @@ public:
 		return *this;
 	}
 
-	// $deBlob: FUNCTION 00674570
-	TQuaternion& operator/=( TFLOAT a_fScalar )
-	{
-		if ( a_fScalar != 0.0f )
-		{
-			TFLOAT fRatio = 1.0f / a_fScalar;
-			x *= fRatio;
-			y *= fRatio;
-			z *= fRatio;
-			w *= fRatio;
-		}
-
-		return *this;
-	}
+	TQuaternion& operator/=( TFLOAT a_fScalar );
 
 	// $deBlob: FUNCTION 006745b0
 	TQuaternion& operator+=( const TQuaternion& a_rcQuat )
@@ -138,30 +129,11 @@ public:
 		return result;
 	}
 
-	// $deBlob: FUNCTION 006746a0
-	TQuaternion operator-( const TQuaternion& a_rcQuat ) const
-	{
-		TQuaternion result = *this;
-		result -= a_rcQuat;
-		return result;
-	}
+	TQuaternion operator-( const TQuaternion& a_rcQuat ) const;
 
-	// $deBlob: FUNCTION 006746f0
-	// $Barnyard: FUNCTION 006c9290
-	TQuaternion operator*( const TQuaternion& a_rcQuat ) const
-	{
-		TQuaternion result = *this;
-		result *= a_rcQuat;
-		return result;
-	}
+	TQuaternion operator*( const TQuaternion& a_rcQuat ) const;
 
-	// $deBlob: FUNCTION 00674800
-	TQuaternion operator*( TFLOAT a_fScalar ) const
-	{
-		TQuaternion result = *this;
-		result *= a_fScalar;
-		return result;
-	}
+	TQuaternion operator*( TFLOAT a_fScalar ) const;
 
 	// $deBlob: FUNCTION 00674830
 	TQuaternion operator/( const TQuaternion& a_rcQuat ) const
@@ -182,8 +154,7 @@ public:
 	// $deBlob: FUNCTION 006748c0
 	TBOOL operator==( const TQuaternion& a_rcQuat ) const { return x == a_rcQuat.x && y == a_rcQuat.y && z == a_rcQuat.z && w == a_rcQuat.w; }
 
-	// $deBlob: FUNCTION 00674910
-	TBOOL operator!=( const TQuaternion& a_rcQuat ) const { return !( *this == a_rcQuat ); }
+	TBOOL operator!=( const TQuaternion& a_rcQuat ) const;
 
 	// $deBlob: FUNCTION 00674960
 	TBOOL IsNormalised( TFLOAT a_fTolerance ) const
@@ -207,8 +178,8 @@ public:
 	void Lerp( const TQuaternion& a_rStart, const TQuaternion& a_rEnd, TFLOAT a_fProgress );
 
 public:
-	static const TQuaternion       IDENTITY;
-	static inline constexpr TFLOAT DELTA = 0.001f;
+	static const TQuaternion IDENTITY;
+	static const TFLOAT      DELTA;
 
 public:
 	TFLOAT x, y, z, w;

@@ -40,22 +40,28 @@ public:
 
 	struct Check
 	{
-		Check*       pNext         = TNULL;
-		const TCHAR* pchFileName   = TNULL;
-		const TCHAR* pchStatement  = TNULL;
-		TINT         iLineNum : 31 = -1;
-		TBOOL        bFailed : 1   = TFALSE;
+		Check()
+		    : pNext( TNULL ), pchFileName( TNULL ), pchStatement( TNULL ), iLineNum( -1 ), bFailed( TFALSE ) {}
+
+		Check*       pNext;
+		const TCHAR* pchFileName;
+		const TCHAR* pchStatement;
+		TINT         iLineNum : 31;
+		TBOOL        bFailed : 1;
 	};
 
 	struct Test
 	{
-		Test*        pNext            = TNULL;
-		const TCHAR* pchName          = TNULL;
-		Category*    pCategory        = TNULL;
-		TestMethod_t fnMethod         = TNULL;
-		TINT         bWasExecuted : 1 = TFALSE;
-		TINT         iNumFails : 31   = 0;
-		Check*       pHeadCheck       = TNULL;
+		Test()
+		    : pNext( TNULL ), pchName( TNULL ), pCategory( TNULL ), fnMethod( TNULL ), bWasExecuted( TFALSE ), iNumFails( 0 ), pHeadCheck( TNULL ) {}
+
+		Test*        pNext;
+		const TCHAR* pchName;
+		Category*    pCategory;
+		TestMethod_t fnMethod;
+		TINT         bWasExecuted : 1;
+		TINT         iNumFails : 31;
+		Check*       pHeadCheck;
 	};
 
 	using FailCallback_t    = void ( * )( Test* a_pTest, Check* a_pCheck );

@@ -13,7 +13,7 @@
 
 #undef FillMemory
 
-TMemoryContext TMemory_Context; // 0x009b1fa0
+TMemoryContext TMemory_Context;
 
 // CRT callbacks (TMEMORY_FLAGS_NATIVE)
 

@@ -13,7 +13,7 @@ enum T2MutexLockFlags_ : TUINT32
 	T2MUTEX_LOCK_NOWAIT = BITFLAG( 0 ), // don't block, only try to acquire the mutex
 };
 
-TBOOL T2Mutex_Create( T2MutexHandle* a_pMutex );
-TBOOL T2Mutex_Destroy( T2MutexHandle* a_pMutex );
+TINT T2Mutex_Create( T2MutexHandle* a_pMutex );
+TINT T2Mutex_Destroy( T2MutexHandle* a_pMutex );
 TBOOL T2Mutex_Lock( T2MutexHandle* a_pMutex, TUINT32 a_uiFlags );
-TBOOL T2Mutex_Unlock( T2MutexHandle* a_pMutex );
+TINT T2Mutex_Unlock( T2MutexHandle* a_pMutex );

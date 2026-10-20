@@ -19,12 +19,17 @@ public:
 
 	// NOTE: retail calls Malloc( sizeof( T ) ) without the alignment
 	// $Barnyard: FUNCTION 006bc0d0
-	// New<T2RedBlackTreeNode<T2Pair<TPString8, AInteriorNetwork::LookupList>>> (retail takes the value by copy): 00554550
 	// $Barnyard: FUNCTION 00554550
+	// $deBlob: FUNCTION 005d9f90
+	// $deBlob: FUNCTION 005dff50
+	// $deBlob: FUNCTION 005dffe0
+	// $deBlob: FUNCTION 006a9a00
+	// $deBlob: FUNCTION 0075ee50
+	// $deBlob: FUNCTION 007e3e60
 	template <class T, class... Args>
 	T* New( Args&&... args )
 	{
-		void* mem    = Malloc( sizeof( T ), alignof( T ) );
+		void* mem    = Malloc( sizeof( T ), TALIGNOF( T ) );
 		T*    object = new ( mem ) T( std::forward<Args>( args )... );
 		return object;
 	}
@@ -40,6 +45,10 @@ public:
 class TOSHI_API T2GlobalAllocator : public T2Allocator
 {
 public:
+	// NOTE: explicitly defaulted to carry the marker
+	// $deBlob: FUNCTION 006f20c0
+	T2GlobalAllocator() = default;
+
 	virtual void*  Malloc( size_t size ) override;
 	virtual void*  Malloc( size_t size, size_t alignment ) override;
 	virtual void   Free( void* ptr ) override;

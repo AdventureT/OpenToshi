@@ -23,23 +23,62 @@ public:
 		T* As() { return TSTATICCAST( T, this ); }
 
 	protected:
-		TNode();
-		TNode( TUninitialised );
-		~TNode();
+		TNode() { Reset(); }
+		TNode( TUninitialised ) {}
+#ifdef DEBLOB_COMMUNITY_PATCH
+		// NOTE: retail's destructor is empty (a node destroyed while linked stays in its list); Barnyard's unlinks it
+		~TNode() { Remove(); }
+#else
+		~TNode() {}
+#endif
 
 		TNode* Next() const { return m_pNext; }
 		TNode* Prev() const { return m_pPrev; }
 
 	public:
-		void Remove();
-		void InsertAfter( TNode* a_pNode );
-		void InsertBefore( TNode* a_pNode );
+		// $deBlob: FUNCTION 00662c80
+		// $deBlob: FUNCTION 00662ca0
+		// $Barnyard: FUNCTION 006c8120
+		void Remove()
+		{
+			m_pPrev->m_pNext = m_pNext;
+			m_pNext->m_pPrev = m_pPrev;
+			Reset();
+		}
+
+		// $deBlob: FUNCTION 00662b60
+		// $Barnyard: FUNCTION 006c8100
+		void InsertAfter( TNode* a_pNode )
+		{
+			TASSERT( !IsLinked(), "TNode::InsertAfter - TNode shouldn't be linked" );
+
+			m_pPrev          = a_pNode;
+			m_pNext          = a_pNode->m_pNext;
+			a_pNode->m_pNext = this;
+			m_pNext->m_pPrev = this;
+		}
+
+		// $deBlob: FUNCTION 00686510
+		// $Barnyard: FUNCTION 006c80e0
+		void InsertBefore( TNode* a_pNode )
+		{
+			TASSERT( !IsLinked(), "TNode::InsertBefore - TNode shouldn't be linked" );
+
+			m_pNext          = a_pNode;
+			m_pPrev          = a_pNode->m_pPrev;
+			a_pNode->m_pPrev = this;
+			m_pPrev->m_pNext = this;
+		}
 
 		// $deBlob: FUNCTION 00662c50
-		TBOOL IsLinked() const { return this != m_pNext; }
+		TBOOL IsLinked() const { return m_pNext != this; }
 
 	private:
-		void Reset();
+		void Reset()
+		{
+			m_pNext = this;
+			m_pPrev = this;
+		}
 
 	protected:
 		TNode* m_pNext;
@@ -50,13 +89,11 @@ public:
 	void InsertSegmentAtHead( TNode* a_pNode1, TNode* a_pNode2 );
 	void InsertSegmentAtTail( TNode* a_pNode1, TNode* a_pNode2 );
 
-	// Out-of-line instances:
 	// $deBlob: FUNCTION 00662bb0
 	// $deBlob: FUNCTION 00662c00
 	// $deBlob: FUNCTION 00686560
 	void InsertHead( TNode* a_pNode ) { a_pNode->InsertAfter( &m_oRoot ); }
 
-	// Out-of-line instances:
 	// $deBlob: FUNCTION 006865b0
 	// $deBlob: FUNCTION 00686600
 	void InsertTail( TNode* a_pNode ) { a_pNode->InsertBefore( &m_oRoot ); }
@@ -84,8 +121,12 @@ public:
 	static void InsertSegmentBefore( TNode* a_pNode1, TNode* a_pNode2, TNode* a_pNode3 );
 
 protected:
-	TGenericDList();
-	~TGenericDList();
+	TGenericDList() {}
+
+	// $deBlob: FUNCTION 00662a90
+	// $deBlob: FUNCTION 00662aa0
+	// $deBlob: FUNCTION 00686430
+	~TGenericDList() { RemoveAll(); }
 
 protected:
 	TNode m_oRoot;
@@ -111,27 +152,61 @@ public:
 		T* As() { return TSTATICCAST( T, this ); }
 
 	protected:
-		TNode();
-		TNode( TUninitialised );
-		~TNode();
+		TNode() { Reset(); }
+		TNode( TUninitialised ) {}
+		~TNode() {}
 
 		TNode* Next() const { return m_pNext; }
 		TNode* Prev() const { return m_pPrev; }
 
 	public:
-		void Remove();
-		void InsertAfter( TNode* a_pNode );
-		void InsertBefore( TNode* a_pNode );
+		void Remove()
+		{
+			m_pPrev->m_pNext = m_pNext;
+			m_pNext->m_pPrev = m_pPrev;
+			m_pNext          = this;
+			m_pPrev          = this;
+		}
 
-		TBOOL IsLinked() const { return this != m_pNext; }
+		// NOTE: header inlines in de Blob (asserts in TDList.h)
+		void InsertBefore( TNode* a_pNode )
+		{
+			TASSERT( !IsLinked() );
+			m_pNext          = a_pNode;
+			m_pPrev          = a_pNode->m_pPrev;
+			a_pNode->m_pPrev = this;
+			m_pPrev->m_pNext = this;
+		}
+
+		void InsertAfter( TNode* a_pNode )
+		{
+			TASSERT( !IsLinked() );
+			m_pPrev          = a_pNode;
+			m_pNext          = a_pNode->m_pNext;
+			a_pNode->m_pNext = this;
+			m_pNext->m_pPrev = this;
+		}
+
+		TBOOL IsLinked() const { return m_pNext != this; }
 
 		void SetPriority( TINT priority ) { m_iPriority = priority; }
 		TINT GetPriority() const { return m_iPriority; }
 
-		TNode& operator=( const TNode& a_pNode );
+		TNode& operator=( const TNode& a_pNode )
+		{
+			m_pNext = a_pNode.m_pNext;
+			m_pPrev = a_pNode.m_pPrev;
+			SetPriority( a_pNode.GetPriority() );
+			return *this;
+		}
 
 	private:
-		void Reset();
+		void Reset()
+		{
+			m_pNext = this;
+			m_pPrev = this;
+			SetPriority( 0 );
+		}
 
 	public:
 		TNode* m_pNext;
@@ -154,8 +229,13 @@ public:
 	void RemoveAll();
 
 protected:
-	TGenericPriList();
-	~TGenericPriList();
+	TGenericPriList()
+	{
+		m_pNext = End();
+		m_pPrev = End();
+	}
+
+	~TGenericPriList() { RemoveAll(); }
 
 private:
 	TNode* m_pNext;

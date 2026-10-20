@@ -155,8 +155,8 @@ public:
 	};
 #pragma endregion
 
-	inline static constexpr TUINT KEYBOARD_NUM_DOODADS     = 128;
-	inline static constexpr TUINT VIRTSTK_DIRECTIONAL_MAPS = 2;
+	static TCONSTEXPR_VAR TUINT KEYBOARD_NUM_DOODADS     = 128;
+	static TCONSTEXPR_VAR TUINT VIRTSTK_DIRECTIONAL_MAPS = 2;
 
 public:
 	TInputDeviceKeyboard();
@@ -164,40 +164,51 @@ public:
 
 	virtual TBOOL GetDoodadProperties( Doodad a_iDoodad, DoodadProperties& doodadProps ) const override;
 
-	virtual TINT         GetAxisCount() const override { return 0; }
+	// $deBlob: FUNCTION 0067ae20
+	virtual TINT GetAxisCount() const override { return 0; }
+	// $deBlob: FUNCTION 00679a80
+	virtual GAMEPADTYPE  GetGamepadType() const override { return Gamepad_Keyboard; }
 	virtual const TCHAR* GetButtonFromDoodad( Doodad a_iDoodad ) const override;
-	virtual TINT         GetAxisInt( Doodad a_iDoodad, TINT axis ) const override { return 0; }
+	// $deBlob: FUNCTION 0067ae30
+	virtual TINT GetAxisInt( Doodad a_iDoodad, TINT axis ) const override { return 0; }
+	// $deBlob: FUNCTION 0067ae40
 	// $Barnyard: FUNCTION 006c4fb0
 	virtual float GetAxisFloat( Doodad a_iDoodad, TINT axis ) const override { return 0; }
 
-	virtual TBOOL   IsShiftDown() const                                  = 0;
-	virtual TBOOL   IsControlDown() const                                = 0;
-	virtual TBOOL   IsAltDown() const                                    = 0;
-	virtual TBOOL   WasDown( Doodad a_iDoodad ) const                    = 0;
-	virtual TWCHAR* TranslateDoodadToCharacter( Doodad a_iDoodad ) const = 0;
-	virtual TINT    ProcessVirtualButtons( EventEmitter& a_rEmitter, TFLOAT flt );
+	virtual TBOOL   IsShiftDown() const                                  = 0;      // +0x5C
+	virtual TBOOL   IsControlDown() const                                = 0;      // +0x60
+	virtual TBOOL   IsAltDown() const                                    = 0;      // +0x64
+	virtual TBOOL   WasDown( Doodad a_iDoodad ) const                    = 0;      // +0x68
+	virtual TWCHAR* TranslateDoodadToCharacter( Doodad a_iDoodad ) const = 0;      // +0x6C
+	virtual TINT    ProcessVirtualButtons( EventEmitter& a_rEmitter, TFLOAT flt ); // +0x70
 
 	void SetVirtStickDoodads( TINT a_iMapID, Doodad a_iDoodad1, Doodad a_iDoodad2, Doodad a_iDoodad3, Doodad a_iDoodad4 );
 	void GetVirtStickDoodads( TINT a_iMapID, Doodad& a_rDoodad1, Doodad& a_rDoodad2, Doodad& a_rDoodad3, Doodad& a_rDoodad4 );
 
-#if defined( BARNYARD_COMMUNITY_PATCH ) && !defined( TOSHI_FINAL )
-	// Development: queues a key change that the platform keyboard handles as if it came from
-	// the device, so unattended runs exercise the whole input path (see -devkeys)
+#if defined( DEBLOB_COMMUNITY_PATCH ) && !defined( TOSHI_FINAL )
+	// Development: "-devkeys <Key>:<start>-<end>[,...]" (seconds since the start of the process, e.g.
+	// "-devkeys Return:20-20.15,Down:18-18.15") presses keyboard keys as if they came from the device, so unattended
+	// runs exercise the whole input path. <Key> is a doodad name of GetButtonFromDoodad with or without "KEY_"
+	// (case-insensitive). Without an end (or with an end before the start) the key is tapped for 0.2 seconds.
+	// The platform keyboard handles the queued changes in its ProcessEvents, also while it isn't acquired
 	static void  Dev_QueueKey( Doodad a_iDoodad, TBOOL a_bDown );
 	static TBOOL Dev_HasInjectedKeys() { return ms_bDevKeys; }
 
 protected:
+	// Parses -devkeys once and queues the key changes that are due
+	void Dev_UpdateKeys();
+
 	struct DevKey
 	{
 		Doodad iDoodad;
 		TBOOL  bDown;
 	};
 
-	inline static constexpr TINT DEV_MAX_QUEUED_KEYS = 32;
+	static TCONSTEXPR_VAR TINT DEV_MAX_QUEUED_KEYS = 32;
 
-	inline static DevKey ms_aDevKeys[ DEV_MAX_QUEUED_KEYS ];
-	inline static TINT   ms_iNumDevKeys = 0;
-	inline static TBOOL  ms_bDevKeys    = TFALSE; // set once any key got queued
+	static DevKey ms_aDevKeys[ DEV_MAX_QUEUED_KEYS ];
+	static TINT   ms_iNumDevKeys;
+	static TBOOL  ms_bDevKeys; // set when -devkeys has keys
 #endif
 
 protected:
@@ -206,14 +217,16 @@ protected:
 protected:
 	struct VirtStickDoodad
 	{
-		Doodad iDoodad1 = 0;
-		Doodad iDoodad2 = 0;
-		Doodad iDoodad3 = 0;
-		Doodad iDoodad4 = 0;
+		Doodad iDoodad1;
+		Doodad iDoodad2;
+		Doodad iDoodad3;
+		Doodad iDoodad4;
 	};
 
 	TFLOAT          m_aMags[ 4 ];                                    // 0x40
 	VirtStickDoodad m_aVirtStickDoodads[ VIRTSTK_DIRECTIONAL_MAPS ]; // 0x50
 };
+
+TSTATICASSERT( sizeof( TInputDeviceKeyboard ) == 0x70 );
 
 TOSHI_NAMESPACE_END

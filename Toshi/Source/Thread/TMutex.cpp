@@ -41,7 +41,7 @@ TBOOL TMutex::Destroy()
 	TASSERT( m_Handle != NULL );
 	BOOL result = CloseHandle( m_Handle );
 	m_Handle    = NULL;
-	return result;
+	return result != 0;
 #else  // USE_WIN32_MUTEX
 	return TTRUE;
 #endif // !USE_WIN32_MUTEX
@@ -69,7 +69,7 @@ TBOOL TMutex::Unlock()
 {
 #ifdef USE_WIN32_MUTEX
 	TASSERT( m_Handle != NULL );
-	return ReleaseMutex( m_Handle );
+	return ReleaseMutex( m_Handle ) != 0;
 #else  // !USE_WIN32_MUTEX
 	m_Atomic.Unlock();
 	return TTRUE;
@@ -82,8 +82,11 @@ TBOOL TMutex::Lock( FLAG a_eFlags /*= FLAG_NONE */ )
 {
 #ifdef USE_WIN32_MUTEX
 	TASSERT( m_Handle != NULL );
-	DWORD waitForMs = ( a_eFlags & FLAG_NO_WAIT ) ? 0 : INFINITE;
-	DWORD result    = WaitForSingleObject( m_Handle, waitForMs );
+	DWORD result;
+	if ( a_eFlags & FLAG_NO_WAIT )
+		result = WaitForSingleObject( m_Handle, 0 );
+	else
+		result = WaitForSingleObject( m_Handle, INFINITE );
 
 	return result == WAIT_OBJECT_0;
 #else  // !USE_WIN32_MUTEX

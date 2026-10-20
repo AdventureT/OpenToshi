@@ -9,11 +9,9 @@ TOSHI_NAMESPACE_START
 class TRenderDX11;
 
 //-----------------------------------------------------------------------------
-// de Blob: Source\Render\TRenderAdapter_DX11.cpp. One adapter per DXGI adapter, one mode per display mode of
-// each of its outputs (TRenderDX11::BuildAdapterDatabase 006a7df0).
-//
-// NOTE: de Blob never fills the devices of the modes (they stay as constructed: no depth/stencil format and
-// no windowed support), so TRender::FindDevice never finds one. TRenderDX11::GetCurrentDevice returns TNULL.
+// One adapter per DXGI adapter, one mode per display mode of each of its outputs (TRenderDX11::BuildAdapterDatabase).
+// NOTE: de Blob never fills the devices of the modes (they stay as constructed: no depth/stencil format and no windowed support), so TRender::FindDevice never finds one.
+// TRenderDX11::GetCurrentDevice returns TNULL.
 //-----------------------------------------------------------------------------
 class TD3DAdapter : public TRenderAdapter
 {
@@ -21,16 +19,17 @@ public:
 	class Mode : public TRenderAdapter::Mode
 	{
 	public:
-		static constexpr TINT NUMSUPPORTEDDEVICES = 2;
-		static constexpr TINT DISPLAYNAMESIZE     = 46;
+		static TCONSTEXPR_VAR TINT NUMSUPPORTEDDEVICES = 2;
+		static TCONSTEXPR_VAR TINT DISPLAYNAMESIZE     = 46;
 
 		class Device : public TRenderAdapter::Mode::Device
 		{
 		public:
-			static constexpr const TCHAR* DEVICETYPES[ NUMSUPPORTEDDEVICES ] = { "HAL", "REF" }; // 0x00981fdc
+			static const TCHAR* DEVICETYPES[ NUMSUPPORTEDDEVICES ];
 
 		public:
 			Device();
+			// $deBlob: FUNCTION 006b3b10
 			~Device() = default;
 
 			//-----------------------------------------------------------------------------
@@ -75,8 +74,7 @@ public:
 
 		void SetDescription( const DXGI_MODE_DESC& a_rDescription );
 
-		// $deBlob: FUNCTION 006b35e0
-		DXGI_MODE_DESC*       GetDescription() { return &m_Description; }
+		DXGI_MODE_DESC* GetDescription();
 		const WCHAR*          GetDisplayName() const { return m_wszDisplayName; }
 		TUINT32               GetDisplayIndex() const { return m_uiDisplayIndex; }
 
@@ -104,19 +102,21 @@ public:
 	virtual TUINT32      GetAdapterIndex() const OVERRIDE;
 	virtual const TCHAR* GetDriver() const OVERRIDE;
 	virtual const TCHAR* GetDriverDescription() const OVERRIDE;
-	virtual TUINT16      GetProductID() const OVERRIDE;
-	virtual TUINT16      GetVersion() const OVERRIDE;
-	virtual TUINT16      GetSubVersion() const OVERRIDE;
-	virtual TUINT16      GetBuild() const OVERRIDE;
+	virtual TUINT        GetProductID() const OVERRIDE;
+	virtual TUINT        GetVersion() const OVERRIDE;
+	virtual TUINT        GetSubVersion() const OVERRIDE;
+	virtual TUINT        GetBuild() const OVERRIDE;
 	virtual TUINT32      GetNumSupportedDevices() const OVERRIDE;
 
 	// Adds the display modes of every output of the adapter, the desktop mode of the first output is GetMode()
+	void EnumerateDevices( TRenderDX11* a_pRender );
 	void EnumerateOutputs( TRenderDX11* a_pRender, IDXGIAdapter* a_pDXGIAdapter );
 
 	// $deBlob: FUNCTION 006b39d0
 	// The desktop mode of the first output
 	Mode* GetMode() { return &m_Mode; }
 
+	// $deBlob: FUNCTION 006b36a0
 	const DXGI_ADAPTER_DESC& GetAdapterDesc() const { return m_AdapterDesc; }
 
 private:

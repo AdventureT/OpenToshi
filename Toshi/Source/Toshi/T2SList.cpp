@@ -61,7 +61,7 @@ void T2GenericSList::PushBack( Node* a_pNode )
 {
 	TASSERT( !a_pNode->IsLinked() );
 
-	// NOTE: inlined Back() without its assert
+	// NOTE: Back() without its assert
 	Node* pBack = &m_oRoot;
 
 	for ( Node* pNode = m_oRoot.m_pNext; pNode != &m_oRoot; pNode = pNode->m_pNext )
@@ -154,6 +154,8 @@ T2GenericSList::Node* T2GenericSList::Erase( Node* a_pFrom, Node* a_pTo )
 }
 
 // $deBlob: FUNCTION 006f00a0
+// $deBlob: FUNCTION 0056efd0
+// $deBlob: FUNCTION 00791f60
 // $Barnyard: FUNCTION 006c7ec0
 void T2GenericSList::Clear()
 {

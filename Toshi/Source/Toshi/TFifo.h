@@ -12,7 +12,7 @@ TOSHI_NAMESPACE_START
 
 class TGenericFifo
 {
-protected:
+public: // NOTE: public, VS2013 checks the access of default arguments at the call site
 	typedef uint8_t Flags;
 	enum Flags_ : Flags
 	{

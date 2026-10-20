@@ -9,7 +9,10 @@ TOSHI_NAMESPACE_START
 template <class T, size_t ID>
 struct T2UniqueValue
 {
-	inline static T value = T();
+	static T value;
 };
+
+template <class T, size_t ID>
+T T2UniqueValue<T, ID>::value = T();
 
 TOSHI_NAMESPACE_END

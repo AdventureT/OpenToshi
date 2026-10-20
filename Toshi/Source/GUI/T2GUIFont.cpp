@@ -1,6 +1,11 @@
 #include "ToshiPCH.h"
 #include "T2GUIFont.h"
+#include "T2GUIFontManager.h"
 #include "T2GUI.h"
+#include "XUI/TXUIScene.h"
+
+#include "File/TTRB.h"
+#include "Toshi/T2ResourceManager.h"
 
 #include <cwctype>
 
@@ -12,777 +17,928 @@
 
 TOSHI_NAMESPACE_START
 
-// $Barnyard: FUNCTION 006c3340
+T2GUIFont::t_IsLanguage T2GUIFont::ms_fnIsJapaneseLanguage = TNULL;
+T2GUIFont::t_IsLanguage T2GUIFont::ms_fnIsChineseLanguage  = TNULL;
+TBitField<128>          T2GUIFont::s_aBitField;
+
+T2GUIFont::t_CanBreakBetweenChars T2GUIFont::s_CanBreakBetweenChars = CanBreakBetweenChars_Default;
+
+// $deBlob: FUNCTION 006f75b0
+T2GUIFont::T2GUIFont()
+{
+	m_font        = TNULL;
+	m_font2       = TNULL;
+	m_materials   = TNULL;
+	m_bOwnsFont   = TFALSE;
+	m_iLineHeight = 0;
+}
+
+// $deBlob: FUNCTION 006f75e0
+// $deBlob: FUNCTION 006f5b20
 T2GUIFont::~T2GUIFont()
 {
 	Destroy();
 }
 
-// $Barnyard: FUNCTION 006c2d60
-void T2GUIFont::Destroy()
+// $deBlob: FUNCTION 006f75f0
+void T2GUIFont::SetRegion()
 {
-	if ( m_bFlag )
+	// NOTE: retail calls SteamManager::IsJapaneseLanguage and IsChineseLanguage (game code) directly
+	if ( ms_fnIsJapaneseLanguage && ms_fnIsJapaneseLanguage() )
 	{
-		// A clone, only the definition is owned
-		TFree( m_pFontDef );
-		m_pFontDef = TNULL;
+		s_CanBreakBetweenChars = CanBreakBetweenChars_Japanese;
 		return;
 	}
 
-	if ( m_pFontDef )
-	{
-		for ( TINT i = 0; i < m_pFontDef->uiNumMaterials; i++ )
-			T2GUI::GetRenderer()->DestroyMaterial( m_ppMaterials[ i ] );
+	s_CanBreakBetweenChars = CanBreakBetweenChars_Default;
 
-		TFree( m_ppMaterials );
-		m_ppMaterials = TNULL;
-		m_pFontDef    = TNULL;
-	}
+	if ( ms_fnIsChineseLanguage && ms_fnIsChineseLanguage() )
+		s_CanBreakBetweenChars = CanBreakBetweenChars_Chinese;
 }
 
-// $Barnyard: FUNCTION 006c2f80
-T2GUIFont* T2GUIFont::Clone()
+// $deBlob: FUNCTION 006f7620
+TBOOL T2GUIFont::Create( const TCHAR* a_szSymbolName, TTRB* a_pTRB )
 {
-	T2GUIFont* pFont = new T2GUIFont();
-
-	pFont->m_pFontDef = TSTATICCAST( T2GUIFontDef, TMalloc( sizeof( T2GUIFontDef ) ) );
-	TUtil::MemCopy( pFont->m_pFontDef, m_pFontDef, sizeof( T2GUIFontDef ) );
-	pFont->m_ppMaterials = m_ppMaterials;
-	pFont->m_bFlag       = TTRUE;
-
-
-	return pFont;
+	return Create( TSTATICCAST( T2GUIFontDef, a_pTRB->GetSymbolAddress( a_szSymbolName ) ) );
 }
 
-// $Barnyard: FUNCTION 006c2cf0
+// $deBlob: FUNCTION 006f7640
 TBOOL T2GUIFont::Create( T2GUIFontDef* a_pFontDef )
 {
-	TASSERT( a_pFontDef->uiNumMaterials != 0 );
+	m_font = a_pFontDef;
 
-	m_pFontDef    = a_pFontDef;
-	m_ppMaterials = new T2GUIMaterial*[ a_pFontDef->uiNumMaterials ];
+	TUINT uiNumMaterials = a_pFontDef->uiNumMaterials;
+	m_materials          = TSTATICCAST( T2GUIMaterial*, TMemalign( 16, uiNumMaterials * sizeof( T2GUIMaterial* ) ) );
 
-	auto pRenderer    = T2GUI::GetRenderer();
-	auto pTextureName = a_pFontDef->szTextureNames;
+	const TCHAR* szTextureName = a_pFontDef->szTextureNames;
 
-	for ( TUINT8 i = 0; i < a_pFontDef->uiNumMaterials; i++ )
+	for ( TUINT i = 0; i < uiNumMaterials; i++ )
 	{
-		m_ppMaterials[ i ] = pRenderer->CreateMaterial( pTextureName );
-
-		while ( *pTextureName != '\0' ) pTextureName++;
-		pTextureName++;
+		m_materials[ i ] = T2GUI::CreateMaterial( szTextureName );
+		szTextureName += TStringManager::String8Length( szTextureName ) + 1;
 	}
 
 	return TTRUE;
 }
 
-// $Barnyard: FUNCTION 006c3410
-void T2GUIFont::DrawTextWrapped( const TWCHAR* a_wszText, TFLOAT a_fX, TFLOAT a_fY, TFLOAT a_fWidth, TFLOAT a_fHeight, TUINT32 a_uiColour, TFLOAT a_fScale, TextAlign a_eAlign, void* a_fnCallback /*= TNULL*/ )
+// $deBlob: FUNCTION 006f76c0
+TBOOL T2GUIFont::Create( T2GUIFontDef2* a_pFontDef )
 {
-	auto pFontDef = m_pFontDef;
+	m_font2 = a_pFontDef;
 
-	if ( a_wszText && a_wszText[ 0 ] != '\0' && pFontDef )
+	TUINT uiNumMaterials = a_pFontDef->GetDef()->uiNumMaterials;
+	m_materials          = TSTATICCAST( T2GUIMaterial*, TMemalign( 16, uiNumMaterials * sizeof( T2GUIMaterial* ) ) );
+
+	const TCHAR* szTextureName = a_pFontDef->GetDef()->szTextureNames;
+
+	for ( TUINT i = 0; i < uiNumMaterials; i++ )
 	{
-		auto pTextBuffer = a_wszText;
-
-		do
-		{
-			auto pTextBuffer2 = pTextBuffer;
-
-			while ( *pTextBuffer2 != L'\0' && std::iswspace( *pTextBuffer2 ) != 0 )
-			{
-				if ( *pTextBuffer2 == L'\n' ) break;
-				pTextBuffer2++;
-			}
-
-			auto wChar = *pTextBuffer2;
-
-			if ( wChar == L'\n' )
-			{
-				pTextBuffer = pTextBuffer2 + 1;
-			}
-			else
-			{
-				if ( wChar == L'\0' ) return;
-
-				pTextBuffer         = TNULL;
-				TFLOAT fWidth1      = 0.0f;
-				TFLOAT fWidth2      = 0.0f;
-				auto   pTextBuffer3 = pTextBuffer2;
-
-				do {
-					if ( auto pCharData = FindCharData( wChar ) )
-						fWidth1 += ( pFontDef->iLetterSpacing + pCharData->iRightPadding + pCharData->iLeftPadding + pCharData->ui8CharWidth ) * a_fScale;
-
-					if ( wChar == L'\n' )
-					{
-						fWidth2     = fWidth1;
-						pTextBuffer = pTextBuffer3;
-						break;
-					}
-
-					if ( std::iswspace( wChar ) != 0 && *pTextBuffer3 != L'\xA0' )
-					{
-						fWidth2     = fWidth1;
-						pTextBuffer = pTextBuffer3;
-					}
-
-					wChar = pTextBuffer3[ 1 ];
-					if ( wChar == L'\0' ) break;
-					pTextBuffer3++;
-
-				} while ( fWidth1 < a_fWidth || pTextBuffer == TNULL );
-
-				if ( pTextBuffer3[ 1 ] == L'\0' )
-				{
-					pTextBuffer = pTextBuffer3 + 1;
-					fWidth2     = fWidth1;
-				}
-
-				TFLOAT fPosX;
-
-				if ( a_eAlign == TextAlign_Left )
-					fPosX = a_fX;
-				else if ( a_eAlign == TextAlign_Center )
-					fPosX = ( a_fWidth - fWidth2 ) * 0.5f + a_fX;
-				else if ( a_eAlign == TextAlign_Right )
-					fPosX = ( a_fWidth - fWidth2 ) + a_fX;
-				else
-					fPosX = a_fX;
-
-				DrawTextSingleLine( pTextBuffer2, pTextBuffer - pTextBuffer2, fPosX, a_fY, a_uiColour, a_fScale, a_fnCallback );
-			}
-
-			a_fY += ( pFontDef->uiLineHeight + pFontDef->uiLinesMargin ) * a_fScale;
-
-		} while ( *pTextBuffer != L'\0' );
+		m_materials[ i ] = T2GUI::CreateMaterial( szTextureName );
+		szTextureName += TStringManager::String8Length( szTextureName ) + 1;
 	}
+
+	return TTRUE;
 }
 
-// $Barnyard: FUNCTION 006c2fe0
-void T2GUIFont::DrawTextSingleLine( const TWCHAR* a_wszText, TINT a_iTextLength, TFLOAT a_fX, TFLOAT a_fY, TUINT32 a_uiColour, TFLOAT a_fScale, void* a_fnCallback /*= TNULL*/ )
+// $deBlob: FUNCTION 006f7740
+void T2GUIFont::Destroy()
 {
-	auto pRenderer = T2GUI::GetRenderer();
-	pRenderer->SetColour( a_uiColour );
-
-	TFLOAT         fOffsetX      = 0.0f;
-	TFLOAT         fOffsetY      = 0.0f;
-	TFLOAT         fXToUV        = 0.0f;
-	TFLOAT         fYToUV        = 0.0f;
-	T2GUIMaterial* pPrevMaterial = TNULL;
-
-	for ( TINT i = 0; i < a_iTextLength; i++ )
+	if ( m_bOwnsFont )
 	{
-		auto pFontDef = m_pFontDef;
-		auto wChar    = a_wszText[ i ];
+		// NOTE: an owned font keeps the T2Resource of its TRB at m_font2 (the ID is its first member)
+		operator delete( m_font );
+		TINT* pResource = TREINTERPRETCAST( TINT*, m_font2 );
+		m_font          = TNULL;
 
-		if ( auto pCharDataPtr = FindCharData( wChar ) )
+		if ( pResource != TNULL )
 		{
-			{
-				auto&  pCharData = *pCharDataPtr;
-				TFLOAT fPos1X    = pCharData.iLeftPadding * a_fScale + a_fX;
-
-				if ( pCharData.ui8CharWidth != 0 && pCharData.ui8CharHeight != 0 )
-				{
-					T2GUIMaterial* pMaterial = GetCharMaterial( wChar, pCharDataPtr );
-
-					if ( pMaterial != pPrevMaterial )
-					{
-						pPrevMaterial = pMaterial;
-						pRenderer->SetMaterial( pMaterial );
-						fXToUV = 1.0f / pRenderer->GetWidth( pMaterial );
-						fYToUV = 1.0f / pRenderer->GetHeight( pMaterial );
-					}
-
-					if ( a_fnCallback )
-						TREINTERPRETCAST( CharCallback, a_fnCallback )
-					( i, &fOffsetX, &fOffsetY );
-
-					TFLOAT fPos1Y = ( ( pFontDef->uiLineHeight + pCharData.iYOffset ) - pCharData.ui8CharHeight ) * a_fScale + a_fY;
-					TFLOAT fPos2Y = fPos1Y + ( pCharData.ui8CharHeight + 1 ) * a_fScale;
-					TFLOAT fPos2X = fPos1X + ( pCharData.ui8CharWidth + 1 ) * a_fScale;
-
-					pRenderer->RenderRectangle(
-					    { fPos1X + fOffsetX, fPos1Y + fOffsetY },
-					    { fPos2X + fOffsetX, fPos2Y + fOffsetY },
-					    { ( pCharData.ui16PosX ) * fXToUV, ( pCharData.ui16PosY ) * fYToUV },
-					    { ( pCharData.ui16PosX + pCharData.ui8CharWidth + 1 ) * fXToUV, ( pCharData.ui16PosY + pCharData.ui8CharHeight + 1 ) * fYToUV }
-					);
-				}
-
-				TFLOAT fPos2X = TFLOAT( pFontDef->iLetterSpacing + pCharData.iRightPadding + pCharData.ui8CharWidth );
-				a_fX          = fPos2X * a_fScale + fPos1X;
-			}
+			T2ResourceManager::GetSingleton()->DestroyResource( *pResource );
+			operator delete( pResource );
 		}
+
+		m_font2 = TNULL;
+		return;
+	}
+
+	if ( m_font == TNULL )
+	{
+		if ( m_font2 != TNULL )
+		{
+			TUINT uiNumMaterials = m_font2->GetDef()->uiNumMaterials;
+
+			for ( TUINT i = 0; i < uiNumMaterials; i++ )
+				T2GUI::DestroyMaterial( m_materials[ i ] );
+
+			operator delete( m_materials );
+			m_font2     = TNULL;
+			m_materials = TNULL;
+		}
+
+		return;
+	}
+
+	TUINT uiNumMaterials = m_font->uiNumMaterials;
+
+	for ( TUINT i = 0; i < uiNumMaterials; i++ )
+		T2GUI::DestroyMaterial( m_materials[ i ] );
+
+	operator delete( m_materials );
+	m_font      = TNULL;
+	m_materials = TNULL;
+}
+
+// $deBlob: FUNCTION 006f7820
+TFLOAT T2GUIFont::GetHeight() const
+{
+	if ( m_font != TNULL ) return TFLOAT( m_font->uiHeight );
+	if ( m_font2 != TNULL ) return TFLOAT( m_font2->GetDef()->uiHeight );
+
+	return 0.0f;
+}
+
+// $deBlob: FUNCTION 006f7860
+TFLOAT T2GUIFont::GetLineSpacing() const
+{
+	if ( m_font != TNULL ) return TFLOAT( m_font->iLineSpacing );
+	if ( m_font2 != TNULL ) return TFLOAT( m_font2->GetDef()->iLineSpacing );
+
+	return 0.0f;
+}
+
+// $deBlob: FUNCTION 006f78a0
+TFLOAT T2GUIFont::GetCharWidth( TWCHAR a_wcChar, TFLOAT a_fScale, t_GetCharWidth a_fnGetCharWidth ) const
+{
+	if ( !IsCreated() )
+		return 0.0f;
+
+	if ( a_fnGetCharWidth != TNULL )
+	{
+		TFLOAT fWidth = a_fnGetCharWidth( a_wcChar );
+
+		if ( fWidth != -1.0f )
+			return fWidth * a_fScale;
+	}
+
+	const T2GUIFontGlyph* pGlyph = GetGlyph( a_wcChar );
+
+	if ( pGlyph == TNULL )
+		return 0.0f * a_fScale;
+
+	return TFLOAT( pGlyph->iRightPadding + pGlyph->iLeftPadding + pGlyph->uiWidth ) * a_fScale;
+}
+
+// $deBlob: FUNCTION 006f7920
+TFLOAT T2GUIFont::GetStringWidth( const TWCHAR* a_wszString, TFLOAT a_fScale, t_GetCharWidth a_fnGetCharWidth ) const
+{
+	if ( a_wszString != TNULL && IsCreated() )
+		return GetStringWidth_Imp( a_wszString, wcslen( a_wszString ), a_fScale, a_fnGetCharWidth );
+
+	return 0.0f;
+}
+
+// $deBlob: FUNCTION 006f7980
+TFLOAT T2GUIFont::GetLongestNonBreakableSubStringWidth( const TWCHAR* a_wszString, TFLOAT a_fScale, t_GetCharWidth a_fnGetCharWidth ) const
+{
+	const TWCHAR* pWordStart = TNULL;
+	TFLOAT        fLongest   = 0.0f;
+
+	while ( TTRUE )
+	{
+		TWCHAR wcChar = *a_wszString;
+
+		if ( pWordStart == TNULL )
+		{
+			if ( ( !iswspace( wcChar ) || *a_wszString == CHAR_NOBREAKSPACE ) && *a_wszString != CHAR_IDEOGRAPHICSPACE )
+				pWordStart = a_wszString;
+		}
+		else if ( wcChar == L'\0' || s_CanBreakBetweenChars( a_wszString[ -1 ], wcChar ) )
+		{
+			const T2GUIFontDef* pDef   = GetFontDef();
+			TINT                iCount = TINT( a_wszString - pWordStart );
+			TFLOAT              fWidth = 0.0f;
+
+			for ( ; iCount > 0; iCount-- )
+			{
+				fWidth = TFLOAT( pDef->iCharSpacing ) + GetGlyphWidth( *pWordStart, a_fnGetCharWidth ) + fWidth;
+				pWordStart++;
+			}
+
+			if ( fLongest < fWidth * a_fScale )
+				fLongest = fWidth * a_fScale;
+
+			pWordStart = TNULL;
+		}
+
+		if ( *a_wszString == L'\0' )
+			return fLongest;
+
+		a_wszString++;
 	}
 }
 
-// $Barnyard: FUNCTION 006c2e10
-TFLOAT T2GUIFont::GetTextHeightWrapped( const TWCHAR* a_wszText, TFLOAT a_fMaxWidth, TFLOAT a_fScale )
+// $deBlob: FUNCTION 006f7af0
+TFLOAT T2GUIFont::GetTextBoxHeight( const TWCHAR* a_wszString, TFLOAT a_fWidth, TFLOAT a_fScale, TBOOL a_bWordWrap, TUINT a_uiLineSpacing, t_GetCharWidth a_fnGetCharWidth ) const
 {
-	auto pFontDef = m_pFontDef;
+	TFLOAT fHeight = 0.0f;
 
-	if ( a_wszText && a_wszText[ 0 ] != '\0' && pFontDef )
+	if ( a_wszString != TNULL && IsCreated() )
 	{
-		TFLOAT fHeight     = 0.0f;
-		auto   pTextBuffer = a_wszText;
+		TFLOAT        fLineHeight = GetLineHeight( a_wszString, a_uiLineSpacing ) * a_fScale;
+		const TWCHAR* pString     = a_wszString;
+		TFLOAT        fLineWidth;
 
 		do
 		{
-			auto pTextBuffer2 = pTextBuffer;
-
-			while ( *pTextBuffer2 != L'\0' && std::iswspace( *pTextBuffer2 ) != 0 )
-			{
-				if ( *pTextBuffer2 == L'\n' ) break;
-				pTextBuffer2++;
-			}
-
-			auto wChar = *pTextBuffer2;
-
-			if ( wChar == L'\n' )
-			{
-				pTextBuffer = pTextBuffer2 + 1;
-			}
-			else
-			{
-				if ( wChar == L'\0' ) break;
-
-				pTextBuffer         = TNULL;
-				TFLOAT fWidth1      = 0.0f;
-				TFLOAT fWidth2      = 0.0f;
-				auto   pTextBuffer3 = pTextBuffer2;
-
-				do {
-					if ( auto pCharData = FindCharData( wChar ) )
-						fWidth1 += ( pFontDef->iLetterSpacing + pCharData->iRightPadding + pCharData->iLeftPadding + pCharData->ui8CharWidth ) * a_fScale;
-
-					if ( wChar == L'\n' )
-					{
-						fWidth2     = fWidth1;
-						pTextBuffer = pTextBuffer3;
-						break;
-					}
-
-					if ( std::iswspace( wChar ) != 0 && *pTextBuffer3 != L'\xA0' )
-					{
-						fWidth2     = fWidth1;
-						pTextBuffer = pTextBuffer3;
-					}
-
-					wChar = pTextBuffer3[ 1 ];
-					if ( wChar == L'\0' ) break;
-					pTextBuffer3++;
-
-				} while ( fWidth1 < a_fMaxWidth || pTextBuffer == TNULL );
-
-				if ( pTextBuffer3[ 1 ] == L'\0' )
-				{
-					pTextBuffer = pTextBuffer3 + 1;
-					fWidth2     = fWidth1;
-				}
-			}
-
-			fHeight += ( pFontDef->uiLineHeight + pFontDef->uiLinesMargin ) * a_fScale;
-
-		} while ( *pTextBuffer != L'\0' );
+			GetNextTextBoxLine( pString, a_fWidth, a_fScale, fLineWidth, a_bWordWrap, a_fnGetCharWidth );
+			fHeight = fLineHeight + fHeight;
+		} while ( *pString != L'\0' );
 
 		return fHeight;
 	}
+
+	return 0.0f;
+}
+
+// $deBlob: FUNCTION 006f7b90
+void T2GUIFont::DrawString( const TWCHAR* a_wszString, TFLOAT a_fX, TFLOAT a_fY, TUINT32 a_uiColour, TFLOAT a_fScale )
+{
+	if ( a_wszString != TNULL && *a_wszString != L'\0' && IsCreated() )
+		DrawString_Imp( a_wszString, wcslen( a_wszString ), a_fX, a_fY, a_uiColour, a_fScale, TNULL, TNULL, TNULL );
+}
+
+// $deBlob: FUNCTION 006f7c00
+void T2GUIFont::DrawStringMultiColoured( const TWCHAR* a_wszString, TFLOAT a_fX, TFLOAT a_fY, const TUINT8* a_pColourIndices, const TUINT32* a_pColours, TFLOAT a_fScale )
+{
+	if ( a_wszString != TNULL && *a_wszString != L'\0' && IsCreated() )
+		DrawStringMultiColoured_Imp( a_wszString, wcslen( a_wszString ), a_fX, a_fY, a_pColourIndices, a_pColours, a_fScale, TNULL );
+}
+
+// $deBlob: FUNCTION 006f7c70
+void T2GUIFont::DrawTextBox( const TWCHAR* a_wszString, TFLOAT a_fX, TFLOAT a_fY, TFLOAT a_fWidth, TFLOAT a_fHeight, TUINT32 a_uiColour, TFLOAT a_fScale, JUSTIFY a_eJustify, TINT a_iMaxChars, TBOOL a_bWordWrap, TUINT a_uiLineSpacing, TBOOL a_bLastLineFits, t_CharCallback a_fnCharCallback, t_GetCharWidth a_fnGetCharWidth, t_RenderChar a_fnRenderChar )
+{
+	TFLOAT fStartY = a_fY;
+
+	if ( a_wszString == TNULL || *a_wszString == L'\0' || !IsCreated() )
+		return;
+
+	GetFontDef();
+	TFLOAT fLineHeight = GetLineHeight( a_wszString, a_uiLineSpacing ) * a_fScale;
+	m_iLineHeight      = TINT( fLineHeight );
+	m_bFirstLine       = TTRUE;
+	m_bMoreLines       = TFALSE;
+
+	const TWCHAR* pString = a_wszString;
+	TFLOAT        fLineWidth;
+	GetNextTextBoxLine( pString, a_fWidth, a_fScale, fLineWidth, a_bWordWrap, a_fnGetCharWidth );
+
+	if ( *pString != L'\0' )
+		m_bMoreLines = TTRUE;
+
+	pString                = a_wszString;
+	const TWCHAR* pNextLine = a_wszString;
+
+	if ( !a_bLastLineFits )
+		a_fHeight -= fLineHeight;
+
+	while ( TTRUE )
+	{
+		const TWCHAR* pLine     = pNextLine;
+		TINT          iNumChars = GetNextTextBoxLine( pString, a_fWidth, a_fScale, fLineWidth, a_bWordWrap, a_fnGetCharWidth );
+		TFLOAT        fX        = a_fX;
+
+		if ( a_eJustify != JUSTIFY_LEFT )
+		{
+			if ( a_eJustify == JUSTIFY_CENTRE )
+				fX = ( a_fWidth - fLineWidth ) * 0.5f + a_fX;
+			else if ( a_eJustify == JUSTIFY_RIGHT )
+				fX = ( a_fWidth - fLineWidth ) + a_fX;
+			else
+				TASSERT( 0 );
+		}
+
+		TINT iDrawChars = iNumChars;
+
+		if ( a_iMaxChars != -1 && a_iMaxChars <= TINT( pString - a_wszString ) )
+		{
+			pString         = a_wszString + a_iMaxChars;
+			TINT iToMaxChar = TINT( pString - pLine );
+			iDrawChars      = TMath::Min( iNumChars, iToMaxChar );
+		}
+
+		pNextLine = pString;
+		DrawString_Imp( pLine, iDrawChars, fX, a_fY, a_uiColour, a_fScale, a_fnCharCallback, a_fnGetCharWidth, a_fnRenderChar );
+
+		if ( a_iMaxChars != -1 && a_wszString + a_iMaxChars <= pNextLine )
+			return;
+
+		a_fY         = fLineHeight + a_fY;
+		m_bFirstLine = TFALSE;
+
+		if ( *pNextLine == L'\0' )
+			return;
+
+		if ( a_fHeight < a_fY - fStartY )
+			return;
+	}
+}
+
+// $deBlob: FUNCTION 006f7ea0
+void T2GUIFont::DrawTextBoxMultiColoured( const TWCHAR* a_wszString, TFLOAT a_fX, TFLOAT a_fY, TFLOAT a_fWidth, TFLOAT a_fHeight, const TUINT8* a_pColourIndices, const TUINT32* a_pColours, TFLOAT a_fScale, JUSTIFY a_eJustify, TINT a_iMaxChars, TBOOL a_bWordWrap, TUINT a_uiLineSpacing, TBOOL a_bLastLineFits, const TFLOAT* a_pfAlpha )
+{
+	TFLOAT fStartY = a_fY;
+
+	if ( a_wszString == TNULL || *a_wszString == L'\0' || !IsCreated() )
+		return;
+
+	GetFontDef();
+	TFLOAT fLineHeight = GetLineHeight( a_wszString, a_uiLineSpacing ) * a_fScale;
+	m_bFirstLine       = TTRUE;
+	m_bMoreLines       = TFALSE;
+	m_iLineHeight      = TINT( fLineHeight );
+
+	const TWCHAR* pString = a_wszString;
+	TFLOAT        fLineWidth;
+	GetNextTextBoxLine( pString, a_fWidth, a_fScale, fLineWidth, a_bWordWrap, TNULL );
+
+	if ( *pString != L'\0' )
+		m_bMoreLines = TTRUE;
+
+	pString                 = a_wszString;
+	const TWCHAR* pNextLine = a_wszString;
+
+	if ( !a_bLastLineFits )
+		a_fHeight -= fLineHeight;
+
+	while ( TTRUE )
+	{
+		const TWCHAR* pLine     = pNextLine;
+		TINT          iNumChars = GetNextTextBoxLine( pString, a_fWidth, a_fScale, fLineWidth, a_bWordWrap, TNULL );
+		TFLOAT        fX        = a_fX;
+
+		if ( a_eJustify != JUSTIFY_LEFT )
+		{
+			if ( a_eJustify == JUSTIFY_CENTRE )
+				fX = ( a_fWidth - fLineWidth ) * 0.5f + a_fX;
+			else if ( a_eJustify == JUSTIFY_RIGHT )
+				fX = ( a_fWidth - fLineWidth ) + a_fX;
+			else
+				TASSERT( 0 );
+		}
+
+		TINT iDrawChars = iNumChars;
+
+		if ( a_iMaxChars != -1 && a_iMaxChars <= TINT( pString - a_wszString ) )
+		{
+			pString         = a_wszString + a_iMaxChars;
+			TINT iToMaxChar = TINT( pString - pLine );
+			iDrawChars      = TMath::Min( iNumChars, iToMaxChar );
+		}
+
+		pNextLine = pString;
+		DrawStringMultiColoured_Imp( pLine, iDrawChars, fX, a_fY, a_pColourIndices + ( pLine - a_wszString ), a_pColours, a_fScale, a_pfAlpha );
+
+		if ( a_iMaxChars != -1 && a_wszString + a_iMaxChars <= pNextLine )
+			return;
+
+		a_fY         = fLineHeight + a_fY;
+		m_bFirstLine = TFALSE;
+
+		if ( *pNextLine == L'\0' )
+			return;
+
+		if ( a_fHeight < a_fY - fStartY )
+			return;
+	}
+}
+
+// $deBlob: FUNCTION 006f80c0
+const T2GUIFontGlyph* T2GUIFont::GetGlyph( TWCHAR a_wcChar ) const
+{
+	const T2GUIFontDef* pDef    = GetFontDef();
+	TINT32**            ppPages = GetPages();
+	T2GUIFontGlyph*     pGlyphs = GetGlyphs();
+
+	TUINT    uiPage = ( a_wcChar >> 8 ) & 0xFF;
+	TINT32*  pPage  = ppPages[ uiPage ];
+
+	if ( pPage != TNULL )
+	{
+		const T2GUIFontPageRange& rRange = pDef->pPageRanges[ uiPage ];
+
+		if ( rRange.uiMin <= a_wcChar && a_wcChar <= rRange.uiMax )
+		{
+			TINT32 iGlyph = pPage[ a_wcChar - rRange.uiMin ];
+
+			if ( iGlyph >= 0 )
+				return &pGlyphs[ iGlyph ];
+		}
+	}
+
+	return TNULL;
+}
+
+// Draws the characters material by material: each pass draws the glyphs of the material of the last glyph not
+// drawn yet
+// $deBlob: FUNCTION 006f81f0
+void T2GUIFont::DrawString_Imp( const TWCHAR* a_wszString, TINT a_iLength, TFLOAT a_fX, TFLOAT a_fY, TUINT32 a_uiColour, TFLOAT a_fScale, t_CharCallback a_fnCharCallback, t_GetCharWidth a_fnGetCharWidth, t_RenderChar a_fnRenderChar )
+{
+	TFLOAT              fOffsetX  = 0.0f;
+	TFLOAT              fOffsetY  = 0.0f;
+	T2GUIRenderer*      pRenderer = T2GUI::GetSingleton()->GetRenderer();
+	const T2GUIFontDef* pDef      = GetFontDef();
+
+	TINT iLast = -1;
+	s_aBitField.Clear();
+
+	if ( a_fnRenderChar == TNULL )
+	{
+		for ( iLast = a_iLength - 1; iLast >= 0 && GetGlyph( a_wszString[ iLast ] ) == TNULL; iLast-- )
+			;
+	}
 	else
 	{
-		return 0.0f;
-	}
-}
+		// The special characters are drawn first, the last glyph of the font starts the passes
+		TFLOAT fX = a_fX;
 
-// $Barnyard: FUNCTION 006c3380
-TFLOAT T2GUIFont::GetTextWidth( const TWCHAR* a_wszText, TFLOAT a_fScale )
-{
-	if ( a_wszText && m_pFontDef )
+		for ( TINT i = 0; i < a_iLength; i++ )
+		{
+			if ( a_fnCharCallback != TNULL )
+				a_fnCharCallback( i, fOffsetX, fOffsetY );
+
+			TFLOAT fCharWidth = 0.0f;
+
+			if ( !a_fnRenderChar( pRenderer, a_wszString[ i ], TFLOAT( pDef->uiHeight ), fX + fOffsetX, TFLOAT( pDef->uiHeight ) + a_fY + fOffsetY, fCharWidth ) )
+			{
+				const T2GUIFontGlyph* pGlyph = GetGlyph( a_wszString[ i ] );
+
+				if ( pGlyph != TNULL )
+				{
+					iLast = TMath::Max( iLast, i );
+					fX    = TFLOAT( pGlyph->iRightPadding + pGlyph->iLeftPadding + pGlyph->uiWidth + pDef->iCharSpacing ) * a_fScale + fX;
+				}
+			}
+			else
+			{
+				fX = ( TFLOAT( pDef->iCharSpacing ) + fCharWidth ) * a_fScale + fX;
+			}
+		}
+	}
+
+	while ( iLast >= 0 )
 	{
-		return GetTextWidth(
-		    a_wszText,
-		    Toshi::TStringManager::String16Length( a_wszText ),
-		    a_fScale
-		);
+		TFLOAT                fX       = a_fX;
+		const T2GUIFontGlyph* pGlyph   = GetGlyph( a_wszString[ iLast ] );
+		TUINT                 uiPassMat = pGlyph->GetMaterial();
+
+		s_aBitField.Set( uiPassMat, TTRUE );
+
+		T2GUIMaterial* pMaterial = m_materials[ uiPassMat ];
+		pRenderer->SetMaterial( pMaterial );
+		TFLOAT fInvWidth  = 1.0f / TFLOAT( TINT( T2GUI::GetWidth( pMaterial ) ) );
+		TFLOAT fInvHeight = 1.0f / TFLOAT( TINT( T2GUI::GetHeight( pMaterial ) ) );
+
+		TINT iNextLast = -1;
+		TINT iEnd      = iLast;
+
+		for ( TINT i = 0; i <= iEnd; i++ )
+		{
+			const TWCHAR wcChar = a_wszString[ i ];
+
+			if ( a_fnGetCharWidth != TNULL )
+			{
+				TFLOAT fCharWidth = a_fnGetCharWidth( wcChar );
+
+				if ( fCharWidth > 0.0f )
+				{
+					fX = ( TFLOAT( pDef->iCharSpacing ) + fCharWidth ) * a_fScale + fX;
+					continue;
+				}
+			}
+
+			const T2GUIFontGlyph* pCharGlyph = GetGlyph( wcChar );
+
+			if ( pCharGlyph == TNULL )
+				continue;
+
+			// NOTE: retail keeps the scale of the first call ever in a function static
+			static TFLOAT s_fScale = a_fScale;
+			a_fScale               = s_fScale;
+
+			// The glyphs of the platform buttons are scaled down to the line height
+			TFLOAT fIconOffsetY = 0.0f;
+
+			if ( TXUIScene::IsPlatformGlyph( wcChar ) )
+			{
+				TFLOAT fMaxHeight = ( !m_bMoreLines && i == 0 && m_bFirstLine ) ? TFLOAT( m_iLineHeight ) * 1.5f : TFLOAT( m_iLineHeight );
+				TFLOAT fHeight    = TFLOAT( pCharGlyph->uiHeight );
+
+				if ( fMaxHeight < fHeight )
+					a_fScale = fMaxHeight / fHeight;
+
+				fIconOffsetY = ( fHeight - fHeight * a_fScale ) * 0.5f;
+			}
+
+			TFLOAT fGlyphX = TFLOAT( pCharGlyph->iLeftPadding ) * a_fScale + fX;
+
+			if ( pCharGlyph->uiWidth != 0 && pCharGlyph->uiHeight != 0 )
+			{
+				TUINT uiMat = pCharGlyph->GetMaterial();
+
+				if ( uiMat == uiPassMat )
+				{
+					TUINT  uiHeight = pCharGlyph->uiHeight;
+					TFLOAT fU1      = TFLOAT( pCharGlyph->uiPosX ) * fInvWidth;
+					TFLOAT fV1      = TFLOAT( pCharGlyph->uiPosY ) * fInvHeight;
+					TFLOAT fU2      = TFLOAT( pCharGlyph->uiPosX + 1 + pCharGlyph->uiWidth ) * fInvWidth;
+					TFLOAT fV2      = TFLOAT( uiHeight + 1 + pCharGlyph->uiPosY ) * fInvHeight;
+					TFLOAT fX2      = TFLOAT( pCharGlyph->uiWidth + 1 ) * a_fScale + fGlyphX;
+					TFLOAT fTop     = TFLOAT( TINT( ( pCharGlyph->iYOffset + TUINT( pDef->uiHeight ) ) - uiHeight ) ) * a_fScale + a_fY;
+					TFLOAT fY1      = fTop + fIconOffsetY;
+					TFLOAT fY2      = TFLOAT( uiHeight + 1 ) * a_fScale + fTop + fIconOffsetY;
+
+					if ( a_fnCharCallback != TNULL )
+						a_fnCharCallback( i, fOffsetX, fOffsetY );
+
+					if ( !pCharGlyph->IsWhite() )
+						pRenderer->SetColour( a_uiColour );
+					else
+						pRenderer->SetColour( a_uiColour | 0xFFFFFF );
+
+					TVector2 vUV2( fU2, fV2 );
+					TVector2 vUV1( fU1, fV1 );
+					TVector2 vB( fX2 + fOffsetX, fY2 + fOffsetY );
+					TVector2 vA( fGlyphX + fOffsetX, fY1 + fOffsetY );
+					pRenderer->RenderRectangle( vA, vB, vUV1, vUV2 );
+				}
+				else if ( !s_aBitField.IsSet( uiMat ) && iNextLast < i )
+				{
+					iNextLast = i;
+				}
+			}
+
+			fX = TFLOAT( pCharGlyph->iRightPadding + pDef->iCharSpacing + pCharGlyph->uiWidth ) * a_fScale + fGlyphX;
+		}
+
+		iLast = iNextLast;
 	}
-
-	return 0.0f;
 }
 
-// $Barnyard: FUNCTION 006c33c0
-void T2GUIFont::DrawTextSingleLine( const TWCHAR* a_wszText, TFLOAT a_fX, TFLOAT a_fY, TUINT32 a_uiColour, TFLOAT a_fScale )
+// $deBlob: FUNCTION 006f8810
+void T2GUIFont::DrawStringMultiColoured_Imp( const TWCHAR* a_wszString, TINT a_iLength, TFLOAT a_fX, TFLOAT a_fY, const TUINT8* a_pColourIndices, const TUINT32* a_pColours, TFLOAT a_fScale, const TFLOAT* a_pfAlpha )
 {
-	if ( a_wszText && a_wszText[ 0 ] != L'\0' && m_pFontDef )
-		DrawTextSingleLine( a_wszText, TStringManager::String16Length( a_wszText ), a_fX, a_fY, a_uiColour, a_fScale, TNULL );
-}
+	const T2GUIFontDef* pDef      = GetFontDef();
+	T2GUIRenderer*      pRenderer = T2GUI::GetSingleton()->GetRenderer();
+	TINT                iLast     = a_iLength - 1;
+	s_aBitField.Clear();
 
-// $Barnyard: FUNCTION 006c3350
-TFLOAT T2GUIFont::GetCharWidth( TWCHAR a_wcChar, TFLOAT a_fScale )
-{
-	if ( m_pFontDef )
-		return GetTextWidth( &a_wcChar, 1, a_fScale );
+	if ( iLast < 0 )
+		return;
 
-	return 0.0f;
-}
-
-// $Barnyard: FUNCTION 006c32b0
-TFLOAT T2GUIFont::GetTextWidth( const TWCHAR* a_wszText, TINT a_iTextLength, TFLOAT a_fScale )
-{
-	TINT iWidth = 0;
-
-	for ( TINT i = 0; i < a_iTextLength; i++ )
+	while ( GetGlyph( a_wszString[ iLast ] ) == TNULL )
 	{
-		auto pFontDef = m_pFontDef;
-		auto wChar    = a_wszText[ i ];
-
-		if ( auto pCharData = FindCharData( wChar ) )
-			iWidth += pFontDef->iLetterSpacing + pCharData->iRightPadding + pCharData->iLeftPadding + pCharData->ui8CharWidth;
+		if ( --iLast < 0 )
+			return;
 	}
 
-	return iWidth * a_fScale;
+	while ( iLast >= 0 )
+	{
+		TFLOAT                fX        = a_fX;
+		const T2GUIFontGlyph* pGlyph    = GetGlyph( a_wszString[ iLast ] );
+		TUINT                 uiPassMat = pGlyph->GetMaterial();
+
+		s_aBitField.Set( uiPassMat, TTRUE );
+
+		T2GUIMaterial* pMaterial = m_materials[ uiPassMat ];
+		pRenderer->SetMaterial( pMaterial );
+		TFLOAT fInvWidth  = 1.0f / TFLOAT( TINT( T2GUI::GetWidth( pMaterial ) ) );
+		TFLOAT fInvHeight = 1.0f / TFLOAT( TINT( T2GUI::GetHeight( pMaterial ) ) );
+
+		TINT iNextLast = -1;
+		TINT iEnd      = iLast;
+
+		for ( TINT i = 0; i <= iEnd; i++ )
+		{
+			const TWCHAR          wcChar     = a_wszString[ i ];
+			const T2GUIFontGlyph* pCharGlyph = GetGlyph( wcChar );
+
+			if ( pCharGlyph == TNULL )
+				continue;
+
+			// NOTE: retail keeps the scale of the first call ever in a function static
+			static TFLOAT s_fScale = a_fScale;
+			a_fScale               = s_fScale;
+
+			TFLOAT fIconOffsetY = 0.0f;
+
+			if ( TXUIScene::IsPlatformGlyph( wcChar ) )
+			{
+				TFLOAT fMaxHeight = ( !m_bMoreLines && i == 0 && m_bFirstLine ) ? TFLOAT( m_iLineHeight ) * 1.5f : TFLOAT( m_iLineHeight );
+				TFLOAT fHeight    = TFLOAT( pCharGlyph->uiHeight );
+
+				if ( fMaxHeight < fHeight )
+					a_fScale = fMaxHeight / fHeight;
+
+				fIconOffsetY = ( fHeight - fHeight * a_fScale ) * 0.5f;
+			}
+
+			fX = TFLOAT( pCharGlyph->iLeftPadding ) * a_fScale + fX;
+
+			if ( pCharGlyph->uiWidth != 0 && pCharGlyph->uiHeight != 0 )
+			{
+				TUINT uiMat = pCharGlyph->GetMaterial();
+
+				if ( uiMat == uiPassMat )
+				{
+					TUINT32 uiColour = a_pColours[ a_pColourIndices[ i ] ];
+
+					if ( a_pfAlpha == TNULL )
+					{
+						pRenderer->SetColour( uiColour );
+					}
+					else
+					{
+						TFLOAT fAlpha = TFLOAT( uiColour >> 24 ) / 255.0f;
+						TASSERT( fAlpha >= 0 && fAlpha <= 1.0f );
+						pRenderer->SetColour( ( TUINT32( *a_pfAlpha * fAlpha * 255.0f ) << 24 ) | ( uiColour & 0xFFFFFF ) );
+					}
+
+					TUINT  uiHeight = pCharGlyph->uiHeight;
+					TFLOAT fU2      = TFLOAT( pCharGlyph->uiWidth + 1 + pCharGlyph->uiPosX ) * fInvWidth;
+					TFLOAT fV2      = TFLOAT( uiHeight + 1 + pCharGlyph->uiPosY ) * fInvHeight;
+					TFLOAT fTop     = TFLOAT( TINT( ( pCharGlyph->iYOffset + TUINT( pDef->uiHeight ) ) - uiHeight ) ) * a_fScale + a_fY;
+					TFLOAT fU1      = TFLOAT( pCharGlyph->uiPosX ) * fInvWidth;
+					TFLOAT fV1      = TFLOAT( pCharGlyph->uiPosY ) * fInvHeight;
+					TFLOAT fX2      = TFLOAT( pCharGlyph->uiWidth + 1 ) * a_fScale + fX;
+
+					TVector2 vUV2( fU2, fV2 );
+					TVector2 vUV1( fU1, fV1 );
+					TVector2 vB( fX2, TFLOAT( uiHeight + 1 ) * a_fScale + fTop + fIconOffsetY );
+					TVector2 vA( fX, fTop + fIconOffsetY );
+					pRenderer->RenderRectangle( vA, vB, vUV1, vUV2 );
+				}
+				else if ( !s_aBitField.IsSet( uiMat ) && iNextLast < i )
+				{
+					iNextLast = i;
+				}
+			}
+
+			fX = TFLOAT( pCharGlyph->iRightPadding + pDef->iCharSpacing + pCharGlyph->uiWidth ) * a_fScale + fX;
+		}
+
+		iLast = iNextLast;
+	}
 }
 
-// $Barnyard: FUNCTION 006c2dd0
-TFLOAT T2GUIFont::GetLineHeight()
+// $deBlob: FUNCTION 006f8d10
+TFLOAT T2GUIFont::GetStringWidth_Imp( const TWCHAR* a_wszString, TINT a_iLength, TFLOAT a_fScale, t_GetCharWidth a_fnGetCharWidth ) const
 {
-	if ( m_pFontDef )
-		return TFLOAT( m_pFontDef->uiLineHeight );
+	TFLOAT              fWidth = 0.0f;
+	const T2GUIFontDef* pDef   = GetFontDef();
 
-	return 0.0f;
+	for ( ; a_iLength > 0; a_iLength-- )
+	{
+		fWidth = TFLOAT( pDef->iCharSpacing ) + GetGlyphWidth( *a_wszString, a_fnGetCharWidth ) + fWidth;
+		a_wszString++;
+	}
+
+	return fWidth * a_fScale;
 }
 
-// $Barnyard: FUNCTION 006c2df0
-TFLOAT T2GUIFont::GetLinesMargin()
+// $deBlob: FUNCTION 006f8df0
+TINT T2GUIFont::GetNextTextBoxLine( const TWCHAR*& a_rpString, TFLOAT a_fWidth, TFLOAT a_fScale, TFLOAT& a_rfOutWidth, TBOOL a_bWordWrap, t_GetCharWidth a_fnGetCharWidth ) const
 {
-	if ( m_pFontDef )
-		return TFLOAT( m_pFontDef->uiLinesMargin );
+	const T2GUIFontDef* pDef = GetFontDef();
+	const TWCHAR*       pChar = a_rpString;
+	a_rfOutWidth             = 0.0f;
 
-	return 0.0f;
+	if ( !a_bWordWrap )
+	{
+		// Up to the new line or as many characters as fit, the rest of the line is skipped
+		do
+		{
+			TWCHAR wcChar = *pChar;
+
+			if ( wcChar != L'\r' )
+			{
+				if ( wcChar == L'\n' )
+				{
+					pChar++;
+					break;
+				}
+
+				TFLOAT fWidth = a_rfOutWidth + ( TFLOAT( pDef->iCharSpacing ) + GetGlyphWidth( wcChar, a_fnGetCharWidth ) ) * a_fScale;
+
+				if ( a_fWidth < fWidth )
+					break;
+
+				a_rfOutWidth = fWidth;
+			}
+
+			pChar++;
+		} while ( *pChar != L'\0' );
+
+		TINT iNumChars = TINT( pChar - a_rpString );
+
+		if ( ( pChar == a_rpString || pChar[ -1 ] != L'\n' ) && *pChar != L'\0' )
+		{
+			while ( *pChar != L'\n' )
+			{
+				pChar++;
+
+				if ( *pChar == L'\0' )
+				{
+					a_rpString = pChar;
+					return iNumChars;
+				}
+			}
+
+			if ( *pChar != L'\0' )
+				pChar++;
+		}
+
+		a_rpString = pChar;
+		return iNumChars;
+	}
+
+	// Word wrap: the line ends after the last place it can be broken at
+	const TWCHAR* pBreak      = TNULL;
+	TFLOAT        fBreakWidth = 0.0f;
+	const TWCHAR* pWordStart  = TNULL;
+
+	do
+	{
+		TWCHAR wcChar = *pChar;
+
+		if ( wcChar != L'\r' )
+		{
+			if ( wcChar == L'\n' )
+			{
+				fBreakWidth = a_rfOutWidth;
+				pBreak      = pChar + 1;
+				pChar       = pBreak;
+			}
+			else
+			{
+				if ( pWordStart == TNULL )
+					fBreakWidth = a_rfOutWidth;
+
+				TFLOAT fWidth = ( TFLOAT( pDef->iCharSpacing ) + GetGlyphWidth( wcChar, a_fnGetCharWidth ) ) * a_fScale + a_rfOutWidth;
+				a_rfOutWidth  = fWidth;
+
+				if ( fWidth <= a_fWidth )
+				{
+					if ( s_CanBreakBetweenChars( pChar[ 0 ], pChar[ 1 ] ) )
+					{
+						fBreakWidth = a_rfOutWidth;
+						pBreak      = pChar + 1;
+					}
+
+					pWordStart = pBreak;
+					pChar++;
+					continue;
+				}
+			}
+
+			if ( *pChar == L'\0' )
+				fBreakWidth = a_rfOutWidth;
+			else if ( pBreak != TNULL )
+				pChar = pBreak;
+
+			goto LINE_END;
+		}
+
+		pChar++;
+	} while ( *pChar != L'\0' );
+
+	fBreakWidth = a_rfOutWidth;
+
+LINE_END:
+	TINT iNumChars = TINT( pChar - a_rpString );
+
+	if ( iNumChars != 0 )
+	{
+		// Skips the spaces the next line would start with
+		if ( a_fWidth <= a_rfOutWidth )
+		{
+			while ( *pChar != L'\0' && ( ( iswspace( *pChar ) && *pChar != CHAR_NOBREAKSPACE ) || *pChar == CHAR_IDEOGRAPHICSPACE ) && *pChar != L'\n' )
+				pChar++;
+		}
+
+		a_rpString   = pChar;
+		a_rfOutWidth = fBreakWidth;
+		return iNumChars;
+	}
+
+	a_rpString   = pChar + 1;
+	a_rfOutWidth = fBreakWidth;
+	return 0;
 }
 
-#ifdef BARNYARD_LATEST
-
-//-----------------------------------------------------------------------------
-// Wii T2GUIFont
-// NOTE: the Wii functions look the characters up in the 256 character pages of the Wii
-// fonts. Paged fonts aren't supported (the PC retail fonts are used), so they use the PC lookup
-// (FindCharData) and the PC material of a character instead. For reference, the Wii lookup
-// (804a1358, T2GUIFontDef +0xC = TUINT16 min/max[ 256 ][ 2 ], +0x14 = TINT32* maps[ 256 ]):
-//
-//   TUINT uiPage = a_wcChar >> 8;
-//   if ( !pDef->ppPageMaps[ uiPage ] ) return TNULL;
-//   if ( a_wcChar < pDef->pPageRanges[ uiPage ].min || a_wcChar > pDef->pPageRanges[ uiPage ].max ) return TNULL;
-//   TINT iIndex = pDef->ppPageMaps[ uiPage ][ a_wcChar - pDef->pPageRanges[ uiPage ].min ];
-//   return ( iIndex < 0 ) ? TNULL : &pDef->pCharactersData[ iIndex ];
-//
-// and the material of a character is pCharData->Unk6 (+0xB).
-//-----------------------------------------------------------------------------
-
-// The CodeWarrior ctype classes the Wii build tests (characters below 0x100, C locale)
-static TBOOL IsSpaceMSL( TWCHAR a_wcChar )
-{
-	return a_wcChar < 0x80 && std::iswspace( a_wcChar ) != 0;
-}
-
-static TBOOL IsAlnumMSL( TWCHAR a_wcChar )
-{
-	return a_wcChar < 0x80 && std::iswalnum( a_wcChar ) != 0;
-}
-
-// Characters a line can't end with (opening brackets, currency signs), sorted
-static const TUINT16 s_aNoBreakAfter[] = {
-	0x0024, 0x0028, 0x005b, 0x007b, 0x00a3, 0x00a5, 0x2018, 0x201b, 0x201c, 0x201f, 0x2116,
-	0x3008, 0x300a, 0x300c, 0x300e, 0x3010, 0x3014, 0x3016, 0x3018, 0x301a, 0x301d
+// The characters a Japanese line can't end with (opening brackets...) and start with (closing punctuation, small
+// kana...), sorted
+static const TWCHAR s_aJapaneseBeforeChars[] = {
+	0x24, 0x28, 0x5B, 0x7B, 0xA3, 0xA5, 0x2018, 0x201B, 0x201C, 0x201F, 0x2116,
+	0x3008, 0x300A, 0x300C, 0x300E, 0x3010, 0x3014, 0x3016, 0x3018, 0x301A, 0x301D
 };
 
-// Characters a line can't start with (closing punctuation, small kana, prolonged sound marks), sorted
-static const TUINT16 s_aNoBreakBefore[] = {
-	0x0021, 0x0025, 0x0029, 0x002c, 0x002e, 0x003a, 0x003b, 0x003f, 0x005d, 0x007d, 0x00a2, 0x00b0,
-	0x2014, 0x2019, 0x201a, 0x201d, 0x201e, 0x2024, 0x2025, 0x2026, 0x2030, 0x2031, 0x2032, 0x2033,
-	0x203c, 0x2044, 0x3001, 0x3002, 0x3009, 0x300b, 0x300d, 0x300f, 0x3011, 0x3015, 0x3017, 0x3019,
-	0x301b, 0x301c, 0x301e, 0x301f, 0x3041, 0x3043, 0x3045, 0x3047, 0x3049, 0x3063, 0x3083, 0x3085,
-	0x3087, 0x308e, 0x309d, 0x309e, 0x30a1, 0x30a3, 0x30a5, 0x30a7, 0x30a9, 0x30c3, 0x30e3, 0x30e5,
-	0x30e7, 0x30ee, 0x30f5, 0x30f6, 0x30fb, 0x30fc, 0x30fd, 0x30fe
+static const TWCHAR s_aJapaneseAfterChars[] = {
+	0x21, 0x25, 0x29, 0x2C, 0x2E, 0x3A, 0x3B, 0x3F, 0x5D, 0x7D, 0xA2, 0xB0,
+	0x2014, 0x2019, 0x201A, 0x201D, 0x201E, 0x2024, 0x2025, 0x2026, 0x2030, 0x2031, 0x2032, 0x2033,
+	0x203C, 0x2044, 0x3001, 0x3002, 0x3009, 0x300B, 0x300D, 0x300F, 0x3011, 0x3015, 0x3017, 0x3019,
+	0x301B, 0x301C, 0x301E, 0x301F, 0x3041, 0x3043, 0x3045, 0x3047, 0x3049, 0x3063, 0x3083, 0x3085,
+	0x3087, 0x308E, 0x309D, 0x309E, 0x30A1, 0x30A3, 0x30A5, 0x30A7, 0x30A9, 0x30C3, 0x30E3, 0x30E5,
+	0x30E7, 0x30EE, 0x30F5, 0x30F6, 0x30FB, 0x30FC, 0x30FD, 0x30FE
 };
 
-TSTATICASSERT( TARRAYSIZE( s_aNoBreakAfter ) == 21 );
-TSTATICASSERT( TARRAYSIZE( s_aNoBreakBefore ) == 68 );
+// The characters a Chinese line can't start with and end with
+static const TWCHAR s_aChineseAfterChars[] = {
+	0x21, 0x25, 0x29, 0x2C, 0x2E, 0x3A, 0x3B, 0x3F, 0x5D, 0x7D, 0xA2, 0xB0, 0xB7, 0x2019,
+	0x2020, 0x2021, 0x203A, 0x2103, 0x2236, 0x3001, 0x3002, 0x3003, 0x3006, 0x3015, 0x3017, 0x301E,
+	0xFE5A, 0xFE5C, 0xFF01, 0xFF02, 0xFF05, 0xFF07, 0xFF09, 0xFF0C, 0xFF0E, 0xFF1A, 0xFF1B, 0xFF1F,
+	0xFF01, 0xFF3D, 0xFF5D, 0xFF5E
+};
 
-static TBOOL IsInSortedTable( const TUINT16* a_pTable, TINT a_iSize, TUINT a_uiChar )
+static const TWCHAR s_aChineseBeforeChars[] = {
+	0x24, 0x28, 0xA3, 0xA5, 0xB7, 0x2018, 0x3008, 0x300A, 0x300C, 0x300E, 0x3010, 0x3014,
+	0x3016, 0x301D, 0xFE59, 0xFE5B, 0xFF04, 0xFF08, 0xFF0E, 0xFF3B, 0xFF5B, 0xFFE1, 0xFFE5
+};
+
+static TBOOL BinarySearchChar( const TWCHAR* a_pChars, TINT a_iNumChars, TWCHAR a_wcChar )
 {
 	TINT iLow  = 0;
-	TINT iHigh = a_iSize;
+	TINT iHigh = a_iNumChars;
 
-	while ( iLow < iHigh )
+	do
 	{
-		TINT iMid = iLow + ( iHigh - iLow ) / 2;
+		TINT iMid = ( iHigh - iLow ) / 2 + iLow;
 
-		if ( a_uiChar < a_pTable[ iMid ] )
+		if ( a_wcChar < a_pChars[ iMid ] )
 			iHigh = iMid;
-		else if ( a_uiChar > a_pTable[ iMid ] )
+		else if ( a_wcChar > a_pChars[ iMid ] )
 			iLow = iMid + 1;
 		else
 			return TTRUE;
-	}
+	} while ( iLow < iHigh );
 
 	return TFALSE;
 }
 
-// $BarnyardWiiJP: FUNCTION 804a13c4
-void T2GUIFont::ResetDrawnMaterials()
+// $deBlob: FUNCTION 006f90f0
+TBOOL CanBreakBetweenChars_Japanese( TWCHAR a_wcChar, TWCHAR a_wcNextChar )
 {
-	for ( TINT i = 0; i < TARRAYSIZE( ms_auiDrawnMaterials ); i++ )
-		ms_auiDrawnMaterials[ i ] = 0;
-}
-
-// $BarnyardWiiJP: FUNCTION 804a0388
-TBOOL T2GUIFont::CanBreakLine( TWCHAR a_wcChar, TWCHAR a_wcNextChar )
-{
-	// Never inside a word
-	if ( IsAlnumMSL( a_wcChar ) && IsAlnumMSL( a_wcNextChar ) )
+	if ( iswalnum( a_wcChar ) && iswalnum( a_wcNextChar ) )
 		return TFALSE;
 
-	if ( IsInSortedTable( s_aNoBreakAfter, TARRAYSIZE( s_aNoBreakAfter ), a_wcChar ) )
+	if ( BinarySearchChar( s_aJapaneseBeforeChars, TARRAYSIZE( s_aJapaneseBeforeChars ), a_wcChar ) )
 		return TFALSE;
 
-	if ( IsInSortedTable( s_aNoBreakBefore, TARRAYSIZE( s_aNoBreakBefore ), a_wcNextChar ) )
+	if ( BinarySearchChar( s_aJapaneseAfterChars, TARRAYSIZE( s_aJapaneseAfterChars ), a_wcNextChar ) )
 		return TFALSE;
 
 	return TTRUE;
 }
 
-// $BarnyardWiiJP: FUNCTION 804a1090
-TINT T2GUIFont::GetLineLength( const TWCHAR** a_ppText, TFLOAT* a_pOutWidth, IconWidthCallback a_fnIconWidth, TBOOL a_bIncludeNewLine, TFLOAT a_fMaxWidth, TFLOAT a_fScale )
+// $deBlob: FUNCTION 006f9190
+TBOOL CanBreakBetweenChars_Chinese( TWCHAR a_wcChar, TWCHAR a_wcNextChar )
 {
-	const TWCHAR* pText = *a_ppText;
+	if ( iswdigit( a_wcChar ) && iswdigit( a_wcNextChar ) )
+		return TFALSE;
 
-	if ( !pText || *pText == L'\0' || !m_pFontDef )
-		return 0;
-
-	// Skip the spaces the line starts with, but not a new line
-	TWCHAR wcChar;
-
-	while ( TTRUE )
+	for ( TINT i = 0; i < TARRAYSIZE( s_aChineseAfterChars ); i++ )
 	{
-		wcChar = *pText;
-
-		if ( wcChar == L'\0' || !IsSpaceMSL( wcChar ) || wcChar == L'\n' )
-			break;
-
-		pText++;
+		if ( a_wcNextChar == s_aChineseAfterChars[ i ] )
+			return TFALSE;
 	}
 
-	if ( wcChar == L'\n' )
+	for ( TINT i = 0; i < TARRAYSIZE( s_aChineseBeforeChars ); i++ )
 	{
-		// An empty line
-		*a_ppText    = pText;
-		*a_pOutWidth = 0.0f;
-		return 1;
+		if ( a_wcChar == s_aChineseBeforeChars[ i ] )
+			return TFALSE;
 	}
 
-	*a_ppText = pText;
-
-	if ( *pText == L'\0' )
-		return 0;
-
-	TFLOAT        fBreakWidth = 0.0f;
-	const TWCHAR* pBreak      = TNULL;
-	*a_pOutWidth              = 0.0f;
-
-	while ( TTRUE )
-	{
-		wcChar = *pText;
-
-		if ( wcChar == L'\r' )
-		{
-			pText++;
-		}
-		else if ( wcChar == L'\n' )
-		{
-			if ( a_bIncludeNewLine )
-				pText++;
-
-			fBreakWidth = *a_pOutWidth;
-			pBreak      = pText;
-
-			if ( !a_bIncludeNewLine )
-				pText++;
-
-			break;
-		}
-		else
-		{
-			TFLOAT fIconWidth;
-
-			if ( !a_fnIconWidth || ( fIconWidth = a_fnIconWidth( wcChar ), fIconWidth == -1.0f ) )
-			{
-				if ( auto pCharData = FindCharData( *pText ) )
-					*a_pOutWidth += a_fScale * ( pCharData->iLeftPadding + pCharData->ui8CharWidth + m_pFontDef->iLetterSpacing + pCharData->iRightPadding );
-			}
-			else
-			{
-				*a_pOutWidth += fIconWidth * a_fScale;
-			}
-
-			if ( ( *a_pOutWidth <= a_fMaxWidth || !pBreak ) && CanBreakLine( pText[ 0 ], pText[ 1 ] ) )
-			{
-				pBreak      = pText + 1;
-				fBreakWidth = *a_pOutWidth;
-			}
-
-			pText++;
-		}
-
-		if ( *pText == L'\0' || ( *a_pOutWidth > a_fMaxWidth && pBreak ) )
-			break;
-	}
-
-	if ( *pText != L'\0' )
-		pText = pBreak;
-	else
-		fBreakWidth = *a_pOutWidth;
-
-	*a_pOutWidth = fBreakWidth;
-	return TINT( pText - *a_ppText );
+	return TTRUE;
 }
 
-// $BarnyardWiiJP: FUNCTION 804a0574
-void T2GUIFont::DrawTextWrapped( const TWCHAR* a_wszText, TUINT32 a_uiColour, TextAlign a_eAlign, CharCallback a_fnCallback, IconWidthCallback a_fnIconWidth, IconRenderCallback a_fnIconRender, TBOOL a_bIncludeNewLine, TFLOAT a_fX, TFLOAT a_fY, TFLOAT a_fWidth, TFLOAT a_fHeight, TFLOAT a_fScale, TINT a_iMaxChars )
+// $deBlob: FUNCTION 006f9200
+TBOOL CanBreakBetweenChars_Default( TWCHAR a_wcChar, TWCHAR a_wcNextChar )
 {
-	if ( !a_wszText || *a_wszText == L'\0' || !m_pFontDef )
-		return;
-
-	TFLOAT fLineAdvance = a_fScale * ( m_pFontDef->uiLineHeight + TINT8( m_pFontDef->uiLinesMargin ) );
-	TINT   iCharsLeft   = 0;
-
-	if ( a_iMaxChars >= 0 )
-		iCharsLeft = a_iMaxChars;
-
-	const TWCHAR* pLine = a_wszText;
-	TFLOAT        fY    = a_fY;
-
-	while ( TTRUE )
-	{
-		TFLOAT fLineWidth;
-		TINT   iLength = GetLineLength( &pLine, &fLineWidth, a_fnIconWidth, a_bIncludeNewLine, a_fWidth, a_fScale );
-
-		if ( iLength == 0 )
-			break;
-
-		TFLOAT fX;
-
-		if ( a_eAlign == TextAlign_Center )
-			fX = a_fX + 0.5f * ( a_fWidth - fLineWidth );
-		else if ( a_eAlign == TextAlign_Right )
-			fX = a_fX + ( a_fWidth - fLineWidth );
-		else
-			fX = a_fX;
-
-		TINT iDrawLength = iLength;
-
-		if ( a_iMaxChars >= 0 )
-		{
-			iDrawLength = TMath::Min( iCharsLeft, iLength );
-			iCharsLeft -= iDrawLength;
-		}
-
-		DrawTextSingleLine( pLine, iDrawLength, a_uiColour, a_fnCallback, a_fnIconWidth, a_fnIconRender, fX, fY, a_fScale );
-
-		if ( a_iMaxChars >= 0 && iCharsLeft <= 0 )
-			break;
-
-		fY += fLineAdvance;
-		pLine += iLength;
-
-		if ( *pLine == L'\0' || fLineAdvance + TMath::Abs( fY - a_fY ) > a_fHeight || ms_bMultipleLines != TTRUE )
-			break;
-	}
+	return ( iswspace( a_wcNextChar ) && T2GUIFont::CHAR_NOBREAKSPACE != a_wcNextChar ) || a_wcNextChar == T2GUIFont::CHAR_IDEOGRAPHICSPACE;
 }
 
-// $BarnyardWiiJP: FUNCTION 804a0898
-void T2GUIFont::DrawTextSingleLine( const TWCHAR* a_wszText, TINT a_iTextLength, TUINT32 a_uiColour, CharCallback a_fnCallback, IconWidthCallback a_fnIconWidth, IconRenderCallback a_fnIconRender, TFLOAT a_fX, TFLOAT a_fY, TFLOAT a_fScale )
+//-----------------------------------------------------------------------------
+// T2GUIFontDef2
+//-----------------------------------------------------------------------------
+
+// $deBlob: FUNCTION 006f98d0
+void T2GUIFontDef2::Init()
 {
-	TFLOAT         fOffsetX  = 0.0f;
-	TFLOAT         fOffsetY  = 0.0f;
-	T2GUIRenderer* pRenderer = T2GUI::GetRenderer();
-
-	ResetDrawnMaterials();
-
-	// Index of the last character of the next material pass
-	TINT iLastChar = -1;
-
-	if ( a_fnIconRender )
-	{
-		// The icons are drawn first, in one go
-		TFLOAT fX = a_fX;
-
-		for ( TINT i = 0; i < a_iTextLength; i++ )
-		{
-			if ( a_fnCallback )
-				a_fnCallback( i, &fOffsetX, &fOffsetY );
-
-			TFLOAT fAdvance    = 0.0f;
-			TFLOAT fLineHeight = TFLOAT( m_pFontDef->uiLineHeight );
-
-			if ( a_fnIconRender( pRenderer, a_wszText[ i ], &fAdvance, fLineHeight, fX + fOffsetX, fOffsetY + ( a_fY + fLineHeight ) ) )
-			{
-				fX += a_fScale * ( fAdvance + m_pFontDef->iLetterSpacing );
-			}
-			else if ( auto pCharData = FindCharData( a_wszText[ i ] ) )
-			{
-				iLastChar = TMath::Max( iLastChar, i );
-				fX += a_fScale * ( m_pFontDef->iLetterSpacing + pCharData->iRightPadding + pCharData->iLeftPadding + pCharData->ui8CharWidth );
-			}
-		}
-	}
-	else
-	{
-		iLastChar = a_iTextLength - 1;
-
-		while ( iLastChar >= 0 && !FindCharData( a_wszText[ iLastChar ] ) )
-			iLastChar--;
-	}
-
-	pRenderer->SetColour( a_uiColour );
-
-	// One pass per material (texture page), starting with the material of the last character
-	while ( iLastChar >= 0 )
-	{
-		TFLOAT fX = a_fX;
-
-		TUINT uiMaterial = GetCharMaterialIndex( a_wszText[ iLastChar ], FindCharData( a_wszText[ iLastChar ] ) );
-		ms_auiDrawnMaterials[ uiMaterial >> 5 ] |= 1 << ( uiMaterial & 31 );
-
-		T2GUIMaterial* pMaterial = m_ppMaterials[ uiMaterial ];
-		pRenderer->SetMaterial( pMaterial );
-		TFLOAT fXToUV = 1.0f / pRenderer->GetWidth( pMaterial );
-		TFLOAT fYToUV = 1.0f / pRenderer->GetHeight( pMaterial );
-
-		TINT iPassLastChar = iLastChar;
-		iLastChar          = -1;
-
-		for ( TINT i = 0; i <= iPassLastChar; i++ )
-		{
-			TFLOAT fIconWidth;
-
-			if ( a_fnIconRender && ( fIconWidth = a_fnIconWidth( a_wszText[ i ] ), fIconWidth > 0.0f ) )
-			{
-				fX += a_fScale * ( fIconWidth + m_pFontDef->iLetterSpacing );
-			}
-			else if ( auto pCharData = FindCharData( a_wszText[ i ] ) )
-			{
-				TFLOAT fPos1X = fX + pCharData->iLeftPadding * a_fScale;
-
-				if ( pCharData->ui8CharWidth != 0 && pCharData->ui8CharHeight != 0 )
-				{
-					TUINT uiCharMaterial = GetCharMaterialIndex( a_wszText[ i ], pCharData );
-
-					if ( uiCharMaterial == uiMaterial )
-					{
-						TFLOAT fPos1Y = a_fY + a_fScale * ( pCharData->iYOffset + m_pFontDef->uiLineHeight - pCharData->ui8CharHeight );
-						TFLOAT fPos2X = fPos1X + ( pCharData->ui8CharWidth + 1 ) * a_fScale;
-						TFLOAT fPos2Y = fPos1Y + ( pCharData->ui8CharHeight + 1 ) * a_fScale;
-
-						if ( a_fnCallback )
-							a_fnCallback( i, &fOffsetX, &fOffsetY );
-
-						pRenderer->RenderRectangle(
-						    { fPos1X + fOffsetX, fPos1Y + fOffsetY },
-						    { fPos2X + fOffsetX, fPos2Y + fOffsetY },
-						    { pCharData->ui16PosX * fXToUV, pCharData->ui16PosY * fYToUV },
-						    { ( pCharData->ui16PosX + pCharData->ui8CharWidth + 1 ) * fXToUV, ( pCharData->ui16PosY + pCharData->ui8CharHeight + 1 ) * fYToUV }
-						);
-					}
-					else if ( ( ms_auiDrawnMaterials[ uiCharMaterial >> 5 ] & ( 1 << ( uiCharMaterial & 31 ) ) ) == 0 && i > iLastChar )
-					{
-						// Drawn by a later pass
-						iLastChar = i;
-					}
-				}
-
-				fX = fPos1X + a_fScale * ( pCharData->iRightPadding + m_pFontDef->iLetterSpacing + pCharData->ui8CharWidth );
-			}
-		}
-	}
+	T2GUIFontManager::CreateFont( this );
 }
 
-// $BarnyardWiiJP: FUNCTION 804a0238
-TFLOAT T2GUIFont::GetTextHeightWrapped( const TWCHAR* a_wszText, IconWidthCallback a_fnIconWidth, TBOOL a_bIncludeNewLine, TINT a_iMaxChars, TFLOAT a_fMaxWidth, TFLOAT a_fScale )
+// $deBlob: FUNCTION 006f98e0
+void T2GUIFontDef2::Deinit()
 {
-	TFLOAT fHeight = 0.0f;
-
-	if ( a_wszText && *a_wszText != L'\0' && m_pFontDef )
-	{
-		TFLOAT        fLineAdvance = a_fScale * ( m_pFontDef->uiLineHeight + TINT8( m_pFontDef->uiLinesMargin ) );
-		TINT          iCharsLeft   = ( a_iMaxChars >= 0 ) ? a_iMaxChars : 0;
-		const TWCHAR* pLine        = a_wszText;
-
-		do
-		{
-			TFLOAT fLineWidth;
-			TINT   iLength = GetLineLength( &pLine, &fLineWidth, a_fnIconWidth, a_bIncludeNewLine, a_fMaxWidth, a_fScale );
-
-			if ( iLength == 0 )
-				break;
-
-			fHeight += fLineAdvance;
-			pLine += iLength;
-
-			if ( a_iMaxChars >= 0 )
-			{
-				iCharsLeft -= iLength;
-
-				if ( iCharsLeft <= 0 )
-					break;
-			}
-
-		} while ( *pLine != L'\0' );
-	}
-
-	return fHeight;
+	T2GUIFontManager::DestroyFont( this );
 }
-
-// $BarnyardWiiJP: FUNCTION 804a0f68
-TFLOAT T2GUIFont::GetTextWidth( const TWCHAR* a_wszText, TINT a_iTextLength, IconWidthCallback a_fnIconWidth, TFLOAT a_fScale )
-{
-	TINT iWidth = 0;
-
-	for ( TINT i = 0; i < a_iTextLength; i++ )
-	{
-		TFLOAT fIconWidth;
-
-		if ( !a_fnIconWidth || ( fIconWidth = a_fnIconWidth( a_wszText[ i ] ), fIconWidth == -1.0f ) )
-		{
-			if ( auto pCharData = FindCharData( a_wszText[ i ] ) )
-				iWidth += pCharData->ui8CharWidth + pCharData->iLeftPadding + m_pFontDef->iLetterSpacing + pCharData->iRightPadding;
-		}
-		else
-		{
-			iWidth += m_pFontDef->iLetterSpacing + TINT( fIconWidth );
-		}
-	}
-
-	return iWidth * a_fScale;
-}
-
-// $BarnyardWiiJP: FUNCTION 804a01a8
-TFLOAT T2GUIFont::GetTextWidth( const TWCHAR* a_wszText, IconWidthCallback a_fnIconWidth, TFLOAT a_fScale )
-{
-	if ( a_wszText && m_pFontDef )
-		return GetTextWidth( a_wszText, TStringManager::String16Length( a_wszText ), a_fnIconWidth, a_fScale );
-
-	return 0.0f;
-}
-
-// $BarnyardWiiJP: FUNCTION 804a0164
-TFLOAT T2GUIFont::GetCharWidth( TWCHAR a_wcChar, IconWidthCallback a_fnIconWidth, TFLOAT a_fScale )
-{
-	if ( m_pFontDef )
-		return GetTextWidth( &a_wcChar, 1, a_fnIconWidth, a_fScale );
-
-	return 0.0f;
-}
-
-#endif // BARNYARD_LATEST
 
 TOSHI_NAMESPACE_END

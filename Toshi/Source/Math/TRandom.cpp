@@ -60,7 +60,12 @@ TOSHI_NAMESPACE_START
 TRandom::TRandom()
 {
 	THPTimer timer = THPTimer();
-	SetSeed( timer.GetRaw32() );
+
+	LARGE_INTEGER liCounter;
+	QueryPerformanceCounter( &liCounter );
+
+	m_uiSeed = liCounter.LowPart;
+	RandInit();
 }
 
 // $deBlob: FUNCTION 00673e00
@@ -130,20 +135,19 @@ void TRandom::RandInit()
 	m_uiRndCnt = RANDSIZ;
 }
 
+// $deBlob: FUNCTION 0057b470
 TINT TRandom::GetInt( TUINT32 a_iLower, TUINT32 a_iUpper )
 {
-	TASSERT( a_iUpper > a_iLower, "a_iLower can't be higher than a_iUpper" );
-
-	unsigned long long rand  = RandRaw();
-	unsigned long long range = a_iUpper - a_iLower;
-	return a_iLower + ( range * rand >> 32 );
+	TASSERT( a_iUpper > a_iLower );
+	return a_iLower + GetInt( a_iUpper - a_iLower );
 }
 
 // $deBlob: FUNCTION 00673db0
 // $Barnyard: FUNCTION 006b5ce0
 TINT TRandom::GetInt( TUINT32 a_iUpper )
 {
-	return GetInt( 0, a_iUpper );
+	// NOTE: unlike GetInt( 0, a_iUpper ) there's no assert
+	return TINT( ( TUINT64( a_iUpper ) * RandRaw() ) >> 32 );
 }
 
 TINT TRandom::GetInt()
@@ -151,12 +155,14 @@ TINT TRandom::GetInt()
 	return RandRaw();
 }
 
+// $deBlob: FUNCTION 0057b420
 // $Barnyard: FUNCTION 00401030
 TFLOAT TRandom::GetFloat()
 {
 	return ( RandRaw() >> 1 ) * 4.6566129E-10f;
 }
 
+// $deBlob: FUNCTION 00590160
 // $Barnyard: FUNCTION 00401080
 TFLOAT TRandom::GetFloatMinMax( TFLOAT a_fLower, TFLOAT a_fUpper )
 {
@@ -164,6 +170,7 @@ TFLOAT TRandom::GetFloatMinMax( TFLOAT a_fLower, TFLOAT a_fUpper )
 }
 
 // Returns a random number from -1 to 1
+// $deBlob: FUNCTION 00718450
 // $Barnyard: FUNCTION 00608c90
 TFLOAT TRandom::GetFloat2()
 {
@@ -177,6 +184,7 @@ void TRandom::SetSeed( TUINT a_uiSeed )
 	RandInit();
 }
 
+// $deBlob: FUNCTION 0079a3d0
 // $Barnyard: FUNCTION 00608c60
 TUINT32 TRandom::RandRaw()
 {

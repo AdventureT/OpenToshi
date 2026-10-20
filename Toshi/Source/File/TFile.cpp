@@ -39,6 +39,8 @@ TINT TFile::CPrintf( const TCHAR* a_szFormat, ... )
 	return iResult;
 }
 
+static TBOOL s_bVerbose = TFALSE;
+
 // $deBlob: FUNCTION 00685e40
 // $Barnyard: FUNCTION 006be700
 TFile* TFile::Create( const TString8& filename, TFILEMODE mode )
@@ -47,17 +49,13 @@ TFile* TFile::Create( const TString8& filename, TFILEMODE mode )
 
 	TFile* pFile = TFileManager::GetSingletonSafe()->CreateFile( filename, mode );
 
-	// NOTE: de Blob only traces while a global trace flag (byte 009a557c) is set
-#ifndef TOSHI_FINAL
-	if ( pFile != TNULL )
+	if ( s_bVerbose )
 	{
-		TTRACE( "TFile::Create - Created file %s with mode %d\n", filename.GetString(), mode );
+		if ( pFile != TNULL )
+			TDebug_FinalPrintf( "TFile::Create - Created file %s with mode %d\n", filename.GetString(), mode );
+		else
+			TDebug_FinalPrintf( "TFile::Create - Failed to create file %s with mode %d\n", filename.GetString(), mode );
 	}
-	else
-	{
-		TTRACE( "TFile::Create - Failed to create file %s with mode %d\n", filename.GetString(), mode );
-	}
-#endif
 
 	return pFile;
 }
@@ -262,7 +260,7 @@ void TFile::SplitPath( const TString8& a_rcPath, TString8& a_rDirectory, TString
 		}
 	}
 
-	a_rDirectory.Copy( "" );
+	a_rDirectory = "";
 	a_rFileName = a_rcPath;
 }
 
@@ -272,8 +270,8 @@ void TFile::SplitPath( const TString8& a_rcPath, TString8& a_rDirectory, TString
 void TFile::Destroy()
 {
 	// NOTE: retail checks this != TNULL
-	TVALIDPTR( m_pFileSystem );
-	m_pFileSystem->DestroyFile( this );
+	if ( this )
+		m_pFileSystem->DestroyFile( this );
 }
 
 TOSHI_NAMESPACE_END

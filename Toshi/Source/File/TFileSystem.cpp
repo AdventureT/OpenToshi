@@ -22,6 +22,12 @@ TFileSystem::TFileSystem( const TCHAR* name )
 {
 }
 
+// $deBlob: FUNCTION 00685d60
+// $Barnyard: FUNCTION 006bdd10
+TFileSystem::~TFileSystem()
+{
+}
+
 // $deBlob: FUNCTION 00685db0
 // $Barnyard: FUNCTION 006bdd30
 void TFileSystem::SetPrefix( const TString8& a_rcPrefix )

@@ -14,6 +14,8 @@
 
 TOSHI_NAMESPACE_START
 
+const TCHAR* TD3DAdapter::Mode::Device::DEVICETYPES[ NUMSUPPORTEDDEVICES ] = { "HAL", "REF" };
+
 //-----------------------------------------------------------------------------
 // TD3DAdapter::Mode::Device
 //-----------------------------------------------------------------------------
@@ -93,6 +95,7 @@ TD3DAdapter::Mode::Mode()
 
 // $deBlob: FUNCTION 006aa0f0
 // $deBlob: FUNCTION 006aa710
+// $deBlob: FUNCTION 006aa740
 TD3DAdapter::Mode::~Mode()
 {
 }
@@ -156,6 +159,12 @@ TRenderAdapter::Mode::Device* TD3DAdapter::Mode::GetDevice( TINT a_iDevice )
 void TD3DAdapter::Mode::SetDescription( const DXGI_MODE_DESC& a_rDescription )
 {
 	m_Description = a_rDescription;
+}
+
+// $deBlob: FUNCTION 006b35e0
+DXGI_MODE_DESC* TD3DAdapter::Mode::GetDescription()
+{
+	return &m_Description;
 }
 
 // $deBlob: FUNCTION 006b39e0
@@ -228,25 +237,25 @@ const TCHAR* TD3DAdapter::GetDriverDescription() const
 // NOTE: the four version getters read the LUID of the adapter (TOSHI's DX8 adapter kept the driver version there)
 
 // $deBlob: FUNCTION 006b3650
-TUINT16 TD3DAdapter::GetProductID() const
+TUINT TD3DAdapter::GetProductID() const
 {
 	return HIWORD( m_AdapterLuid.HighPart );
 }
 
 // $deBlob: FUNCTION 006b3660
-TUINT16 TD3DAdapter::GetVersion() const
+TUINT TD3DAdapter::GetVersion() const
 {
 	return LOWORD( m_AdapterLuid.HighPart );
 }
 
 // $deBlob: FUNCTION 006b3670
-TUINT16 TD3DAdapter::GetSubVersion() const
+TUINT TD3DAdapter::GetSubVersion() const
 {
 	return HIWORD( m_AdapterLuid.LowPart );
 }
 
 // $deBlob: FUNCTION 006b3680
-TUINT16 TD3DAdapter::GetBuild() const
+TUINT TD3DAdapter::GetBuild() const
 {
 	return LOWORD( m_AdapterLuid.LowPart );
 }
@@ -255,6 +264,12 @@ TUINT16 TD3DAdapter::GetBuild() const
 TUINT32 TD3DAdapter::GetNumSupportedDevices() const
 {
 	return Mode::NUMSUPPORTEDDEVICES;
+}
+
+// $deBlob: FUNCTION 006b36b0
+// (called after EnumerateOutputs, only by BuildAdapterDatabase); empty in de Blob
+void TD3DAdapter::EnumerateDevices( TRenderDX11* a_pRender )
+{
 }
 
 // $deBlob: FUNCTION 006b36d0
@@ -315,7 +330,7 @@ void TD3DAdapter::EnumerateOutputs( TRenderDX11* a_pRender, IDXGIAdapter* a_pDXG
 				GetModeList()->InsertTail( pMode );
 			}
 
-			TFree( pModes );
+			operator delete( pModes );
 		}
 
 		uiDisplayIndex++;

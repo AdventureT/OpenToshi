@@ -15,7 +15,7 @@ public:
 		TINT iItemIndex; // 0x4
 	};
 
-	inline static constexpr TINT INVALID_BUCKET_ID = -1;
+	static TCONSTEXPR_VAR TINT INVALID_BUCKET_ID = -1;
 
 	using t_ItemCompareFunc = TBOOL ( * )( void* a_pMem1, void* a_pMem2, TINT a_iSize );
 	using t_ItemHashFunc    = TUINT32 ( * )( void* a_pMem, TINT a_iSize, TINT a_iMaxValue );
@@ -58,8 +58,8 @@ private:
 	TINT              m_iItemSize;           // 0x04
 	TINT              m_iItemCount;          // 0x08
 	TINT              m_iItemCountTotal;     // 0x0C
-	TINT              m_iHashNodeCount;      // 0x10
-	TINT              m_iHashNodeCountTotal; // 0x14 number of used nodes
+	TINT              m_iHashNodeCountTotal;      // 0x10 capacity
+	TINT              m_iHashNodeCount;      // 0x14 number of used nodes
 	TINT*             m_pBuckets;            // 0x18
 	HashNode*         m_pHashNodes;          // 0x1C
 	TBYTE*            m_pItems;              // 0x20

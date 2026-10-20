@@ -12,6 +12,8 @@
 
 TOSHI_NAMESPACE_START
 
+TString16::func_DefaultAllocatorCB TString16::sm_pDefaultAllocatorCB = &GetDefaultAllocatorCB;
+
 // NOTE: inline in the original, an instance of it lives in the game code
 // $Barnyard: FUNCTION 0042b530
 TString16::TString16()
@@ -19,16 +21,19 @@ TString16::TString16()
 {
 }
 
+// NOTE: retail's constructors store a_pAllocator as is (the callers pass GetAllocator() through the inlined default
+// argument); a TNULL allocator falls back to TMalloc/TFree, the same heap as the default allocator
 // $deBlob: FUNCTION 006f0180
 // $Barnyard: FUNCTION 006cc820
 TString16::TString16( T2Allocator* allocator )
 {
 	Reset();
-	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
+	m_pAllocator = allocator;
 	AllocBuffer( 0, TTRUE );
 }
 
-TString16::TString16( TString16&& src ) noexcept
+#ifdef TOSHI_STRING_MOVE
+TString16::TString16( TString16&& src ) TNOEXCEPT
 {
 	TString16::m_pAllocator = src.m_pAllocator;
 	TString16::m_iExcessLen = src.m_iExcessLen;
@@ -36,12 +41,32 @@ TString16::TString16( TString16&& src ) noexcept
 	TString16::m_pBuffer    = src.m_pBuffer;
 	src.Reset();
 }
+#endif
+
+// $deBlob: FUNCTION 006f1050
+TString16& TString16::operator=( const TString16& str )
+{
+	Copy( str, -1 );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006f0170
+T2Allocator* TString16::GetAllocator()
+{
+	return sm_pDefaultAllocatorCB();
+}
+
+// $deBlob: FUNCTION 006f0160
+T2Allocator* TString16::GetDefaultAllocatorCB()
+{
+	return GetGlobalAllocator();
+}
 
 // $deBlob: FUNCTION 006f0330
 TString16::TString16( const TString16& src, T2Allocator* allocator )
 {
+	m_pAllocator = allocator;
 	Reset();
-	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
 	Copy( src, -1 );
 }
 
@@ -49,7 +74,7 @@ TString16::TString16( const TString16& src, T2Allocator* allocator )
 TString16::TString16( TINT size, T2Allocator* allocator )
 {
 	Reset();
-	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
+	m_pAllocator = allocator;
 	AllocBuffer( size );
 }
 
@@ -57,8 +82,8 @@ TString16::TString16( TINT size, T2Allocator* allocator )
 // $Barnyard: FUNCTION 006cc880
 TString16::TString16( const TWCHAR* src, T2Allocator* allocator )
 {
+	m_pAllocator = allocator;
 	Reset();
-	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
 	*this        = src;
 }
 
@@ -66,9 +91,24 @@ TString16::TString16( const TWCHAR* src, T2Allocator* allocator )
 // $Barnyard: FUNCTION 006cc8f0
 TString16::TString16( const TString8& src, T2Allocator* allocator )
 {
+	m_pAllocator = allocator;
 	Reset();
-	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
 	*this        = src;
+}
+
+// $deBlob: FUNCTION 006f02c0
+TString16::TString16( const TCHAR* src, T2Allocator* allocator )
+{
+	m_pAllocator = allocator;
+	Reset();
+
+	TINT iLength = !src ? 0 : TINT( strlen( src ) );
+	AllocBuffer( iLength, TTRUE );
+
+	if ( iLength != 0 )
+		TStringManager::StringCharToUnicode( m_pBuffer, src, iLength );
+
+	m_pBuffer[ iLength ] = L'\0';
 }
 
 // $deBlob: FUNCTION 006f0710
@@ -82,14 +122,9 @@ void TString16::Copy( const TString16& src, TINT size )
 	AllocBuffer( size, TTRUE );
 
 	if ( size != 0 )
-	{
 		wcsncpy( m_pBuffer, src.m_pBuffer, size );
-		m_pBuffer[ size ] = L'\0';
-	}
-	else
-	{
-		m_pBuffer[ 0 ] = L'\0';
-	}
+
+	m_pBuffer[ size ] = L'\0';
 }
 
 // $deBlob: FUNCTION 006f07b0
@@ -97,7 +132,7 @@ void TString16::Copy( const TString16& src, TINT size )
 void TString16::Copy( const TWCHAR* src, TINT size )
 {
 	// NOTE: unlike Barnyard, de Blob doesn't check for src == m_pBuffer
-	TINT srcLen = src ? TINT( wcslen( src ) ) : 0;
+	TINT srcLen = !src ? 0 : TINT( wcslen( src ) );
 
 	if ( size > srcLen || size == -1 )
 		size = srcLen;
@@ -119,7 +154,7 @@ void TString16::Copy( const TString8& src, TINT size )
 	AllocBuffer( size, TTRUE );
 
 	if ( size != 0 )
-		TStringManager::StringCharToUnicode( m_pBuffer, src.GetString(), size );
+		TStringManager::StringCharToUnicode( m_pBuffer, (const TCHAR*)src, size );
 
 	m_pBuffer[ size ] = L'\0';
 }
@@ -127,7 +162,7 @@ void TString16::Copy( const TString8& src, TINT size )
 // $deBlob: FUNCTION 006f0820
 void TString16::Copy( const TCHAR* src, TINT size )
 {
-	TINT srcLen = src ? TINT( strlen( src ) ) : 0;
+	TINT srcLen = !src ? 0 : TINT( strlen( src ) );
 
 	if ( size > srcLen || size == -1 )
 		size = srcLen;
@@ -144,24 +179,27 @@ void TString16::Copy( const TCHAR* src, TINT size )
 // $Barnyard: FUNCTION 006cca50
 TINT TString16::Find( TWCHAR character, TINT pos ) const
 {
-	if ( !IsIndexValid( pos ) ) return -1;
+	if ( pos > Length() || pos < 0 ) return -1;
 
-	const TWCHAR* foundAt = wcschr( &m_pBuffer[ pos ], character );
-	if ( foundAt == TNULL ) return -1;
+	const TWCHAR* foundAt = wcschr( GetString() + pos, character );
 
-	return (TINT)( foundAt - m_pBuffer );
+	if ( foundAt == TNULL )
+		return -1;
+
+	return (TINT)( foundAt - GetString() );
 }
 
 // $deBlob: FUNCTION 006f0d90
 // $Barnyard: FUNCTION 006cc9f0
 TINT TString16::Find( const TWCHAR* substr, TINT pos ) const
 {
-	if ( !IsIndexValid( pos ) ) return -1;
+	if ( pos > Length() || pos < 0 ) return -1;
 
-	const TWCHAR* foundAt = wcsstr( GetString( pos ), substr );
-	if ( foundAt == TNULL ) return -1;
+	const TWCHAR* foundAt = wcsstr( GetString() + pos, substr );
+	if ( foundAt == TNULL )
+		return -1;
 
-	return (TINT)( foundAt - m_pBuffer );
+	return (TINT)( foundAt - GetString() );
 }
 
 // NOTE: de Blob's TString16 falls back to TMalloc/TFree when it has no allocator
@@ -169,16 +207,25 @@ TINT TString16::Find( const TWCHAR* substr, TINT pos ) const
 // $Barnyard: FUNCTION 006cbfe0
 TBOOL TString16::AllocBuffer( TINT a_iLength, TBOOL freeMemory )
 {
-	TBOOL hasChanged    = TFALSE;
-	TINT  currentLength = Length();
-
 	TASSERT( a_iLength >= 0 );
 
-	if ( a_iLength != currentLength )
+	TBOOL hasChanged;
+
+	if ( a_iLength == TMath::UInt32ToInt32( Length() ) )
+	{
+		hasChanged = TFALSE;
+	}
+	else
 	{
 		if ( a_iLength == 0 )
 		{
-			if ( freeMemory ) FreeMemory( m_pBuffer );
+			if ( freeMemory == TTRUE )
+			{
+				if ( m_pAllocator )
+					m_pAllocator->Free( m_pBuffer );
+				else
+					TFree( m_pBuffer );
+			}
 
 			m_pBuffer    = NullWString;
 			m_iExcessLen = 0;
@@ -187,13 +234,22 @@ TBOOL TString16::AllocBuffer( TINT a_iLength, TBOOL freeMemory )
 		}
 		else
 		{
-			TINT newExcessLen = ( currentLength - a_iLength ) + m_iExcessLen;
+			TINT  iLength       = Length();
+			TUINT newExcessLen = ( m_iExcessLen - a_iLength ) + iLength;
 
-			if ( newExcessLen < 0 || newExcessLen > 0xFF )
+			if ( newExcessLen <= 0xFF )
 			{
-				if ( currentLength > 0 && freeMemory )
+				m_iExcessLen = newExcessLen;
+				hasChanged   = TFALSE;
+			}
+			else
+			{
+				if ( iLength > 0 && freeMemory == TTRUE )
 				{
-					FreeMemory( m_pBuffer );
+					if ( m_pAllocator != TNULL )
+						m_pAllocator->Free( m_pBuffer );
+					else
+						TFree( m_pBuffer );
 				}
 
 				m_pBuffer    = TSTATICCAST( TWCHAR, m_pAllocator ? m_pAllocator->Malloc( ( a_iLength + 1 ) * sizeof( TWCHAR ) ) : TMalloc( ( a_iLength + 1 ) * sizeof( TWCHAR ) ) );
@@ -202,17 +258,12 @@ TBOOL TString16::AllocBuffer( TINT a_iLength, TBOOL freeMemory )
 
 				hasChanged = TTRUE;
 			}
-			else
-			{
-				m_iExcessLen = newExcessLen;
-				hasChanged   = TFALSE;
-			}
 		}
 
 		m_iStrLen = a_iLength;
 	}
 
-	if ( freeMemory ) m_pBuffer[ 0 ] = L'\0';
+	if ( freeMemory == TTRUE ) m_pBuffer[ 0 ] = L'\0';
 	return hasChanged;
 }
 
@@ -236,7 +287,7 @@ TString16& TString16::Format( const TWCHAR* a_pcFormat, ... )
 // $Barnyard: FUNCTION 006cc7d0
 TString16& TString16::operator=( const TCHAR* a_szStr )
 {
-	TINT iLength = a_szStr ? TINT( TStringManager::String8Length( a_szStr ) ) : 0;
+	TINT iLength = !a_szStr ? 0 : TINT( strlen( a_szStr ) );
 	AllocBuffer( iLength, TTRUE );
 
 	if ( iLength != 0 )
@@ -278,17 +329,18 @@ TINT TString16::FindReverse( TWCHAR a_findChar, TINT pos ) const
 {
 	if ( pos == -1 )
 	{
-		pos = m_iStrLen;
+		pos = Length();
 	}
 	else
 	{
 		if ( !IsIndexValid( pos ) ) return -1;
 	}
 
+	const TWCHAR* pBuffer = GetString();
 
-	for ( ; pos > -1; pos-- )
+	for ( ; pos >= 0; pos-- )
 	{
-		if ( a_findChar == m_pBuffer[ pos ] )
+		if ( pBuffer[ pos ] == a_findChar )
 		{
 			return pos;
 		}
@@ -300,17 +352,16 @@ TINT TString16::FindReverse( TWCHAR a_findChar, TINT pos ) const
 // $deBlob: FUNCTION 006f0f00
 void TString16::Truncate( TINT length )
 {
-	TINT iOldLength = Length();
+	TWCHAR* oldBuffer   = m_pBuffer;
+	TINT    iOldLength = Length();
 
-	if ( Length() < length )
+	if ( length > iOldLength )
 	{
-		length = Length();
+		length = iOldLength;
 	}
 
-	TWCHAR* oldBuffer = m_pBuffer;
-
 	TBOOL allocated = AllocBuffer( length, TFALSE );
-	if ( allocated )
+	if ( allocated == TTRUE )
 	{
 		TStringManager::String16Copy( m_pBuffer, oldBuffer, length );
 	}
@@ -318,9 +369,12 @@ void TString16::Truncate( TINT length )
 	m_pBuffer[ length ] = 0;
 
 	// NOTE: Barnyard's port checked the new length here
-	if ( allocated && iOldLength > 0 )
+	if ( allocated == TTRUE && iOldLength > 0 )
 	{
-		FreeMemory( oldBuffer );
+		if ( m_pAllocator != TNULL )
+			m_pAllocator->Free( oldBuffer );
+		else
+			TFree( oldBuffer );
 	}
 }
 
@@ -328,7 +382,16 @@ void TString16::Truncate( TINT length )
 // $Barnyard: FUNCTION 006ccab0
 void TString16::FreeBuffer()
 {
-	if ( Length() > 0 ) FreeMemory( m_pBuffer );
+	if ( Length() > 0 )
+	{
+		if ( m_pAllocator != TNULL )
+			m_pAllocator->Free( m_pBuffer );
+		else
+			TFree( m_pBuffer );
+
+		m_pBuffer = TNULL;
+	}
+
 	Reset();
 }
 
@@ -371,7 +434,7 @@ TString16& TString16::Concat( const TWCHAR* str, TINT size )
 {
 	TINT len = (TINT)TStringManager::String16Length( str );
 
-	if ( ( len < size ) || ( size == -1 ) )
+	if ( size > len || size == -1 )
 	{
 		size = len;
 	}
@@ -379,9 +442,9 @@ TString16& TString16::Concat( const TWCHAR* str, TINT size )
 	TINT    oldLength = m_iStrLen;
 	TWCHAR* oldString = m_pBuffer;
 
-	TBOOL allocated = AllocBuffer( m_iStrLen + size, TFALSE );
+	TBOOL allocated = AllocBuffer( oldLength + size, TFALSE );
 
-	if ( allocated )
+	if ( allocated == TTRUE )
 	{
 		// since it has made a new buffer
 		// it need to copy the old string
@@ -391,11 +454,14 @@ TString16& TString16::Concat( const TWCHAR* str, TINT size )
 	}
 
 	TStringManager::String16Copy( m_pBuffer + oldLength, str, size );
-	m_pBuffer[ m_iStrLen ] = 0;
+	m_pBuffer[ oldLength + size ] = 0;
 
-	if ( allocated && oldLength > 0 )
+	if ( allocated == TTRUE && oldLength > 0 )
 	{
-		FreeMemory( oldString );
+		if ( m_pAllocator != TNULL )
+			m_pAllocator->Free( oldString );
+		else
+			TFree( oldString );
 	}
 
 	return *this;
@@ -405,24 +471,27 @@ TString16& TString16::Concat( const TWCHAR* str, TINT size )
 // $Barnyard: FUNCTION 006cc210
 TString16& TString16::Concat( const TString16& str, TINT size )
 {
-	if ( ( str.Length() < size ) || ( size == -1 ) )
-	{
+	if ( size > str.Length() || size == -1 )
 		size = str.Length();
-	}
 
 	TINT    oldLength = m_iStrLen;
 	TWCHAR* oldString = m_pBuffer;
 
-	TBOOL allocated = AllocBuffer( m_iStrLen + size, TFALSE );
+	TBOOL allocated = AllocBuffer( oldLength + size, TFALSE );
 
-	if ( allocated )
+	if ( allocated == TTRUE )
 		TStringManager::String16Copy( m_pBuffer, oldString, -1 );
 
 	TStringManager::String16Copy( m_pBuffer + oldLength, str.m_pBuffer, size );
-	m_pBuffer[ m_iStrLen ] = 0;
+	m_pBuffer[ oldLength + size ] = 0;
 
-	if ( allocated && oldLength > 0 )
-		FreeMemory( oldString );
+	if ( allocated == TTRUE && oldLength > 0 )
+	{
+		if ( m_pAllocator != TNULL )
+			m_pAllocator->Free( oldString );
+		else
+			TFree( oldString );
+	}
 
 	return *this;
 }
@@ -450,7 +519,7 @@ TString16& TString16::Insert( const TWCHAR* a_wszString, TINT a_iPos, TINT a_iCo
 	else
 	{
 		// Shift the tail (and the terminator) to make room
-		T2String16::Move( m_pBuffer + a_iPos + a_iCount, m_pBuffer + a_iPos, iOldLength - a_iPos );
+		TStringManager::String16Move( m_pBuffer + a_iPos + a_iCount, m_pBuffer + a_iPos, iOldLength - a_iPos );
 	}
 
 	TStringManager::String16Copy( m_pBuffer + a_iPos, a_wszString, a_iCount );
@@ -465,7 +534,8 @@ TString16& TString16::Insert( const TWCHAR* a_wszString, TINT a_iPos, TINT a_iCo
 // $deBlob: FUNCTION 006f0ba0
 TString16& TString16::Insert( const TString16& a_rcString, TINT a_iPos, TINT a_iCount )
 {
-	return Insert( a_rcString.GetString(), a_iPos, a_iCount );
+	Insert( a_rcString.GetString(), a_iPos, a_iCount );
+	return *this;
 }
 
 // $deBlob: FUNCTION 006f0cd0
@@ -477,7 +547,7 @@ TString16& TString16::Delete( TINT a_iPos, TINT a_iCount )
 
 	TBOOL bAllocated = AllocBuffer( iOldLength - a_iCount, TFALSE );
 
-	if ( bAllocated )
+	if ( bAllocated == TTRUE )
 	{
 		TStringManager::String16Copy( m_pBuffer, pOldString, a_iPos );
 		TStringManager::String16Copy( m_pBuffer + a_iPos, pOldString + a_iPos + a_iCount, iOldLength - a_iPos - a_iCount );
@@ -489,8 +559,13 @@ TString16& TString16::Delete( TINT a_iPos, TINT a_iCount )
 
 	m_pBuffer[ m_iStrLen ] = 0;
 
-	if ( bAllocated && iOldLength > 0 )
-		FreeMemory( pOldString );
+	if ( bAllocated == TTRUE && iOldLength > 0 )
+	{
+		if ( m_pAllocator != TNULL )
+			m_pAllocator->Free( pOldString );
+		else
+			TFree( pOldString );
+	}
 
 	return *this;
 }
@@ -503,7 +578,7 @@ TString16& TString16::operator=( const TString8& a_rcStr )
 	AllocBuffer( iLength, TTRUE );
 
 	if ( iLength != 0 )
-		TStringManager::StringCharToUnicode( m_pBuffer, a_rcStr.GetString(), iLength );
+		TStringManager::StringCharToUnicode( m_pBuffer, (const TCHAR*)a_rcStr, iLength );
 
 	m_pBuffer[ iLength ] = L'\0';
 	return *this;
@@ -518,7 +593,7 @@ TString16& TString16::operator=( const TWCHAR* a_wszStr )
 	if ( a_wszStr == m_pBuffer ) return *this;
 #endif
 
-	TINT iLength = a_wszStr ? TINT( wcslen( a_wszStr ) ) : 0;
+	TINT iLength = !a_wszStr ? 0 : TINT( wcslen( a_wszStr ) );
 	AllocBuffer( iLength, TTRUE );
 
 	if ( iLength != 0 )
@@ -596,9 +671,9 @@ TString16 TString16::Mid( TINT a_iFirst, TINT a_iCount ) const
 		a_iCount = Length() - a_iFirst;
 	}
 
-	TString16 strResult( a_iCount, TNULL );
-	TUtil::MemCopy( strResult.GetStringUnsafe(), GetString( a_iFirst ), a_iCount * 2 );
-	strResult[ a_iCount ] = '\0';
+	TString16 strResult = TString16( a_iCount );
+	wcsncpy( strResult.m_pBuffer, m_pBuffer + a_iFirst, a_iCount );
+	strResult.m_pBuffer[ a_iCount ] = 0;
 
 	return strResult;
 }

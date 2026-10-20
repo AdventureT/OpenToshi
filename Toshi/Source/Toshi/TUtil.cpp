@@ -18,6 +18,15 @@
 
 TOSHI_NAMESPACE_START
 
+const TCHAR* const TUtil::kTypeStrings[ LogType_NUMOF ] = {
+	"Info",
+	"Warning",
+	"Error",
+	"Critical"
+};
+TPString8Pool** TUtil::ms_poStringPool;
+TUINT32         TUtil::s_aiCRC32LUT[ CRC_TABSIZE ] = {};
+
 // $deBlob: FUNCTION 0065d2d0
 void TUtil::Destroy()
 {
@@ -83,6 +92,41 @@ void TUtil::ToshiUpdate()
 	TSystemManager::GetSingleton()->Update();
 }
 
+// $deBlob: FUNCTION 0065d470
+// $Barnyard: FUNCTION 006bfcc0
+// NOTE: de Blob's MemCopy is a memmove
+void* TUtil::MemCopy( void* dst, const void* src, TSIZE size )
+{
+	return std::memmove( dst, src, size );
+}
+
+// $deBlob: FUNCTION 0065d490
+// $Barnyard: FUNCTION 006bfcf0
+void* TUtil::MemMove( void* dst, const void* src, TSIZE size )
+{
+	return std::memmove( dst, src, size );
+}
+
+// $deBlob: FUNCTION 0065d4b0
+// $Barnyard: FUNCTION 006bfd10
+void TUtil::MemSet( void* ptr, TINT value, TSIZE size )
+{
+	std::memset( ptr, value, size );
+}
+
+// $deBlob: FUNCTION 0065d4d0
+// $Barnyard: FUNCTION 006bfd50
+void TUtil::MemClear( void* ptr, TSIZE size )
+{
+	std::memset( ptr, 0, size );
+}
+
+// $deBlob: FUNCTION 0065d4f0
+TINT TUtil::MemCompare( const void* ptr1, const void* ptr2, TSIZE size )
+{
+	return std::memcmp( ptr1, ptr2, size );
+}
+
 // $deBlob: FUNCTION 0065d560
 void TUtil::LogConsole( const TCHAR* a_szFormat, ... )
 {
@@ -106,12 +150,14 @@ void TUtil::LogConsole( const TCHAR* a_szFormat, ... )
 void TUtil::LogSet( TLogFile* a_pLogFile )
 {
 	Log( "Changing log file." );
-	TUtil* pUtil = TUtil::GetSingleton();
 
-	if ( pUtil->m_pCurrentLogFile )
-		pUtil->m_pCurrentLogFile->Close();
+	if ( TUtil::GetSingleton()->m_pCurrentLogFile )
+		TUtil::GetSingleton()->m_pCurrentLogFile->Close();
 
-	pUtil->m_pCurrentLogFile = ( !a_pLogFile ) ? pUtil->m_pDefaultLogFile : a_pLogFile;
+	if ( !a_pLogFile )
+		a_pLogFile = TUtil::GetSingleton()->m_pDefaultLogFile;
+
+	TUtil::GetSingleton()->m_pCurrentLogFile = a_pLogFile;
 }
 
 // $deBlob: FUNCTION 0065d610
@@ -151,7 +197,6 @@ void TUtil::Log( LogType a_eLogType, const TCHAR* a_szFormat, ... )
 }
 
 // $deBlob: FUNCTION 0065d750
-// NOTE: retail's TLogFile::Down increments the level (deeper indentation), see TLogFile
 void TUtil::LogDown()
 {
 	if ( IsSingletonCreated() && GetCurrentLogFile() )
@@ -274,7 +319,6 @@ void TUtil::LogUninitialise()
 // $Barnyard: FUNCTION 006bfee0
 void TUtil::Create()
 {
-	// NOTE: inlined in ToshiCreate in retail
 	new TUtil;
 	GetSingleton()->LogInitialise();
 	CRCInitialise();

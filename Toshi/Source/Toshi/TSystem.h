@@ -22,15 +22,7 @@ public:
 
 	void Update();
 
-	// $deBlob: FUNCTION 006616a0
-	// $Barnyard: FUNCTION 006bbc50
-	TBOOL Pause( TBOOL a_bPause )
-	{
-		TBOOL bOldState = m_bPaused;
-		m_bPaused       = a_bPause;
-		m_PauseEmitter.Throw( &a_bPause );
-		return bOldState;
-	}
+	TBOOL Pause( TBOOL a_bPause );
 
 	TEmitter<TSystemManager, TBOOL>& GetPauseEmitter() { return m_PauseEmitter; }
 

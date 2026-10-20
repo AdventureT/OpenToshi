@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include "Toshi/Compiler.h"
 
 using TFLOAT   = float;
 using TDOUBLE  = double;

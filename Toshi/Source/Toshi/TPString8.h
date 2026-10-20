@@ -53,7 +53,7 @@ public:
 	TPString8Pool( T2Allocator* a_pAllocator );
 
 	// Initialises strings from TPString8Initialiser
-	TPString8Pool( TINT a_iUnknown1, TINT a_iUnknown2, T2Allocator* a_pAllocator, void* m_pUnknown3 );
+	TPString8Pool( TINT a_iUnknown1, TINT a_iUnknown2, T2Allocator* a_pAllocator, void* a_pUnknown3 );
 
 	// Releases strings of every TPString8Initialiser and frees every pooled string
 	~TPString8Pool();
@@ -111,10 +111,10 @@ public:
 		}
 	};
 
-	inline static const TString8 ms_sEmpty = TString8( "" );
+	static const TString8 ms_sEmpty;
 
 public:
-	TFORCEINLINE constexpr TPString8()
+	TFORCEINLINE TCONSTEXPR TPString8()
 	    : m_pPtr( TNULL )
 	{}
 
@@ -195,7 +195,6 @@ public:
 	}
 
 	// Compares the pooled string pointers
-	// NOTE: the name is unknown
 	// $Barnyard: FUNCTION 006bc110
 	TINT Compare( const TPString8& a_rcOther ) const
 	{
@@ -204,7 +203,6 @@ public:
 	}
 
 	// Compares the strings alphabetically
-	// NOTE: the name is unknown
 	// $Barnyard: FUNCTION 006bc130
 	TINT CompareStrings( const TPString8& a_rcOther ) const
 	{
@@ -248,7 +246,7 @@ public:
 		return *this;
 	}
 
-	// NOTE: in the original, an out of line copy of operator= that returns the new pointer instead of the string (the callers ignore it)
+	// NOTE: the original returns the new pointer instead of the string (the callers ignore it)
 	// $Barnyard: FUNCTION 0040a0c0
 	TFORCEINLINE TPString8& operator=( const TPString8* pOther )
 	{
@@ -322,7 +320,7 @@ private:
 #ifdef BARNYARD_COMMUNITY_PATCH
 public:
 	// Set once a string pool is destroyed (on shutdown), TPString8 objects don't release their strings after that
-	inline static TBOOL ms_bPoolDestroyed = TFALSE;
+	static TBOOL ms_bPoolDestroyed;
 #endif // BARNYARD_COMMUNITY_PATCH
 
 private:
@@ -358,7 +356,7 @@ public:
 	static TPString8Initialiser* Head() { return ms_pHeadInitialiser; }
 
 private:
-	inline static TPString8Initialiser* ms_pHeadInitialiser;
+	static TPString8Initialiser* ms_pHeadInitialiser;
 
 private:
 	StringMap*            m_pStrings;

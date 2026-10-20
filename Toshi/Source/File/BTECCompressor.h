@@ -43,16 +43,28 @@ public:
 	TBOOL FindMatch( TBYTE* buffer, size_t bufferSize, TBYTE*& offset, size_t& dataSize );
 	void  AllocSubstring( TBYTE* buffer );
 
-	static TBOOL FindNodeInBucket( TBYTE* buffer, Bucket nodeBucket, size_t bufferSize, Node*& out1, Node*& out2 );
+	// The parts of AllocSubstring as functions
+	// Moves the first free node to the used list (no free node: retail throws "SlidingWindow::AllocSubstring: No free
+	// substrings!")
+	Node* AllocNode();
+	// Unlinks the node from its hash bucket and gives it back to the free list
+	void FreeNode( Node* a_pNode );
+	// Links the node into the bucket of the hash of its first a_uiSize bytes
+	static void AddNodeToBucket( Node* a_pNode, Bucket a_pBucket, TINT a_iSize );
 
-	static TUINT32 HashData( TBYTE* data, size_t size )
+	static TBOOL FindNodeInBucket( TBYTE* buffer, Bucket nodeBucket, TINT bufferSize, Node*& out1, Node*& out2 );
+
+	static TUINT32 HashData( TBYTE* data, TINT size )
 	{
 		TUINT32 hash = 0;
-		while ( size != 0 )
+		if ( size > 0 )
 		{
-			hash = (TUINT32)*data ^ hash >> 0x1B ^ hash << 5;
-			size -= 1;
-			data += 1;
+			do
+			{
+				hash = (TUINT32)*data ^ hash >> 0x1B ^ hash << 5;
+				data += 1;
+				size -= 1;
+			} while ( size != 0 );
 		}
 
 		return hash;
@@ -69,7 +81,7 @@ private:
 	Node    m_Root2;
 	TBYTE*  m_Offsets[ 256 ];
 	Bucket* m_Buckets;
-	TUINT32 m_BucketCount;
+	TINT    m_BucketCount;
 };
 
 TOSHI_NAMESPACE_END

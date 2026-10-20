@@ -71,18 +71,14 @@
 #define TCAST( TYPE, VALUE )              ( static_cast<TYPE>( VALUE ) )
 #define TARRAYSIZE( ARRAY )               ( sizeof( ARRAY ) / sizeof( *ARRAY ) )
 #define TOFFSETOF( CLASS, MEMBER )        offsetof( CLASS, MEMBER )
-#define TALIGNAS( VALUE )                 alignas( VALUE )
 #define TINLINE                           inline
 #define TFORCEINLINE                      __forceinline
-#define TNODISCARD                        [[nodiscard]]
 
 #define TANONYMOUSVAR_1( Y )                CONCATTOKEN( _anonymous, Y )
 #define TANONYMOUSVAR( TYPE )               TYPE TANONYMOUSVAR_1( __COUNTER__ )
 #define TANONYMOUSVARC( TYPE, COUNTER )     TYPE TANONYMOUSVAR_1( COUNTER )
 #define TANONYMOUSVARC_GET( TYPE, COUNTER ) TANONYMOUSVAR_1( COUNTER )
 
-#define TDEPRECATED                  [[deprecated]]
-#define TDEPRECATED_REASON( REASON ) [[deprecated( REASON )]]
 
 #define TDECLARE_POINTER_HANDLE( NAME ) typedef void* NAME
 
@@ -144,11 +140,16 @@
 			  TWARN( "%s is not implemented: %s\n", __FUNCTION__, DESC ); \
 		  }                                                               \
 	  }
-#  define TASSERT( X, ... )                                                       \
-	  {                                                                           \
-		  TCALL_ONCE_IF( !( X ) )                                                 \
-		  if ( 1 == TDebug_AssertHandler( #X, __FILE__, __LINE__, __VA_ARGS__ ) ) \
-			  TBREAK();                                                           \
+// Retail's shape: a 4-byte "already fired" flag per assert site, tested before the condition, a __cdecl handler with
+// 4 arguments (expression, file, line, "TASSERT" or the message; the result is ignored), the flag set after the call
+#  define TASSERT( X, ... )                                                \
+	  {                                                                    \
+		  static TINT s_iAssertFired;                                      \
+		  if ( s_iAssertFired == 0 && !( X ) )                             \
+		  {                                                                \
+			  TDebug_AssertHandler( #X, __FILE__, __LINE__, __VA_ARGS__ ); \
+			  s_iAssertFired = 1;                                          \
+		  }                                                                \
 	  }
 #  define TVALIDPTR( PTR ) TASSERT( TDebug_IsValidAddress( PTR ) )
 #else // TOSHI_ENABLE_ASSERTS

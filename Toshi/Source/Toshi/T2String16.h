@@ -9,7 +9,7 @@ TOSHI_NAMESPACE_START
 class T2String16
 {
 public:
-	static constexpr TSIZE SCRATCH_MEM_SIZE = 512;
+	static TCONSTEXPR_VAR TSIZE SCRATCH_MEM_SIZE = 512;
 
 public:
 	static TWCHAR* CreateCopy( const TWCHAR* a_wszString, TSIZE a_uiSize = -1 );
@@ -35,7 +35,7 @@ public:
 	static TWCHAR*       FindString( TWCHAR* str, const TWCHAR* substr );
 	static const TWCHAR* FindString( const TWCHAR* str, const TWCHAR* substr );
 
-	static TSIZE Length( const TWCHAR* str );
+	static TINT Length( const TWCHAR* str );
 
 	static TBOOL IsLowerCase( const TWCHAR* str );
 	static TBOOL IsUpperCase( const TWCHAR* str );
@@ -44,11 +44,9 @@ public:
 	static void ToUpperCase( TWCHAR* str );
 
 	// Converts an ASCII character to upper case (only the low byte of a wide character is used)
-	// NOTE: the name is unknown
 	static TWCHAR CharToUpperCase( TWCHAR a_uiChar );
 	static TWCHAR CharToLowerCase( TWCHAR a_uiChar );
 
-	// NOTE: names unknown
 	static TWCHAR*       FindLastChar( TWCHAR* str, TWCHAR character );
 	static const TWCHAR* FindLastChar( const TWCHAR* str, TWCHAR character );
 	static TUINT32       Hash( const TWCHAR* str );
@@ -70,8 +68,8 @@ public:
 	}
 
 public:
-	static inline T2Allocator* sm_pDefaultAllocatorCB = GetDefaultAllocatorCB();
-	static TWCHAR              ms_aScratchMem[ SCRATCH_MEM_SIZE ];
+	static T2Allocator* sm_pDefaultAllocatorCB;
+	static TWCHAR       ms_aScratchMem[ SCRATCH_MEM_SIZE ];
 };
 
 TOSHI_NAMESPACE_END

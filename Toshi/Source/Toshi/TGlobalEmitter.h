@@ -42,13 +42,12 @@ public:
 	};
 
 public:
-	// Instantiations: 00429630, <ATriggerGuiEvent> 005c26c0
+	// <TApplicationExitEvent>
+	// $deBlob: FUNCTION 006b17e0
 	// $Barnyard: FUNCTION 00429630
-	// TGlobalEmitter<AInteractionActivityEvent> 0059f9a0, TGlobalEmitter<AInteractionManagerEvent> 005a31b0
 	// $Barnyard: FUNCTION 005a31b0
 	// $Barnyard: FUNCTION 0059f9a0
 	// $Barnyard: FUNCTION 005c26c0
-	// <AGameStateControllerEvent>: 00429630, <AAnimalConversationEvent>: 00430410, <AUIDMapClearEvent>: 0040da70, <AUnitDestroyEvent>: 0040fe90
 	// $Barnyard: FUNCTION 00430410
 	// $Barnyard: FUNCTION 0040da70
 	// $Barnyard: FUNCTION 0040fe90
@@ -66,14 +65,21 @@ public:
 	}
 
 public:
-	inline static ListenerList sm_oListeners;
+	static ListenerList sm_oListeners;
 };
+
+// <TApplicationExitEvent>: per-TU dynamic initializers (atexit), then their atexit destructors
+// $deBlob: FUNCTION 0053ecc0
+// $deBlob: FUNCTION 0053f8f0
+// $deBlob: FUNCTION 00858fb0
+// $deBlob: FUNCTION 00859480
+template <class T>
+typename TGlobalEmitter<T>::ListenerList TGlobalEmitter<T>::sm_oListeners;
 
 template <class ReceiverType, class EventType>
 class TGlobalListener : public TGenericGlobalListener<EventType>
 {
 public:
-	// <TApplication, TApplicationExitEvent>: 006ef670
 	// $deBlob: FUNCTION 006ef670
 	void Connect( ReceiverType* receiver, TGenericGlobalListener<EventType>::EventCallback callback )
 	{
@@ -86,7 +92,6 @@ public:
 	}
 };
 
-// <TApplicationExitEvent>: 006ef680
 // $deBlob: FUNCTION 006ef680
 template <class T>
 inline void TGenericGlobalListener<T>::ConnectImpl( void* pReceiver, EventCallback fnCallback )
@@ -97,7 +102,6 @@ inline void TGenericGlobalListener<T>::ConnectImpl( void* pReceiver, EventCallba
 	TGlobalEmitter<T>::sm_oListeners.Push( this );
 }
 
-// Two out-of-line instances, one is <TApplicationExitEvent>
 // $deBlob: FUNCTION 006ef770
 // $deBlob: FUNCTION 006ef7a0
 template <class T>
@@ -128,11 +132,8 @@ template <class T>
 class TGlobalEvent
 {
 public:
-	// TGlobalEvent<AInteractionActivityEvent> 0059f9f0
 	// $Barnyard: FUNCTION 0059f9f0
-	// <AAnimalConversationEvent>: 004303f0
 	// $Barnyard: FUNCTION 004303f0
-	// <AGameStateControllerEvent>: 004296c0, <AInteractionManagerEvent>: 005a32a0
 	// $Barnyard: FUNCTION 004296c0
 	// $Barnyard: FUNCTION 005a32a0
 	virtual void ThrowGlobal() const

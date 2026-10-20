@@ -9,7 +9,6 @@
 
 TOSHI_NAMESPACE_START
 
-// 0x00981ff0 (sorted: the handles are found with a binary search)
 static const TCHAR* s_aV4ParamNames[] = {
 	"",
 	"tambcolour",
@@ -49,10 +48,8 @@ static const TCHAR* s_aV4ParamNames[] = {
 	"{",
 };
 
-// 0x00982080
 static const TCHAR* s_aM44ParamNames[] = { "", "tmodelview", "tmodelviewproj", "tmodelworld", "tproj", "{" };
 
-// 0x00982098
 static const TCHAR* s_aTexParamNames[] = { "", "tcubeenvmap", "tframebuftex", "tlightfalloffmap", "tplanarenvmap", "tshadowtex", "{" };
 
 TSTATICASSERT( TARRAYSIZE( s_aV4ParamNames ) == TRenderParamTable::V4PARAM_NUMOF );
@@ -69,9 +66,9 @@ TRenderParamTable::TRenderParamTable()
 	m_iNumMatrixParams = M44PARAM_NUMOF;
 	m_iNumTexParams    = TEXPARAM_NUMOF;
 
-	m_Vectors  = TSTATICCAST( TVector4, TMemalign( 16, m_iNumV4Params * sizeof( TVector4 ) ) );
-	m_Matrices = TSTATICCAST( TMatrix44, TMemalign( 16, m_iNumMatrixParams * sizeof( TMatrix44 ) ) );
-	m_Textures = TSTATICCAST( TTexture*, TMemalign( 16, m_iNumTexParams * sizeof( TTexture* ) ) );
+	m_Vectors  = new TVector4[ m_iNumV4Params ];
+	m_Matrices = new TMatrix44[ m_iNumMatrixParams ];
+	m_Textures = new TTexture*[ m_iNumTexParams ];
 
 	for ( TINT i = 0; i < m_iNumV4Params; i++ )
 		m_Vectors[ i ] = TVector4( 0.0f, 0.0f, 0.0f, 1.0f ); // TVector4::X0Y0Z0W1
@@ -134,11 +131,12 @@ TRenderParamTable::TRenderParamTable()
 }
 
 // $deBlob: FUNCTION 006b6f40
+// $deBlob: FUNCTION 00691770
 TRenderParamTable::~TRenderParamTable()
 {
-	TFree( m_Vectors );
-	TFree( m_Matrices );
-	TFree( m_Textures );
+	delete m_Vectors;
+	delete m_Matrices;
+	delete m_Textures;
 }
 
 // $deBlob: FUNCTION 006b6ff0

@@ -1,32 +1,25 @@
 #pragma once
+#include "T2GUIElement.h"
 
 TOSHI_NAMESPACE_START
 
-class T2GUIRenderer;
-class T2GUIElement;
-
+// NOTE: de Blob's T2GUIContext (0x3C) is just its root element (Barnyard's has a renderer, a root and a debug canvas)
 class T2GUIContext
 {
 public:
 	T2GUIContext();
-	~T2GUIContext();
+	// NOTE: only the root element's destructor
+	// $deBlob: FUNCTION 006f5430
+	// $deBlob: FUNCTION 006be5f0
+	~T2GUIContext() = default;
 
 	void Tick( TFLOAT a_fDeltaTime );
 	void Render();
 
-	T2GUIRenderer* GetRenderer() const { return m_pRenderer; }
-	T2GUIElement*  GetRootElement() const { return m_pRootElement; }
-	T2GUIElement*  GetDebugCanvas() const { return m_pDebugCanvas; }
-	T2GUIElement*  GetCreatedRootElement() const { return m_pCreatedRootElement; }
-
-	void SetRenderer( T2GUIRenderer* a_pRenderer ) { m_pRenderer = a_pRenderer; }
-	void SetRootElement( T2GUIElement* a_pElement ) { m_pRootElement = a_pElement; }
+	T2GUIElement* GetRootElement() { return &m_oRootElement; }
 
 private:
-	T2GUIRenderer* m_pRenderer;
-	T2GUIElement*  m_pRootElement;
-	T2GUIElement*  m_pCreatedRootElement;
-	T2GUIElement*  m_pDebugCanvas;
+	T2GUIElement m_oRootElement; // 0x00
 };
 
 TOSHI_NAMESPACE_END

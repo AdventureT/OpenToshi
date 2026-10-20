@@ -75,7 +75,7 @@ public:
 		TDECLARE_CLASS_NO_PARENT( PPropertyValueArray );
 	};
 
-	// NOTE: retail registers this TClass as "TManagedPtr" (0x007ceffc). Values of a type that
+	// NOTE: retail registers this TClass as "TManagedPtr". Values of a type that
 	// IsA TManagedPtr hold a pointer to a ref counted block (refcount at +0x0).
 	struct TManagedPtr
 	{
@@ -98,7 +98,7 @@ public:
 	void AddProperty( const Toshi::TPString8& a_rcName, const Toshi::TPString8& a_rcSubName, const PPropertyValue& a_rcValue );
 
 	// Adds a new property with a comment to the end of the list (a_iUnused is ignored, the wrappers pass -1)
-	// NOTE: retail has two copies of this code with the same behaviour, the names are unknown
+	// NOTE: retail has two copies of this code with the same behaviour
 	void AddCommentedProperty( const ::PPropertyName& a_rcName, const PPropertyValue& a_rcValue, const Toshi::TPString8& a_rcComment, TINT a_iUnused );
 	void AddCommentedProperty( const Toshi::TPString8& a_rcName, const PPropertyValue& a_rcValue, const Toshi::TPString8& a_rcComment );
 	void AddCommentedProperty( const Toshi::TPString8& a_rcName, const Toshi::TPString8& a_rcSubName, const PPropertyValue& a_rcValue, const Toshi::TPString8& a_rcComment );
@@ -121,17 +121,12 @@ public:
 	void PutProperty( const Toshi::TPString8& a_rcName, const PPropertyValue& a_rcValue );
 	void PutProperty( const Toshi::TPString8& a_rcName, const Toshi::TPString8& a_rcSubName, const PPropertyValue& a_rcValue );
 
-	// Sorts the properties by their names (unused in retail)
+	// Sorts the properties by their names
 	void Sort();
 
 	Toshi::TDList<PProperty>& GetProperties() { return m_llProperties; }
 
-	//-----------------------------------------------------------------------------
-	// NOTE: everything in this block is unreferenced in retail (the library was built
-	// without function-level linking). Names from JPOG's PPropertyParser.dll where it
-	// has them. Retail has no asserts in the GetRequired* functions, they're the same
-	// code as the GetOptional* ones.
-	//-----------------------------------------------------------------------------
+	// NOTE: retail has no asserts in the GetRequired* functions, they're the same code as the GetOptional* ones.
 	PProperties( PProperties* a_pParent );
 
 	// Return the value of the property if it's of type a_pType, TNULL otherwise
@@ -173,7 +168,7 @@ public:
 	PProperties* GetParentProperties() const { return m_pParent; }
 
 private:
-	PProperties*             m_pParent;        // 0x08, TNULL unless created with the unreferenced PProperties( PProperties* )
+	PProperties*             m_pParent;        // 0x08, TNULL unless created with PProperties( PProperties* )
 	Toshi::TDList<PProperty> m_llProperties;   // 0x0c
 	TINT                     m_iNumProperties; // 0x14
 };

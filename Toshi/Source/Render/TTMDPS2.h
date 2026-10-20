@@ -37,12 +37,12 @@ struct TRBPS2Header
 namespace StaticInstance
 {
 
-static constexpr TFLOAT POSITION_SCALE     = 1.0f / 128.0f;
-static constexpr TFLOAT UV_SCALE           = 1.0f / 4096.0f;
-static constexpr TINT   POSITIONS_HDR_SIZE = 48; // VIF packet header bytes before the position data
-static constexpr TINT   UV_HDR_SIZE        = 12; // header bytes before the UV data
-static constexpr TINT   INDEX_HDR_SIZE     = 4;  // header bytes before the index data
-static constexpr TINT   COLOR_HDR_SIZE     = 4;  // header bytes before the color data
+static TCONSTEXPR_VAR TFLOAT POSITION_SCALE     = 1.0f / 128.0f;
+static TCONSTEXPR_VAR TFLOAT UV_SCALE           = 1.0f / 4096.0f;
+static TCONSTEXPR_VAR TINT   POSITIONS_HDR_SIZE = 48; // VIF packet header bytes before the position data
+static TCONSTEXPR_VAR TINT   UV_HDR_SIZE        = 12; // header bytes before the UV data
+static TCONSTEXPR_VAR TINT   INDEX_HDR_SIZE     = 4;  // header bytes before the index data
+static TCONSTEXPR_VAR TINT   COLOR_HDR_SIZE     = 4;  // header bytes before the color data
 
 struct SubMesh
 {

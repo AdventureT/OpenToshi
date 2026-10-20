@@ -10,7 +10,7 @@
 TOSHI_NAMESPACE_START
 
 // $deBlob: FUNCTION 006eedc0
-TBOOL T2GenericDList::Node::IsLinked() const
+TBOOL T2GenericDList::Node::IsLinkedCall() const
 {
 	return m_pNext != this;
 }
@@ -95,6 +95,10 @@ void T2GenericDList::Clear()
 }
 
 // $deBlob: FUNCTION 006ef010
+// $deBlob: FUNCTION 0059d000
+// $deBlob: FUNCTION 0060e6d0
+// $deBlob: FUNCTION 0060e6e0
+// $deBlob: FUNCTION 006513f0
 TINT T2GenericDList::Size()
 {
 	TINT iSize = 0;
@@ -121,7 +125,7 @@ TBOOL T2GenericDList::IsInList( Node* a_pNode ) const
 {
 	for ( Node* pNode = m_oRoot.m_pNext; pNode != &m_oRoot; pNode = pNode->m_pNext )
 	{
-		if ( pNode == a_pNode )
+		if ( a_pNode == pNode )
 			return TTRUE;
 	}
 

@@ -16,7 +16,7 @@ public:
 	};
 
 public:
-	constexpr T2Atomic32( TINT32 a_iValue = 0 )
+	TCONSTEXPR T2Atomic32( TINT32 a_iValue = 0 )
 	    : m_iValue( a_iValue ) {}
 
 	~T2Atomic32() = default;

@@ -22,8 +22,8 @@ public:
 	virtual TSIZE Tell() OVERRIDE { return 0; } // +0x0C
 	// $deBlob: FUNCTION 0068a320
 	virtual TSIZE GetSize() OVERRIDE { return 0; } // +0x14
-	virtual TCHAR  GetCChar() OVERRIDE;                                                           // +0x1C
-	virtual TWCHAR GetWChar() OVERRIDE;                                                           // +0x20
+	virtual TINT   GetCChar() OVERRIDE;                                                           // +0x1C
+	virtual TINT   GetWChar() OVERRIDE;                                                           // +0x20
 	virtual TINT   PutCChar( TCHAR a_cCharacter ) OVERRIDE;                                       // +0x24
 	virtual TINT   PutWChar( TWCHAR a_wcCharacter ) OVERRIDE;                                     // +0x28
 	virtual TINT   VCPrintf( const TCHAR* a_szFormat, va_list a_vargs ) OVERRIDE;                 // +0x2C
@@ -56,7 +56,7 @@ public:
 	static TNullFileSystem* GetNullFileSystem() { return s_pFileSystem; }
 
 private:
-	inline static TNullFileSystem* s_pFileSystem;
+	static TNullFileSystem* s_pFileSystem;
 };
 
 TOSHI_NAMESPACE_END

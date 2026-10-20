@@ -4,9 +4,7 @@
 TOSHI_NAMESPACE_START
 
 //-----------------------------------------------------------------------------
-// de Blob: Source\Render\TRenderContext_DX11.cpp, class TRenderContextDX11 (vftable ??_7TRenderContextDX11@Toshi@@6B@,
-// size 0x404). Ported from the old repo (Legacy/Toshi/Source/Platform/DX11/TRenderContext_DX11.*) onto
-// OpenBarnyard's TRenderContext.
+// The render context of TRenderDX11.
 //-----------------------------------------------------------------------------
 class TRenderContextDX11 : public TRenderContext
 {

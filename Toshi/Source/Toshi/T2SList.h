@@ -142,7 +142,12 @@ public:
 	T2_DEFINE_ITERATOR( T, T2GenericSList::Node );
 
 public:
+	// $deBlob: FUNCTION 007e0e50
 	T2SList() {}
+	// $deBlob: FUNCTION 007e0ef0
+	// $deBlob: FUNCTION 0061b9d0
+	// $deBlob: FUNCTION 007e0ea0
+	// $deBlob: FUNCTION 00792130
 	~T2SList() { Clear(); }
 
 	void Delete( Iterator iter )
@@ -151,17 +156,36 @@ public:
 		delete TSTATICCAST( T, iter );
 	}
 
+	// de Blob pops the nodes and deletes them (Barnyard removes and deletes Begin())
+	// $deBlob: FUNCTION 0056f230
+	// $deBlob: FUNCTION 007e1010
 	void DeleteAll()
 	{
-		while ( Begin() != End() )
+		while ( !IsEmpty() )
 		{
-			Delete( Begin() );
+			delete TSTATICCAST( T, T2GenericSList::PopFront() );
 		}
 	}
 
+	// $deBlob: FUNCTION 0056f210
+	// $deBlob: FUNCTION 0056f220
+	// $deBlob: FUNCTION 0061baf0
+	// $deBlob: FUNCTION 00792110
+	// $deBlob: FUNCTION 00792120
+	// $deBlob: FUNCTION 007e1000
+	// T2SList<ATerrain2::MaterialEntry> (ACellBucket::CreateInstanceMaterials, ACellBucket::m_oUsedList):
+	// $deBlob: FUNCTION 0061d9f0
 	Iterator Begin() const { return T2GenericSList::Begin(); }
 	Iterator RBegin() const { return T2GenericSList::RBegin(); }
 
+	// $deBlob: FUNCTION 0056f280
+	// $deBlob: FUNCTION 0056f290
+	// $deBlob: FUNCTION 0061bb00
+	// $deBlob: FUNCTION 00792170
+	// $deBlob: FUNCTION 00792180
+	// $deBlob: FUNCTION 007e1030
+	// T2SList<ATerrain2::MaterialEntry> (ACellBucket::CreateInstanceMaterials, ACellBucket::m_oUsedList):
+	// $deBlob: FUNCTION 0061da00
 	Iterator End() const { return T2GenericSList::End(); }
 	Iterator REnd() const { return T2GenericSList::REnd(); }
 
@@ -170,18 +194,35 @@ public:
 
 	Iterator FindNodeBefore( Iterator a_Node ) { return T2GenericSList::FindNodeBefore( a_Node ); }
 
+	// $deBlob: FUNCTION 0061bb20
+	// $deBlob: FUNCTION 007e1180
 	Iterator PopBack() { return T2GenericSList::PopBack(); }
+	// $deBlob: FUNCTION 0056f360
+	// $deBlob: FUNCTION 0056f370
+	// $deBlob: FUNCTION 0061dae0
+	// $deBlob: FUNCTION 007921e0
+	// $deBlob: FUNCTION 007e1190
 	// $Barnyard: FUNCTION 006c7e50
 	Iterator PopFront() { return T2GenericSList::PopFront(); }
 
-	// T2SList<AGoalCollisionUpdateInterface> (node at +4): 00551d40
+	// $deBlob: FUNCTION 0061bb30
+	// $deBlob: FUNCTION 007921f0
+	// $deBlob: FUNCTION 007e11a0
+	void PushBack( T2GenericSList::Node* a_pNode ) { T2GenericSList::PushBack( a_pNode ); }
+
+	// T2SList<T> group of AAINodeHash.cpp, which calls the base function inline
+	// $deBlob: FUNCTION 007e11b0
+	TINT Size() { return T2GenericSList::Size(); }
+
+	// $deBlob: FUNCTION 00792190
+	// $deBlob: FUNCTION 007e1040
 	// $Barnyard: FUNCTION 0057d4c0
 	// $Barnyard: FUNCTION 005fbf00
 	// $Barnyard: FUNCTION 00551d40
 	Iterator Erase( Iterator a_Iterator ) { return T2GenericSList::Erase( a_Iterator, a_Iterator.Next() ); }
 	Iterator Erase( Iterator a_From, Iterator a_To ) { return T2GenericSList::Erase( a_From, a_To ); }
 
-	// Shared (identical code folding) by every instantiation: 005313a0
+	// $deBlob: FUNCTION 0061bb40
 	// $Barnyard: FUNCTION 005313a0
 	Iterator Transfer( Node* a_pNode, T2GenericSList& a_rList ) { return T2GenericSList::Transfer( a_pNode, a_rList ); }
 };
@@ -197,29 +238,28 @@ public:
 
 public:
 	// constructors/destructor
-	// T2SListNodeWrapper<ACollisionModelInstance> 005dfd40 (AInstanceManager, ARegrowthManager)
 	// $Barnyard: FUNCTION 005dfd40
-	constexpr T2SListNodeWrapper() = default;
+	TCONSTEXPR T2SListNodeWrapper() = default;
 
-	constexpr T2SListNodeWrapper( T a_Value )
+	TCONSTEXPR T2SListNodeWrapper( T a_Value )
 	    : m_Value( a_Value ) {}
 
-	constexpr T2SListNodeWrapper( const T2SListNodeWrapper& a_Other )
+	TCONSTEXPR T2SListNodeWrapper( const T2SListNodeWrapper& a_Other )
 	    : m_Value( a_Other.m_Value ) {}
 
-	constexpr T2SListNodeWrapper( T2SListNodeWrapper&& a_Other )
+	TCONSTEXPR T2SListNodeWrapper( T2SListNodeWrapper&& a_Other )
 	    : m_Value( std::move( a_Other.m_Value ) ) {}
 
 	~T2SListNodeWrapper() = default;
 
-	constexpr T&       GetNodeValue() { return m_Value; }
-	constexpr const T& GetNodeValue() const { return m_Value; }
-	constexpr T&       operator->() { return m_Value; }
-	constexpr const T& operator->() const { return m_Value; }
+	TCONSTEXPR T&       GetNodeValue() { return m_Value; }
+	TCONSTEXPR const T& GetNodeValue() const { return m_Value; }
+	TCONSTEXPR T&       operator->() { return m_Value; }
+	TCONSTEXPR const T& operator->() const { return m_Value; }
 
-	constexpr void SetNodeValue( T a_Value ) { m_Value = a_Value; }
+	TCONSTEXPR void SetNodeValue( T a_Value ) { m_Value = a_Value; }
 
-	constexpr T2SListNodeWrapper& operator=( T a_Value )
+	TCONSTEXPR T2SListNodeWrapper& operator=( T a_Value )
 	{
 		SetNodeValue( a_Value );
 		return *this;

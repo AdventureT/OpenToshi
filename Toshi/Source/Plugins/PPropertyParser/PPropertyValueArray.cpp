@@ -14,7 +14,6 @@
 
 TOSHI_NAMESPACE_USING
 
-// NOTE: 00592e70 is the ctor of the TArray<PPropertyValue> base, only called from here
 // $Barnyard: FUNCTION 005968a0
 // $Barnyard: FUNCTION 00592e70
 PPropertyValueArray::PPropertyValueArray( TINT a_iSize )

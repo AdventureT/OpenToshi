@@ -44,4 +44,6 @@ public:
 	virtual const TCHAR* GetButtonFromDoodad( Doodad a_iDoodad ) const override;
 };
 
+TSTATICASSERT( sizeof( TInputDeviceMouse ) == 0x40 );
+
 TOSHI_NAMESPACE_END

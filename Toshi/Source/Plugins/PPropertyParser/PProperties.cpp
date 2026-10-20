@@ -9,7 +9,6 @@
 
 TOSHI_NAMESPACE_USING
 
-// NOTE: GetClass 006b28d0, CreateObject 006b2e70, CreateObjectInPlace 006b2ec0
 TDEFINE_CLASS_NORUNTIME( PProperties );
 TDEFINE_FREELIST_ALLOCATOR( PProperties );
 
@@ -34,7 +33,6 @@ PProperties::PProperties()
 {
 }
 
-// NOTE: 006b3790 is the unreferenced out of line copy, the deleting destructor inlines it
 // $Barnyard: FUNCTION 006b3d80
 // $Barnyard: FUNCTION 006b3790
 PProperties::~PProperties()
@@ -193,7 +191,7 @@ const PPropertyValue* PProperties::GetProperty( const Toshi::TPString8& a_rcName
 }
 
 //-----------------------------------------------------------------------------
-// Unreferenced in retail (see the note in PProperties.h)
+// Not used by the game
 //-----------------------------------------------------------------------------
 
 // $Barnyard: FUNCTION 006b2a20

@@ -29,7 +29,12 @@ public:
 	};
 
 public:
-	TMesh();
+	TMesh()
+	{
+		m_pMaterial    = TNULL;
+		m_pOwnerShader = TNULL;
+		m_State        = State_None;
+	}
 
 	//-----------------------------------------------------------------------------
 	// Own methods
@@ -40,7 +45,14 @@ public:
 	virtual TBOOL Render();
 	virtual void  OnDestroy();
 
-	void SetFlags( State a_eFlags, TBOOL a_bEnable );
+	// $Barnyard: FUNCTION 006ccd60
+	void SetFlags( State a_eFlags, TBOOL a_bEnable )
+	{
+		if ( a_bEnable )
+			m_State |= a_eFlags;
+		else
+			m_State &= ~a_eFlags;
+	}
 
 	void DestroyResource();
 
@@ -51,7 +63,7 @@ public:
 	void     SetOwnerShader( TShader* a_pShader );
 
 	TBOOL IsCreated() const;
-	TBOOL IsValidated() const;
+	TBOOL IsValidated() const { return TBOOL( ( m_State >> 1 ) & 1 ); }
 	TBOOL IsWater() const;
 
 protected:

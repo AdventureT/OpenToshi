@@ -20,10 +20,16 @@ class TString16;
 class TString8
 {
 public:
-	TString8();
+	// $Barnyard: FUNCTION 004024c0
+	// NOTE: inline in retail, it just calls TString8( TNULL )
+	TString8()
+	    : TString8( TSTATICCAST( T2Allocator, TNULL ) )
+	{}
 	TString8( T2Allocator* allocator );
-	TString8( TString8&& src ) noexcept;
-	TString8( const TString8& src, T2Allocator* allocator = TNULL );
+#ifdef TOSHI_STRING_MOVE
+	TString8( TString8&& src ) TNOEXCEPT;
+#endif
+	TString8( const TString8& src, T2Allocator* allocator = TNULL ) TNOEXCEPT;
 	TString8( const TString16& src, T2Allocator* allocator = TNULL );
 	TString8( const TCHAR* src, T2Allocator* allocator = TNULL );
 	TString8( const TWCHAR* src, T2Allocator* allocator = TNULL );
@@ -62,7 +68,7 @@ public:
 	TINT Find( const TCHAR* substr, TINT pos = 0 ) const;
 
 	// Returns const string starting from specified a_iIndex
-	const TCHAR* GetString( TINT a_iIndex = 0 ) const;
+	const TCHAR* GetString( TINT a_iIndex ) const;
 
 	// Returns string starting from specified a_iIndex. Use only if you are sure about what you do!
 	TCHAR* GetStringUnsafe( TINT a_iIndex = 0 );
@@ -101,8 +107,8 @@ public:
 	// $Barnyard: FUNCTION 0060ac20
 	TString8 Left( TINT a_iCount ) const { return Mid( 0, a_iCount ); }
 
-	// Returns a substring contained in a [a_iFrom; end of the string] range
-	TString8 Right( TINT a_iFrom ) const;
+	// Returns the last a_iCount characters (de Blob; Barnyard's Right takes the first index instead)
+	TString8 Right( TINT a_iCount ) const;
 
 	// $deBlob: FUNCTION 006ed910
 	TString8& MakeUpper()
@@ -111,13 +117,7 @@ public:
 		return *this;
 	}
 
-	// $deBlob: FUNCTION 006ed930
-	// $Barnyard: FUNCTION 006bcfc0
-	TString8& MakeLower()
-	{
-		if ( m_pBuffer ) _strlwr( m_pBuffer );
-		return *this;
-	}
+	TString8& MakeLower();
 
 	TINT    Length() const { return m_iStrLen; }
 	TUINT16 ExcessLength() const { return m_iExcessLen; }
@@ -130,8 +130,7 @@ public:
 	TBOOL IsAllLowerCase() const;
 	TBOOL IsAllUpperCase() const;
 	TBOOL IsAllAlphaNumeric() const;
-	// $deBlob: FUNCTION 006ee600
-	TBOOL IsIndexValid( TINT a_iIndex ) const { return a_iIndex <= Length() && a_iIndex >= 0; }
+	TBOOL IsIndexValid( TINT a_iIndex ) const;
 	// $deBlob: FUNCTION 006edc50
 	TBOOL IsEmpty() const { return m_iStrLen == 0; }
 	// $deBlob: FUNCTION 006ee630
@@ -143,44 +142,34 @@ public:
 	TString8 operator+( const TString8& str ) const;
 	TString8 operator+( const TString16& str ) const;
 
-	// $deBlob: FUNCTION 006edd70
-	// $Barnyard: FUNCTION 006bd6e0
-	TString8& operator+=( const TCHAR* cstr )
-	{
-		Concat( cstr, -1 );
-		return *this;
-	}
+	TString8& operator+=( const TCHAR* cstr );
 
-	// $deBlob: FUNCTION 006edc60
-	// $Barnyard: FUNCTION 006bd6c0
-	TString8& operator+=( const TString8& str )
-	{
-		Concat( str, -1 );
-		return *this;
-	}
+	TString8& operator+=( const TString8& str );
 
-	// $deBlob: FUNCTION 006edce0
-	TString8& operator+=( const TString16& str )
-	{
-		Concat( str, -1 );
-		return *this;
-	}
+	TString8& operator+=( const TString16& str );
 
 	TCHAR&       operator[]( TINT a_iIndex ) { return m_pBuffer[ a_iIndex ]; }
 	const TCHAR& operator[]( TINT a_iIndex ) const { return *GetString( a_iIndex ); }
 
-	// $deBlob: FUNCTION 006eda60
-	operator const TCHAR*() const { return m_pBuffer; }
+	// $deBlob: FUNCTION 005532e0
+	const TCHAR* GetString() const
+	{
+		TASSERT( IsIndexValid( 0 ) );
+		return m_pBuffer;
+	}
+
+	// NOTE: retail's conversion returns the buffer without the assert (3 bytes)
+	operator const TCHAR*() const;
 	operator const TBOOL() const { return !IsEmpty(); }
 
 	TBOOL operator!() { return m_iStrLen == 0; }
 	// NOTE: de Blob compares through Compare (Barnyard: strcmp, and its < / <= were inverted)
 	// $deBlob: FUNCTION 006ee470
 	// $Barnyard: FUNCTION 006bd040
-	TBOOL operator==( const TCHAR* cstr ) const { return Compare( cstr, -1 ) == 0; }
+	TBOOL operator==( const TCHAR* cstr ) const { return Compare( cstr, -1 ) ? TFALSE : TTRUE; }
 	// $deBlob: FUNCTION 006ee450
 	// $Barnyard: FUNCTION 006bcff0
-	TBOOL operator==( const TString8& str ) const { return Compare( str.m_pBuffer, -1 ) == 0; }
+	TBOOL operator==( const TString8& str ) const { return Compare( str.m_pBuffer, -1 ) ? TFALSE : TTRUE; }
 	// $deBlob: FUNCTION 006ee4b0
 	TBOOL operator!=( const TCHAR* cstr ) const { return Compare( cstr, -1 ) != 0; }
 	// $deBlob: FUNCTION 006ee490
@@ -202,29 +191,13 @@ public:
 	// $deBlob: FUNCTION 006ee590
 	TBOOL operator>=( const TString8& str ) const { return Compare( str.m_pBuffer, -1 ) >= 0; }
 
-	// $deBlob: FUNCTION 006edbb0
-	// $Barnyard: FUNCTION 006bd6a0
-	TString8& operator=( const TCHAR* cstr )
-	{
-		Copy( cstr, -1 );
-		return *this;
-	}
+	TString8& operator=( const TCHAR* cstr );
 
-	// $deBlob: FUNCTION 006edc00
-	TString8& operator=( const TWCHAR* wcstr )
-	{
-		Copy( wcstr, -1 );
-		return *this;
-	}
+	TString8& operator=( const TWCHAR* wcstr );
 
-	// $deBlob: FUNCTION 006edb30
-	// $Barnyard: FUNCTION 006bd680
-	TString8& operator=( const TString8& str )
-	{
-		Copy( str, -1 );
-		return *this;
-	}
+	TString8& operator=( const TString8& str );
 
+#ifdef TOSHI_STRING_MOVE
 	TString8& operator=( TString8&& str )
 	{
 		FreeBuffer();
@@ -236,17 +209,23 @@ public:
 		str.Reset();
 		return *this;
 	}
+#endif
 
-	// $deBlob: FUNCTION 006edb70
-	TString8& operator=( const TString16& str )
-	{
-		Copy( str, -1 );
-		return *this;
-	}
+	TString8& operator=( const TString16& str );
 
-private:
+public:
 	typedef T2Allocator* ( *func_DefaultAllocatorCB )();
 
+	// Sets the callback giving the allocator of new strings (de Blob: AppStringAllocator)
+	// NOTE: no assert in de Blob
+	static void SetDefaultAllocatorCB( func_DefaultAllocatorCB a_pCallback )
+	{
+		sm_pDefaultAllocatorCB = a_pCallback;
+	}
+
+	static func_DefaultAllocatorCB GetDefaultAllocatorCallback() { return sm_pDefaultAllocatorCB; }
+
+private:
 	// $deBlob: FUNCTION 006ee950
 	// $Barnyard: FUNCTION 006bd700
 	void Reset()
@@ -256,21 +235,12 @@ private:
 		m_iExcessLen = 0;
 	}
 
-	// $deBlob: FUNCTION 006ec610
-	T2Allocator* GetAllocator()
-	{
-		TASSERT( TNULL != sm_pDefaultAllocatorCB );
-		return sm_pDefaultAllocatorCB();
-	}
+	T2Allocator* GetAllocator();
 
-	// $deBlob: FUNCTION 006ec600
-	static T2Allocator* GetDefaultAllocatorCB()
-	{
-		return GetGlobalAllocator();
-	}
+	static T2Allocator* GetDefaultAllocatorCB();
 
 private:
-	static inline func_DefaultAllocatorCB sm_pDefaultAllocatorCB = &GetDefaultAllocatorCB;
+	static func_DefaultAllocatorCB sm_pDefaultAllocatorCB;
 
 private:
 	TCHAR*       m_pBuffer;        // 0x0

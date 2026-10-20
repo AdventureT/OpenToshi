@@ -15,8 +15,8 @@ class T2CharTraits
 public:
 	using CharType                     = CharT;
 	using UCharType                    = std::make_unsigned_t<CharT>;
-	constexpr static TSIZE    CharSize = sizeof( CharType );
-	constexpr static CharType NullChar = 0;
+	static TCONSTEXPR_VAR TSIZE    CharSize = sizeof( CharType );
+	TCONSTEXPR_VAR static CharType NullChar = 0;
 
 public:
 	static TBOOL    IsSpace( TINT a_cChar ) { TUNREACHABLE(); }

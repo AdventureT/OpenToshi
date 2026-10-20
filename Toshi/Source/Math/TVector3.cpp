@@ -3,17 +3,73 @@
 
 TOSHI_NAMESPACE_START
 
-constinit const TVector3 TVector3::VEC_ZERO     = TVector3( 0, 0, 0 );
-constinit const TVector3 TVector3::VEC_POSX     = TVector3( 1, 0, 0 );
-constinit const TVector3 TVector3::VEC_POSY     = TVector3( 0, 1, 0 );
-constinit const TVector3 TVector3::VEC_POSZ     = TVector3( 0, 0, 1 );
-constinit const TVector3 TVector3::VEC_NEGX     = TVector3( -1, 0, 0 );
-constinit const TVector3 TVector3::VEC_NEGY     = TVector3( 0, -1, 0 );
-constinit const TVector3 TVector3::VEC_NEGZ     = TVector3( 0, 0, -1 );
-constinit const TVector3 TVector3::VEC_POSXPOSZ = TVector3( TMath::ONEOVER_SQRT_TWO, 0, TMath::ONEOVER_SQRT_TWO );
-constinit const TVector3 TVector3::VEC_POSXNEGZ = TVector3( TMath::ONEOVER_SQRT_TWO, 0, -TMath::ONEOVER_SQRT_TWO );
-constinit const TVector3 TVector3::VEC_NEGXPOSZ = TVector3( -TMath::ONEOVER_SQRT_TWO, 0, TMath::ONEOVER_SQRT_TWO );
-constinit const TVector3 TVector3::VEC_NEGXNEGZ = TVector3( -TMath::ONEOVER_SQRT_TWO, 0, -TMath::ONEOVER_SQRT_TWO );
+TCONSTINIT const TVector3 TVector3::VEC_ZERO     = TVector3( 0, 0, 0 );
+TCONSTINIT const TVector3 TVector3::VEC_POSX     = TVector3( 1, 0, 0 );
+TCONSTINIT const TVector3 TVector3::VEC_POSY     = TVector3( 0, 1, 0 );
+TCONSTINIT const TVector3 TVector3::VEC_POSZ     = TVector3( 0, 0, 1 );
+TCONSTINIT const TVector3 TVector3::VEC_NEGX     = TVector3( -1, 0, 0 );
+TCONSTINIT const TVector3 TVector3::VEC_NEGY     = TVector3( 0, -1, 0 );
+TCONSTINIT const TVector3 TVector3::VEC_NEGZ     = TVector3( 0, 0, -1 );
+TCONSTINIT const TVector3 TVector3::VEC_POSXPOSZ = TVector3( TMath::ONEOVER_SQRT_TWO, 0, TMath::ONEOVER_SQRT_TWO );
+TCONSTINIT const TVector3 TVector3::VEC_POSXNEGZ = TVector3( TMath::ONEOVER_SQRT_TWO, 0, -TMath::ONEOVER_SQRT_TWO );
+TCONSTINIT const TVector3 TVector3::VEC_NEGXPOSZ = TVector3( -TMath::ONEOVER_SQRT_TWO, 0, TMath::ONEOVER_SQRT_TWO );
+TCONSTINIT const TVector3 TVector3::VEC_NEGXNEGZ = TVector3( -TMath::ONEOVER_SQRT_TWO, 0, -TMath::ONEOVER_SQRT_TWO );
+
+// $deBlob: FUNCTION 00676350
+void TVector3::Abs( const TVector3& vec3 )
+{
+	Set( TMath::Abs( vec3.x ), TMath::Abs( vec3.y ), TMath::Abs( vec3.z ) );
+}
+
+// $deBlob: FUNCTION 006763a0
+void TVector3::Abs()
+{
+	Set( TMath::Abs( x ), TMath::Abs( y ), TMath::Abs( z ) );
+}
+
+// $deBlob: FUNCTION 006763f0
+// $Barnyard: FUNCTION 006cbb20
+TBOOL TVector3::Equals( const TVector3& vec )
+{
+	return x == vec.x && y == vec.y && z == vec.z;
+}
+
+// $deBlob: FUNCTION 00676430
+// $Barnyard: FUNCTION 006c74f0
+TFLOAT TVector3::Magnitude() const
+{
+	return TMath::Sqrt( x * x + y * y + z * z );
+}
+
+// $deBlob: FUNCTION 00676620
+TBOOL TVector3::IsNormalised( TFLOAT fVal ) const
+{
+	TFLOAT fMagSq = MagnitudeSq();
+	return ( ( 1.0f - fVal ) * ( 1.0f - fVal ) ) < fMagSq && fMagSq < ( ( fVal + 1.0f ) * ( fVal + 1.0f ) );
+}
+
+// $deBlob: FUNCTION 006766d0
+TFLOAT TVector3::Distance( const TVector3& vec1, const TVector3& vec2 )
+{
+	return ( vec2 - vec1 ).Magnitude();
+}
+
+// $deBlob: FUNCTION 00676780
+// $Barnyard: FUNCTION 006cbb60
+void TVector3::Lerp( const TVector3& start, const TVector3& finish, float t )
+{
+	TVector3 progress = finish - start;
+	progress.Multiply( t );
+
+	Set( start + progress );
+}
+
+// $deBlob: FUNCTION 006767e0
+// $Barnyard: FUNCTION 006cbba0
+void TVector3::Lerp( const TVector3& finish, float t )
+{
+	Lerp( *this, finish, t );
+}
 
 // $deBlob: FUNCTION 00676840
 void TVector3::Clip( TFLOAT fVal, TFLOAT fVal2 )

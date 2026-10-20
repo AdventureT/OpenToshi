@@ -12,12 +12,7 @@
 
 TOSHI_NAMESPACE_START
 
-// NOTE: in the original, an out of line copy of it just calls TString8( TNULL ) (TString8::TString8( T2Allocator* ))
-// $Barnyard: FUNCTION 004024c0
-TString8::TString8()
-    : TString8( TSTATICCAST( T2Allocator, TNULL ) )
-{
-}
+TString8::func_DefaultAllocatorCB TString8::sm_pDefaultAllocatorCB = &GetDefaultAllocatorCB;
 
 // $deBlob: FUNCTION 006ec650
 // $Barnyard: FUNCTION 006bd790
@@ -30,10 +25,10 @@ TString8::TString8( T2Allocator* allocator )
 
 // $deBlob: FUNCTION 006ec8d0
 // $Barnyard: FUNCTION 006bd910
-TString8::TString8( const TString8& src, T2Allocator* allocator )
+TString8::TString8( const TString8& src, T2Allocator* allocator ) TNOEXCEPT
 {
-	Reset();
 	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
+	Reset();
 	Copy( src, -1 );
 }
 
@@ -49,8 +44,8 @@ TString8::TString8( TINT size, T2Allocator* allocator )
 // $deBlob: FUNCTION 006ec960
 TString8::TString8( const TString16& src, T2Allocator* allocator )
 {
-	Reset();
 	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
+	Reset();
 	Copy( src );
 }
 
@@ -58,8 +53,8 @@ TString8::TString8( const TString16& src, T2Allocator* allocator )
 // $Barnyard: FUNCTION 006bd890
 TString8::TString8( const TCHAR* src, T2Allocator* allocator )
 {
-	Reset();
 	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
+	Reset();
 	Copy( src );
 }
 
@@ -67,12 +62,13 @@ TString8::TString8( const TCHAR* src, T2Allocator* allocator )
 // $Barnyard: FUNCTION 006bd8d0
 TString8::TString8( const TWCHAR* src, T2Allocator* allocator )
 {
-	Reset();
 	m_pAllocator = allocator == TNULL ? GetAllocator() : allocator;
+	Reset();
 	Copy( src );
 }
 
-TString8::TString8( TString8&& src ) noexcept
+#ifdef TOSHI_STRING_MOVE
+TString8::TString8( TString8&& src ) TNOEXCEPT
 {
 	TString8::m_pAllocator = src.m_pAllocator;
 	TString8::m_iExcessLen = src.m_iExcessLen;
@@ -80,13 +76,100 @@ TString8::TString8( TString8&& src ) noexcept
 	TString8::m_pBuffer    = src.m_pBuffer;
 	src.Reset();
 }
+#endif
+
+// $deBlob: FUNCTION 005533a0
+TString8 TString8::Right( TINT a_iCount ) const
+{
+	return Mid( Length() - a_iCount, a_iCount );
+}
+
+// $deBlob: FUNCTION 006ed930
+// $Barnyard: FUNCTION 006bcfc0
+TString8& TString8::MakeLower()
+{
+	if ( m_pBuffer ) _strlwr( m_pBuffer );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006edd70
+// $Barnyard: FUNCTION 006bd6e0
+TString8& TString8::operator+=( const TCHAR* cstr )
+{
+	Concat( cstr, -1 );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006edc60
+// $Barnyard: FUNCTION 006bd6c0
+TString8& TString8::operator+=( const TString8& str )
+{
+	Concat( str, -1 );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006edce0
+TString8& TString8::operator+=( const TString16& str )
+{
+	Concat( str, -1 );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006eda60
+TString8::operator const TCHAR*() const
+{
+	return m_pBuffer;
+}
+
+// $deBlob: FUNCTION 006edbb0
+// $Barnyard: FUNCTION 006bd6a0
+TString8& TString8::operator=( const TCHAR* cstr )
+{
+	Copy( cstr, -1 );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006edc00
+TString8& TString8::operator=( const TWCHAR* wcstr )
+{
+	Copy( wcstr, -1 );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006edb30
+// $Barnyard: FUNCTION 006bd680
+TString8& TString8::operator=( const TString8& str )
+{
+	Copy( str, -1 );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006edb70
+TString8& TString8::operator=( const TString16& str )
+{
+	Copy( str, -1 );
+	return *this;
+}
+
+// $deBlob: FUNCTION 006ec610
+T2Allocator* TString8::GetAllocator()
+{
+	TASSERT( TNULL != sm_pDefaultAllocatorCB );
+	return sm_pDefaultAllocatorCB();
+}
+
+// $deBlob: FUNCTION 006ec600
+T2Allocator* TString8::GetDefaultAllocatorCB()
+{
+	return GetGlobalAllocator();
+}
 
 // $deBlob: FUNCTION 006ece00
 void TString8::Copy( const TString16& src, TINT size )
 {
 	TINT srcLen = src.Length();
 
-	if ( srcLen < size || size == -1 ) { size = srcLen; }
+	if ( size > srcLen || size == -1 ) { size = srcLen; }
 
 	AllocBuffer( size, TTRUE );
 	TStringManager::StringUnicodeToChar( m_pBuffer, src, size );
@@ -113,11 +196,11 @@ void TString8::Copy( const TString8& src, TINT size )
 // $Barnyard: FUNCTION 006bd180
 void TString8::Copy( const TCHAR* src, TINT size )
 {
-	if ( src != m_pBuffer )
+	if ( m_pBuffer != src )
 	{
-		TINT srcLen = src ? TINT( TStringManager::String8Length( src ) ) : 0;
+		TINT srcLen = !src ? 0 : TINT( TStringManager::String8Length( src ) );
 
-		if ( srcLen < size || size == -1 )
+		if ( size > srcLen || size == -1 )
 		{
 			size = srcLen;
 		}
@@ -133,9 +216,9 @@ void TString8::Copy( const TCHAR* src, TINT size )
 // $Barnyard: FUNCTION 006bd240
 void TString8::Copy( const TWCHAR* src, TINT size )
 {
-	TINT srcLen = src ? TINT( TStringManager::String16Length( src ) ) : 0;
+	TINT srcLen = !src ? 0 : TINT( TStringManager::String16Length( src ) );
 
-	if ( srcLen < size || size == -1 ) { size = srcLen; }
+	if ( size > srcLen || size == -1 ) { size = srcLen; }
 
 	AllocBuffer( size, TTRUE );
 
@@ -149,39 +232,44 @@ void TString8::Copy( const TWCHAR* src, TINT size )
 // $Barnyard: FUNCTION 006bcf30
 TINT TString8::Find( TCHAR character, TINT pos ) const
 {
-	if ( !IsIndexValid( pos ) ) return -1;
+	if ( pos > Length() || pos < 0 ) return -1;
 
-	const TCHAR* foundAt = strchr( &m_pBuffer[ pos ], character );
-	if ( foundAt == TNULL ) return -1;
+	const TCHAR* foundAt = strchr( GetString() + pos, character );
+	if ( foundAt != TNULL )
+		return (TINT)( foundAt - GetString() );
 
-	return (TINT)( foundAt - m_pBuffer );
+	return -1;
 }
 
 // $deBlob: FUNCTION 006ed6d0
 // $Barnyard: FUNCTION 006bcef0
 TINT TString8::Find( const TCHAR* substr, TINT pos ) const
 {
-	if ( !IsIndexValid( pos ) ) return -1;
+	if ( pos > Length() || pos < 0 ) return -1;
 
-	const TCHAR* foundAt = strstr( GetString( pos ), substr );
-	if ( foundAt == TNULL ) return -1;
+	const TCHAR* foundAt = strstr( GetString() + pos, substr );
+	if ( foundAt == TNULL )
+		return -1;
 
-	return (TINT)( foundAt - m_pBuffer );
+	return (TINT)( foundAt - GetString() );
 }
 
 // $deBlob: FUNCTION 006ee970
 TBOOL TString8::AllocBuffer( TINT a_iLength, TBOOL a_bFreeMemory )
 {
-	TBOOL   hasChanged    = TFALSE;
-	TUINT32 currentLength = Length();
-
 	TASSERT( a_iLength >= 0 );
 
-	if ( a_iLength != currentLength )
+	TBOOL hasChanged;
+
+	if ( a_iLength == TMath::UInt32ToInt32( Length() ) )
+	{
+		hasChanged = TFALSE;
+	}
+	else
 	{
 		if ( a_iLength == 0 )
 		{
-			if ( a_bFreeMemory ) m_pAllocator->Free( m_pBuffer );
+			if ( a_bFreeMemory == TTRUE ) m_pAllocator->Free( m_pBuffer );
 
 			m_pBuffer    = NullString;
 			m_iExcessLen = 0;
@@ -190,11 +278,17 @@ TBOOL TString8::AllocBuffer( TINT a_iLength, TBOOL a_bFreeMemory )
 		}
 		else
 		{
-			TINT newExcessLen = ( currentLength - a_iLength ) + m_iExcessLen;
+			TINT   iLength        = Length();
+			TUINT  newExcessLen   = ( m_iExcessLen - a_iLength ) + iLength;
 
-			if ( newExcessLen < 0 || newExcessLen > 0xFF )
+			if ( newExcessLen <= 0xFF )
 			{
-				if ( currentLength != 0 && a_bFreeMemory )
+				m_iExcessLen = newExcessLen;
+				hasChanged   = TFALSE;
+			}
+			else
+			{
+				if ( iLength > 0 && a_bFreeMemory == TTRUE )
 				{
 					m_pAllocator->Free( m_pBuffer );
 				}
@@ -205,17 +299,12 @@ TBOOL TString8::AllocBuffer( TINT a_iLength, TBOOL a_bFreeMemory )
 
 				hasChanged = TTRUE;
 			}
-			else
-			{
-				m_iExcessLen = newExcessLen;
-				hasChanged   = TFALSE;
-			}
 		}
 
 		m_iStrLen = a_iLength;
 	}
 
-	if ( a_bFreeMemory ) m_pBuffer[ 0 ] = '\0';
+	if ( a_bFreeMemory == TTRUE ) m_pBuffer[ 0 ] = '\0';
 	return hasChanged;
 }
 
@@ -225,11 +314,9 @@ TString8& TString8::Format( const TCHAR* a_pcFormat, ... )
 {
 	va_list args;
 	va_start( args, a_pcFormat );
-	// TASSERT is only in T2String8
 
 	TCHAR buffer[ 1024 ];
-	TINT  iResult = _vsnprintf( buffer, sizeof( buffer ), a_pcFormat, args );
-	TASSERT( iResult != -1, "PS2/GC/X360 do not correctly support _vsnprintf, this code will cause memory to be clobbered on those platforms! Increase the size of the destination string to avoid this problem" );
+	TStringManager::String8FormatV( buffer, sizeof( buffer ), a_pcFormat, args );
 	Copy( buffer, -1 );
 
 	return *this;
@@ -239,10 +326,7 @@ TString8& TString8::Format( const TCHAR* a_pcFormat, ... )
 TString8& TString8::VFormat( const TCHAR* a_pcFormat, va_list a_vargs )
 {
 	TCHAR buffer[ 0x400 ];
-
-	// TASSERT is only in T2String8
-	TINT iResult = _vsnprintf( buffer, sizeof( buffer ), a_pcFormat, a_vargs );
-	TASSERT( iResult != -1, "PS2/GC/X360 do not correctly support _vsnprintf, this code will cause memory to be clobbered on those platforms! Increase the size of the destination string to avoid this problem" );
+	TStringManager::String8FormatV( buffer, sizeof( buffer ), a_pcFormat, a_vargs );
 	Copy( buffer, -1 );
 
 	return *this;
@@ -291,17 +375,18 @@ TINT TString8::FindReverse( TCHAR a_findChar, TINT pos ) const
 {
 	if ( pos == -1 )
 	{
-		pos = m_iStrLen;
+		pos = Length();
 	}
 	else
 	{
-		if ( !IsIndexValid( pos ) ) return -1;
+		if ( pos > Length() || pos < 0 ) return -1;
 	}
 
+	const TCHAR* pBuffer = GetString();
 
-	for ( ; pos > -1; pos-- )
+	for ( ; pos >= 0; pos-- )
 	{
-		if ( a_findChar == m_pBuffer[ pos ] )
+		if ( pBuffer[ pos ] == a_findChar )
 		{
 			return pos;
 		}
@@ -314,7 +399,7 @@ TINT TString8::FindReverse( TCHAR a_findChar, TINT pos ) const
 // $Barnyard: FUNCTION 006bd5d0
 void TString8::Truncate( TINT length )
 {
-	if ( Length() < length )
+	if ( length > Length() )
 	{
 		length = Length();
 	}
@@ -323,23 +408,29 @@ void TString8::Truncate( TINT length )
 	TINT   iOldLength = Length();
 
 	TBOOL allocated = AllocBuffer( length, TFALSE );
-	if ( allocated )
+	if ( allocated == TTRUE )
 	{
 		TStringManager::String8Copy( m_pBuffer, oldBuffer, length );
 	}
 
 	m_pBuffer[ length ] = 0;
 
-	if ( allocated && iOldLength > 0 )
+	if ( allocated == TTRUE && iOldLength > 0 )
 	{
 		m_pAllocator->Free( oldBuffer );
 	}
 }
 
 // $deBlob: FUNCTION 006ec9f0
+// $deBlob: FUNCTION 0075af40
 void TString8::FreeBuffer()
 {
-	if ( Length() != 0 ) m_pAllocator->Free( m_pBuffer );
+	if ( Length() > 0 )
+	{
+		m_pAllocator->Free( m_pBuffer );
+		m_pBuffer = TNULL;
+	}
+
 	Reset();
 }
 
@@ -368,6 +459,12 @@ const TCHAR* TString8::GetStringSafe( TINT a_iIndex ) const
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006ee600
+TNOINLINE TBOOL TString8::IsIndexValid( TINT a_iIndex ) const
+{
+	return a_iIndex <= Length() && a_iIndex >= 0;
+}
+
 // $deBlob: FUNCTION 006ee7f0
 TCHAR TString8::SetChar( TINT a_iIndex, TCHAR a_cChar )
 {
@@ -394,15 +491,15 @@ TString8& TString8::Concat( const TString8& str, TINT size )
 	TINT   oldLength = m_iStrLen;
 	TCHAR* oldString = m_pBuffer;
 
-	TBOOL allocated = AllocBuffer( m_iStrLen + size, TFALSE );
+	TBOOL allocated = AllocBuffer( oldLength + size, TFALSE );
 
-	if ( allocated )
+	if ( allocated == TTRUE )
 		TStringManager::String8Copy( m_pBuffer, oldString, -1 );
 
 	TStringManager::String8Copy( m_pBuffer + oldLength, str.m_pBuffer, size );
-	m_pBuffer[ m_iStrLen ] = 0;
+	m_pBuffer[ oldLength + size ] = 0;
 
-	if ( allocated && oldLength > 0 )
+	if ( allocated == TTRUE && oldLength > 0 )
 		m_pAllocator->Free( oldString );
 
 	return *this;
@@ -517,16 +614,11 @@ TString8 TString8::Mid( TINT a_iFirst, TINT a_iCount ) const
 		a_iCount = Length() - a_iFirst;
 	}
 
-	TString8 strResult( a_iCount, TNULL );
-	TUtil::MemCopy( strResult.GetStringUnsafe(), GetString( a_iFirst ), a_iCount );
-	strResult[ a_iCount ] = '\0';
+	TString8 strResult = TString8( a_iCount );
+	TUtil::MemCopy( strResult.m_pBuffer, m_pBuffer + a_iFirst, a_iCount );
+	strResult.m_pBuffer[ a_iCount ] = 0;
 
 	return strResult;
-}
-
-TString8 TString8::Right( TINT a_iFrom ) const
-{
-	return Mid( a_iFrom, Length() - a_iFrom );
 }
 
 // $deBlob: FUNCTION 006ed3f0
@@ -569,11 +661,9 @@ TString8& TString8::Concat( const TString16& str, TINT size )
 // $Barnyard: FUNCTION 006bd0e0
 TBOOL TString8::IsAllLowerCase() const
 {
-	TCHAR* pChar = m_pBuffer;
-
-	while ( pChar < m_pBuffer + m_iStrLen )
+	for ( TINT i = 0; i < m_iStrLen; i++ )
 	{
-		TCHAR cChar = *pChar++;
+		TCHAR cChar = m_pBuffer[ i ];
 		if ( cChar >= 'A' && cChar <= 'Z' ) return TFALSE;
 	}
 
@@ -583,11 +673,9 @@ TBOOL TString8::IsAllLowerCase() const
 // $deBlob: FUNCTION 006ed9e0
 TBOOL TString8::IsAllUpperCase() const
 {
-	TCHAR* pChar = m_pBuffer;
-
-	while ( pChar < m_pBuffer + m_iStrLen )
+	for ( TINT i = 0; i < m_iStrLen; i++ )
 	{
-		TCHAR cChar = *pChar++;
+		TCHAR cChar = m_pBuffer[ i ];
 		if ( cChar >= 'a' && cChar <= 'z' ) return TFALSE;
 	}
 
@@ -640,7 +728,8 @@ TString8& TString8::Insert( const TCHAR* a_pcString, TINT a_iIndex, TINT a_iLeng
 // $deBlob: FUNCTION 006ed510
 TString8& TString8::Insert( const TString8& a_rcString, TINT a_iIndex, TINT a_iLength )
 {
-	return Insert( a_rcString.GetString(), a_iIndex, a_iLength );
+	Insert( a_rcString.GetString(), a_iIndex, a_iLength );
+	return *this;
 }
 
 // $deBlob: FUNCTION 006ed630
@@ -777,7 +866,7 @@ TBOOL TString8::EndsWithNoCase( const TCHAR* a_szString, TINT a_iLength /*= -1 *
 // $Barnyard: FUNCTION 006bdab0
 TString8 TString8::operator+( const TCHAR* cstr ) const
 {
-	TString8    strResult( *this );
+	TString8     strResult( *this );
 	const TCHAR* a_pRHS = cstr;
 	TASSERT( a_pRHS );
 	strResult.Concat( TString8( cstr ) );

@@ -1,5 +1,7 @@
 #include "ToshiPCH.h"
 #include "TRenderContext_DX11.h"
+#include "Render/TRender.h"
+#include "Render/TRenderParamTable.h"
 
 //-----------------------------------------------------------------------------
 // Enables memory debugging.
@@ -15,6 +17,8 @@ TRenderContextDX11::TRenderContextDX11( TRender* a_pRender )
 {
 }
 
+// $deBlob: FUNCTION 006ba450
+// $deBlob: FUNCTION 006b96f0
 TRenderContextDX11::~TRenderContextDX11()
 {
 }
@@ -35,8 +39,7 @@ void TRenderContextDX11::Update()
 			ComputeOrthographicFrustum();
 		}
 
-		// TRenderParamTable::SetParameterM44( TRender::s_Interface->m_ParamTable, M44PARAM_PROJ (4), &m_oProjection )
-		TTODO( "TRenderParamTable::SetParameterM44" );
+		TRender::GetSingleton()->GetParamTable()->SetParameterM44( TRenderParamTable::M44PARAM_PROJ, m_oProjection );
 	}
 }
 
@@ -64,7 +67,6 @@ void TRenderContextDX11::ComputePerspectiveProjection()
 // $deBlob: FUNCTION 006b9820
 void TRenderContextDX11::ComputePerspectiveFrustum()
 {
-	// NOTE: the asserts and the planes are the same as in TRenderContext::ComputePerspectiveFrustum
 	TRenderContext::ComputePerspectiveFrustum( m_aFrustumPlanes1, m_oViewportParams, m_oProjParams );
 
 	for ( TINT i = 0; i < WORLDPLANE_NUMOF; i++ )
@@ -105,7 +107,6 @@ void TRenderContextDX11::ComputeOrthographicProjection()
 // $deBlob: FUNCTION 006b9ff0
 void TRenderContextDX11::ComputeOrthographicFrustum()
 {
-	// NOTE: the asserts and the planes are the same as in TRenderContext::ComputeOrthographicFrustum
 	TRenderContext::ComputeOrthographicFrustum( m_aFrustumPlanes1, m_oViewportParams, m_oProjParams );
 
 	for ( TINT i = 0; i < WORLDPLANE_NUMOF; i++ )

@@ -15,7 +15,12 @@ TOSHI_NAMESPACE_START
 
 TINT32 T2Atomic32::Load( MemoryOrders a_eOrder ) const
 {
+#ifdef TOSHI_COMPILER_VS2013
+	// NOTE: VS2013 has no __iso_volatile_load32
+	TINT32 iValue = *TREINTERPRETCAST( const volatile TINT32*, &m_iValue );
+#else
 	TINT32 iValue = __iso_volatile_load32( &m_iValue );
+#endif
 
 	if ( a_eOrder == MEMORY_ORDER_STRONG )
 		_ReadWriteBarrier();

@@ -29,6 +29,9 @@ public:
 	// NOTE: pure virtual in de Blob (__purecall in TTask's vtable), defined in TTask.cpp
 	virtual ~TTask() = 0;
 
+	// The system manager's scheduler
+	TScheduler* GetScheduler();
+
 	virtual TBOOL Create();
 	virtual TBOOL CreateFailed();
 	virtual TBOOL Reset();
@@ -48,7 +51,7 @@ public:
 	void SetParent( TTask* a_pAttachTo );
 
 	// $deBlob: FUNCTION 006f3050
-	TUINT32& GetFlags() { return m_ulFlags; }
+	TUINT32 GetFlags() const { return m_ulFlags; }
 	// $deBlob: FUNCTION 006f3020
 	TBOOL IsCreated() const { return m_ulFlags & FLAGS_CREATED; }
 	// $deBlob: FUNCTION 006f3030

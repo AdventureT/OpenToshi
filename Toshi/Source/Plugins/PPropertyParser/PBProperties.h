@@ -16,11 +16,11 @@
 
 struct PBPropertyLocaleString
 {
-	constexpr PBPropertyLocaleString()
+	TCONSTEXPR PBPropertyLocaleString()
 	    : uiIndex( -1 )
 	{}
 
-	constexpr PBPropertyLocaleString( TUINT a_uiIndex )
+	TCONSTEXPR PBPropertyLocaleString( TUINT a_uiIndex )
 	    : uiIndex( a_uiIndex )
 	{}
 
@@ -116,7 +116,7 @@ public:
 	}
 
 	PBPropertyValue( const PBPropertyValue& other );
-	PBPropertyValue( PBPropertyValue&& other ) noexcept;
+	PBPropertyValue( PBPropertyValue&& other ) TNOEXCEPT;
 
 	~PBPropertyValue();
 
@@ -162,7 +162,6 @@ public:
 	}
 
 	// Returns the localised string of the LocaleString value
-	// NOTE: unreferenced in retail, the name is invented (defined in PBPropertyReader.cpp)
 	const TWCHAR* GetLocalisedString() const;
 
 	const TCHAR* GetString() const
@@ -306,7 +305,7 @@ public:
 	}
 
 	PBPropertyValue& operator=( const PBPropertyValue& other );
-	PBPropertyValue& operator=( PBPropertyValue&& other ) noexcept;
+	PBPropertyValue& operator=( PBPropertyValue&& other ) TNOEXCEPT;
 
 private:
 	void Delete();
@@ -337,97 +336,97 @@ struct PBPropertiesTypeCast
 template <>
 struct PBPropertiesTypeCast<TINT>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Int;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Int;
 };
 
 template <>
 struct PBPropertiesTypeCast<TINT8>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Int;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Int;
 };
 
 template <>
 struct PBPropertiesTypeCast<TINT16>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Int;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Int;
 };
 
 template <>
 struct PBPropertiesTypeCast<TUINT8>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Int;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Int;
 };
 
 template <>
 struct PBPropertiesTypeCast<TUINT16>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Int;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Int;
 };
 
 template <>
 struct PBPropertiesTypeCast<TUINT32>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::UInt32;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::UInt32;
 };
 
 template <>
 struct PBPropertiesTypeCast<TFLOAT>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Float;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Float;
 };
 
 template <>
 struct PBPropertiesTypeCast<TBOOL>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Bool;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Bool;
 };
 
 template <>
 struct PBPropertiesTypeCast<PBProperties*>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Properties;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Properties;
 };
 
 template <>
 struct PBPropertiesTypeCast<const PBProperties*>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Properties;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Properties;
 };
 
 template <>
 struct PBPropertiesTypeCast<PBPropertyValueArray*>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Array;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Array;
 };
 
 template <>
 struct PBPropertiesTypeCast<const PBPropertyValueArray*>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::Array;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::Array;
 };
 
 template <>
 struct PBPropertiesTypeCast<TCHAR*>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::String;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::String;
 };
 
 template <>
 struct PBPropertiesTypeCast<const TCHAR*>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::String;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::String;
 };
 
 template <>
 struct PBPropertiesTypeCast<PBPropertyLocaleString>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::LocaleString;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::LocaleString;
 };
 
 template <>
 struct PBPropertiesTypeCast<Toshi::TString8>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::String;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::String;
 };
 
 #ifdef __TOSHI_TPSTRING8_H__
@@ -435,7 +434,7 @@ struct PBPropertiesTypeCast<Toshi::TString8>
 template <>
 struct PBPropertiesTypeCast<Toshi::TPString8>
 {
-	static constexpr PBPropertyValue::Type type = PBPropertyValue::Type::String;
+	static TCONSTEXPR_VAR PBPropertyValue::Type type = PBPropertyValue::Type::String;
 };
 
 #endif // __TOSHI_TPSTRING8_H__
@@ -470,7 +469,7 @@ public:
 		m_iSize = other.m_iSize;
 	}
 
-	PBPropertyValueArray( PBPropertyValueArray&& other ) noexcept
+	PBPropertyValueArray( PBPropertyValueArray&& other ) TNOEXCEPT
 	{
 		m_pValues       = other.m_pValues;
 		m_iSize         = other.m_iSize;
@@ -565,7 +564,7 @@ public:
 		return *this;
 	}
 
-	PBPropertyValueArray& operator=( PBPropertyValueArray&& other ) noexcept
+	PBPropertyValueArray& operator=( PBPropertyValueArray&& other ) TNOEXCEPT
 	{
 		if ( this != &other )
 		{
@@ -713,7 +712,7 @@ public:
 		Toshi::TStringManager::String8Copy( m_szName, other.m_szName );
 	}
 
-	PBPropertyName( PBPropertyName&& other ) noexcept
+	PBPropertyName( PBPropertyName&& other ) TNOEXCEPT
 	{
 		m_szName       = other.m_szName;
 		other.m_szName = TNULL;
@@ -764,6 +763,62 @@ private:
 
 private:
 	TCHAR* m_szName;
+};
+
+//-----------------------------------------------------------------------------
+// Reads a property value of the given type (PBProperties::GetOptionalPropertyValue)
+//-----------------------------------------------------------------------------
+template <PBPropertyValue::Type TYPE>
+struct PBPropertyValueGetter
+{
+	template <typename T>
+	static void Get( const PBPropertyValue* a_pValue, T& a_rOutValue )
+	{
+		void* rawValue = a_pValue->GetRaw();
+		a_rOutValue    = *(T*)( &rawValue );
+	}
+};
+
+template <>
+struct PBPropertyValueGetter<PBPropertyValue::Type::Float>
+{
+	template <typename T>
+	static void Get( const PBPropertyValue* a_pValue, T& a_rOutValue ) { a_rOutValue = a_pValue->GetFloat(); }
+};
+
+template <>
+struct PBPropertyValueGetter<PBPropertyValue::Type::LocaleString>
+{
+	template <typename T>
+	static void Get( const PBPropertyValue* a_pValue, T& a_rOutValue ) { a_rOutValue = a_pValue->GetLocaleString(); }
+};
+
+template <>
+struct PBPropertyValueGetter<PBPropertyValue::Type::Int>
+{
+	template <typename T>
+	static void Get( const PBPropertyValue* a_pValue, T& a_rOutValue ) { a_rOutValue = a_pValue->GetInteger(); }
+};
+
+template <>
+struct PBPropertyValueGetter<PBPropertyValue::Type::Bool>
+{
+	template <typename T>
+	static void Get( const PBPropertyValue* a_pValue, T& a_rOutValue ) { a_rOutValue = a_pValue->GetBoolean(); }
+};
+
+template <>
+struct PBPropertyValueGetter<PBPropertyValue::Type::UInt32>
+{
+	template <typename T>
+	static void Get( const PBPropertyValue* a_pValue, T& a_rOutValue ) { a_rOutValue = a_pValue->GetUINT32(); }
+};
+
+template <>
+struct PBPropertyValueGetter<PBPropertyValue::Type::String>
+{
+	template <typename T>
+	static void Get( const PBPropertyValue* a_pValue, T& a_rOutValue ) { a_rOutValue = a_pValue->GetString(); }
 };
 
 class PBProperties
@@ -835,7 +890,7 @@ public:
 			m_pValue = new PBPropertyValue( *other.m_pValue );
 		}
 
-		PBProperty( PBProperty&& other ) noexcept
+		PBProperty( PBProperty&& other ) TNOEXCEPT
 		{
 			m_pName        = other.m_pName;
 			m_pValue       = other.m_pValue;
@@ -878,7 +933,7 @@ public:
 			return *this;
 		}
 
-		PBProperty& operator=( PBProperty&& other ) noexcept
+		PBProperty& operator=( PBProperty&& other ) TNOEXCEPT
 		{
 			Delete();
 
@@ -907,7 +962,7 @@ public:
 
 	friend class PPropertiesWriter;
 
-	static constexpr const TCHAR* TRB_SECTION_NAME = "Main";
+	static const TCHAR* const TRB_SECTION_NAME;
 
 public:
 	PBProperties()
@@ -944,7 +999,7 @@ public:
 		m_iCount = other.m_iCount;
 	}
 
-	PBProperties( PBProperties&& other ) noexcept
+	PBProperties( PBProperties&& other ) TNOEXCEPT
 	{
 		m_pParent           = other.m_pParent;
 		m_pProperties       = other.m_pProperties;
@@ -1028,8 +1083,8 @@ public:
 		return TFALSE;
 	}
 
-	// Reads a_szName as an array of 2 numbers
-	// NOTE: unreferenced in retail. Like the other ones, only the type of the first element is checked
+	// Reads a_szName as an array of 2 numbers Like the other ones, only the type of the first element
+	// is checked
 	// $Barnyard: FUNCTION 006b2020
 	TBOOL GetOptionalVector2( Toshi::TVector2& a_rOutValue, const TCHAR* a_szName ) const
 	{
@@ -1053,7 +1108,6 @@ public:
 	}
 
 	// Reads the LocaleString a_szName as the localised string
-	// NOTE: unreferenced in retail, the name is invented (defined in PBPropertyReader.cpp)
 	TBOOL GetOptionalLocalisedString( const TWCHAR*& a_rOutValue, const TCHAR* a_szName ) const;
 
 	// Reads a_szName as an array of 3 numbers
@@ -1141,9 +1195,7 @@ public:
 		return TNULL;
 	}
 
-	// NOTE: retail has a separate copy of this per type that takes the name as a const TPString8&:
-	// 006b1f50 (TFLOAT, same code as 006b2270), 006b1fa0/006b22c0 (TINT), 006b1fe0/006b2300 (TBOOL),
-	// 006b2230 (PBPropertyLocaleString), 006b2470 (TPString8)
+	// NOTE: retail has a separate copy of this per type that takes the name as a const TPString8&
 	// $Barnyard: FUNCTION 006b1f50
 	// $Barnyard: FUNCTION 006b1fa0
 	// $Barnyard: FUNCTION 006b22c0
@@ -1154,36 +1206,21 @@ public:
 	template <typename T>
 	TBOOL GetOptionalPropertyValue( T& a_rOutValue, const TCHAR* a_szName ) const
 	{
-		// Like the original, the TFLOAT version also accepts integers
-		if constexpr ( PBPropertiesTypeCast<T>::type == PBPropertyValue::Type::Float )
-			return GetOptionalFloatOrIntValue( a_rOutValue, a_szName );
-
 		const PBPropertyValue* pFoundProperty = GetProperty( a_szName );
 
 		if ( pFoundProperty && pFoundProperty->GetType() == PBPropertiesTypeCast<T>::type )
 		{
-			if constexpr ( PBPropertiesTypeCast<T>::type == PBPropertyValue::Type::Float )
-				a_rOutValue = pFoundProperty->GetFloat();
-			else if constexpr ( PBPropertiesTypeCast<T>::type == PBPropertyValue::Type::LocaleString )
-				a_rOutValue = pFoundProperty->GetLocaleString();
-			else if constexpr ( PBPropertiesTypeCast<T>::type == PBPropertyValue::Type::Int )
-				a_rOutValue = pFoundProperty->GetInteger();
-			else if constexpr ( PBPropertiesTypeCast<T>::type == PBPropertyValue::Type::Bool )
-				a_rOutValue = pFoundProperty->GetBoolean();
-			else if constexpr ( PBPropertiesTypeCast<T>::type == PBPropertyValue::Type::UInt32 )
-				a_rOutValue = pFoundProperty->GetUINT32();
-			else if constexpr ( PBPropertiesTypeCast<T>::type == PBPropertyValue::Type::String )
-				a_rOutValue = pFoundProperty->GetString();
-			else
-			{
-				void* rawValue = pFoundProperty->GetRaw();
-				a_rOutValue    = *(T*)( &rawValue );
-			}
-
+			PBPropertyValueGetter<PBPropertiesTypeCast<T>::type>::Get( pFoundProperty, a_rOutValue );
 			return TTRUE;
 		}
 
 		return TFALSE;
+	}
+
+	// Like the original, the TFLOAT version also accepts integers
+	TBOOL GetOptionalPropertyValue( TFLOAT& a_rOutValue, const TCHAR* a_szName ) const
+	{
+		return GetOptionalFloatOrIntValue( a_rOutValue, a_szName );
 	}
 
 	const PBProperties* GetParentProperties() const
@@ -1310,6 +1347,9 @@ private:
 	TUINT32       m_iCount;
 };
 
+// NOTE: a header-only definition: selectany, as VS2013 has no inline variables
+__declspec( selectany ) const TCHAR* const PBProperties::TRB_SECTION_NAME = "Main";
+
 inline void PBPropertyValue::Delete()
 {
 	if ( m_uValue.Pointer )
@@ -1364,7 +1404,7 @@ public:
 	static TBOOL FillProperties( const PBProperties* a_pBProperties, class PProperties* a_pProperties );
 };
 
-inline PBPropertyValue::PBPropertyValue( PBPropertyValue&& other ) noexcept
+inline PBPropertyValue::PBPropertyValue( PBPropertyValue&& other ) TNOEXCEPT
 {
 	m_eType                = other.m_eType;
 	m_uValue.Pointer       = other.m_uValue.Pointer;
@@ -1389,7 +1429,7 @@ inline PBPropertyValue& PBPropertyValue::operator=( const PBPropertyValue& other
 	return *this;
 }
 
-inline PBPropertyValue& PBPropertyValue::operator=( PBPropertyValue&& other ) noexcept
+inline PBPropertyValue& PBPropertyValue::operator=( PBPropertyValue&& other ) TNOEXCEPT
 {
 	Delete();
 

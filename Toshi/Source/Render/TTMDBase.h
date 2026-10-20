@@ -29,10 +29,11 @@ struct FileHeader
 	TUINT32 m_uiZero2;
 };
 
+// NOTE: de Blob's has a pointer to the keyframe library name (Barnyard's has the name inline, 16 bytes)
 struct SkeletonHeader
 {
-	TCHAR  m_szTKLName[ 16 ];
-	TINT32 m_iTKeyCount;
+	const TCHAR* m_pTKLName;
+	TINT32       m_iTKeyCount;
 	TINT32 m_iQKeyCount;
 	TINT32 m_iSKeyCount;
 	TINT32 m_iTBaseIndex;

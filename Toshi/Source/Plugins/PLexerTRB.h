@@ -53,7 +53,6 @@ public:
 
 		const TCHAR* GetIdent( const TCHAR** a_ppCustomTokens );
 
-		// NOTE: unreferenced in retail, the names are invented
 		// Returns TTRUE if the value of the token is a string: identifiers, strings,
 		// comments, includes and custom identifiers
 		// $Barnyard: FUNCTION 006b43a0

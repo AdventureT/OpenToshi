@@ -13,14 +13,16 @@ public:
 
 	const TCHAR* GetError( TINT a_iIndex );
 	void         AddError( const TCHAR* a_szFormat, ... );
+	// $deBlob: FUNCTION 00663430
+	void SetErrorOffsets( TINT* a_pErrorOffsets ) { m_pErrorOffsets = a_pErrorOffsets; }
 
 private:
-	TCHAR* m_pStringBuffer;      // 0x00
-	TINT   m_iStringBufferSize;  // 0x04
-	TINT*  m_pErrorOffsets;      // 0x08
-	TINT   m_iMaxErrors;         // 0x0C
-	TINT   m_iStringBufferUsed;  // 0x10
-	TINT   m_iNumErrors;         // 0x14
-}; // 0x18
+	TCHAR* m_pStringBuffer;     // 0x00
+	TINT   m_iStringBufferSize; // 0x04
+	TINT*  m_pErrorOffsets;     // 0x08
+	TINT   m_iMaxErrors;        // 0x0C
+	TINT   m_iStringBufferUsed; // 0x10
+	TINT   m_iNumErrors;        // 0x14
+};                              // 0x18
 
 TOSHI_NAMESPACE_END

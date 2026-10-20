@@ -27,11 +27,11 @@ public:
 		return TSTATICCAST( T, CreateTask( &TGetClass( T ), a_pParent ) );
 	}
 
-	// Called by TSystemManager::Update (inlined there in retail)
+	// Called by TSystemManager::Update
 	void Update( TFLOAT a_fDeltaTime );
 
 	// Marks the task and all its children as dying, they get destroyed on the next update
-	static void KillTask( TTask* a_pTask );
+	void KillTask( TTask* a_pTask );
 
 	void DestroyAllTasks();
 
@@ -41,7 +41,7 @@ public:
 	void SetDebugPause( TBOOL a_bPause );
 	void SetFixedFps( TBOOL a_bFixedFps, TFLOAT a_fFixedFps );
 
-	// NOTE: the name is unknown, TTRUE if the debug delta time or the debug slow time is used
+	// TTRUE if the debug delta time or the debug slow time is used
 	TBOOL IsDebugTime() const;
 
 	TFLOAT GetDebugDeltaTime() const;
@@ -49,6 +49,7 @@ public:
 
 	TNodeTree<TTask>* GetTree();
 
+	// $deBlob: FUNCTION 0056f2a0
 	TFLOAT GetCurrentDeltaTime() const { return m_fDeltaTime; }
 	TFLOAT GetFrameTime() const { return m_fFrameTime; }
 	TFLOAT GetTotalTime() const { return m_fTotalTime; }
@@ -64,9 +65,9 @@ public:
 	static void DumpTaskTree( TTask* a_pTask, TINT a_iDepth );
 
 private:
-	static void DestroyTaskRecurse( TTask* a_pTask );
-	void        DeleteTaskAtomic( TTask* a_pTask );
-	void        DeleteTaskRecurse( TTask* a_pTask );
+	void DestroyTaskRecurse( TTask* a_pTask );
+	void DeleteTaskAtomic( TTask* a_pTask );
+	void DeleteTaskRecurse( TTask* a_pTask );
 
 	// Destroys all the dying tasks from the last one to the first one
 	void DestroyDyingTasks( TTask* a_pTask );
@@ -79,7 +80,7 @@ private:
 	static TFLOAT s_MaxTimeDeltaAllowed;
 
 private:
-	TUINT32          m_Unk1;                   // 0x04
+	// NOTE: 0x04 is the vftable pointer's padding (the class is 8-aligned because of THPTimer)
 	TNodeTree<TTask> m_TaskTree;               // 0x08
 	TFLOAT           m_fDeltaTime;             // 0x20
 	TFLOAT           m_fFrameTime;             // 0x24 time the last update took
@@ -95,6 +96,6 @@ private:
 	TFLOAT           m_fDebugDeltaTimeMult;    // 0x70
 	TBOOL            m_bFixedFps;              // 0x74
 	TFLOAT           m_fFixedFrameTime;        // 0x78
-}; // 0x80
+};                                             // 0x80
 
 TOSHI_NAMESPACE_END

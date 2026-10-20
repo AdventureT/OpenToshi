@@ -10,74 +10,8 @@
 
 #include "TMemoryDebugOff.h"
 
-TMemoryHeap*  TMemory_GlobalHeap;  // 0x009b1fc4
-T2MutexHandle TMemory_GlobalMutex; // 0x009b1fc8
-
-// $deBlob: FUNCTION 006fb970
-void* __CRTDECL operator new( TSIZE a_uiSize )
-{
-	return TMemalign( 16, a_uiSize );
-}
-
-void* __CRTDECL operator new( TSIZE a_uiSize, ::std::nothrow_t const& ) noexcept
-{
-	return TMemalign( 16, a_uiSize );
-}
-
-// $deBlob: FUNCTION 006fb990
-void* __CRTDECL operator new[]( TSIZE a_uiSize )
-{
-	return TMemalign( 16, a_uiSize );
-}
-
-void* __CRTDECL operator new[]( TSIZE a_uiSize, ::std::nothrow_t const& ) noexcept
-{
-	return TMemalign( 16, a_uiSize );
-}
-
-// $deBlob: FUNCTION 006fb980
-void __CRTDECL operator delete( void* a_pMem ) noexcept
-{
-	TFree( a_pMem );
-}
-
-void __CRTDECL operator delete( void* a_pMem, ::std::nothrow_t const& ) noexcept
-{
-	TFree( a_pMem );
-}
-
-void __CRTDECL operator delete( void* a_pMem, TSIZE a_uiSize ) noexcept
-{
-	TFree( a_pMem );
-}
-
-// $deBlob: FUNCTION 006fb9a0
-void __CRTDECL operator delete[]( void* a_pMem ) noexcept
-{
-	TFree( a_pMem );
-}
-
-void __CRTDECL operator delete[]( void* a_pMem, ::std::nothrow_t const& ) noexcept
-{
-	TFree( a_pMem );
-}
-
-void __CRTDECL operator delete[]( void* a_pMem, TSIZE a_uiSize ) noexcept
-{
-	TFree( a_pMem );
-}
-
-// $deBlob: FUNCTION 006fb9b0
-void* __CRTDECL operator new( size_t a_uiSize, TMemoryHeap* a_pHeap )
-{
-	return TMemoryHeap_Malloc( a_pHeap, a_uiSize );
-}
-
-// $deBlob: FUNCTION 006fb9c0
-void* __CRTDECL operator new[]( size_t a_uiSize, TMemoryHeap* a_pHeap )
-{
-	return TMemoryHeap_Malloc( a_pHeap, a_uiSize );
-}
+TMemoryHeap*  TMemory_GlobalHeap;
+T2MutexHandle TMemory_GlobalMutex;
 
 // $deBlob: FUNCTION 006fbb50
 TMemoryHeap* TMemory_CreateHeap( TSIZE a_uiSize, TMemoryHeapFlags a_eFlags, const TCHAR* a_szName )
@@ -199,7 +133,7 @@ void TMemory_FillMemory( void* a_pMem, TINT a_iValue, TSIZE a_uiSize )
 			break;
 		case 3:
 			*TREINTERPRETCAST( TUINT16*, pMem ) = TUINT16( a_iValue );
-			pMem[ 2 ]                             = TBYTE( a_iValue );
+			pMem[ 2 ]                           = TBYTE( a_iValue );
 			break;
 	}
 }

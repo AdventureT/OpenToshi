@@ -56,8 +56,6 @@ protected:
 	}
 
 protected:
-	// NOTE: in retail T2GenericObjectPool's functions are out-of-line (Toshi/T2ObjectPool.cpp, Globs of Doom names:
-	// InitialiseFreeList, CountFreeList, AllocateObject, DeallocateObject)
 	// $deBlob: FUNCTION 00831540
 	// $Barnyard: FUNCTION 006cdae0
 	void Initialise( UnusedObject* a_pObjects, TUINT a_uiMaxNumber, TUINT a_uiObjectSize )
@@ -107,7 +105,7 @@ protected:
 	UnusedObject* m_pHead;
 };
 
-template <class T, TUINT MaxNumber, TUINT ObjectSize = sizeof( T ), TUINT Alignment = alignof( T )>
+template <class T, TUINT MaxNumber, TUINT ObjectSize = sizeof( T ), TUINT Alignment = TALIGNOF( T )>
 class T2ObjectPool : protected T2GenericObjectPool
 {
 public:
@@ -115,6 +113,7 @@ public:
 	TSTATICASSERT( sizeof( T ) >= sizeof( T2GenericObjectPool::UnusedObject ) );
 
 public:
+	// $deBlob: FUNCTION 007e2510
 	T2ObjectPool()
 	{
 		T2GenericObjectPool::Initialise(
@@ -124,19 +123,41 @@ public:
 		);
 	}
 
-	// Instantiations: <AQuestInstance, 1, 64, 4> 005cc050 (AQuestManager)
 	// $Barnyard: FUNCTION 005cc050
 	// $Barnyard: FUNCTION 005cc0b0
-	// T2ObjectPool<AFade, 8> (deleting destructor): 0045c5e0
-	// T2ObjectPool<AInteriorNetwork, 12> (deleting destructor): 00555340
 	// $Barnyard: FUNCTION 0045c5e0
 	// $Barnyard: FUNCTION 00555340
-	virtual ~T2ObjectPool() {}
+	// $deBlob: FUNCTION 007e2690
+	// $deBlob: FUNCTION 007e2580
+	virtual ~T2ObjectPool()
+	{
+		TASSERT( GetNumFreeObjects() == MaxNumber );
+	}
 
-	// Instantiations: <AQuestInstance, 1, 64, 4> 005cc0d0 (AQuestManager)
+	// de Blob's T2ObjectPool (T2ObjectPool<AAIBehaviour::Enemy, 4, 32, 4>) checks the sizes and addresses
+	// $deBlob: FUNCTION 007e28c0
+	virtual void* Malloc( TSIZE a_uiSize ) OVERRIDE
+	{
+		TASSERT( a_uiSize <= ObjectSize );
+		return GetObject();
+	}
+
+	// $deBlob: FUNCTION 007e2950
+	virtual void* TryMalloc( TSIZE a_uiSize ) OVERRIDE
+	{
+		TASSERT( a_uiSize <= ObjectSize );
+		return ( m_pHead != TNULL ) ? GetObject() : TNULL;
+	}
+
+	// $deBlob: FUNCTION 007e27c0
+	virtual void Free( void* a_pData ) OVERRIDE
+	{
+		TASSERT( a_pData >= &m_aObjects[ 0 ] && a_pData < &m_aObjects[ MaxNumber * ObjectSize ] );
+		TASSERT( ( (ptrdiff_t)a_pData - (ptrdiff_t)m_aObjects ) % ObjectSize == 0 );
+		ReturnObject( TSTATICCAST( UnusedObject, a_pData ) );
+	}
+
 	// $Barnyard: FUNCTION 005cc0d0
-	// T2ObjectPool<AFade, 8>::NewObject<>: 0045ca20
-	// T2ObjectPool<AInteriorNetwork, 12>::NewObject<>: 00555230
 	// $Barnyard: FUNCTION 0045ca20
 	// $Barnyard: FUNCTION 00555230
 	template <class... Args>
@@ -159,17 +180,30 @@ public:
 		Free( a_pObject );
 	}
 
+	// NOTE: de Blob's has no IsAddressInPool assert
+	// $deBlob: FUNCTION 007e2480
 	void DeleteObject( T* a_pObject )
 	{
-		TASSERT( TTRUE == IsAddressInPool( a_pObject ) );
 		a_pObject->~T();
 		Free( a_pObject );
 	}
 
-	// Instantiations: <AQuestInstance, 1, 64, 4> 005cc060 (AQuestManager)
+	// NOTE: de Blob's T2GenericObjectPool has only pure slots (vftable of __purecall), every T2ObjectPool<>
+	// instantiation has its own copy of these
+	using T2GenericObjectPool::Malloc;
+	using T2GenericObjectPool::TryMalloc;
+
+	// $deBlob: FUNCTION 007e2910
+	virtual void* Malloc( TSIZE a_uiSize, TSIZE a_uiAlignment ) OVERRIDE { return TNULL; } // +0x00
+
+	// $deBlob: FUNCTION 007e2790
+	virtual TBOOL CanAllocate( TSIZE a_uiSize ) const OVERRIDE { return T2GenericObjectPool::CanAllocate( a_uiSize ); } // +0x0C
+
+	// $deBlob: FUNCTION 007e29b0
+	virtual void* TryMalloc( TSIZE a_uiSize, TSIZE a_uiAlignment ) OVERRIDE { return TNULL; } // +0x10
+
 	// $Barnyard: FUNCTION 005cc060
-	// T2ObjectPool<AFade, 8>: 0045c590 0045c5b0 0045c5c0
-	// T2ObjectPool<AInteriorNetwork, 12>: 005552e0 00555300 00555320
+	// $deBlob: FUNCTION 007e2930
 	// $Barnyard: FUNCTION 0045c590
 	// $Barnyard: FUNCTION 005552e0
 	virtual TSIZE GetUsedSize() const OVERRIDE
@@ -177,6 +211,7 @@ public:
 		return ( MaxNumber - GetNumFreeObjects() ) * ObjectSize;
 	}
 
+	// $deBlob: FUNCTION 007e27b0
 	// $Barnyard: FUNCTION 0045c5b0
 	// $Barnyard: FUNCTION 00555300
 	virtual TSIZE GetCapacity() const OVERRIDE
@@ -184,6 +219,7 @@ public:
 		return MaxNumber * ObjectSize;
 	}
 
+	// $deBlob: FUNCTION 007e2890
 	// $Barnyard: FUNCTION 0045c5c0
 	// $Barnyard: FUNCTION 005cc090
 	// $Barnyard: FUNCTION 00555320
@@ -215,7 +251,7 @@ template <class T>
 class T2DynamicObjectPool : protected T2GenericObjectPool
 {
 public:
-	T2DynamicObjectPool( T2Allocator* a_pAllocator, TINT a_iMaxNumber, TSIZE a_uiSize = sizeof( T ), TSIZE a_uiAlignment = alignof( T ) )
+	T2DynamicObjectPool( T2Allocator* a_pAllocator, TINT a_iMaxNumber, TSIZE a_uiSize = sizeof( T ), TSIZE a_uiAlignment = TALIGNOF( T ) )
 	{
 		TVALIDPTR( a_pAllocator );
 		m_iMaxNumber = a_iMaxNumber;
@@ -244,7 +280,6 @@ public:
 		);
 	}
 
-	// Instantiations (scalar deleting destructor): three of the ASoundManager pools 005d63b0 005d63e0 005d6410
 	// $Barnyard: FUNCTION 005d63b0
 	// $Barnyard: FUNCTION 005d63e0
 	// $Barnyard: FUNCTION 005d6410
@@ -253,7 +288,6 @@ public:
 		m_pAllocator->Free( m_pData );
 	}
 
-	// Instantiations (ASoundManager pools): ChannelRefLegacy 005d6a50, SoundEvent 005d6a70, ChannelRef 005d6aa0, StreamRef 005d6ae0
 	// $Barnyard: FUNCTION 005d6a50
 	// $Barnyard: FUNCTION 005d6a70
 	// $Barnyard: FUNCTION 005d6aa0
@@ -319,7 +353,6 @@ public:
 	// $Barnyard: FUNCTION 005740b0
 	// $Barnyard: FUNCTION 0058c670
 	// $Barnyard: FUNCTION 0062fae0
-	// Instantiations: <AInteractionEvent> 005c5c20 (AInteractionEventManager)
 	// $Barnyard: FUNCTION 005c5c20
 	T2DerivedDynamicObjectPool( T2Allocator* a_pAllocator, TINT a_iMaxNumber )
 	{
@@ -366,9 +399,7 @@ public:
 	// $Barnyard: FUNCTION 0058c9c0
 	// $Barnyard: FUNCTION 0062fa30
 	// $Barnyard: FUNCTION 0062fd50
-	// Instantiations (scalar deleting destructor): <AInteractionEvent> 005c5cb0 (AInteractionEventManager)
 	// $Barnyard: FUNCTION 005c5cb0
-	// Instantiations: T2DerivedDynamicObjectPool<AAniEffect> 0062fa00 (scalar deleting destructor)
 	// $Barnyard: FUNCTION 0062fa00
 	virtual ~T2DerivedDynamicObjectPool()
 	{
@@ -411,7 +442,7 @@ public:
 		Free( a_pObject );
 	}
 
-	// NOTE: retail folds the T2DynamicObjectPool and T2DerivedDynamicObjectPool instantiations (0062f9e0)
+	// NOTE: retail folds the T2DynamicObjectPool and T2DerivedDynamicObjectPool instantiations
 	// $Barnyard: FUNCTION 0062f9e0
 	virtual TSIZE GetUsedSize() const OVERRIDE
 	{

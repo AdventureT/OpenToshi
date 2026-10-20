@@ -18,19 +18,19 @@ class TQuaternion;
 class PPropertyValue
 {
 public:
-	inline static const Toshi::TClass* TYPE_INT        = &TGetClass( PProperties::INT );
-	inline static const Toshi::TClass* TYPE_UINT32     = &TGetClass( PProperties::UINT32 );
-	inline static const Toshi::TClass* TYPE_FLOAT      = &TGetClass( PProperties::FLOAT );
-	inline static const Toshi::TClass* TYPE_BOOL       = &TGetClass( PProperties::BOOL );
-	inline static const Toshi::TClass* TYPE_TPSTRING8  = &TGetClass( PProperties::TPString8 );
-	inline static const Toshi::TClass* TYPE_STRING16   = &TGetClass( PProperties::String16 );
-	inline static const Toshi::TClass* TYPE_STRING16A  = &TGetClass( PProperties::String16A );
-	inline static const Toshi::TClass* TYPE_LOCALEID   = &TGetClass( PProperties::LocaleID );
-	inline static const Toshi::TClass* TYPE_PROPS      = &TGetClass( PProperties );
-	inline static const Toshi::TClass* TYPE_PROPNAME   = &TGetClass( PProperties::PPropertyName );
-	inline static const Toshi::TClass* TYPE_ARRAY      = &TGetClass( PProperties::PPropertyValueArray );
-	inline static const Toshi::TClass* TYPE_MANAGEDPTR = &TGetClass( PProperties::TManagedPtr );
-	inline static const Toshi::TClass* TYPE_UNDEF      = TNULL;
+	static const Toshi::TClass* TYPE_INT;
+	static const Toshi::TClass* TYPE_UINT32;
+	static const Toshi::TClass* TYPE_FLOAT;
+	static const Toshi::TClass* TYPE_BOOL;
+	static const Toshi::TClass* TYPE_TPSTRING8;
+	static const Toshi::TClass* TYPE_STRING16;
+	static const Toshi::TClass* TYPE_STRING16A;
+	static const Toshi::TClass* TYPE_LOCALEID;
+	static const Toshi::TClass* TYPE_PROPS;
+	static const Toshi::TClass* TYPE_PROPNAME;
+	static const Toshi::TClass* TYPE_ARRAY;
+	static const Toshi::TClass* TYPE_MANAGEDPTR;
+	static const Toshi::TClass* TYPE_UNDEF;
 
 public:
 	PPropertyValue();
@@ -47,12 +47,6 @@ public:
 	PPropertyValue( const PPropertyValue& a_rcOther );
 	~PPropertyValue();
 
-	//-----------------------------------------------------------------------------
-	// NOTE: everything in this block is unreferenced in retail. The PPropertyParser
-	// library was built without function-level linking, so its unused overloads were
-	// kept in the exe. Names from JPOG's PPropertyParser.dll where it has them,
-	// otherwise inferred from the code and the address order.
-	//-----------------------------------------------------------------------------
 	PPropertyValue( TINT8 a_iValue );
 	PPropertyValue( TUINT8 a_uiValue );
 	PPropertyValue( const Toshi::TVector2& a_rcValue );
@@ -118,8 +112,7 @@ public:
 	PPropertyValue& operator=( const Toshi::TVector4& a_rcValue );
 
 	// NOTE: not in retail, keeps bools from being promoted to operator=( TINT )
-	template <typename T>
-	    requires std::is_same_v<T, TBOOL>
+	template <typename T, typename = typename std::enable_if<std::is_same<T, TBOOL>::value>::type>
 	PPropertyValue& operator=( T a_bValue )
 	{
 		SetBoolean( a_bValue );
@@ -171,8 +164,6 @@ public:
 	// $Barnyard: FUNCTION 006af680
 	TINT& GetIntegerRef() { return m_uValue.iValue; }
 
-	// NOTE: 006af680..006af6b0 are four unreferenced copies of the same accessor placed right after
-	// GetInteger/GetUINT32/GetFloat/GetBoolean, the names are inferred from that order
 	// $Barnyard: FUNCTION 006af690
 	TUINT32& GetUINT32Ref() { return m_uValue.uiValue; }
 	// $Barnyard: FUNCTION 006af6a0
@@ -199,7 +190,6 @@ protected:
 	// Releases the value of the current type (shared by ChangeType and the destructor)
 	void ReleaseValue();
 
-	// NOTE: unreferenced in retail (names from JPOG's PPropertyParser.dll)
 	// $Barnyard: FUNCTION 006af780
 	Toshi::TRef<PProperties>& GetPropertiesMP() { return *TREINTERPRETCAST( Toshi::TRef<PProperties>*, &m_uValue ); }
 	// $Barnyard: FUNCTION 006af790

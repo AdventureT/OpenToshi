@@ -10,6 +10,8 @@
 
 TOSHI_NAMESPACE_START
 
+T2Allocator* T2String8::sm_pDefaultAllocatorCB = GetDefaultAllocatorCB();
+
 TCHAR T2String8::ms_aScratchMem[ T2String8::SCRATCH_MEM_SIZE ];
 
 // $deBlob: FUNCTION 006ec1f0
@@ -184,12 +186,12 @@ TCHAR* T2String8::FindString( TCHAR* str, const TCHAR* substr )
 
 // $deBlob: FUNCTION 006ec150
 // $Barnyard: FUNCTION 006bb160
-TSIZE T2String8::Length( const TCHAR* str )
+TINT T2String8::Length( const TCHAR* str )
 {
 	const TCHAR* a_String = str;
 	TASSERT( a_String != TNULL );
 
-	return strlen( str );
+	return TINT( strlen( str ) );
 }
 
 // $deBlob: FUNCTION 006ec5b0
@@ -198,7 +200,7 @@ TBOOL T2String8::IsLowerCase( const TCHAR* str )
 	while ( *str != '\0' && T2Char8::IsLowerCase( *str ) )
 		str++;
 
-	return *str == '\0';
+	return *str == '\0' ? TTRUE : TFALSE;
 }
 
 TBOOL T2String8::IsUpperCase( const TCHAR* str )
@@ -278,7 +280,7 @@ TBOOL T2String8::IsNumeric( const TCHAR* str )
 	while ( isdigit( *str ) )
 		str++;
 
-	return *str == '\0';
+	return *str == '\0' ? TTRUE : TFALSE;
 }
 
 // $deBlob: FUNCTION 006ec310

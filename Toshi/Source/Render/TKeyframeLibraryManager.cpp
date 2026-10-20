@@ -9,82 +9,90 @@
 
 TOSHI_NAMESPACE_START
 
-// $Barnyard: FUNCTION 006cb0e0
+// $deBlob: FUNCTION 0068e6e0
 TKeyframeLibraryManager::TKeyframeLibraryManager()
 {
 }
 
-// $Barnyard: FUNCTION 006cbf80
+// $deBlob: FUNCTION 0068e6f0
 TKeyframeLibraryManager::~TKeyframeLibraryManager()
 {
+	m_List.Clear();
 }
 
-// $Barnyard: FUNCTION 006ca710
-TKeyframeLibrary* TKeyframeLibraryManager::GetLibrary( const TCHAR* a_szName )
-{
-	for ( auto it = m_List.Begin(); it != m_List.End(); ++it )
-	{
-		if ( TStringManager::String8Length( a_szName ) == it->GetNameLength() &&
-		     TStringManager::String8CompareNoCase( it->GetName(), a_szName, it->GetNameLength() ) == 0 )
-		{
-			return it;
-		}
-	}
-
-	return TNULL;
-}
-
-// $Barnyard: FUNCTION 006cb0f0
+// $deBlob: FUNCTION 0068e730
 TKeyframeLibrary* TKeyframeLibraryManager::LoadLibrary( const TCHAR* a_szFilePath )
 {
-	TVALIDPTR( a_szFilePath );
-
-	auto pTRB = new TTRB();
+	TTRB* pTRB = new TTRB();
 
 	if ( pTRB->Load( a_szFilePath, 0 ) != TTRB::ERROR_OK )
 	{
-		delete pTRB;
+		if ( pTRB )
+			delete pTRB;
+
 		return TNULL;
 	}
 
-	TKeyframeLibrary* pLibrary = TKeyframeLibrary::CreateFromTRB( pTRB, "keylib" );
+	TKeyframeLibrary* pLibrary = LoadLibrary( TSTATICCAST( TKeyframeLibrary::TRBHeader, pTRB->GetSymbolAddress( "tkey" ) ) );
 
-	m_List.InsertHead( pLibrary );
-	m_iNumLibraries++;
+	if ( pLibrary == TNULL )
+	{
+		if ( pTRB )
+			delete pTRB;
+
+		return TNULL;
+	}
 
 	pLibrary->SetTRB( pTRB );
 	return pLibrary;
 }
 
-// $Barnyard: FUNCTION 006ca6d0
-TKeyframeLibrary* TKeyframeLibraryManager::LoadLibrary( TTRB* a_pTRB, const TCHAR* a_szSymbolName )
-{
-	TKeyframeLibrary* pLibrary = TKeyframeLibrary::CreateFromTRB( a_pTRB, a_szSymbolName );
-
-	m_List.InsertHead( pLibrary );
-	m_iNumLibraries++;
-
-	return pLibrary;
-}
-
+// $deBlob: FUNCTION 0068e7c0
 TKeyframeLibrary* TKeyframeLibraryManager::LoadLibrary( TKeyframeLibrary::TRBHeader* a_pTRBHeader )
 {
 	TKeyframeLibrary* pLibrary = TKeyframeLibrary::CreateFromData( a_pTRBHeader );
 
-	m_List.InsertHead( pLibrary );
-	m_iNumLibraries++;
+	if ( pLibrary != TNULL )
+	{
+		m_List.PushFront( pLibrary );
+		m_iNumLibraries++;
+	}
 
 	return pLibrary;
 }
 
-// $Barnyard: FUNCTION 006ca3c0
+// $deBlob: FUNCTION 0068e830
+TKeyframeLibrary* TKeyframeLibraryManager::LoadLibrary( TTRB* a_pTRB, const TCHAR* a_szSymbolName )
+{
+	TKeyframeLibrary* pLibrary = TKeyframeLibrary::CreateFromTRB( a_pTRB, a_szSymbolName );
+
+	if ( pLibrary != TNULL )
+	{
+		m_List.PushFront( pLibrary );
+		m_iNumLibraries++;
+	}
+
+	return pLibrary;
+}
+
+// $deBlob: FUNCTION 0068e8a0
 void TKeyframeLibraryManager::UnloadLibrary( TKeyframeLibrary* a_pLibrary )
 {
-	TVALIDPTR( a_pLibrary );
-
 	a_pLibrary->Remove();
 	a_pLibrary->Delete();
 	m_iNumLibraries--;
+}
+
+// $deBlob: FUNCTION 0068e8d0
+TKeyframeLibrary* TKeyframeLibraryManager::GetLibrary( const TCHAR* a_szName )
+{
+	for ( auto it = m_List.Begin(); it != m_List.End(); ++it )
+	{
+		if ( TStringManager::String8CompareNoCase( it->GetName(), a_szName ) == 0 )
+			return it;
+	}
+
+	return TNULL;
 }
 
 TOSHI_NAMESPACE_END

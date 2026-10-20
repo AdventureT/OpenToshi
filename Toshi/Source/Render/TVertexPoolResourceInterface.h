@@ -24,6 +24,16 @@ public:
 	{
 		LockBuffer();
 
+		// $deBlob: FUNCTION 005fcff0
+		// $deBlob: FUNCTION 005fd050
+		// $deBlob: FUNCTION 00603320
+		// $deBlob: FUNCTION 006b6260
+		TBYTE* GetStream( TUINT a_uiBuffer ) const
+		{
+			TASSERT( a_uiBuffer < uiNumStreams );
+			return apStreams[ a_uiBuffer ];
+		}
+
 		TUINT   uiNumStreams;
 		TUINT32 uiOffset;
 		TBYTE*  apStreams[ TVertexFactoryFormat::MAX_NUM_STREAMS ];

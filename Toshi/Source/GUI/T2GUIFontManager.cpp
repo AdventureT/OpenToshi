@@ -7,205 +7,267 @@
 //-----------------------------------------------------------------------------
 #include <Core/TMemoryDebugOn.h>
 
-TOSHI_NAMESPACE_USING
+TOSHI_NAMESPACE_START
 
-// NOTE: the Wii version (804a1424) has a second argument: TTRUE loads "<font directory><a_szFileName>.trb",
-// the font directory being "Data/XUI/Fonts/<language>/" (set by 804a13f0 from AGUI2::OnCreate), and it
-// keeps 8 font resources. It's only used for the paged XUI fonts, which aren't supported.
-// $Barnyard: FUNCTION 006c4410
-TBOOL T2GUIFontManager::Open( const TCHAR* a_szFileName )
+// $deBlob: FUNCTION 0053f9d0
+// $deBlob: FUNCTION 008594c0
+T2GUIFontManager::TRBRef T2GUIFontManager::s_trbrefs[ MAX_TRBREFS ];
+// $deBlob: FUNCTION 0053f990
+T2GUIFontManager::FontRef T2GUIFontManager::s_fontrefs[ MAX_FONTREFS ];
+
+static TCHAR* DuplicateString( const TCHAR* a_szString )
 {
-	auto pResource = FindFontResource( a_szFileName );
+	TSIZE  uiSize = TStringManager::String8Length( a_szString ) + 1;
+	TCHAR* szCopy = TSTATICCAST( TCHAR, TMalloc( uiSize ) );
+	TUtil::MemCopy( szCopy, a_szString, uiSize );
+	return szCopy;
+}
 
-	if ( pResource )
+// $deBlob: FUNCTION 006f54d0
+TBOOL T2GUIFontManager::Open()
+{
+	T2GUIFont::SetRegion();
+	return TTRUE;
+}
+
+// $deBlob: FUNCTION 006f54e0
+void T2GUIFontManager::Close()
+{
+}
+
+// $deBlob: FUNCTION 006f54f0
+TBOOL T2GUIFontManager::LoadFontTRB( const TCHAR* a_szFileName )
+{
+	TRBRef* pTRBRef = FindTRBRef( a_szFileName );
+
+	if ( pTRBRef != TNULL )
 	{
-		pResource->uiRefCount++;
+		pTRBRef->m_iRefCount++;
 		return TTRUE;
 	}
 
-	pResource = FindUnusedFontResource();
-	TASSERT( pResource != TNULL );
+	pTRBRef = FindFreeTRBRef();
 
-	if ( !pResource )
-	{
+	if ( pTRBRef == TNULL )
 		return TFALSE;
-	}
 
-	if ( pResource->oTRB.Load( a_szFileName ) != TTRB::ERROR_OK )
-	{
+	if ( pTRBRef->m_oTRB.Load( a_szFileName ) != TTRB::ERROR_OK )
 		return TFALSE;
-	}
 
-	pResource->szFileName = new TCHAR[ TStringManager::String8Length( a_szFileName ) + 1 ];
-	TStringManager::String8Copy( pResource->szFileName, a_szFileName );
-
-	pResource->uiRefCount++;
-	CreateFontFromResource( pResource );
+	pTRBRef->m_szName = DuplicateString( a_szFileName );
+	pTRBRef->m_iRefCount++;
+	LoadTRBFonts( pTRBRef );
 
 	return TTRUE;
 }
 
-// $Barnyard: FUNCTION 006c44d0
-T2GUIFont* T2GUIFontManager::FindFont( const TCHAR* a_szFontName )
+// $deBlob: FUNCTION 006f55a0
+void T2GUIFontManager::UnloadFontTRB( const TCHAR* a_szFileName )
 {
-	auto pRef = FindFontRef( a_szFontName );
+	TRBRef* pTRBRef = FindTRBRef( a_szFileName );
 
-	if ( pRef )
+	if ( pTRBRef != TNULL && --pTRBRef->m_iRefCount == 0 )
 	{
-		pRef->uiNumRefs += 1;
-		return pRef->pFont;
+		if ( !UnloadTRBFonts( pTRBRef ) )
+			TASSERT( 0 );
+
+		pTRBRef->m_oTRB.Close();
+		TFree( pTRBRef->m_szName );
+	}
+}
+
+// $deBlob: FUNCTION 006f5610
+T2GUIFont* T2GUIFontManager::GetFont( const TCHAR* a_szFontName )
+{
+	FontRef* pFontRef = FindFontRef( a_szFontName );
+
+	if ( pFontRef != TNULL )
+	{
+		pFontRef->m_iRefCount++;
+		return pFontRef->m_pFont;
 	}
 
 	return TNULL;
 }
 
-// Decrements the reference count of the font that FindFont returned
-// $Barnyard: FUNCTION 006c44f0
+// $deBlob: FUNCTION 006f5630
 void T2GUIFontManager::ReleaseFont( T2GUIFont* a_pFont )
 {
-	if ( !a_pFont )
-		return;
-
-	for ( TUINT i = 0; i < MAX_NUM_FONT_REFS; i++ )
+	if ( a_pFont != TNULL )
 	{
-		if ( s_fontrefs[ i ].pFontResource != TNULL && s_fontrefs[ i ].pFont == a_pFont )
-		{
-			s_fontrefs[ i ].uiNumRefs -= 1;
-			return;
-		}
-	}
-
-	// NOTE: the original decrements through a null ref here (writes to address 0x10)
-	TASSERT( TFALSE && "T2GUIFontManager::ReleaseFont: unknown font" );
-}
-
-// Releases the file name and the fonts of a font resource and unloads it once it's not referenced anymore
-// $Barnyard: FUNCTION 006c45a0
-void T2GUIFontManager::Close( const TCHAR* a_szFileName )
-{
-	T2GUIFontResource* pResource = FindFontResource( a_szFileName );
-
-	if ( pResource && pResource->uiRefCount-- == 1 )
-	{
-		DestroyFontRefs( pResource );
-		pResource->oTRB.Close();
-		delete[] pResource->szFileName;
+		// NOTE: retail doesn't check the ref (an unknown font writes through TNULL)
+		FontRef* pFontRef = FindFontRef( a_pFont );
+		pFontRef->m_iRefCount--;
+		TASSERT( pFontRef->m_iRefCount >= 0 );
 	}
 }
 
-// $Barnyard: FUNCTION 006c4540
-void T2GUIFontManager::DestroyFontRefs( T2GUIFontResource* a_pFontResource )
+// $deBlob: FUNCTION 006f5680
+TBOOL T2GUIFontManager::CreateFont( T2GUIFontDef2* a_pFontDef )
 {
-	for ( TUINT i = 0; i < MAX_NUM_FONT_REFS; i++ )
-	{
-		T2GUIFontRef& rFontRef = s_fontrefs[ i ];
+	if ( FindFontRef( a_pFontDef->GetName() ) != TNULL )
+		return TFALSE;
 
-		if ( rFontRef.pFontResource == a_pFontResource )
-		{
-			if ( rFontRef.pUnk1 )
-			{
-				delete rFontRef.pUnk1;
-				rFontRef.pUnk1 = TNULL;
-			}
+	FontRef* pFontRef = FindFreeFontRef();
 
-			if ( TINT( rFontRef.uiNumRefs ) > 0 )
-				rFontRef.uiNumRefs = 0;
+	if ( pFontRef == TNULL )
+		return TFALSE;
 
-			delete[] rFontRef.szName;
-			delete rFontRef.pFont;
+	pFontRef->m_szName = DuplicateString( a_pFontDef->GetName() );
+	pFontRef->m_pFont  = new T2GUIFont();
+	pFontRef->m_pFont->Create( a_pFontDef );
+	pFontRef->m_pTRBRef = TNULL;
 
-			rFontRef.pFontResource = TNULL;
-		}
-	}
+	TASSERT( pFontRef->m_iRefCount == 0 );
+	pFontRef->m_iRefCount++;
+
+	return TTRUE;
 }
 
-// $Barnyard: FUNCTION 006c42a0
-T2GUIFontRef* T2GUIFontManager::FindFontRef( const TCHAR* a_szFontName )
+// $deBlob: FUNCTION 006f5780
+TBOOL T2GUIFontManager::DestroyFont( T2GUIFontDef2* a_pFontDef )
 {
-	for ( TUINT i = 0; i < MAX_NUM_FONT_REFS; i++ )
+	for ( TINT i = 0; i < MAX_FONTREFS; i++ )
 	{
-		if ( s_fontrefs[ i ].pFontResource != TNULL )
+		FontRef& rFontRef = s_fontrefs[ i ];
+
+		if ( rFontRef.m_szName != TNULL && TStringManager::String8Compare( rFontRef.m_szName, a_pFontDef->GetName() ) == 0 )
 		{
-			if ( TStringManager::String8CompareNoCase( s_fontrefs[ i ].szName, a_szFontName ) == 0 )
-			{
-				return &s_fontrefs[ i ];
-			}
+			if ( rFontRef.m_iRefCount > 0 )
+				rFontRef.m_iRefCount = 0;
+
+			// NOTE: retail leaves m_szName and m_pFont dangling (the ref is free again: no TRB, no references)
+			TFree( rFontRef.m_szName );
+
+			if ( rFontRef.m_pFont != TNULL )
+				delete rFontRef.m_pFont;
+
+			return TTRUE;
 		}
+	}
+
+	return TTRUE;
+}
+
+// $deBlob: FUNCTION 006f5830
+T2GUIFontManager::TRBRef* T2GUIFontManager::FindTRBRef( const TCHAR* a_szFileName )
+{
+	for ( TINT i = 0; i < MAX_TRBREFS; i++ )
+	{
+		if ( s_trbrefs[ i ].m_iRefCount > 0 && _stricmp( a_szFileName, s_trbrefs[ i ].m_szName ) == 0 )
+			return &s_trbrefs[ i ];
 	}
 
 	return TNULL;
 }
 
-// $Barnyard: FUNCTION 006c4240
-T2GUIFontResource* T2GUIFontManager::FindFontResource( const TCHAR* a_szResourceName )
+// $deBlob: FUNCTION 006f5890
+T2GUIFontManager::TRBRef* T2GUIFontManager::FindFreeTRBRef()
 {
-	for ( TUINT i = 0; i < MAX_NUM_LOADED_FONTS; i++ )
+	for ( TINT i = 0; i < MAX_TRBREFS; i++ )
 	{
-		if ( s_fontresources[ i ].uiRefCount > 0 )
-		{
-			if ( TStringManager::String8CompareNoCase( s_fontresources[ i ].szFileName, a_szResourceName ) == 0 )
-			{
-				return &s_fontresources[ i ];
-			}
-		}
+		if ( s_trbrefs[ i ].m_iRefCount == 0 )
+			return &s_trbrefs[ i ];
 	}
 
 	return TNULL;
 }
 
-T2GUIFontRef* T2GUIFontManager::FindUnusedFontRef()
+// $deBlob: FUNCTION 006f58c0
+T2GUIFontManager::FontRef* T2GUIFontManager::FindFontRef( T2GUIFont* a_pFont )
 {
-	for ( TUINT i = 0; i < MAX_NUM_FONT_REFS; i++ )
+	for ( TINT i = 0; i < MAX_FONTREFS; i++ )
 	{
-		if ( s_fontrefs[ i ].pFontResource == TNULL )
-		{
+		if ( ( s_fontrefs[ i ].m_pTRBRef != TNULL || s_fontrefs[ i ].m_iRefCount > 0 ) && s_fontrefs[ i ].m_pFont == a_pFont )
 			return &s_fontrefs[ i ];
+	}
+
+	return TNULL;
+}
+
+// $deBlob: FUNCTION 006f5900
+T2GUIFontManager::FontRef* T2GUIFontManager::FindFontRef( const TCHAR* a_szFontName )
+{
+	for ( TINT i = 0; i < MAX_FONTREFS; i++ )
+	{
+		if ( s_fontrefs[ i ].m_pTRBRef != TNULL || s_fontrefs[ i ].m_iRefCount > 0 )
+		{
+			// TNULL: the first font
+			if ( a_szFontName == TNULL || _stricmp( a_szFontName, s_fontrefs[ i ].m_szName ) == 0 )
+				return &s_fontrefs[ i ];
 		}
 	}
 
 	return TNULL;
 }
 
-T2GUIFontResource* T2GUIFontManager::FindUnusedFontResource()
+// $deBlob: FUNCTION 006f5960
+T2GUIFontManager::FontRef* T2GUIFontManager::FindFreeFontRef()
 {
-	for ( TUINT i = 0; i < MAX_NUM_LOADED_FONTS; i++ )
+	for ( TINT i = 0; i < MAX_FONTREFS; i++ )
 	{
-		if ( s_fontresources[ i ].uiRefCount == 0 )
-		{
-			return &s_fontresources[ i ];
-		}
+		if ( s_fontrefs[ i ].m_pTRBRef == TNULL && s_fontrefs[ i ].m_iRefCount == 0 )
+			return &s_fontrefs[ i ];
 	}
 
 	return TNULL;
 }
 
-// $Barnyard: FUNCTION 006c42f0
-void T2GUIFontManager::CreateFontFromResource( T2GUIFontResource* a_pFontResource )
+// Creates a font for every symbol of the TRB
+// $deBlob: FUNCTION 006f5990
+void T2GUIFontManager::LoadTRBFonts( TRBRef* a_pTRBRef )
 {
-	auto& trb = a_pFontResource->oTRB;
+	TTRB* pTRB  = &a_pTRBRef->m_oTRB;
+	TINT  iNext = 0;
 
-	for ( TINT i = 0; i < trb.GetNumSymbols(); i++ )
+	for ( TTRB::TTRBSymbol* pSymbol = pTRB->GetSymbol( iNext ); pSymbol != TNULL; pSymbol = pTRB->GetSymbol( iNext ) )
 	{
-		auto pSymbol     = trb.GetSymbol( i );
-		auto pSymbolName = trb.GetSymbolName( pSymbol );
+		iNext++;
+		const TCHAR* szSymbolName = pTRB->GetSymbolName( pSymbol );
 
-		auto pFontRef = FindFontRef( pSymbolName );
-
-		if ( pFontRef == TNULL )
+		if ( FindFontRef( szSymbolName ) == TNULL )
 		{
-			pFontRef = FindUnusedFontRef();
-			TASSERT( pFontRef != TNULL );
+			FontRef* pFontRef = FindFreeFontRef();
 
-			if ( pFontRef == TNULL ) return;
+			if ( pFontRef == TNULL )
+				return;
 
-			pFontRef->szName = new TCHAR[ TStringManager::String8Length( pSymbolName ) + 1 ];
-			TStringManager::String8Copy( pFontRef->szName, pSymbolName );
-
-			auto pFontDef   = trb.CastSymbol<T2GUIFontDef>( pSymbolName );
-			pFontRef->pFont = new T2GUIFont();
-			pFontRef->pFont->Create( pFontDef );
-			pFontRef->pFontResource = a_pFontResource;
-			pFontRef->pUnk1         = TNULL;
+			pFontRef->m_szName = DuplicateString( szSymbolName );
+			pFontRef->m_pFont  = new T2GUIFont();
+			pFontRef->m_pFont->Create( TSTATICCAST( T2GUIFontDef, pTRB->GetSymbolAddress( pFontRef->m_szName ) ) );
+			pFontRef->m_pTRBRef = a_pTRBRef;
 		}
 	}
 }
+
+// $deBlob: FUNCTION 006f5a70
+TBOOL T2GUIFontManager::UnloadTRBFonts( TRBRef* a_pTRBRef )
+{
+	for ( TINT i = 0; i < MAX_FONTREFS; i++ )
+	{
+		FontRef& rFontRef = s_fontrefs[ i ];
+
+		if ( rFontRef.m_pTRBRef == a_pTRBRef )
+		{
+			if ( rFontRef.m_iRefCount > 0 )
+				rFontRef.m_iRefCount = 0;
+
+			TFree( rFontRef.m_szName );
+
+			if ( rFontRef.m_pFont != TNULL )
+				delete rFontRef.m_pFont;
+
+			rFontRef.m_pTRBRef = TNULL;
+		}
+	}
+
+	return TTRUE;
+}
+
+// $deBlob: FUNCTION 006f5af0
+T2GUIFontManager::TRBRef::TRBRef()
+    : m_szName( TNULL ), m_iRefCount( 0 )
+{
+}
+
+TOSHI_NAMESPACE_END

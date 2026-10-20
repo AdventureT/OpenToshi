@@ -34,12 +34,13 @@ public:
 };
 
 class TTSFI;
+class TTSFO;
 
 class TTSF
 {
 public:
-	static constexpr TUINT32 IDMAGICB = TFourCC( "TSFB" );
-	static constexpr TUINT32 IDMAGICL = TFourCC( "TSFL" );
+	static TCONSTEXPR_VAR TUINT32 IDMAGICB = 0x42465354; // TFourCC( "TSFB" )
+	static TCONSTEXPR_VAR TUINT32 IDMAGICL = 0x4c465354; // TFourCC( "TSFL" )
 
 	struct Header
 	{
@@ -68,15 +69,32 @@ public:
 
 	~TTSF() = default;
 
+	// Allocate a reader/writer into *a_ppOut, return 1 if the allocation failed (else 0)
+	static TUINT32 CreateTTSFI( TTSFI** a_ppOut );
+	static TUINT32 CreateTTSFO( TTSFO** a_ppOut );
+
 	// $deBlob: FUNCTION 006873f0
 	Endianess GetEndianess() const { return m_Endianess; }
+
+	// A 32 bit value in the file's byte order (swapped unless little endian)
+	// $deBlob: FUNCTION 00689180
+	// $deBlob: FUNCTION 006891d0
+	// $deBlob: FUNCTION 00689220
+	// $deBlob: FUNCTION 00689270
+	TUINT32 ConvertEndian32( TUINT32 a_uiValue ) const
+	{
+		if ( m_Endianess != Endianess_Little )
+			a_uiValue = SWAP32( a_uiValue );
+
+		return a_uiValue;
+	}
 
 protected:
 	Endianess m_Endianess; // 0x0
 	TFile*    m_pFile;     // 0x4
 };
 
-// NOTE: de Blob: 0x124 bytes (TTSFI::TTSFI 00687d80)
+// NOTE: de Blob: 0x124 bytes
 class TTSFI : public TTSF
 {
 public:
@@ -99,10 +117,10 @@ public:
 	template <class T> void Read( T* a_pDst ) { m_iReadPos += m_pFile->Read( a_pDst, sizeof( T ) ); }
 	template <class T> void Read( T* a_pDst, TUINT a_uiCount ) { m_iReadPos += m_pFile->Read( a_pDst, a_uiCount * sizeof( T ) ); }
 
-	TUINT8 ReadHunk();
-	TUINT8 SkipHunk();
-	TUINT8 ReadFORM( TFORM* section );
-	TUINT8 ReadHunkData( void* dest );
+	TINT ReadHunk();
+	TINT SkipHunk();
+	TINT ReadFORM( TFORM* section );
+	TINT ReadHunkData( void* dest );
 
 	void Close( TBOOL free = TTRUE );
 
@@ -116,7 +134,7 @@ public:
 	TBOOL ProcessForm_Parse( TFORM* a_pForm, t_HunkCallback a_fnCallback, void* a_pUserData );
 
 	// Same as ProcessForm_Parse but checks that the file has just been opened
-	TUINT8 Parse( t_HunkCallback a_fnCallback, void* a_pUserData );
+	TINT Parse( t_HunkCallback a_fnCallback, void* a_pUserData );
 
 	// Opens a_szFilePath and walks its hunks
 	static TUINT32 Read( const TCHAR* a_szFilePath, TUINT32 a_uiMagic, t_HunkCallback a_fnCallback, void* a_pUserData );
@@ -149,7 +167,7 @@ public:
 	void  ReadVector4( TVector4* a_pOut );
 	void  ReadQuaternion( TQuaternion* a_pOut );
 	TBOOL Tell( TUINT32* a_pOutPos );
-	TBOOL Align();
+	TBOOL Align( TINT a_iUnused = 0 );
 
 	// $deBlob: FUNCTION 006873c0
 	const Hunk& GetCurrentHunk() const { return m_CurrentHunk; }
@@ -163,10 +181,10 @@ private:
 	Header   m_Header;         // 0x10C
 	TUINT32  m_Magic;          // 0x114
 	Hunk     m_CurrentHunk;    // 0x118
-	TUINT32  m_iReadPos;        // 0x120
+	TUINT32  m_iReadPos;       // 0x120
 };
 
-// NOTE: de Blob: 0x8C bytes (TTSFO::TTSFO 00688a90)
+// NOTE: de Blob: 0x8C bytes
 class TTSFO : public TTSF
 {
 public:
@@ -289,6 +307,16 @@ public:
 	void WriteUInt8( TUINT8 value ) { m_pFile->Write( &value, 1 ); }
 	// $deBlob: FUNCTION 00688ff0
 	void WriteFloat( TFLOAT value ) { m_pFile->Write( &value, 4 ); }
+	// The length (TUINT16) and the characters
+	// $deBlob: FUNCTION 00689010
+	TBOOL WriteString( const TCHAR* a_szString )
+	{
+		TINT    iLength  = T2String8::Length( a_szString );
+		TUINT16 uiLength = TUINT16( TMath::Int32ToInt16( iLength ) );
+		m_pFile->Write( &uiLength, 2 );
+		m_pFile->Write( a_szString, iLength );
+		return TTRUE;
+	}
 	void WriteVector3( TVector3& value ) { Write( value ); }
 	void WriteVector4( TVector4& value ) { Write( value ); }
 	void WriteQuaternion( TQuaternion& value ) { Write( value ); }
@@ -302,7 +330,10 @@ private:
 class TTRB
 {
 public:
-	typedef TUINT8 ERROR;
+	friend class TAssetInit; // DestroySection
+
+	// NOTE: int-sized in de Blob (Load returns it in eax, callers test eax)
+	typedef TINT ERROR;
 	enum ERROR_ : ERROR
 	{
 		ERROR_OK                   = 0,
@@ -314,6 +345,9 @@ public:
 		ERROR_NO_FILE              = 6,
 		ERROR_NOT_TRB              = 7,
 		ERROR_NO_FILEINFO_ON_STACK = 8,
+		ERROR_PARSE_FAILED         = 10, // TTSFI::Parse: the hunks couldn't be parsed
+		ERROR_NOT_AT_START         = 11, // TTSFI::Parse: the file position isn't right behind the header
+		ERROR_SAME_MAGIC           = 12, // TTSFI::Read: the file has the given magic
 	};
 
 	typedef TUINT8 AllocType;
@@ -351,7 +385,7 @@ public:
 
 	struct TTRBSymbol
 	{
-		TUINT16 HDRX;
+		TINT16  HDRX; // NOTE: signed in retail (movsx)
 		TUINT16 NameOffset;
 		TUINT16 Padding;
 		TINT16  NameHash;

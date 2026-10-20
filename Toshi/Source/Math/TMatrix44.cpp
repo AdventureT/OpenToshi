@@ -3,7 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
-constinit TMatrix44 TMatrix44::IDENTITY(
+TCONSTINIT TMatrix44 TMatrix44::IDENTITY(
     1.0f,
     0.0f,
     0.0f,
@@ -21,6 +21,112 @@ constinit TMatrix44 TMatrix44::IDENTITY(
     0.0f,
     1.0f
 );
+
+// $deBlob: FUNCTION 00663680
+// $Barnyard: FUNCTION 006c8500
+// $Barnyard: FUNCTION 006c8520
+void TMatrix44::Identity()
+{
+	*this = IDENTITY;
+}
+
+// $deBlob: FUNCTION 00664d60
+// $Barnyard: FUNCTION 006c8540
+void TMatrix44::Transpose( const TMatrix44& a_rcMatrix )
+{
+	TFLOAT f14 = a_rcMatrix.m_f41, f24 = a_rcMatrix.m_f42, f34 = a_rcMatrix.m_f43, f44 = a_rcMatrix.m_f44;
+	TFLOAT f13 = a_rcMatrix.m_f31, f23 = a_rcMatrix.m_f32, f33 = a_rcMatrix.m_f33, f43 = a_rcMatrix.m_f34;
+	TFLOAT f12 = a_rcMatrix.m_f21, f22 = a_rcMatrix.m_f22, f32 = a_rcMatrix.m_f23, f42 = a_rcMatrix.m_f24;
+	TFLOAT f11 = a_rcMatrix.m_f11, f21 = a_rcMatrix.m_f12, f31 = a_rcMatrix.m_f13, f41 = a_rcMatrix.m_f14;
+	Set( f11, f12, f13, f14, f21, f22, f23, f24, f31, f32, f33, f34, f41, f42, f43, f44 );
+}
+
+// $deBlob: FUNCTION 006653a0
+TBOOL TMatrix44::IsEqual( const TMatrix44& a_rcMatrix ) const
+{
+	const TFLOAT* pThis  = &m_f11;
+	const TFLOAT* pOther = &a_rcMatrix.m_f11;
+
+	for ( TINT i = 0; i < 4; i++ )
+		for ( TINT k = 0; k < 4; k++ )
+			if ( pThis[ i * 4 + k ] != pOther[ i * 4 + k ] ) return TFALSE;
+
+	return TTRUE;
+}
+
+// The three basis vectors are perpendicular to each other
+// $deBlob: FUNCTION 006653f0
+TBOOL TMatrix44::IsOrthogonal() const
+{
+	TFLOAT fDot12 = m_f11 * m_f21 + m_f12 * m_f22 + m_f13 * m_f23;
+	TFLOAT fDot13 = m_f11 * m_f31 + m_f12 * m_f32 + m_f13 * m_f33;
+	TFLOAT fDot23 = m_f21 * m_f31 + m_f22 * m_f32 + m_f23 * m_f33;
+	return fDot13 * fDot13 + fDot12 * fDot12 + fDot23 * fDot23 < 0.01f;
+}
+
+// $deBlob: FUNCTION 00665490
+TBOOL TMatrix44::IsOrthonormal() const
+{
+	TFLOAT fVar6 = m_f22 * m_f12 + m_f11 * m_f21 + m_f23 * m_f13;
+	TFLOAT fVar4 = m_f32 * m_f12 + m_f11 * m_f31 + m_f33 * m_f13;
+	TFLOAT fVar5 = ( m_f11 * m_f11 + m_f12 * m_f12 + m_f13 * m_f13 ) - 1.0f;
+	TFLOAT fVar3 = m_f22 * m_f32 + m_f21 * m_f31 + m_f23 * m_f33;
+	TFLOAT fVar2 = ( m_f22 * m_f22 + m_f21 * m_f21 + m_f23 * m_f23 ) - 1.0f;
+	TFLOAT fVar1 = ( m_f32 * m_f32 + m_f31 * m_f31 + m_f33 * m_f33 ) - 1.0f;
+
+	return fVar2 * fVar2 + fVar5 * fVar5 + fVar1 * fVar1 + fVar4 * fVar4 + fVar6 * fVar6 + fVar3 * fVar3 < 0.01f &&
+	    m_f14 == 0.0f && m_f24 == 0.0f && m_f34 == 0.0f && m_f44 == 1.0f;
+}
+
+// $deBlob: FUNCTION 00665660
+// $Barnyard: FUNCTION 006c86f0
+void TMatrix44::Scale( TFLOAT a_fScalar1, TFLOAT a_fScalar2, TFLOAT a_fScalar3 )
+{
+	m_f11 *= a_fScalar1;
+	m_f12 *= a_fScalar1;
+	m_f13 *= a_fScalar1;
+	m_f21 *= a_fScalar2;
+	m_f22 *= a_fScalar2;
+	m_f23 *= a_fScalar2;
+	m_f31 *= a_fScalar3;
+	m_f32 *= a_fScalar3;
+	m_f33 *= a_fScalar3;
+}
+
+// $deBlob: FUNCTION 00665700
+// $Barnyard: FUNCTION 006c8750
+void TMatrix44::Scale( const TVector4& a_rScalars )
+{
+	m_f11 *= a_rScalars.x;
+	m_f12 *= a_rScalars.x;
+	m_f13 *= a_rScalars.x;
+	m_f21 *= a_rScalars.y;
+	m_f22 *= a_rScalars.y;
+	m_f23 *= a_rScalars.y;
+	m_f31 *= a_rScalars.z;
+	m_f32 *= a_rScalars.z;
+	m_f33 *= a_rScalars.z;
+}
+
+// $deBlob: FUNCTION 00665790
+// NOTE: retail returns a_rOutScale in EAX (callers chain on it, e.g. Magnitude of the scale)
+TVector4& TMatrix44::GetScale( TVector4& a_rOutScale ) const
+{
+	TFLOAT fX = AsBasisVector4( 0 ).Magnitude();
+	TFLOAT fY = AsBasisVector4( 1 ).Magnitude();
+	TFLOAT fZ = AsBasisVector4( 2 ).Magnitude();
+	a_rOutScale.Set( fX, fY, fZ, 1.0f );
+	return a_rOutScale;
+}
+
+// $deBlob: FUNCTION 006657f0
+// $Barnyard: FUNCTION 006c9160
+void TMatrix44::Rotate( TFLOAT a_fAngleX, TFLOAT a_fAngleY, TFLOAT a_fAngleZ )
+{
+	RotateX( a_fAngleX );
+	RotateY( a_fAngleY );
+	RotateZ( a_fAngleZ );
+}
 
 // $deBlob: FUNCTION 00665ca0
 void TMatrix44::LookAtTarget( const TVector4& target, const TVector4& up )
@@ -78,6 +184,7 @@ void TMatrix44::Multiply( const TMatrix44& a_rLeft, const TMatrix44& a_rRight )
 	}
 }
 
+// $deBlob: FUNCTION 005f0040
 // $deBlob: FUNCTION 00572e80
 // $Barnyard: FUNCTION 0041fb30
 void TMatrix44::Multiply( const TMatrix44& a_rRight )
@@ -177,9 +284,9 @@ void TMatrix44::InvertOrthogonal( const TMatrix44& a_rRight )
 
 	// NOTE: de Blob's order of operations
 	TFLOAT f41 = -fVar4, f42 = -fVar3, f43 = -fVar2;
-	m_f42      = f41 * fVar14 + f42 * fVar10 + f43 * m_f32;
-	m_f43      = f41 * fVar13 + f42 * fVar9 + f43 * fVar6;
-	m_f41      = f41 * fVar15 + f42 * fVar11 + f43 * fVar7;
+	m_f42 = f41 * fVar14 + f42 * fVar10 + f43 * m_f32;
+	m_f43 = f41 * fVar13 + f42 * fVar9 + f43 * fVar6;
+	m_f41 = f41 * fVar15 + f42 * fVar11 + f43 * fVar7;
 }
 
 // $Barnyard: FUNCTION 006c9110
@@ -205,6 +312,115 @@ void TMatrix44::InvertOrthonormal()
 	m_f42 = m_f22 * f42 + f41 * m_f12 + f43 * m_f32;
 	m_f43 = f42 * m_f23 + f41 * m_f13 + m_f33 * f43;
 	m_f41 = f42 * m_f21 + f41 * m_f11 + f43 * m_f31;
+}
+
+// $deBlob: FUNCTION 00665e90
+// $Barnyard: FUNCTION 006c8a20
+void TMatrix44::TransformVector( TVector3& a_rOutVector, const TMatrix44& a_rMatrix, const TVector3& a_rVector )
+{
+	TFLOAT fX = a_rVector.x, fY = a_rVector.y, fZ = a_rVector.z;
+
+	a_rOutVector.x = a_rMatrix.m_f21 * fY + a_rMatrix.m_f11 * fX + a_rMatrix.m_f31 * fZ + a_rMatrix.m_f41;
+	a_rOutVector.y = a_rMatrix.m_f12 * fX + a_rMatrix.m_f22 * fY + a_rMatrix.m_f32 * fZ + a_rMatrix.m_f42;
+	a_rOutVector.z = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + a_rMatrix.m_f33 * fZ + a_rMatrix.m_f43;
+}
+
+// $deBlob: FUNCTION 00666010
+// $Barnyard: FUNCTION 006c8a80
+void TMatrix44::TransformVector( TVector4& a_rOutVector, const TMatrix44& a_rMatrix, const TVector4& a_rVector )
+{
+	TFLOAT fX = a_rVector.x, fY = a_rVector.y, fZ = a_rVector.z, fW = a_rVector.w;
+
+	a_rOutVector.z = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + a_rMatrix.m_f33 * fZ + a_rMatrix.m_f43 * fW;
+	a_rOutVector.w = a_rMatrix.m_f14 * fX + a_rMatrix.m_f24 * fY + a_rMatrix.m_f34 * fZ + a_rMatrix.m_f44 * fW;
+	a_rOutVector.y = a_rMatrix.m_f12 * fX + a_rMatrix.m_f22 * fY + a_rMatrix.m_f32 * fZ + a_rMatrix.m_f42 * fW;
+	a_rOutVector.x = a_rMatrix.m_f21 * fY + a_rMatrix.m_f11 * fX + a_rMatrix.m_f31 * fZ + a_rMatrix.m_f41 * fW;
+}
+
+// $deBlob: FUNCTION 00666330
+// $Barnyard: FUNCTION 006c8b20
+void TMatrix44::RotateVector( TVector3& a_rOutVector, const TMatrix44& a_rMatrix, const TVector3& a_rVector )
+{
+	TFLOAT fY = a_rVector.y, fX = a_rVector.x, fZ = a_rVector.z;
+
+	TFLOAT fOutX = a_rMatrix.m_f21 * fY + a_rMatrix.m_f11 * fX + a_rMatrix.m_f31 * fZ;
+	TFLOAT fOutY = a_rMatrix.m_f12 * fX + a_rMatrix.m_f22 * fY + a_rMatrix.m_f32 * fZ;
+	TFLOAT fOutZ = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + a_rMatrix.m_f33 * fZ;
+
+	a_rOutVector.x = fOutX;
+	a_rOutVector.y = fOutY;
+	a_rOutVector.z = fOutZ;
+}
+
+// $deBlob: FUNCTION 006663d0
+// $Barnyard: FUNCTION 006c8b80
+void TMatrix44::RotateVector( TVector4& a_rOutVector, const TMatrix44& a_rMatrix, const TVector4& a_rVector )
+{
+	TFLOAT fX = a_rVector.x, fY = a_rVector.y, fZ = a_rVector.z, fW = a_rVector.w;
+
+	a_rOutVector.y = a_rMatrix.m_f12 * fX + a_rMatrix.m_f22 * fY + a_rMatrix.m_f32 * fZ;
+	a_rOutVector.z = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + a_rMatrix.m_f33 * fZ;
+	a_rOutVector.w = fW;
+	a_rOutVector.x = a_rMatrix.m_f21 * fY + a_rMatrix.m_f11 * fX + a_rMatrix.m_f31 * fZ;
+}
+
+// $deBlob: FUNCTION 00666a60
+// $Barnyard: FUNCTION 006c8c20
+void TMatrix44::MatToQuat( TQuaternion& a_rOutQuat, const TMatrix44& a_rMatrix )
+{
+	TFLOAT fVar1;
+	TFLOAT fVar2;
+	TFLOAT fVar3;
+	TFLOAT fVar4;
+
+	fVar1 = a_rMatrix.m_f11;
+	fVar2 = a_rMatrix.m_f22;
+	fVar3 = a_rMatrix.m_f33;
+
+	// NOTE: de Blob's order of operations (Barnyard adds and subtracts in another order)
+	fVar4 = fVar1 + fVar2 + fVar3;
+
+	if ( 0.0f < fVar4 )
+	{
+		fVar1        = TMath::Sqrt( fVar4 + 1.0f ) * 0.5f;
+		a_rOutQuat.w = fVar1;
+		fVar1        = 0.25f / fVar1;
+		a_rOutQuat.x = ( a_rMatrix.m_f23 - a_rMatrix.m_f32 ) * fVar1;
+		a_rOutQuat.y = ( a_rMatrix.m_f31 - a_rMatrix.m_f13 ) * fVar1;
+		a_rOutQuat.z = ( a_rMatrix.m_f12 - a_rMatrix.m_f21 ) * fVar1;
+		return;
+	}
+	if ( fVar2 <= fVar1 )
+	{
+		if ( fVar3 < fVar1 )
+		{
+			fVar1        = TMath::Sqrt( ( ( fVar1 - fVar2 ) - fVar3 ) + 1.0f ) * 0.5f;
+			a_rOutQuat.x = fVar1;
+			fVar1        = 0.25f / fVar1;
+			a_rOutQuat.w = ( a_rMatrix.m_f23 - a_rMatrix.m_f32 ) * fVar1;
+			a_rOutQuat.y = ( a_rMatrix.m_f12 + a_rMatrix.m_f21 ) * fVar1;
+			a_rOutQuat.z = ( a_rMatrix.m_f13 + a_rMatrix.m_f31 ) * fVar1;
+			return;
+		}
+	}
+	else if ( fVar3 <= fVar2 )
+	{
+		fVar1        = TMath::Sqrt( ( ( fVar2 - fVar3 ) - fVar1 ) + 1.0f ) * 0.5f;
+		a_rOutQuat.y = fVar1;
+		fVar1        = 0.25f / fVar1;
+		a_rOutQuat.w = ( a_rMatrix.m_f31 - a_rMatrix.m_f13 ) * fVar1;
+		a_rOutQuat.z = ( a_rMatrix.m_f23 + a_rMatrix.m_f32 ) * fVar1;
+		a_rOutQuat.x = ( a_rMatrix.m_f21 + a_rMatrix.m_f12 ) * fVar1;
+		return;
+	}
+
+	fVar1        = TMath::Sqrt( ( ( fVar3 - fVar1 ) - fVar2 ) + 1.0f ) * 0.5f;
+	a_rOutQuat.z = fVar1;
+
+	fVar1        = 0.25f / fVar1;
+	a_rOutQuat.w = ( a_rMatrix.m_f12 - a_rMatrix.m_f21 ) * fVar1;
+	a_rOutQuat.x = ( a_rMatrix.m_f31 + a_rMatrix.m_f13 ) * fVar1;
+	a_rOutQuat.y = ( a_rMatrix.m_f32 + a_rMatrix.m_f23 ) * fVar1;
 }
 
 // $deBlob: FUNCTION 00666c80
@@ -313,6 +529,7 @@ void TMatrix44::RotateZ( TFLOAT angle )
 	m_f23 = m_f23 * fCos - fVar1 * fSin;
 }
 
+// $deBlob: FUNCTION 006d9cf0
 // $Barnyard: FUNCTION 005e7bb0
 void TMatrix44::GetEulerXYZ( TVector3& a_rOutVec ) const
 {
@@ -379,50 +596,49 @@ TFLOAT TMatrix44::Determinant4() const
 }
 
 // Inverts any 4x4 matrix, returns TFALSE if it can't be inverted
-// NOTE: written after the decompiled code (temporaries keep the decompiler's names)
 // $deBlob: FUNCTION 00663910
 TBOOL TMatrix44::InvertArbitrary( const TMatrix44& a_rcMatrix )
 {
 	const TFLOAT* param_1    = a_rcMatrix.AsBasisVector4( 0 ).AsArray();
 	TFLOAT*       param_1_00 = AsBasisVector4( 0 ).AsArray();
 
-	TFLOAT fVar1  = param_1[ 15 ];
-	TFLOAT fVar2  = param_1[ 14 ];
-	TFLOAT fVar3  = param_1[ 10 ];
-	TFLOAT fVar4  = param_1[ 11 ];
-	TFLOAT fVar74 = fVar3 * fVar1 - fVar4 * fVar2;
-	TFLOAT fVar72 = param_1[ 1 ] * param_1[ 4 ];
-	TFLOAT fVar75 = param_1[ 0 ] * param_1[ 5 ];
-	TFLOAT fVar5  = param_1[ 7 ];
-	TFLOAT fVar6  = param_1[ 10 ];
-	TFLOAT fVar76 = fVar75 - fVar72;
-	TFLOAT fVar7  = param_1[ 6 ];
-	TFLOAT fVar8  = param_1[ 13 ];
-	TFLOAT fVar9  = param_1[ 7 ];
-	TFLOAT fVar10 = param_1[ 12 ];
-	TFLOAT fVar95 = fVar7 * fVar1 - fVar9 * fVar2;
-	TFLOAT fVar11 = param_1[ 8 ];
-	TFLOAT fVar12 = param_1[ 1 ];
-	TFLOAT fVar77 = fVar11 * param_1[ 1 ];
-	TFLOAT fVar13 = param_1[ 9 ];
-	TFLOAT fVar14 = param_1[ 0 ];
-	TFLOAT fVar96 = fVar13 * fVar14 - fVar77;
-	TFLOAT fVar15 = param_1[ 11 ];
-	TFLOAT fVar16 = param_1[ 0 ];
-	TFLOAT fVar78 = fVar7 * fVar15 - fVar5 * fVar6;
-	TFLOAT fVar79 = fVar8 * fVar16 - fVar10 * fVar12;
-	TFLOAT fVar17 = param_1[ 2 ];
-	TFLOAT fVar18 = param_1[ 3 ];
-	TFLOAT fVar19 = param_1[ 9 ];
-	TFLOAT fVar20 = param_1[ 4 ];
-	TFLOAT fVar85 = fVar17 * fVar1 - fVar18 * fVar2;
-	TFLOAT fVar21 = param_1[ 8 ];
-	TFLOAT fVar22 = param_1[ 5 ];
-	TFLOAT fVar99 = fVar19 * fVar20 - fVar21 * fVar22;
-	TFLOAT fVar23 = param_1[ 12 ];
-	TFLOAT fVar24 = param_1[ 5 ];
-	TFLOAT fVar25 = param_1[ 4 ];
-	TFLOAT fVar26 = param_1[ 3 ];
+	TFLOAT fVar1   = param_1[ 15 ];
+	TFLOAT fVar2   = param_1[ 14 ];
+	TFLOAT fVar3   = param_1[ 10 ];
+	TFLOAT fVar4   = param_1[ 11 ];
+	TFLOAT fVar74  = fVar3 * fVar1 - fVar4 * fVar2;
+	TFLOAT fVar72  = param_1[ 1 ] * param_1[ 4 ];
+	TFLOAT fVar75  = param_1[ 0 ] * param_1[ 5 ];
+	TFLOAT fVar5   = param_1[ 7 ];
+	TFLOAT fVar6   = param_1[ 10 ];
+	TFLOAT fVar76  = fVar75 - fVar72;
+	TFLOAT fVar7   = param_1[ 6 ];
+	TFLOAT fVar8   = param_1[ 13 ];
+	TFLOAT fVar9   = param_1[ 7 ];
+	TFLOAT fVar10  = param_1[ 12 ];
+	TFLOAT fVar95  = fVar7 * fVar1 - fVar9 * fVar2;
+	TFLOAT fVar11  = param_1[ 8 ];
+	TFLOAT fVar12  = param_1[ 1 ];
+	TFLOAT fVar77  = fVar11 * param_1[ 1 ];
+	TFLOAT fVar13  = param_1[ 9 ];
+	TFLOAT fVar14  = param_1[ 0 ];
+	TFLOAT fVar96  = fVar13 * fVar14 - fVar77;
+	TFLOAT fVar15  = param_1[ 11 ];
+	TFLOAT fVar16  = param_1[ 0 ];
+	TFLOAT fVar78  = fVar7 * fVar15 - fVar5 * fVar6;
+	TFLOAT fVar79  = fVar8 * fVar16 - fVar10 * fVar12;
+	TFLOAT fVar17  = param_1[ 2 ];
+	TFLOAT fVar18  = param_1[ 3 ];
+	TFLOAT fVar19  = param_1[ 9 ];
+	TFLOAT fVar20  = param_1[ 4 ];
+	TFLOAT fVar85  = fVar17 * fVar1 - fVar18 * fVar2;
+	TFLOAT fVar21  = param_1[ 8 ];
+	TFLOAT fVar22  = param_1[ 5 ];
+	TFLOAT fVar99  = fVar19 * fVar20 - fVar21 * fVar22;
+	TFLOAT fVar23  = param_1[ 12 ];
+	TFLOAT fVar24  = param_1[ 5 ];
+	TFLOAT fVar25  = param_1[ 4 ];
+	TFLOAT fVar26  = param_1[ 3 ];
 	TFLOAT fVar100 = fVar8 * fVar25 - fVar23 * fVar24;
 	TFLOAT fVar27  = param_1[ 10 ];
 	TFLOAT fVar28  = param_1[ 11 ];
@@ -524,7 +740,6 @@ TBOOL TMatrix44::InvertArbitrary( const TMatrix44& a_rcMatrix )
 }
 
 // Inverts any 4x4 matrix with the cofactors, returns TFALSE if it can't be inverted
-// NOTE: written after the decompiled code (temporaries keep the decompiler's names)
 // $deBlob: FUNCTION 00664490
 TBOOL TMatrix44::Invert4( const TMatrix44& a_rcMatrix )
 {
@@ -672,12 +887,34 @@ void TMatrix44::TransformPlane( TPlane& a_rOutPlane, const TMatrix44& a_rMatrix,
 		vOut.Negate4();
 }
 
+// $deBlob: FUNCTION 00666990
+// $Barnyard: FUNCTION 006c8bf0
+void TMatrix44::TransformPlaneOrthogonal( TPlane& a_rOutPlane, const TMatrix44& a_rMatrix, const TPlane& a_rcSourcePlane )
+{
+	TFLOAT fNY = a_rcSourcePlane.AsNormal().y;
+	TFLOAT fNX = a_rcSourcePlane.AsNormal().x;
+	TFLOAT fNZ = a_rcSourcePlane.AsNormal().z;
+	TFLOAT fM21 = a_rMatrix.m_f21;
+	TFLOAT fM11 = a_rMatrix.m_f11;
+
+	TFLOAT fY   = a_rMatrix.m_f12 * fNX + a_rMatrix.m_f22 * fNY + a_rMatrix.m_f32 * fNZ;
+	TFLOAT fZ   = a_rMatrix.m_f13 * fNX + a_rMatrix.m_f23 * fNY + a_rMatrix.m_f33 * fNZ;
+	TFLOAT fM31 = a_rMatrix.m_f31;
+
+	TFLOAT fCopyD = a_rcSourcePlane.GetD();
+	a_rOutPlane.SetD( fCopyD );
+	a_rOutPlane.AsNormal().y  = fY;
+	a_rOutPlane.AsNormal().z  = fZ;
+	a_rOutPlane.AsNormal().x  = fM21 * fNY + fNX * fM11 + fM31 * fNZ;
+	a_rOutPlane.SetD( a_rMatrix.m_f42 * fY + a_rOutPlane.AsNormal().x * a_rMatrix.m_f41 + a_rMatrix.m_f43 * fZ + a_rcSourcePlane.GetD() );
+}
+
 // $deBlob: FUNCTION 00665f40
 void TMatrix44::TransformVectorBatched( TVector3* a_pOutVectors, const TMatrix44& a_rMatrix, const TVector3* const* a_ppVectors, TINT a_iBatchSize )
 {
 	for ( TINT i = 0; i < a_iBatchSize; i++ )
 	{
-		const TVector3& v = *a_ppVectors[ i ];
+		const TVector3& v  = *a_ppVectors[ i ];
 		TFLOAT          fX = v.x, fY = v.y, fZ = v.z;
 
 		a_pOutVectors[ i ].y = a_rMatrix.m_f22 * fY + fX * a_rMatrix.m_f12 + fZ * a_rMatrix.m_f32 + a_rMatrix.m_f42;
@@ -691,7 +928,7 @@ void TMatrix44::TransformVectorBatched( TVector4* a_pOutVectors, const TMatrix44
 {
 	for ( TINT i = 0; i < a_iBatchSize; i++ )
 	{
-		const TVector4& v = *a_ppVectors[ i ];
+		const TVector4& v  = *a_ppVectors[ i ];
 		TFLOAT          fX = v.x, fY = v.y, fZ = v.z, fW = v.w;
 
 		a_pOutVectors[ i ].z = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + fZ * a_rMatrix.m_f33 + fW * a_rMatrix.m_f43;
@@ -718,11 +955,11 @@ void TMatrix44::TransformVectorBatched( TVector4* a_pOutVectors, const TMatrix44
 // $deBlob: FUNCTION 00666470
 void TMatrix44::RotateVectorBatched( TVector4* a_pOutVectors, const TMatrix44& a_rMatrix, const TVector4* const* a_ppVectors, TINT a_BatchSize )
 {
-	TASSERT( a_BatchSize>0 );
+	TASSERT( a_BatchSize > 0 );
 
 	for ( TINT i = 0; i < a_BatchSize; i++ )
 	{
-		const TVector4& v = *a_ppVectors[ i ];
+		const TVector4& v  = *a_ppVectors[ i ];
 		TFLOAT          fX = v.x, fY = v.y, fZ = v.z, fW = v.w;
 
 		a_pOutVectors[ i ].y = a_rMatrix.m_f12 * fX + fY * a_rMatrix.m_f22 + a_rMatrix.m_f32 * fZ;
@@ -735,7 +972,7 @@ void TMatrix44::RotateVectorBatched( TVector4* a_pOutVectors, const TMatrix44& a
 // $deBlob: FUNCTION 00666560
 void TMatrix44::RotateVectorBatched( TVector4* a_pOutVectors, const TMatrix44& a_rMatrix, const TVector4* a_pVectors, TINT a_BatchSize )
 {
-	TASSERT( a_BatchSize>0 );
+	TASSERT( a_BatchSize > 0 );
 
 	for ( TINT i = 0; i < a_BatchSize; i++ )
 	{

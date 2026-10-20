@@ -54,6 +54,8 @@ public:
 			m_poArray->Push( element );
 		}
 
+		// $deBlob: FUNCTION 0067a6f0
+		// $deBlob: FUNCTION 0067a7a0
 		T* operator->() const
 		{
 			TASSERT( m_iIndex >= 0 );
@@ -88,9 +90,17 @@ public:
 			return ( m_iIndex == a_rIt.m_iIndex ) && ( m_poArray == a_rIt.m_poArray );
 		}
 
+		// NOTE: de Blob's iterator turns into the end iterator (-1) when it steps past the last element
+		// $deBlob: FUNCTION 0067a850
+		// $deBlob: FUNCTION 0067a8a0
 		Iterator& operator++()
 		{
 			m_iIndex++;
+			TASSERT( m_poArray );
+
+			if ( m_iIndex >= m_poArray->m_iNumElements || m_iIndex == 0 )
+				m_iIndex = -1;
+
 			return *this;
 		}
 
@@ -162,6 +172,14 @@ public:
 	};
 
 public:
+	// NOTE: de Blob allocates with new[] and has no assert for an empty array without a grow size
+	// $deBlob: FUNCTION 0067a410
+	// $deBlob: FUNCTION 0067a460
+	// $deBlob: FUNCTION 0070e3b0
+	// $deBlob: FUNCTION 0070e400
+	// $deBlob: FUNCTION 0070e450
+	// $deBlob: FUNCTION 0070e4a0
+	// $deBlob: FUNCTION 0070e4f0
 	TGenericArray( TINT a_iGrowSize, TINT a_iSize )
 	{
 		m_iGrowSize         = a_iGrowSize;
@@ -170,7 +188,7 @@ public:
 
 		if ( m_iNumAllocElements > 0 )
 		{
-			m_pData = TSTATICCAST( T, TMemalign( alignof( T ), m_iNumAllocElements * sizeof( T ) ) );
+			m_pData = TSTATICCAST( T, TMemalign( TALIGNOF( T ), m_iNumAllocElements * sizeof( T ) ) );
 		}
 		else
 		{
@@ -179,31 +197,39 @@ public:
 		}
 	}
 
+	// $deBlob: FUNCTION 0067a530
 	// $Barnyard: FUNCTION 005a2160
+	// $deBlob: FUNCTION 0067a540
 	~TGenericArray()
 	{
+		// NOTE: retail calls operator delete[] (see FreeData)
 		if ( m_pData )
 		{
-			TFree( m_pData );
+			::operator delete[]( m_pData );
 		}
 	}
 
-	// Instantiations: TArray<AGeomContactList::Contact> 0057a130, TArray<TFLOAT> 0057a200 (APrim), TArray<const TClass*> 00410b10 (AMethodPointer signatures)
 	// NOTE: retail allocates the new buffer with new[] when T has a constructor and copies the elements one by one
 	// $Barnyard: FUNCTION 0057a130
 	// $Barnyard: FUNCTION 0057a200
-	// TArray<TUINT16> 0059e720, TArray<ALatchRef> 0059e8f0 (AInteraction)
 	// $Barnyard: FUNCTION 0059e720
 	// $Barnyard: FUNCTION 0059e8f0
 	// $Barnyard: FUNCTION 006d9830
-	// TArray<TPString8> 005a4280 (AInteractionManager::m_aLatchNames)
 	// $Barnyard: FUNCTION 005a4280
 	// $Barnyard: FUNCTION 00410b10
+	// NOTE: retail allocates with new[]/delete[] (TMemalign( 16 )/TFree) and copies the elements by assignment
+	// $deBlob: FUNCTION 0067aba0
+	// $deBlob: FUNCTION 0067ac80
+	// $deBlob: FUNCTION 007107e0
+	// $deBlob: FUNCTION 007108c0
+	// $deBlob: FUNCTION 007109a0
+	// $deBlob: FUNCTION 00710a80
+	// $deBlob: FUNCTION 00710b60
 	void Resize( TINT a_iNewSize )
 	{
 		if ( a_iNewSize != 0 )
 		{
-			T*     pNewBuffer = TSTATICCAST( T, TMemalign( alignof( T ), a_iNewSize * sizeof( T ) ) );
+			T*     pNewBuffer = TSTATICCAST( T, TMemalign( TALIGNOF( T ), a_iNewSize * sizeof( T ) ) );
 			size_t uiCopySize = TMath::Min( m_iNumElements, a_iNewSize );
 
 			TUtil::MemCopy( pNewBuffer, m_pData, sizeof( T ) * uiCopySize );
@@ -221,12 +247,18 @@ public:
 	}
 
 	// Frees the buffer and empties the array
-	// NOTE: An out of line part of Resize.
-	// Instantiations: TArray<const TClass*> 00410b80
+	// $deBlob: FUNCTION 0067a950
+	// $deBlob: FUNCTION 0067a980
+	// $deBlob: FUNCTION 0070ef30
+	// $deBlob: FUNCTION 0070ef60
+	// $deBlob: FUNCTION 0070ef90
+	// $deBlob: FUNCTION 0070efc0
 	// $Barnyard: FUNCTION 00410b80
+	// $deBlob: FUNCTION 0070eff0
 	void FreeData()
 	{
-		if ( m_pData ) TFree( m_pData );
+		// NOTE: retail calls operator delete[] (no destructors, the elements are destroyed by the callers)
+		if ( m_pData ) ::operator delete[]( m_pData );
 		m_pData             = TNULL;
 		m_iNumAllocElements = 0;
 		m_iNumElements      = 0;
@@ -237,18 +269,18 @@ public:
 		if ( m_iNumAllocElements < 0 )
 		{
 			if ( m_pData )
-			{
-				TFree( m_pData );
-				m_pData = TNULL;
-			}
+				::operator delete[]( m_pData );
 
+			m_pData             = TNULL;
 			m_iNumAllocElements = 0;
+			m_iNumElements      = 0;
 		}
 
 		m_iNumElements = 0;
 	}
 
-	// Instantiations: TArray of pointers (folded, used by AFunctionTable, AFSMInstance, AQuest) 005c9f20
+	// $deBlob: FUNCTION 0067a8f0
+	// $deBlob: FUNCTION 0067a920
 	// $Barnyard: FUNCTION 005c9f20
 	Iterator Begin()
 	{
@@ -260,13 +292,13 @@ public:
 		return Iterator( ( m_iNumElements == 0 ) ? -1 : m_iNumElements - 1, *this );
 	}
 
-	// Instantiations: TArray of pointers (folded, used by AFunctionTable, AFSMInstance, AQuest) 005c9d40
 	// $Barnyard: FUNCTION 005c9d40
 	Iterator End()
 	{
 		return Iterator( -1, *this );
 	}
 
+	// $deBlob: FUNCTION 0067ad80
 	TINT Size() const
 	{
 		return m_iNumElements;
@@ -282,6 +314,7 @@ public:
 		return m_iNumAllocElements;
 	}
 
+	// $deBlob: FUNCTION 0070ea70
 	TINT GetGrowSize() const
 	{
 		return m_iGrowSize;
@@ -292,13 +325,11 @@ public:
 		m_iGrowSize = a_iGrowSize;
 	}
 
-	// Instantiations: TArray<AGeomContactList::Contact> 0057a310, TArray<TFLOAT> 0057a920 (APrim)
 	// $Barnyard: FUNCTION 0057a310
 	// $Barnyard: FUNCTION 0057a920
-	// TArray<AInteractionRequirement*> 005a3890 (AInteractionManager)
 	// $Barnyard: FUNCTION 005a3890
-	// TArray<TPString8> 005a54e0 (AInteractionManager::m_aLatchNames)
 	// $Barnyard: FUNCTION 005a54e0
+	// $deBlob: FUNCTION 0067ab50
 	T* Push( const T& element = T() )
 	{
 		GrowBy( 1 );
@@ -318,6 +349,13 @@ public:
 		return m_pData[ --m_iNumElements ];
 	}
 
+	// $deBlob: FUNCTION 0067a5f0
+	// $deBlob: FUNCTION 0067a670
+	// $deBlob: FUNCTION 0070e7f0
+	// $deBlob: FUNCTION 0070e870
+	// $deBlob: FUNCTION 0070e8f0
+	// $deBlob: FUNCTION 0070e970
+	// $deBlob: FUNCTION 0070e9f0
 	T& operator[]( TINT a_iIndex )
 	{
 		TASSERT( a_iIndex >= 0 );
@@ -481,11 +519,16 @@ private:
 		m_iNumElements += a_iCount;
 	}
 
-	// Instantiations: TArray<const TClass*> 00410ad0
 	// $Barnyard: FUNCTION 00410ad0
+	// $deBlob: FUNCTION 0067aa00
+	// $deBlob: FUNCTION 0067aa80
+	// $deBlob: FUNCTION 00718590
+	// $deBlob: FUNCTION 00718610
+	// $deBlob: FUNCTION 00718690
+	// $deBlob: FUNCTION 00718710
 	void GrowBy( TINT a_iGrowBy )
 	{
-		if ( m_iNumAllocElements < m_iNumElements + a_iGrowBy )
+		if ( m_iNumElements + a_iGrowBy > m_iNumAllocElements )
 		{
 			TASSERT( m_iGrowSize != 0 );
 

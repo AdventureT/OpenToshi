@@ -28,14 +28,9 @@ public:
 		LogType_NUMOF
 	};
 
-	static constexpr const TCHAR* kTypeStrings[] = {
-		"Info",
-		"Warning",
-		"Error",
-		"Critical"
-	};
+	static const TCHAR* const kTypeStrings[ LogType_NUMOF ];
 
-	static constexpr const TCHAR* LogTypeToString( LogType a_eType )
+	static TCONSTEXPR const TCHAR* LogTypeToString( LogType a_eType )
 	{
 		TSTATICASSERT( Toshi::TUtil::LogType_NUMOF == TARRAYSIZE( kTypeStrings ) );
 
@@ -46,7 +41,7 @@ public:
 
 	struct LogEvent
 	{
-		constexpr LogEvent( TLogFile* a_pFile, LogType a_eType, const TCHAR* a_szString )
+		TCONSTEXPR LogEvent( TLogFile* a_pFile, LogType a_eType, const TCHAR* a_szString )
 		    : m_pFile( a_pFile ), m_eType( a_eType ), m_szString( a_szString )
 		{}
 
@@ -75,25 +70,16 @@ public:
 
 	static const TCHAR* GetTime();
 
-	// $deBlob: FUNCTION 0065d4b0
-	// $Barnyard: FUNCTION 006bfd10
-	static void MemSet( void* ptr, TINT value, TSIZE size ) { std::memset( ptr, value, size ); }
+	static void MemSet( void* ptr, TINT value, TSIZE size );
 
-	// $deBlob: FUNCTION 0065d470
-	// $Barnyard: FUNCTION 006bfcc0
 	// NOTE: de Blob's MemCopy is a memmove
-	static void* MemCopy( void* dst, const void* src, TSIZE size ) { return std::memmove( dst, src, size ); }
+	static void* MemCopy( void* dst, const void* src, TSIZE size );
 
-	// $deBlob: FUNCTION 0065d4d0
-	// $Barnyard: FUNCTION 006bfd50
-	static void MemClear( void* ptr, TSIZE size ) { std::memset( ptr, 0, size ); }
+	static void MemClear( void* ptr, TSIZE size );
 
-	// $deBlob: FUNCTION 0065d4f0
-	static TINT MemCompare( const void* ptr1, const void* ptr2, TSIZE size ) { return std::memcmp( ptr1, ptr2, size ); }
+	static TINT MemCompare( const void* ptr1, const void* ptr2, TSIZE size );
 
-	// $deBlob: FUNCTION 0065d490
-	// $Barnyard: FUNCTION 006bfcf0
-	static void* MemMove( void* dst, const void* src, TSIZE size ) { return std::memmove( dst, src, size ); }
+	static void* MemMove( void* dst, const void* src, TSIZE size );
 
 	template <class T>
 	static void Fill( T* a_pStart, T* a_pEnd, const T& a_rcValue = T() )
@@ -123,7 +109,7 @@ public:
 	static TLogFile* GetLog() { return GetCurrentLogFile(); }
 
 	// NOTE: de Blob has no TPString8 pool (no trace of TPString8 in retail); kept for the imported engine code
-	static TPString8Pool* SetTPStringPool( TPString8Pool* a_pStringPool ) { return std::exchange( *ms_poStringPool, a_pStringPool ); }
+	static TPString8Pool* SetTPStringPool( TPString8Pool* a_pStringPool ) { return TExchange( *ms_poStringPool, a_pStringPool ); }
 
 	// $Barnyard: FUNCTION 006bb580
 	static TPString8Pool* GetTPStringPool()
@@ -139,7 +125,7 @@ private:
 	static void DestroyTPStringPool();
 
 private:
-	inline static TPString8Pool** ms_poStringPool;
+	static TPString8Pool** ms_poStringPool;
 
 public:
 #pragma region CRC
@@ -177,7 +163,7 @@ public:
 
 	//=============================================================================
 
-	inline static TUINT32 s_aiCRC32LUT[ CRC_TABSIZE ] = {};
+	static TUINT32 s_aiCRC32LUT[ CRC_TABSIZE ];
 
 	static void    CRCInitialise();
 	static TUINT32 CRC32( void* buffer, TUINT32 len );

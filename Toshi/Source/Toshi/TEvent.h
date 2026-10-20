@@ -52,10 +52,18 @@ template <typename Owner, typename Data = Owner>
 class TEmitter : public TGenericEmitter
 {
 public:
+	// $deBlob: FUNCTION 005e7530
+	// $deBlob: FUNCTION 005eff70
+	// $deBlob: FUNCTION 00661970
 	TEmitter( Owner* owner )
 	    : TGenericEmitter( owner ) {}
 
-	// NOTE: every instantiation is folded into one jmp to ~TGenericEmitter: 0042e130
+	// NOTE: every instantiation is folded into one jmp to ~TGenericEmitter
+	// $deBlob: FUNCTION 005e75b0
+	// $deBlob: FUNCTION 005effe0
+	// $deBlob: FUNCTION 006619f0
+	// $deBlob: FUNCTION 00677c90
+	// $deBlob: FUNCTION 00677ca0
 	// $Barnyard: FUNCTION 0042e130
 	~TEmitter() {}
 

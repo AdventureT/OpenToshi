@@ -10,49 +10,31 @@
 
 TOSHI_NAMESPACE_START
 
+TTRB*                                  T2GUITextureSectionManager::g_trb      = TNULL;
+T2GUITextureSectionManager::TRBHeader* T2GUITextureSectionManager::g_defblock = TNULL;
+T2GUITextureSection*                   T2GUITextureSectionManager::g_sections = TNULL;
+
+// $deBlob: FUNCTION 006f5b70
 // $Barnyard: FUNCTION 006bfb20
-TBOOL T2GUITextureSectionManager::Open( const TCHAR* a_szFileName, TTRB* a_pTRB )
+TBOOL T2GUITextureSectionManager::Open( const TCHAR* a_szFileName )
 {
-	if ( a_pTRB == TNULL )
+	TASSERT( g_trb == TNULL );
+	g_trb = new TTRB();
+
+	if ( g_trb->Load( a_szFileName, 0 ) != TTRB::ERROR_OK )
 	{
-		g_providedtrb = TFALSE;
-		g_trb         = new TTRB();
-
-		if ( g_trb->Load( a_szFileName ) != TTRB::ERROR_OK )
-			return TFALSE;
-
-		g_defblock = TSTATICCAST( TRBHeader, g_trb->GetSymbolAddress( "texturesections" ) );
-	}
-	else
-	{
-		g_trb         = a_pTRB;
-		g_providedtrb = TTRUE;
-
-		auto iFilePathLength = TStringManager::String8Length( a_szFileName );
-		auto iFileNamePos    = iFilePathLength - 1;
-
-		while ( a_szFileName[ iFileNamePos ] != '\\' && a_szFileName[ iFileNamePos ] != '/' )
-			iFileNamePos--;
-
-		iFileNamePos++;
-		TCHAR symbolName[ 132 ] = { '\0' };
-
-		auto iFileNameLength = iFilePathLength - iFileNamePos - 4;
-		TStringManager::String8Copy( symbolName, a_szFileName + iFileNamePos, iFileNameLength );
-		symbolName[ iFileNameLength ]     = '_';
-		symbolName[ iFileNameLength + 1 ] = '\0';
-		TStringManager::String8ToLowerCase( symbolName );
-		TStringManager::String8Copy( symbolName + iFileNameLength + 1, "texturesections" );
-
-		g_defblock = TSTATICCAST( TRBHeader, g_trb->GetSymbolAddress( symbolName ) );
+		TASSERT( 0 && "T2GUITextureSectionManager::Open: Failed to load trb" );
+		return TFALSE;
 	}
 
+	g_defblock = TSTATICCAST( TRBHeader, g_trb->GetSymbolAddress( "texturesections" ) );
 	g_sections = g_defblock->m_pSections;
 	CreateMaterials();
 
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006f5c30
 // $Barnyard: FUNCTION 006bfc40
 void T2GUITextureSectionManager::Close()
 {
@@ -61,107 +43,98 @@ void T2GUITextureSectionManager::Close()
 		DestroyMaterials();
 		g_sections = TNULL;
 		g_defblock = TNULL;
-
-		if ( !g_providedtrb )
-			delete g_trb;
-
-		g_providedtrb = TFALSE;
-		g_trb         = TNULL;
+		g_trb->Close();
+		delete g_trb;
+		g_trb = TNULL;
 	}
 }
 
+// $deBlob: FUNCTION 006f5c90
 // $Barnyard: FUNCTION 006bf890
 T2GUITextureSection* T2GUITextureSectionManager::GetTextureSection( const TCHAR* a_szSectionName )
 {
-	TASSERT( g_defblock && g_sections );
+	if ( g_sections == TNULL )
+		return TNULL;
 
-	for ( TUINT32 i = 0; i < g_defblock->m_uiNumSections; i++ )
+	for ( TINT i = 0; i < TINT( g_defblock->m_uiNumSections ); i++ )
 	{
-		auto pSection = &g_sections[ i ];
+		T2GUITextureSection* pSection = &g_sections[ i ];
 
-		if ( TStringManager::String8Compare( pSection->GetName(), a_szSectionName ) == 0 )
+		if ( TStringManager::String8Compare( a_szSectionName, pSection->GetName(), -1 ) == 0 )
 			return pSection;
 	}
 
 	return TNULL;
 }
 
+// $deBlob: FUNCTION 006f5ce0
 // $Barnyard: FUNCTION 006bf8e0
 void T2GUITextureSectionManager::CreateMaterials()
 {
-	TASSERT( g_sections != TNULL );
-
-	auto pRenderer = T2GUI::GetRenderer();
-
-	for ( TUINT i = 0; i < g_defblock->m_uiNumSections; i++ )
+	for ( TINT i = 0; i < TINT( g_defblock->m_uiNumSections ); i++ )
 	{
-		auto pSection = &g_defblock->m_pSections[ i ];
+		T2GUITextureSection* pSection = &g_sections[ i ];
 
 		if ( pSection->GetMaterial() == TNULL )
 		{
-			if ( TTexture* pTexture = pRenderer->GetTexture( pSection->GetTextureFile() ) )
+			if ( TTexture* pTexture = T2GUI::GetTexture( pSection->GetTextureFile() ) )
 			{
-				auto pMaterial = pRenderer->CreateMaterial( pTexture );
+				T2GUIMaterial* pMaterial = T2GUI::CreateMaterial( pTexture );
 				pSection->SetMaterial( pMaterial );
 
-				auto iWidth  = pRenderer->GetWidth( pMaterial );
-				auto iHeight = pRenderer->GetHeight( pMaterial );
+				TUINT uiWidth  = T2GUI::GetWidth( pMaterial );
+				TUINT uiHeight = T2GUI::GetHeight( pSection->GetMaterial() );
 
-				pSection->CalculateUV( TFLOAT( iWidth ), TFLOAT( iHeight ) );
+				pSection->CalculateUV( TFLOAT( TINT( uiWidth ) ), TFLOAT( TINT( uiHeight ) ) );
 			}
 		}
 	}
 }
 
+// $deBlob: FUNCTION 006f5e10
 // $Barnyard: FUNCTION 006bf9c0
 void T2GUITextureSectionManager::DestroyMaterials()
 {
-	TASSERT( g_sections != TNULL );
-
-	auto pRenderer = T2GUI::GetRenderer();
-
-	for ( TUINT i = 0; i < g_defblock->m_uiNumSections; i++ )
+	for ( TINT i = 0; i < TINT( g_defblock->m_uiNumSections ); i++ )
 	{
-		auto pSection  = &g_defblock->m_pSections[ i ];
-		auto pMaterial = pSection->GetMaterial();
+		T2GUITextureSection* pSection = &g_sections[ i ];
 
-		if ( pMaterial != TNULL )
+		if ( pSection->GetMaterial() != TNULL )
 		{
-			pRenderer->DestroyMaterial( pMaterial );
+			T2GUI::DestroyMaterial( pSection->GetMaterial() );
 			pSection->SetMaterial( TNULL );
 		}
 	}
 }
 
+// $deBlob: FUNCTION 006f5e60
 // $Barnyard: FUNCTION 006bfa10
 void T2GUITextureSectionManager::UpdateMaterials()
 {
 	if ( g_sections != TNULL )
 	{
-		auto pRenderer = T2GUI::GetRenderer();
-
-		for ( TUINT i = 0; i < g_defblock->m_uiNumSections; i++ )
+		for ( TINT i = 0; i < TINT( g_defblock->m_uiNumSections ); i++ )
 		{
-			auto pSection = &g_defblock->m_pSections[ i ];
-			auto pTexture = pRenderer->GetTexture( pSection->GetTextureFile() );
+			T2GUITextureSection* pSection = &g_sections[ i ];
+			TTexture*            pTexture = T2GUI::GetTexture( pSection->GetTextureFile() );
 
-			if ( pSection->GetMaterial() == TNULL )
+			if ( pSection->GetMaterial() != TNULL )
 			{
-				if ( pTexture )
+				if ( pTexture == TNULL )
 				{
-					auto pMaterial = pRenderer->CreateMaterial( pTexture );
-					pSection->SetMaterial( pMaterial );
-
-					auto iWidth  = pRenderer->GetWidth( pMaterial );
-					auto iHeight = pRenderer->GetHeight( pMaterial );
-
-					pSection->CalculateUV( TFLOAT( iWidth ), TFLOAT( iHeight ) );
+					T2GUI::DestroyMaterial( pSection->GetMaterial() );
+					pSection->SetMaterial( TNULL );
 				}
 			}
-			else if ( pTexture == TNULL )
+			else if ( pTexture != TNULL )
 			{
-				pRenderer->DestroyMaterial( pSection->GetMaterial() );
-				pSection->SetMaterial( TNULL );
+				T2GUIMaterial* pMaterial = T2GUI::CreateMaterial( pTexture );
+				pSection->SetMaterial( pMaterial );
+
+				TUINT uiWidth  = T2GUI::GetWidth( pMaterial );
+				TUINT uiHeight = T2GUI::GetHeight( pSection->GetMaterial() );
+
+				pSection->CalculateUV( TFLOAT( TINT( uiWidth ) ), TFLOAT( TINT( uiHeight ) ) );
 			}
 		}
 	}

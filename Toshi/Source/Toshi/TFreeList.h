@@ -58,14 +58,12 @@ public:
 	void Delete( void* a_Ptr );
 
 	// Frees the memory chunks of this free list
-	// NOTE: the name is unknown
 	void FreeChunks();
 
 	// Frees the memory chunks of every free list
 	static void DeinitialiseAll();
 
 	// Goes through every free list. The loop body (most likely logging) is compiled out of retail
-	// NOTE: the name is unknown
 	// $deBlob: FUNCTION 006f2c30
 	// $Barnyard: FUNCTION 006c19c0
 	static void DumpAll()
@@ -75,11 +73,11 @@ public:
 	}
 
 private:
-	inline static TFreeList* ms_pLastList = TNULL;
+	static TFreeList* ms_pLastList;
 
 #ifdef DEBLOB_COMMUNITY_PATCH
 	// Set by DeinitialiseAll, Delete does nothing after that
-	inline static TBOOL ms_bDeinitialised = TFALSE;
+	static TBOOL ms_bDeinitialised;
 #endif // DEBLOB_COMMUNITY_PATCH
 
 private:

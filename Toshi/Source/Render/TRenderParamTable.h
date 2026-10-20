@@ -8,8 +8,7 @@ TOSHI_NAMESPACE_START
 class TTexture;
 
 //-----------------------------------------------------------------------------
-// de Blob: Source\Render\TRenderParamTable.cpp. Shader parameters shared by the renderer (lights, matrices,
-// textures), created by TRender::TRender (0x30 bytes). The handles are indices of the (sorted) name tables.
+// Shader parameters shared by the renderer (lights, matrices, textures), created by TRender::TRender. The handles are indices of the (sorted) name tables.
 //-----------------------------------------------------------------------------
 class TRenderParamTable
 {
@@ -79,15 +78,47 @@ public:
 	TRenderParamTable();
 	~TRenderParamTable();
 
-	TINT FindParameterV4Handle( const TCHAR* a_szName ) { return m_V4ParamNames.GetStringID( a_szName ); }
-	TINT FindParameterM44Handle( const TCHAR* a_szName ) { return m_M44ParamNames.GetStringID( a_szName ); }
-	TINT FindParameterTexHandle( const TCHAR* a_szName ) { return m_TexParamNames.GetStringID( a_szName ); }
+	// The handle of a parameter name (0 if unknown)
+	// $deBlob: FUNCTION 006b6f60
+	TINT FindParameterV4Handle( const TCHAR* a_szName )
+	{
+		TINT iHandle = m_V4ParamNames.GetStringID( a_szName );
+		return ( iHandle < 0 ) ? 0 : iHandle;
+	}
+
+	// $deBlob: FUNCTION 006b6f80
+	TINT FindParameterM44Handle( const TCHAR* a_szName )
+	{
+		TINT iHandle = m_M44ParamNames.GetStringID( a_szName );
+		return ( iHandle < 0 ) ? 0 : iHandle;
+	}
+
+	// $deBlob: FUNCTION 006b6fa0
+	TINT FindParameterTexHandle( const TCHAR* a_szName )
+	{
+		TINT iHandle = m_TexParamNames.GetStringID( a_szName );
+		return ( iHandle < 0 ) ? 0 : iHandle;
+	}
+
+	// The name of a parameter handle
+	// $deBlob: FUNCTION 006b6fc0
+	const TCHAR* GetParameterV4Name( TINT a_Handle ) { return m_V4ParamNames.GetStringFromID( a_Handle ); }
+	// $deBlob: FUNCTION 006b6fd0
+	const TCHAR* GetParameterM44Name( TINT a_Handle ) { return m_M44ParamNames.GetStringFromID( a_Handle ); }
+	// $deBlob: FUNCTION 006b6fe0
+	const TCHAR* GetParameterTexName( TINT a_Handle ) { return m_TexParamNames.GetStringFromID( a_Handle ); }
 
 	void SetParameterV4( TINT a_Handle, const TVector4& a_rVector );
 	void SetParameterM44( TINT a_Handle, const TMatrix44& a_rMatrix );
 	void SetParameterTex( TINT a_Handle, TTexture* a_pTexture );
 
-	const TVector4&  GetParameterV4( TINT a_Handle ) const { return m_Vectors[ a_Handle ]; }
+	// $deBlob: FUNCTION 005f03b0
+	const TVector4& GetParameterV4( TINT a_Handle ) const
+	{
+		TASSERT( a_Handle >= 0 && a_Handle < m_iNumV4Params );
+		return m_Vectors[ a_Handle ];
+	}
+
 	const TMatrix44& GetParameterM44( TINT a_Handle ) const { return m_Matrices[ a_Handle ]; }
 	TTexture*        GetParameterTex( TINT a_Handle ) const { return m_Textures[ a_Handle ]; }
 

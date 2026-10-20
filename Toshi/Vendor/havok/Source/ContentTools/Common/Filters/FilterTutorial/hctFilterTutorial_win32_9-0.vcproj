@@ -1,0 +1,868 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9.00"
+	Name="hctFilterTutorial"
+	ProjectGUID="{{AC68BAD9-E7F1-47F7-AF26-37DCDE501A78}}"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Release Multithreaded|Win32"
+			OutputDirectory="..\..\..\..\..\Bin\win32_net_9-0\release_multithreaded"
+			IntermediateDirectory="..\..\..\..\..\Obj\win32_net_9-0\release_multithreaded\hctFilterTutorial"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			CharacterSet="2"
+ 			ManagedExtensions="0"
+			WholeProgramOptimization="false">
+			<Tool Name="VCPreBuildEventTool" Description="Pre Build Event..." 
+                                CommandLine="" />
+			<Tool Name="VCCustomBuildTool" 			 />
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			   	AdditionalOptions="/MP"
+				GlobalOptimizations="true"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\..\..\..,"
+				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE,,"
+				StringPooling="TRUE"
+				MinimalRebuild="false"
+				ExceptionHandling="0"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="0"
+				TreatWChar_tAsBuiltInType="false"
+				EnableFunctionLevelLinking="FALSE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="ContentTools/Common/Filters/FilterTutorial/hctFilterTutorial.h"
+				PrecompiledHeaderFile="$(INTDIR)\FilterTutorial.pch"
+				AssemblerListingLocation="$(INTDIR)/"
+				ObjectFile="$(INTDIR)/"
+				ProgramDataBaseFileName="$(OUTDIR)/$(TARGETNAME).pdb"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"
+				CompileAs="0"
+			/>
+
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG,"
+				Culture="6153"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies=" hkBase.lib hkSerialize.lib hkSceneData.lib hkInternal.lib hkCompat.lib hkpCollide.lib hkpConstraintSolver.lib hkpDynamics.lib hkpInternal.lib hkpUtilities.lib hctCommon.lib comctl32.lib shlwapi.lib"
+				OutputFile="$(OUTDIR)\hctFilterTutorial.dll"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\..\..\Lib\win32_net_9-0\release_multithreaded;..\..\..\..\..\Lib\win32_net_9-0\release_multithreaded"
+				IgnoreDefaultLibraryNames=""
+				DelayLoadDLLs="$(NOINHERIT);"
+				ModuleDefinitionFile="hctFilterTutorial.def"
+				GenerateDebugInformation="0"
+				ProgramDatabaseFile="$(OUTDIR)/$(TARGETNAME).pdb"
+				GenerateMapFile="false"
+				MapFileName=""
+				SubSystem="2"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="True"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool Name="VCPostBuildEventTool" Description="Post Build Event..." 
+                                CommandLine="" />
+
+		</Configuration>
+		<Configuration
+			Name="Release Multithreaded DLL|Win32"
+			OutputDirectory="..\..\..\..\..\Bin\win32_net_9-0\release_multithreaded_dll"
+			IntermediateDirectory="..\..\..\..\..\Obj\win32_net_9-0\release_multithreaded_dll\hctFilterTutorial"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			CharacterSet="2"
+ 			ManagedExtensions="0"
+			WholeProgramOptimization="false">
+			<Tool Name="VCPreBuildEventTool" Description="Pre Build Event..." 
+                                CommandLine="" />
+			<Tool Name="VCCustomBuildTool" 			 />
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			   	AdditionalOptions="/MP"
+				GlobalOptimizations="true"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\..\..\..,"
+				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE,,"
+				StringPooling="TRUE"
+				MinimalRebuild="false"
+				ExceptionHandling="0"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="0"
+				TreatWChar_tAsBuiltInType="false"
+				EnableFunctionLevelLinking="FALSE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="ContentTools/Common/Filters/FilterTutorial/hctFilterTutorial.h"
+				PrecompiledHeaderFile="$(INTDIR)\FilterTutorial.pch"
+				AssemblerListingLocation="$(INTDIR)/"
+				ObjectFile="$(INTDIR)/"
+				ProgramDataBaseFileName="$(OUTDIR)/$(TARGETNAME).pdb"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"
+				CompileAs="0"
+			/>
+
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG,"
+				Culture="6153"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies=" hkBase.lib hkSerialize.lib hkSceneData.lib hkInternal.lib hkCompat.lib hkpCollide.lib hkpConstraintSolver.lib hkpDynamics.lib hkpInternal.lib hkpUtilities.lib hctCommon.lib comctl32.lib shlwapi.lib"
+				OutputFile="$(OUTDIR)\hctFilterTutorial.dll"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\..\..\Lib\win32_net_9-0\release_multithreaded_dll;..\..\..\..\..\Lib\win32_net_9-0\release_multithreaded_dll"
+				IgnoreDefaultLibraryNames=""
+				DelayLoadDLLs="$(NOINHERIT);"
+				ModuleDefinitionFile="hctFilterTutorial.def"
+				GenerateDebugInformation="0"
+				ProgramDatabaseFile="$(OUTDIR)/$(TARGETNAME).pdb"
+				GenerateMapFile="false"
+				MapFileName=""
+				SubSystem="2"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="True"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool Name="VCPostBuildEventTool" Description="Post Build Event..." 
+                                CommandLine="" />
+
+		</Configuration>
+		<Configuration
+			Name="FullDebug Multithreaded|Win32"
+			OutputDirectory="..\..\..\..\..\Bin\win32_net_9-0\fulldebug_multithreaded"
+			IntermediateDirectory="..\..\..\..\..\Obj\win32_net_9-0\fulldebug_multithreaded\hctFilterTutorial"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			CharacterSet="2"
+ 			ManagedExtensions="0"
+			WholeProgramOptimization="false">
+			<Tool Name="VCPreBuildEventTool" Description="Pre Build Event..." 
+                                CommandLine="" />
+			<Tool Name="VCCustomBuildTool" 			 />
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			   	AdditionalOptions="/MP"
+				GlobalOptimizations="false"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="TRUE"
+				Optimization="0"
+				FavorSizeOrSpeed="0"
+				AdditionalIncludeDirectories="..\..\..\..,"
+				PreprocessorDefinitions="WIN32,_DEBUG,HK_DEBUG,HK_FULLDEBUG,_CONSOLE,,"
+				StringPooling="TRUE"
+				MinimalRebuild="false"
+				ExceptionHandling="0"
+				RuntimeLibrary="1"
+				BufferSecurityCheck="true"
+				EnableEnhancedInstructionSet="0"
+				TreatWChar_tAsBuiltInType="false"				
+				EnableFunctionLevelLinking="FALSE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="ContentTools/Common/Filters/FilterTutorial/hctFilterTutorial.h"
+				PrecompiledHeaderFile="$(INTDIR)\FilterTutorial.pch"
+				AssemblerListingLocation="$(INTDIR)/"
+				ObjectFile="$(INTDIR)/"
+				ProgramDataBaseFileName="$(OUTDIR)/$(TARGETNAME).pdb"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"
+			/>
+
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG,HK_DEBUG,HK_FULLDEBUG,"
+				Culture="6153"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies=" hkBase.lib hkSerialize.lib hkSceneData.lib hkInternal.lib hkCompat.lib hkpCollide.lib hkpConstraintSolver.lib hkpDynamics.lib hkpInternal.lib hkpUtilities.lib hctCommon.lib comctl32.lib shlwapi.lib"
+				OutputFile="$(OUTDIR)\hctFilterTutorial.dll"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\..\..\Lib\win32_net_9-0\fulldebug_multithreaded;..\..\..\..\..\Lib\win32_net_9-0\debug_multithreaded;..\..\..\..\..\Lib\win32_net_9-0\fulldebug_multithreaded"
+				IgnoreDefaultLibraryNames=""
+				DelayLoadDLLs="$(NOINHERIT);"
+				ModuleDefinitionFile="hctFilterTutorial.def"
+				GenerateDebugInformation="3"
+				ProgramDatabaseFile="$(OUTDIR)/$(TARGETNAME).pdb"
+				GenerateMapFile="false"
+				MapFileName=""
+				SubSystem="2"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="True"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool Name="VCPostBuildEventTool" Description="Post Build Event..." 
+                                CommandLine="" />
+
+		</Configuration>
+		<Configuration
+			Name="FullDebug Multithreaded DLL|Win32"
+			OutputDirectory="..\..\..\..\..\Bin\win32_net_9-0\fulldebug_multithreaded_dll"
+			IntermediateDirectory="..\..\..\..\..\Obj\win32_net_9-0\fulldebug_multithreaded_dll\hctFilterTutorial"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			CharacterSet="2"
+ 			ManagedExtensions="0"
+			WholeProgramOptimization="false">
+			<Tool Name="VCPreBuildEventTool" Description="Pre Build Event..." 
+                                CommandLine="" />
+			<Tool Name="VCCustomBuildTool" 			 />
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			   	AdditionalOptions="/MP"
+				GlobalOptimizations="false"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="TRUE"
+				Optimization="0"
+				FavorSizeOrSpeed="0"
+				AdditionalIncludeDirectories="..\..\..\..,"
+				PreprocessorDefinitions="WIN32,_DEBUG,HK_DEBUG,HK_FULLDEBUG,_CONSOLE,,"
+				StringPooling="TRUE"
+				MinimalRebuild="false"
+				ExceptionHandling="0"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="true"
+				EnableEnhancedInstructionSet="0"
+				TreatWChar_tAsBuiltInType="false"				
+				EnableFunctionLevelLinking="FALSE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="ContentTools/Common/Filters/FilterTutorial/hctFilterTutorial.h"
+				PrecompiledHeaderFile="$(INTDIR)\FilterTutorial.pch"
+				AssemblerListingLocation="$(INTDIR)/"
+				ObjectFile="$(INTDIR)/"
+				ProgramDataBaseFileName="$(OUTDIR)/$(TARGETNAME).pdb"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"
+			/>
+
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG,HK_DEBUG,HK_FULLDEBUG,"
+				Culture="6153"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies=" hkBase.lib hkSerialize.lib hkSceneData.lib hkInternal.lib hkCompat.lib hkpCollide.lib hkpConstraintSolver.lib hkpDynamics.lib hkpInternal.lib hkpUtilities.lib hctCommon.lib comctl32.lib shlwapi.lib"
+				OutputFile="$(OUTDIR)\hctFilterTutorial.dll"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\..\..\Lib\win32_net_9-0\fulldebug_multithreaded_dll;..\..\..\..\..\Lib\win32_net_9-0\debug_multithreaded_dll;..\..\..\..\..\Lib\win32_net_9-0\fulldebug_multithreaded_dll"
+				IgnoreDefaultLibraryNames=""
+				DelayLoadDLLs="$(NOINHERIT);"
+				ModuleDefinitionFile="hctFilterTutorial.def"
+				GenerateDebugInformation="3"
+				ProgramDatabaseFile="$(OUTDIR)/$(TARGETNAME).pdb"
+				GenerateMapFile="false"
+				MapFileName=""
+				SubSystem="2"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="True"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool Name="VCPostBuildEventTool" Description="Post Build Event..." 
+                                CommandLine="" />
+
+		</Configuration>
+		<Configuration
+			Name="Debug Multithreaded|Win32"
+			OutputDirectory="..\..\..\..\..\Bin\win32_net_9-0\debug_multithreaded"
+			IntermediateDirectory="..\..\..\..\..\Obj\win32_net_9-0\debug_multithreaded\hctFilterTutorial"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			CharacterSet="2"
+ 			ManagedExtensions="0"
+			WholeProgramOptimization="false">
+			<Tool Name="VCPreBuildEventTool" Description="Pre Build Event..." 
+                                CommandLine="" />
+			<Tool Name="VCCustomBuildTool" 			 />
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			   	AdditionalOptions="/MP"
+				GlobalOptimizations="true"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\..\..\..,"
+				PreprocessorDefinitions="WIN32,_DEBUG,HK_DEBUG,_CONSOLE,,"
+				StringPooling="TRUE"
+				MinimalRebuild="false"
+				ExceptionHandling="0"
+				RuntimeLibrary="1"
+				BufferSecurityCheck="true"
+				EnableEnhancedInstructionSet="0"
+				TreatWChar_tAsBuiltInType="false"				
+				EnableFunctionLevelLinking="FALSE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="ContentTools/Common/Filters/FilterTutorial/hctFilterTutorial.h"
+				PrecompiledHeaderFile="$(INTDIR)\FilterTutorial.pch"
+				AssemblerListingLocation="$(INTDIR)/"
+				ObjectFile="$(INTDIR)/"
+				ProgramDataBaseFileName="$(OUTDIR)/$(TARGETNAME).pdb"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"
+			/>
+
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG,HK_DEBUG,"
+				Culture="6153"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies=" hkBase.lib hkSerialize.lib hkSceneData.lib hkInternal.lib hkCompat.lib hkpCollide.lib hkpConstraintSolver.lib hkpDynamics.lib hkpInternal.lib hkpUtilities.lib hctCommon.lib comctl32.lib shlwapi.lib"
+				OutputFile="$(OUTDIR)\hctFilterTutorial.dll"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\..\..\Lib\win32_net_9-0\debug_multithreaded;..\..\..\..\..\Lib\win32_net_9-0\debug_multithreaded"
+				IgnoreDefaultLibraryNames=""
+				DelayLoadDLLs="$(NOINHERIT);"
+				ModuleDefinitionFile="hctFilterTutorial.def"
+				GenerateDebugInformation="3"
+				ProgramDatabaseFile="$(OUTDIR)/$(TARGETNAME).pdb"
+				GenerateMapFile="false"
+				MapFileName=""
+				SubSystem="2"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="True"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool Name="VCPostBuildEventTool" Description="Post Build Event..." 
+                                CommandLine="" />
+
+		</Configuration>
+		<Configuration
+			Name="Debug Multithreaded DLL|Win32"
+			OutputDirectory="..\..\..\..\..\Bin\win32_net_9-0\debug_multithreaded_dll"
+			IntermediateDirectory="..\..\..\..\..\Obj\win32_net_9-0\debug_multithreaded_dll\hctFilterTutorial"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			CharacterSet="2"
+ 			ManagedExtensions="0"
+			WholeProgramOptimization="false">
+			<Tool Name="VCPreBuildEventTool" Description="Pre Build Event..." 
+                                CommandLine="" />
+			<Tool Name="VCCustomBuildTool" 			 />
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			   	AdditionalOptions="/MP"
+				GlobalOptimizations="true"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\..\..\..,"
+				PreprocessorDefinitions="WIN32,_DEBUG,HK_DEBUG,_CONSOLE,,"
+				StringPooling="TRUE"
+				MinimalRebuild="false"
+				ExceptionHandling="0"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="true"
+				EnableEnhancedInstructionSet="0"
+				TreatWChar_tAsBuiltInType="false"				
+				EnableFunctionLevelLinking="FALSE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="ContentTools/Common/Filters/FilterTutorial/hctFilterTutorial.h"
+				PrecompiledHeaderFile="$(INTDIR)\FilterTutorial.pch"
+				AssemblerListingLocation="$(INTDIR)/"
+				ObjectFile="$(INTDIR)/"
+				ProgramDataBaseFileName="$(OUTDIR)/$(TARGETNAME).pdb"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"
+			/>
+
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG,HK_DEBUG,"
+				Culture="6153"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies=" hkBase.lib hkSerialize.lib hkSceneData.lib hkInternal.lib hkCompat.lib hkpCollide.lib hkpConstraintSolver.lib hkpDynamics.lib hkpInternal.lib hkpUtilities.lib hctCommon.lib comctl32.lib shlwapi.lib"
+				OutputFile="$(OUTDIR)\hctFilterTutorial.dll"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\..\..\Lib\win32_net_9-0\debug_multithreaded_dll;..\..\..\..\..\Lib\win32_net_9-0\debug_multithreaded_dll"
+				IgnoreDefaultLibraryNames=""
+				DelayLoadDLLs="$(NOINHERIT);"
+				ModuleDefinitionFile="hctFilterTutorial.def"
+				GenerateDebugInformation="3"
+				ProgramDatabaseFile="$(OUTDIR)/$(TARGETNAME).pdb"
+				GenerateMapFile="false"
+				MapFileName=""
+				SubSystem="2"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="True"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool Name="VCPostBuildEventTool" Description="Post Build Event..." 
+                                CommandLine="" />
+
+		</Configuration>
+		<Configuration
+			Name="Hybrid Multithreaded DLL|Win32"
+			OutputDirectory="..\..\..\..\..\Bin\win32_net_9-0\hybrid_multithreaded_dll"
+			IntermediateDirectory="..\..\..\..\..\Obj\win32_net_9-0\hybrid_multithreaded_dll\hctFilterTutorial"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			CharacterSet="2"
+ 			ManagedExtensions="0"
+			WholeProgramOptimization="false">
+			<Tool Name="VCPreBuildEventTool" Description="Pre Build Event..." 
+                                CommandLine="" />
+			<Tool Name="VCCustomBuildTool" 			 />
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			   	AdditionalOptions="/MP"
+				GlobalOptimizations="false"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				Optimization="0"
+				FavorSizeOrSpeed="0"
+				AdditionalIncludeDirectories="..\..\..\..,"
+				PreprocessorDefinitions="WIN32,HK_DEBUG,_CONSOLE,,"
+				StringPooling="TRUE"
+				MinimalRebuild="false"
+				ExceptionHandling="0"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="0"
+				TreatWChar_tAsBuiltInType="false"				
+				EnableFunctionLevelLinking="FALSE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="ContentTools/Common/Filters/FilterTutorial/hctFilterTutorial.h"
+				PrecompiledHeaderFile="$(INTDIR)\FilterTutorial.pch"
+				AssemblerListingLocation="$(INTDIR)/"
+				ObjectFile="$(INTDIR)/"
+				ProgramDataBaseFileName="$(OUTDIR)/$(TARGETNAME).pdb"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"
+			/>
+
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="HK_DEBUG,"
+				Culture="6153"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies=" hkBase.lib hkSerialize.lib hkSceneData.lib hkInternal.lib hkCompat.lib hkpCollide.lib hkpConstraintSolver.lib hkpDynamics.lib hkpInternal.lib hkpUtilities.lib hctCommon.lib comctl32.lib shlwapi.lib"
+				OutputFile="$(OUTDIR)\hctFilterTutorial.dll"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\..\..\..\Lib\win32_net_9-0\hybrid_multithreaded_dll;..\..\..\..\..\Lib\win32_net_9-0\hybrid_multithreaded_dll"
+				IgnoreDefaultLibraryNames=""
+				DelayLoadDLLs="$(NOINHERIT);"
+				ModuleDefinitionFile="hctFilterTutorial.def"
+				GenerateDebugInformation="3"
+				ProgramDatabaseFile="$(OUTDIR)/$(TARGETNAME).pdb"
+				GenerateMapFile="false"
+				MapFileName=""
+				SubSystem="2"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="True"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool Name="VCPostBuildEventTool" Description="Post Build Event..." 
+                                CommandLine="" />
+
+		</Configuration>
+
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+			<Filter
+Name="ConvertToPhantomAction"
+>
+	<File
+RelativePath=".\ConvertToPhantomAction\hctConvertToPhantomActionFilter.cpp"
+>
+</File>
+	<File
+RelativePath=".\ConvertToPhantomAction\hctConvertToPhantomActionFilter.h"
+>
+</File>
+	<File
+RelativePath=".\ConvertToPhantomAction\hctConvertToPhantomActionFilter_Dialog.cpp"
+>
+</File>
+	<File
+RelativePath=".\ConvertToPhantomAction\hctConvertToPhantomActionFilter_Options.cpp"
+>
+</File>
+	<File
+RelativePath=".\ConvertToPhantomAction\hctConvertToPhantomActionOptions.h"
+>
+</File>
+	<File
+RelativePath=".\ConvertToPhantomAction\hctConvertToPhantomActionOptionsClass.cpp"
+>
+</File>
+	<File
+RelativePath=".\ConvertToPhantomAction\MyPhantomShape.cpp"
+>
+</File>
+	<File
+RelativePath=".\ConvertToPhantomAction\MyPhantomShape.h"
+>
+</File>
+	<File
+RelativePath=".\ConvertToPhantomAction\MyPhantomShapeClass.cpp"
+>
+</File>
+	</Filter>
+	<File
+RelativePath=".\hctFilterTutorial.cpp"
+>
+	<FileConfiguration Name="debug multithreaded|Win32"> 
+		<Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1"/>
+	</FileConfiguration>
+	<FileConfiguration Name="release multithreaded dll|Win32"> 
+		<Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1"/>
+	</FileConfiguration>
+	<FileConfiguration Name="fulldebug multithreaded dll|Win32"> 
+		<Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1"/>
+	</FileConfiguration>
+	<FileConfiguration Name="fulldebug multithreaded|Win32"> 
+		<Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1"/>
+	</FileConfiguration>
+	<FileConfiguration Name="release multithreaded|Win32"> 
+		<Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1"/>
+	</FileConfiguration>
+	<FileConfiguration Name="hybrid multithreaded dll|Win32"> 
+		<Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1"/>
+	</FileConfiguration>
+	<FileConfiguration Name="debug multithreaded dll|Win32"> 
+		<Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1"/>
+	</FileConfiguration>
+</File>
+	<File
+RelativePath=".\hctFilterTutorial.def"
+>
+</File>
+	<File
+RelativePath=".\hctFilterTutorial.h"
+>
+</File>
+	<File
+RelativePath=".\hctFilterTutorial.rc"
+>
+</File>
+	<File
+RelativePath=".\hctFilterTutorialDll.cpp"
+>
+</File>
+	<File
+RelativePath=".\hctFilterTutorialDll.h"
+>
+</File>
+
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
+

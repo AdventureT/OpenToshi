@@ -2,6 +2,8 @@
 #include "T2GUI.h"
 #include "T2GUIContext.h"
 
+#include <Render/TRender.h>
+
 //-----------------------------------------------------------------------------
 // Enables memory debugging.
 // Note: Should be the last include!
@@ -10,71 +12,26 @@
 
 TOSHI_NAMESPACE_START
 
-// $Barnyard: FUNCTION 006c4700
+// $deBlob: FUNCTION 006f53d0
 T2GUIContext::T2GUIContext()
 {
-	m_pRenderer           = TNULL;
-	m_pRootElement        = TNULL;
-	m_pCreatedRootElement = TNULL;
-	m_pDebugCanvas        = TNULL;
-
-	m_pCreatedRootElement = new T2GUIElement;
-
-	if ( m_pCreatedRootElement )
-	{
-		m_pCreatedRootElement->SetDimensions( 640.0f, 512.0f );
-		m_pCreatedRootElement->SetTransform( 0.0f, 0.0f, 0.0f );
-	}
-
-	m_pDebugCanvas = new T2GUIElement;
-
-	if ( m_pDebugCanvas )
-	{
-		m_pDebugCanvas->SetDimensions( 640.0f, 512.0f );
-		m_pDebugCanvas->SetTransform( 0.0f, 0.0f, 0.0f );
-	}
-
-	m_pRootElement = m_pCreatedRootElement;
+	TRender::DISPLAYPARAMS* pDisplayParams = TRender::GetSingleton()->GetCurrentDisplayParams();
+	m_oRootElement.SetDimensions( TFLOAT( pDisplayParams->uiWidth ), TFLOAT( pDisplayParams->uiHeight ) );
+	m_oRootElement.SetTransform( 0.0f, 0.0f, 0.0f );
 }
 
-// NOTE: inlined into T2GUI::DestroyContext (006c4870) in retail
-T2GUIContext::~T2GUIContext()
-{
-	if ( m_pDebugCanvas )
-		delete m_pDebugCanvas;
-
-	if ( m_pCreatedRootElement )
-		delete m_pCreatedRootElement;
-}
-
-// $Barnyard: FUNCTION 006c47f0
+// $deBlob: FUNCTION 006f5440
 void T2GUIContext::Tick( TFLOAT a_fDeltaTime )
 {
-	if ( m_pRootElement )
-	{
-		m_pRootElement->Tick( a_fDeltaTime );
-	}
-
-	m_pDebugCanvas->Tick( a_fDeltaTime );
+	m_oRootElement.Tick( a_fDeltaTime );
 }
 
-// $Barnyard: FUNCTION 006c4820
+// $deBlob: FUNCTION 006f5460
 void T2GUIContext::Render()
 {
-	if ( m_pRootElement )
-	{
-		T2GUI::GetRenderer()->BeginScene();
-
-		m_pRootElement->PreRender();
-		m_pRootElement->Render();
-		m_pRootElement->PostRender();
-
-		m_pDebugCanvas->PreRender();
-		m_pDebugCanvas->Render();
-		m_pDebugCanvas->PostRender();
-
-		T2GUI::GetRenderer()->EndScene();
-	}
+	m_oRootElement.PreRender();
+	m_oRootElement.Render();
+	m_oRootElement.PostRender();
 }
 
 TOSHI_NAMESPACE_END

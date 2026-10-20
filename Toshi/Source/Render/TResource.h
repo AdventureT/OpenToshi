@@ -22,7 +22,7 @@ class TResource : public TObject
 public:
 	TDECLARE_CLASS( TResource, TObject );
 
-	static constexpr size_t MAXNAMELEN = 14;
+	static TCONSTEXPR_VAR size_t MAXNAMELEN = 14;
 	friend TRender;
 
 	using t_RecurseCb = TBOOL ( * )( TResource* a_pResource, void* a_pUserData );
@@ -41,7 +41,8 @@ public:
 
 	TBOOL IsDead() const { return m_State & TResourceState_Dead; }
 	TBOOL IsDying() const { return m_State & TResourceState_Dying; }
-	TBOOL IsValid() const { return m_State & TResourceState_Valid; }
+	// $deBlob: FUNCTION 00691c20
+	TBOOL IsValid() const { return ( m_State & TResourceState_Created ) ? ( m_State & TResourceState_Valid ) : TFALSE; }
 	TBOOL IsExternal() const { return m_State & TResourceState_External; }
 	TBOOL IsCreated() const { return m_State & TResourceState_Created; }
 	TBOOL IsSceneObject() const { return m_State & TResourceState_SceneObject; }
@@ -52,6 +53,7 @@ public:
 
 	void SetParent( TResource* a_pParent );
 
+	// $deBlob: FUNCTION 006b5340
 	const TCHAR* GetName() const { return m_Name; }
 	void         SetName( const TCHAR* name );
 

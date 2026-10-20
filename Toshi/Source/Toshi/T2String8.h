@@ -9,7 +9,7 @@ TOSHI_NAMESPACE_START
 class T2String8
 {
 public:
-	static constexpr TSIZE SCRATCH_MEM_SIZE = 2048;
+	static TCONSTEXPR_VAR TSIZE SCRATCH_MEM_SIZE = 2048;
 
 public:
 	static TCHAR* CreateCopy( const TCHAR* a_pcString, TSIZE a_uiSize = -1 );
@@ -36,7 +36,7 @@ public:
 	static TCHAR*       FindString( TCHAR* str, const TCHAR* substr );
 	static const TCHAR* FindString( const TCHAR* str, const TCHAR* substr );
 
-	static TSIZE Length( const TCHAR* str );
+	static TINT Length( const TCHAR* str );
 
 	static TBOOL IsLowerCase( const TCHAR* str );
 	static TBOOL IsUpperCase( const TCHAR* str );
@@ -53,7 +53,6 @@ public:
 	static TBOOL  StringToBool( const TCHAR* src );
 	static TBOOL  IsNumeric( const TCHAR* str );
 
-	// NOTE: names unknown
 	static TUINT32 Hash( const TCHAR* str );
 	static TCHAR   CharToLowerCase( TCHAR a_cChar );
 	static TCHAR   CharToUpperCase( TCHAR a_cChar );
@@ -67,8 +66,8 @@ public:
 	}
 
 public:
-	static inline T2Allocator* sm_pDefaultAllocatorCB = GetDefaultAllocatorCB();
-	static TCHAR               ms_aScratchMem[ SCRATCH_MEM_SIZE ];
+	static T2Allocator* sm_pDefaultAllocatorCB;
+	static TCHAR        ms_aScratchMem[ SCRATCH_MEM_SIZE ];
 };
 
 TOSHI_NAMESPACE_END

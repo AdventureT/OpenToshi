@@ -44,6 +44,7 @@ TTRB::TTRB()
 }
 
 // $deBlob: FUNCTION 006868d0
+// $deBlob: FUNCTION 0056d9e0
 // $Barnyard: FUNCTION 006baff0
 TTRB::~TTRB()
 {
@@ -55,7 +56,8 @@ TTRB::~TTRB()
 TTRB::ERROR TTRB::Load( const TCHAR* a_szFilePath, TUINT32 a_uiUnknown )
 {
 	TPROFILER_SCOPE();
-	return Load( TFile::Create( a_szFilePath, TFILEMODE_READ ), a_uiUnknown );
+	TFile* pFile = TFile::Create( a_szFilePath, TFILEMODE_READ );
+	return Load( pFile, a_uiUnknown );
 }
 
 // $deBlob: FUNCTION 00686920
@@ -91,7 +93,7 @@ TBOOL TTRB::ProcessForm( TTSFI& ttsf, TFORM* a_pForm )
 {
 	TPROFILER_SCOPE();
 
-	static constexpr TINT MAX_RELC_NUM_BATCH = 512;
+	static TCONSTEXPR_VAR TINT MAX_RELC_NUM_BATCH = 512;
 	RELCEntry             relcEntries[ MAX_RELC_NUM_BATCH ];
 
 	TINT32 fileSize = ttsf.m_CurrentHunk.Size - 4;
@@ -432,7 +434,7 @@ TTRB::TTRBSymbol* TTRB::GetSymbol( const void* a_pAddress )
 	{
 		TTRBSymbol* pSymbol = GetSymbol( i );
 
-		if ( pSymbol != TNULL && GetSymbolAddress( *pSymbol ) == a_pAddress )
+		if ( pSymbol != TNULL && a_pAddress == GetSymbolAddress( *pSymbol ) )
 			return pSymbol;
 	}
 

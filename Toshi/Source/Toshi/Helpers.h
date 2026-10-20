@@ -12,7 +12,7 @@ TFORCEINLINE void TSwapValues( T& a, T& b )
 }
 
 // Returns TUINT32 value that consists of the specified 4 characters
-TFORCEINLINE constexpr TUINT32 TFourCC( const TCHAR str[ 4 ] )
+TFORCEINLINE TCONSTEXPR TUINT32 TFourCC( const TCHAR str[ 4 ] )
 {
 	return ( ( str[ 3 ] << 24 ) | ( str[ 2 ] << 16 ) | ( str[ 1 ] << 8 ) | str[ 0 ] );
 }
@@ -38,7 +38,7 @@ TFORCEINLINE TBOOL TIsPointerAligned( const void* a_pPointer, TSIZE a_uiAlignmen
 }
 
 template <class T>
-TFORCEINLINE constexpr T* TAlignPointerUp( T* a_pMem, TSIZE a_uiAlignment = sizeof( T* ) )
+TFORCEINLINE TCONSTEXPR T* TAlignPointerUp( T* a_pMem, TSIZE a_uiAlignment = sizeof( T* ) )
 {
 	return TREINTERPRETCAST(
 	    T*,
@@ -47,7 +47,7 @@ TFORCEINLINE constexpr T* TAlignPointerUp( T* a_pMem, TSIZE a_uiAlignment = size
 }
 
 template <class T>
-TFORCEINLINE constexpr T* TAlignPointerDown( T* a_pMem, TSIZE a_uiAlignment = sizeof( T* ) )
+TFORCEINLINE TCONSTEXPR T* TAlignPointerDown( T* a_pMem, TSIZE a_uiAlignment = sizeof( T* ) )
 {
 	return TREINTERPRETCAST(
 	    T*,
@@ -56,14 +56,14 @@ TFORCEINLINE constexpr T* TAlignPointerDown( T* a_pMem, TSIZE a_uiAlignment = si
 }
 
 template <class T>
-TFORCEINLINE constexpr T TAlignNumDown( T a_iValue, TSIZE a_uiAlignment = 4 )
+TFORCEINLINE TCONSTEXPR T TAlignNumDown( T a_iValue, TSIZE a_uiAlignment = 4 )
 {
 	TSTATICASSERT( std::is_arithmetic<T>::value );
 	return a_iValue & (T)( ~( a_uiAlignment - 1U ) );
 }
 
 template <class T>
-TFORCEINLINE constexpr T TAlignNumUp( T a_iValue, TSIZE a_uiAlignment = 4 )
+TFORCEINLINE TCONSTEXPR T TAlignNumUp( T a_iValue, TSIZE a_uiAlignment = 4 )
 {
 	TSTATICASSERT( std::is_arithmetic<T>::value );
 	return ( a_iValue + ( a_uiAlignment - 1U ) ) & (T)( ~( a_uiAlignment - 1U ) );

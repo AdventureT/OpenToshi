@@ -43,18 +43,18 @@ public:
 	};
 
 	// Size of header that is common for any BTEC version
-	static constexpr TUINT32 HEADER_SIZE_12 = sizeof( Header );
+	static TCONSTEXPR_VAR TUINT32 HEADER_SIZE_12 = sizeof( Header );
 
 	// Custom variable used to help the compressor/decompressor decide which byte order it should use
 	// NOTE: not in de Blob (its decompressor never swaps), kept for the PTRB tool plugin
-	inline static TBOOL ms_bIsBigEndian = TFALSE;
+	static TBOOL ms_bIsBigEndian;
 
 public:
 	//-----------------------------------------------------------------------------
 	// Compressor
 	//-----------------------------------------------------------------------------
 
-	static constexpr TINT maxlength = 0x4000;
+	static TCONSTEXPR_VAR TINT maxlength = 0x4000;
 	static TINT           usemaxoffset;
 
 public:
@@ -70,7 +70,7 @@ public:
 	//-----------------------------------------------------------------------------
 
 	static TINT   Decompress( TFile* file, TCompress::Header* header, TBYTE* buffer, TUINT32 bufferSize );
-	static int8_t GetHeader( TFile* file, TCompress::Header& btecHeader );
+	static TINT GetHeader( TFile* file, TCompress::Header& btecHeader );
 	static TINT   GetCommand( TFile* file, TBOOL& hasOffset, TUINT32& size, TINT& offset );
 };
 

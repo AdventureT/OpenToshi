@@ -63,9 +63,7 @@ public:
 	TFileSystem( const TCHAR* a_szName );
 	TFileSystem( const TFileSystem& other );
 
-	// $deBlob: FUNCTION 00685d60
-	// $Barnyard: FUNCTION 006bdd10
-	virtual ~TFileSystem() {} // +0x00
+	virtual ~TFileSystem(); // +0x00
 
 	/**
          * Creates file.
@@ -112,12 +110,6 @@ public:
          * Fetches info about the path and returns internal path.
          */
 	virtual TBOOL ToNative( const TString8& a_rcPath, TNativeFileInfo& a_rOutInfo ); // +0x20
-
-	/**
-         * Unmounts this file system from the TFileManager.
-         */
-	// $deBlob: FUNCTION 00685920
-	void UnmountFileSystem() { TNode::Remove(); }
 
 	// $deBlob: FUNCTION 00686500
 	const TString8& GetName() const { return m_Name; }
@@ -188,13 +180,13 @@ public:
          * Reads one character of type TCHAR from the file.
          * @return the read character
          */
-	virtual TCHAR GetCChar() = 0;
+	virtual TINT GetCChar() = 0;
 
 	/**
          * Reads one character of type wchar from the file.
          * @return the read character
          */
-	virtual TWCHAR GetWChar() = 0;
+	virtual TINT GetWChar() = 0;
 
 	/**
          * Writes one character of type TCHAR to the file.
@@ -287,6 +279,9 @@ public:
 	static void Destroy();
 	void        MountFileSystem( TFileSystem* a_pFileSystem );
 
+	// NOTE: retail calls this on the manager (the body doesn't use it)
+	void UnmountFileSystem( TFileSystem* a_pFileSystem );
+
 	TFile* CreateFile( const TString8& a_sName, TFILEMODE flags );
 	TBOOL  ToNative( const TString8& a_sFileName, TNativeFileInfo& a_rNativeInfo );
 
@@ -311,7 +306,9 @@ public:
 		InvalidateSystemPath();
 	}
 
+	// $deBlob: FUNCTION 00685790
 	const TString8& GetSystemPath() const { return m_SysPath; }
+	// $deBlob: FUNCTION 006857c0
 	const TString8& GetWorkingDirectory() const { return m_WorkingDirectory; }
 
 public:
@@ -333,7 +330,7 @@ private:
 	void ValidateSystemPath();
 	void InvalidateSystemPath() { m_IsValidated = TFALSE; }
 
-	static void CreateCommon();
+	static TBOOL CreateCommon();
 	static void DestroyCommon();
 
 private:

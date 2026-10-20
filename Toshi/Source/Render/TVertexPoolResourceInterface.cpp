@@ -43,6 +43,8 @@ TBOOL TVertexPoolResourceInterface::Create( TVertexFactoryResourceInterface* a_p
 	return TResource::Create();
 }
 
+// $deBlob: FUNCTION 005fcea0
+// $deBlob: FUNCTION 006b60f0
 TVertexPoolResourceInterface::LockBuffer::LockBuffer()
 {
 	uiNumStreams   = 0;

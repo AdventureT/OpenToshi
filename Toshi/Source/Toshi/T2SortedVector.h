@@ -23,7 +23,7 @@ template <typename T, typename Container, typename SortResults = T2SortedVectorD
 class T2SortedVector : private Container
 {
 public:
-	using Iterator = Container::Iterator;
+	using Iterator = typename Container::Iterator;
 
 public:
 	template <class... Args>
@@ -34,8 +34,8 @@ public:
 	~T2SortedVector() = default;
 
 	// With a help of binary search algorithm, looks for an insertion place of the specified value
+	// $deBlob: FUNCTION 0078fa30
 	// $Barnyard: FUNCTION 00580480
-	// AChickenFireMinigameState::DepthSortedVector: 0047f560
 	// $Barnyard: FUNCTION 0047f560
 	Iterator FindInsertionPoint( const T& a_rcValue, TBOOL& a_rbNotUnique )
 	{
@@ -62,7 +62,7 @@ public:
 			{
 				// We found an item that is equal to this
 				// Now, skip all equal items after it to prevent order changes
-				// NOTE: continues from the found item like the original (e.g. 004302f0, 0047f560)
+				// NOTE: continues from the found item like the original
 				iSearchStart = iMiddle + 1;
 
 				while ( iSearchStart <= iSearchEnd &&
@@ -79,7 +79,6 @@ public:
 		return Iterator( iSearchStart, this );
 	}
 
-	// Instantiations: AFunctionTable::FunctionList 005c9850
 	// $Barnyard: FUNCTION 005c9850
 	Iterator Push( const T& a_rValue )
 	{

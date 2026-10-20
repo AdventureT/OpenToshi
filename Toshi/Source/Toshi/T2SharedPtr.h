@@ -29,7 +29,7 @@ private:
 	template <typename T> friend class T2WeakPtr;
 
 #ifdef TOSHI2_ENABLE_SHARED_PTR_VALIDATION
-	static constexpr TUINT32 VALIDATION_MAGIC = 'T2SP';
+	static TCONSTEXPR_VAR TUINT32 VALIDATION_MAGIC = 'T2SP';
 #endif // TOSHI2_ENABLE_SHARED_PTR_VALIDATION
 
 public:
@@ -319,7 +319,7 @@ public:
 
 public:
 	// Constructor
-	constexpr T2WeakPtr()
+	TCONSTEXPR T2WeakPtr()
 	    : m_pRawPtr( TNULL )
 	    , m_pData( TNULL )
 	{}
@@ -431,7 +431,7 @@ public:
 
 private:
 	T*                               m_pRawPtr;
-	T2SharedPtr<T>::SharedPtrData_t* m_pData;
+	typename T2SharedPtr<T>::SharedPtrData_t* m_pData;
 };
 
 TOSHI_NAMESPACE_END

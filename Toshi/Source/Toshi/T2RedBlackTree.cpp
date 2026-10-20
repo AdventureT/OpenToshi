@@ -9,7 +9,9 @@
 
 TOSHI_NAMESPACE_START
 
-constinit T2GenericRedBlackTreeNode T2GenericRedBlackTree::ms_oNil( T2GenericRedBlackTreeNode::NIL );
+// $deBlob: FUNCTION 0053f900
+// $deBlob: FUNCTION 00859490
+TCONSTINIT T2GenericRedBlackTreeNode T2GenericRedBlackTree::ms_oNil( T2GenericRedBlackTreeNode::NIL );
 
 // $deBlob: FUNCTION 006f21f0
 T2GenericRedBlackTree::~T2GenericRedBlackTree()
@@ -44,64 +46,67 @@ T2GenericRedBlackTreeNode* T2GenericRedBlackTree::GetFirstNode() const
 // $Barnyard: FUNCTION 006ceff0
 T2GenericRedBlackTreeNode* T2GenericRedBlackTree::Insert( T2GenericRedBlackTreeNode* pNode )
 {
-	T2GenericRedBlackTreeNode* pNode_00;
-	T2GenericRedBlackTreeNode* pTVar1;
-	T2GenericRedBlackTreeNode* node;
+	T2GenericRedBlackTreeNode* pUncle;
+	T2GenericRedBlackTreeNode* pCurrent = pNode;
 
 	m_iNumElements += 1;
 	pNode->red = 1;
-	node       = pNode;
 
-	while ( pNode_00 = node->m_pParent, pNode_00->red != 0 )
+	while ( pCurrent->m_pParent->red )
 	{
-		pTVar1 = pNode_00->m_pParent->m_pLeft;
-		if ( pNode_00 == pTVar1 )
+		if ( pCurrent->m_pParent == pCurrent->m_pParent->m_pParent->m_pLeft )
 		{
-			pTVar1 = pNode_00->m_pParent->m_pRight;
+			pUncle = pCurrent->m_pParent->m_pParent->m_pRight;
 
-			if ( pTVar1->red == 0 )
+			if ( pUncle->red )
 			{
-				if ( node == pNode_00->m_pRight )
-				{
-					LeftRotate( pNode_00 );
-					node = pNode_00;
-				}
-
-				node->m_pParent->red            = 0;
-				node->m_pParent->m_pParent->red = 1;
-				RightRotate( node->m_pParent->m_pParent );
+				pCurrent->m_pParent->red                  = 0;
+				pUncle->red                               = 0;
+				pCurrent->m_pParent->m_pParent->red = 1;
+				pCurrent                                  = pCurrent->m_pParent->m_pParent;
 			}
 			else
 			{
-				pNode_00->red                   = 0;
-				pTVar1->red                     = 0;
-				node->m_pParent->m_pParent->red = 1;
-				node                            = node->m_pParent->m_pParent;
-			}
-		}
-		else if ( pTVar1->red == 0 )
-		{
-			if ( node == pNode_00->m_pLeft )
-			{
-				RightRotate( pNode_00 );
-				node = pNode_00;
-			}
+				if ( pCurrent == pCurrent->m_pParent->m_pRight )
+				{
+					pCurrent = pCurrent->m_pParent;
+					LeftRotate( pCurrent );
+				}
 
-			node->m_pParent->red            = 0;
-			node->m_pParent->m_pParent->red = 1;
-			LeftRotate( node->m_pParent->m_pParent );
+				pCurrent->m_pParent->red                  = 0;
+				pCurrent->m_pParent->m_pParent->red = 1;
+				RightRotate( pCurrent->m_pParent->m_pParent );
+			}
 		}
 		else
 		{
-			pNode_00->red                   = 0;
-			pTVar1->red                     = 0;
-			node->m_pParent->m_pParent->red = 1;
-			node                            = node->m_pParent->m_pParent;
+			pUncle = pCurrent->m_pParent->m_pParent->m_pLeft;
+
+			if ( pUncle->red )
+			{
+				pCurrent->m_pParent->red                  = 0;
+				pUncle->red                               = 0;
+				pCurrent->m_pParent->m_pParent->red = 1;
+				pCurrent                                  = pCurrent->m_pParent->m_pParent;
+			}
+			else
+			{
+				if ( pCurrent == pCurrent->m_pParent->m_pLeft )
+				{
+					pCurrent = pCurrent->m_pParent;
+					RightRotate( pCurrent );
+				}
+
+				pCurrent->m_pParent->red                  = 0;
+				pCurrent->m_pParent->m_pParent->red = 1;
+				LeftRotate( pCurrent->m_pParent->m_pParent );
+			}
 		}
 	}
 
 	m_oRoot.m_pLeft->red = 0;
-	CheckValid();
+	TASSERT( 0 == ms_oNil.red, "nil not red in T2GenericRedBlackTree::Insert" );
+	TASSERT( 0 == m_oRoot.red, "root not red in T2GenericRedBlackTree::Insert" );
 
 	return pNode;
 }
@@ -110,86 +115,77 @@ T2GenericRedBlackTreeNode* T2GenericRedBlackTree::Insert( T2GenericRedBlackTreeN
 // $Barnyard: FUNCTION 006cf200
 void T2GenericRedBlackTree::DeleteFixUp( T2GenericRedBlackTreeNode* pNode )
 {
-	TINT                       uVar2;
-	T2GenericRedBlackTreeNode* pTVar1;
-	T2GenericRedBlackTreeNode* pTVar3;
-	T2GenericRedBlackTreeNode* pTVar4;
+	T2GenericRedBlackTreeNode* pRoot = m_oRoot.m_pLeft;
+	T2GenericRedBlackTreeNode* pSibling;
 
-	pTVar4 = m_oRoot.m_pLeft;
-	while ( pNode->red == 0 && pTVar4 != pNode )
+	while ( !pNode->red && pRoot != pNode )
 	{
-		pTVar3 = pNode->m_pParent;
-		pTVar1 = pTVar3->m_pLeft;
-
-		if ( pNode == pTVar1 )
+		if ( pNode == pNode->m_pParent->m_pLeft )
 		{
-			pTVar1 = pTVar3->m_pRight;
+			pSibling = pNode->m_pParent->m_pRight;
 
-			if ( pTVar1->red != 0 )
+			if ( pSibling->red )
 			{
-				pTVar1->red           = 0;
+				pSibling->red         = 0;
 				pNode->m_pParent->red = 1;
 				LeftRotate( pNode->m_pParent );
-				pTVar3 = pNode->m_pParent;
-				pTVar1 = pTVar3->m_pRight;
+				pSibling = pNode->m_pParent->m_pRight;
 			}
 
-			uVar2 = pTVar1->m_pRight->red;
-			if ( ( uVar2 == 0 ) && ( pTVar1->m_pLeft->red == 0 ) )
+			if ( !pSibling->m_pRight->red && !pSibling->m_pLeft->red )
 			{
-				pTVar1->red = 1;
-				pNode       = pNode->m_pParent;
+				pSibling->red = 1;
+				pNode         = pNode->m_pParent;
 			}
 			else
 			{
-				if ( uVar2 == 0 )
+				if ( !pSibling->m_pRight->red )
 				{
-					pTVar1->m_pLeft->red = 0;
-					pTVar1->red          = 1;
-					RightRotate( pTVar1 );
-					pTVar3 = pNode->m_pParent;
-					pTVar1 = pTVar3->m_pRight;
+					pSibling->m_pLeft->red = 0;
+					pSibling->red          = 1;
+					RightRotate( pSibling );
+					pSibling = pNode->m_pParent->m_pRight;
 				}
 
-				pTVar1->red           = pTVar3->red;
-				pNode->m_pParent->red = 0;
-				pTVar1->m_pRight->red = 0;
+				pSibling->red           = pNode->m_pParent->red;
+				pNode->m_pParent->red   = 0;
+				pSibling->m_pRight->red = 0;
 				LeftRotate( pNode->m_pParent );
-				pNode = pTVar4;
+				pNode = pRoot;
 			}
 		}
 		else
 		{
-			if ( pTVar1->red != 0 )
+			pSibling = pNode->m_pParent->m_pLeft;
+
+			if ( pSibling->red )
 			{
-				pTVar1->red           = 0;
+				pSibling->red         = 0;
 				pNode->m_pParent->red = 1;
 				RightRotate( pNode->m_pParent );
-				pTVar3 = pNode->m_pParent;
-				pTVar1 = pTVar3->m_pLeft;
+				pSibling = pNode->m_pParent->m_pLeft;
 			}
 
-			if ( pTVar1->m_pRight->red == 0 && pTVar1->m_pLeft->red == 0 )
+			if ( !pSibling->m_pRight->red && !pSibling->m_pLeft->red )
 			{
-				pTVar1->red = 1;
-				pNode       = pNode->m_pParent;
+				pSibling->red = 1;
+				pNode         = pNode->m_pParent;
 			}
 			else
 			{
-				if ( pTVar1->m_pLeft->red == 0 )
+				if ( !pSibling->m_pLeft->red )
 				{
-					pTVar1->m_pRight->red = 0;
-					pTVar1->red           = 1;
-					LeftRotate( pTVar1 );
-					pTVar3 = pNode->m_pParent;
-					pTVar1 = pTVar3->m_pLeft;
+					pSibling->m_pRight->red = 0;
+					pSibling->red           = 1;
+					LeftRotate( pSibling );
+					pSibling = pNode->m_pParent->m_pLeft;
 				}
 
-				pTVar1->red           = pTVar3->red;
-				pNode->m_pParent->red = 0;
-				pTVar1->m_pLeft->red  = 0;
+				pSibling->red          = pNode->m_pParent->red;
+				pNode->m_pParent->red  = 0;
+				pSibling->m_pLeft->red = 0;
 				RightRotate( pNode->m_pParent );
-				pNode = pTVar4;
+				pNode = pRoot;
 			}
 		}
 	}
@@ -249,7 +245,7 @@ T2GenericRedBlackTreeNode* T2GenericRedBlackTree::DeleteNode( T2GenericRedBlackT
 
 #ifdef DEBLOB_COMMUNITY_PATCH
 		// NOTE: when the removed node's child is ms_oNil, DeleteNode/DeleteFixUp write the shared nil's parent (and
-		// can leave it red); reset it so other trees don't see a stale nil (see Docs/RetailBugs.md)
+		// can leave it red); reset it so other trees don't see a stale nil
 		ms_oNil.red       = 0;
 		ms_oNil.m_pParent = &ms_oNil;
 #endif
@@ -290,7 +286,7 @@ T2GenericRedBlackTreeNode* T2GenericRedBlackTree::DeleteNode( T2GenericRedBlackT
 
 #ifdef DEBLOB_COMMUNITY_PATCH
 	// NOTE: when the removed node's child is ms_oNil, DeleteNode/DeleteFixUp write the shared nil's parent (and
-	// can leave it red); reset it so other trees don't see a stale nil (see Docs/RetailBugs.md)
+	// can leave it red); reset it so other trees don't see a stale nil
 	ms_oNil.red       = 0;
 	ms_oNil.m_pParent = &ms_oNil;
 #endif

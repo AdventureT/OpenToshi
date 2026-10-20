@@ -9,19 +9,31 @@
 
 TOSHI_NAMESPACE_START
 
+// NOTE: TDEFINE_CLASS generates GetClass, CreateObject, CreateObjectInPlace (abstract: both return TNULL)
+// $deBlob: FUNCTION 0067c790
+// $deBlob: FUNCTION 0067c7a0
+// $deBlob: FUNCTION 0067c7b0
+// $deBlob: FUNCTION 0067c7c0
+// $deBlob: FUNCTION 0067c7d0
+// $deBlob: FUNCTION 0053e950
+// $deBlob: FUNCTION 00858e40
 TDEFINE_CLASS_NORUNTIME( TInputDeviceMouse );
 
+// $deBlob: FUNCTION 0067c7e0
 // $Barnyard: FUNCTION 006c40d0
 TInputDeviceMouse::TInputDeviceMouse()
 {
 }
 
+// $deBlob: FUNCTION 0067c800
+// $deBlob: FUNCTION 0067c930
 // $Barnyard: FUNCTION 006c40f0
 // $Barnyard: FUNCTION 006c4210
 TInputDeviceMouse::~TInputDeviceMouse()
 {
 }
 
+// $deBlob: FUNCTION 0067c810
 // $Barnyard: FUNCTION 006c4100
 TBOOL TInputDeviceMouse::GetDoodadProperties( Doodad a_iDoodad, TInputDevice::DoodadProperties& props ) const
 {
@@ -48,6 +60,7 @@ TBOOL TInputDeviceMouse::GetDoodadProperties( Doodad a_iDoodad, TInputDevice::Do
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 0067c870
 // $Barnyard: FUNCTION 006c4160
 const TCHAR* TInputDeviceMouse::GetButtonFromDoodad( Doodad a_iDoodad ) const
 {

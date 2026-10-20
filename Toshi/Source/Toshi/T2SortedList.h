@@ -23,8 +23,8 @@ template <typename T, typename Container = T2DList<T>, typename SortResults = T2
 class T2SortedList : private Container
 {
 public:
-	using Iterator = Container::Iterator;
-	using Node     = Container::Node;
+	using Iterator = typename Container::Iterator;
+	using Node     = typename Container::Node;
 
 public:
 	T2SortedList()  = default;
@@ -41,7 +41,9 @@ public:
 		return End();
 	}
 
-	// Instantiations: ASoundManager::SoundEventList 005d7a10, ASoundManager::m_QueuedSortedEventLists 005d7a80
+	// $deBlob: FUNCTION 0078c4f0
+	// $deBlob: FUNCTION 0078ff20
+	// $deBlob: FUNCTION 007d0e20
 	// $Barnyard: FUNCTION 005d7a10
 	// $Barnyard: FUNCTION 005d7a80
 	Iterator Push( T& a_rValue )

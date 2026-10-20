@@ -39,14 +39,17 @@ const TVector4& T2GUITextureSection::GetUVPoint2() const
 	return m_UV2;
 }
 
+// NOTE: retail doesn't take the absolute value of Barnyard's
+// $deBlob: FUNCTION 006f7590
 TFLOAT T2GUITextureSection::GetWidth() const
 {
-	return TMath::Abs( TFLOAT( m_iPoint2X - m_iPoint1X ) );
+	return TFLOAT( m_iPoint2X - m_iPoint1X );
 }
 
+// $deBlob: FUNCTION 006f7570
 TFLOAT T2GUITextureSection::GetHeight() const
 {
-	return TMath::Abs( TFLOAT( m_iPoint2Y - m_iPoint1Y ) );
+	return TFLOAT( m_iPoint2Y - m_iPoint1Y );
 }
 
 TINT T2GUITextureSection::GetPoint1X() const
@@ -69,17 +72,21 @@ TINT T2GUITextureSection::GetPoint2Y() const
 	return m_iPoint2Y;
 }
 
+// NOTE: retail multiplies by the reciprocal of the size (Barnyard divides)
 void T2GUITextureSection::CalculateUV( TFLOAT a_flWidth, TFLOAT a_flHeight )
 {
-	m_UV1.x = TFLOAT( GetPoint1X() ) / a_flWidth;
-	m_UV1.y = TFLOAT( GetPoint1Y() ) / a_flHeight;
-	m_UV1.z = TFLOAT( GetPoint2X() ) / a_flWidth;
-	m_UV1.w = TFLOAT( GetPoint1Y() ) / a_flHeight;
+	TFLOAT fInvWidth  = 1.0f / a_flWidth;
+	TFLOAT fInvHeight = 1.0f / a_flHeight;
 
-	m_UV2.x = TFLOAT( GetPoint2X() ) / a_flWidth;
-	m_UV2.y = TFLOAT( GetPoint2Y() ) / a_flHeight;
-	m_UV2.z = TFLOAT( GetPoint1X() ) / a_flWidth;
-	m_UV2.w = TFLOAT( GetPoint2Y() ) / a_flHeight;
+	m_UV1.x = TFLOAT( GetPoint1X() ) * fInvWidth;
+	m_UV1.y = TFLOAT( GetPoint1Y() ) * fInvHeight;
+	m_UV1.z = TFLOAT( GetPoint2X() ) * fInvWidth;
+	m_UV1.w = TFLOAT( GetPoint1Y() ) * fInvHeight;
+
+	m_UV2.x = TFLOAT( GetPoint2X() ) * fInvWidth;
+	m_UV2.y = TFLOAT( GetPoint2Y() ) * fInvHeight;
+	m_UV2.z = TFLOAT( GetPoint1X() ) * fInvWidth;
+	m_UV2.w = TFLOAT( GetPoint2Y() ) * fInvHeight;
 }
 
 TOSHI_NAMESPACE_END

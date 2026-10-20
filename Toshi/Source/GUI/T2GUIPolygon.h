@@ -12,17 +12,20 @@ public:
 	//-----------------------------------------------------------------------------
 	// T2GUIElement
 	//-----------------------------------------------------------------------------
-	virtual void Render() override;
-	virtual void GetDimensions( TFLOAT& a_rWidth, TFLOAT& a_rHeight ) override;
-	virtual void SetDimensions( TFLOAT a_fWidth, TFLOAT a_fHeight ) override {} // +0x28, DOES_NOTHING
+	virtual void  Render() override;                                       // +0x14
+	virtual void  GetDimensions( TFLOAT& a_rWidth, TFLOAT& a_rHeight ) override; // +0x1C
+	virtual void  SetDimensions( TFLOAT a_fWidth, TFLOAT a_fHeight ) override;   // +0x30
+	virtual TBOOL IsPointInside( const TVector2& a_rPoint ) override;      // +0x54
 
 	//-----------------------------------------------------------------------------
 	// Own methods
 	//-----------------------------------------------------------------------------
-	void CreateBuffers( TINT a_iNumVertices );
+	void CreateBuffers( TINT a_iNumPoints );
 
 	void InvalidateBounds();
+	// $deBlob: FUNCTION 005d5fc0
 	void SetMaterial( T2GUIMaterial* a_pMaterial ) { m_pMaterial = a_pMaterial; }
+	T2GUIMaterial* GetMaterial() const { return m_pMaterial; }
 
 	TINT            GetNumVertices() const { return m_iNumVertices; }
 	TVector2*       GetVertices() { return m_pVertices; }
@@ -31,11 +34,11 @@ public:
 	const TVector2* GetUVs() const { return m_pUVs; }
 
 private:
-	T2GUIMaterial* m_pMaterial;    // 0x54
-	TINT           m_iNumVertices; // 0x58
-	TVector2*      m_pVertices;    // 0x5C
-	TVector2*      m_pUVs;         // 0x60
-	TBOOL          m_bBoundsValid; // 0x64
+	T2GUIMaterial* m_pMaterial;    // 0x3C
+	TINT           m_iNumVertices; // 0x40
+	TVector2*      m_pVertices;    // 0x44
+	TVector2*      m_pUVs;         // 0x48
+	TBOOL          m_bBoundsValid; // 0x4C
 };
 
 TOSHI_NAMESPACE_END

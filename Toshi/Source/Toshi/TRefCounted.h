@@ -26,9 +26,9 @@ class TRef
 {
 public:
 	// constructors/destructor
-	// NOTE: every instantiation is folded into one out of line copy, used by the vector constructor iterators: 00440e20
+	// NOTE: every instantiation is folded into one copy, used by the vector constructor iterators
 	// $Barnyard: FUNCTION 00440e20
-	constexpr TRef()
+	TCONSTEXPR TRef()
 	    : m_pPtr( TNULL )
 	{
 	}
@@ -39,7 +39,6 @@ public:
 		Create( a_pPtr );
 	}
 
-	// TRef<AUnitProxy> 0040d8a0
 	// $Barnyard: FUNCTION 0040d8a0
 	TRef( const TRef& a_rcOther )
 	    : m_pPtr( TNULL )
@@ -53,13 +52,11 @@ public:
 		a_rOther.m_pPtr = TNULL;
 	}
 
-	// NOTE: 006b1c50 is the scalar deleting destructor of TRef<PPropertyValueArray>
 	// $Barnyard: FUNCTION 006b1c50
-	// Folded destructor of the TRef instances (AUnitProxy, ...) 005c5330
 	// $Barnyard: FUNCTION 005c5330
 	~TRef() { Destroy(); }
 
-	// NOTE: TRef<PProperties> (006b1b80), TRef<PPropertyValueArray> (006b1bb0)
+	// NOTE: TRef<PProperties>, TRef<PPropertyValueArray>
 	// $Barnyard: FUNCTION 006b1b80
 	// $Barnyard: FUNCTION 006b1bb0
 	TRef& operator=( T* a_pPtr )
@@ -72,7 +69,6 @@ public:
 		return *this;
 	}
 
-	// TRef<AUnitProxy> 0040d8c0
 	// $Barnyard: FUNCTION 0040d8c0
 	TRef& operator=( const TRef& a_rOther )
 	{

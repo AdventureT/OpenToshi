@@ -12,17 +12,34 @@ TOSHI_NAMESPACE_START
 // Target of the alignment pads that are read/written
 static TCHAR s_AlignBuffer[ 4 ] = { 0, 0, 0, 0 };
 
+// $deBlob: FUNCTION 00687cb0
+TUINT32 TTSF::CreateTTSFI( TTSFI** a_ppOut )
+{
+	TTSFI* pTTSFI = new TTSFI();
+	*a_ppOut      = pTTSFI;
+
+	return ( pTTSFI == TNULL ) ? 1 : 0;
+}
+
+// $deBlob: FUNCTION 00687d20
+TUINT32 TTSF::CreateTTSFO( TTSFO** a_ppOut )
+{
+	TTSFO* pTTSFO = new TTSFO();
+	*a_ppOut      = pTTSFO;
+
+	return ( pTTSFO == TNULL ) ? 1 : 0;
+}
+
 // $deBlob: FUNCTION 00687d80
 // $Barnyard: FUNCTION 006d8a20
 TTSFI::TTSFI()
 {
 	m_pFile         = TNULL;
 	m_FileInfoCount = 0;
-	m_iReadPos       = 0;
-	TUtil::MemClear( m_FileInfo, sizeof( m_FileInfo ) );
+	m_iReadPos      = 0;
+	memset( m_FileInfo, 0, sizeof( m_FileInfo ) );
 	m_Magic            = 0;
-	m_CurrentHunk.Name = 0;
-	m_CurrentHunk.Size = 0;
+	memset( &m_CurrentHunk, 0, sizeof( m_CurrentHunk ) );
 }
 
 // $deBlob: FUNCTION 00687dd0
@@ -33,8 +50,8 @@ TTSFI::~TTSFI()
 	if ( m_pFile )
 		m_pFile->Destroy();
 
-	m_FileInfoCount = 0;
 	m_pFile         = TNULL;
+	m_FileInfoCount = 0;
 }
 
 // $deBlob: FUNCTION 00687e40
@@ -68,13 +85,11 @@ TUINT32 TTSFI::Open( TFile* a_pFile )
 		m_Endianess = Endianess_Big;
 	}
 
-	if ( m_Endianess != Endianess_Little )
-		m_Header.FileSize = PARSEDWORD_BIG( m_Header.FileSize );
+	m_Header.FileSize = ConvertEndian32( m_Header.FileSize );
 
 	m_iReadPos += m_pFile->Read( &m_Magic, 4 );
 
-	if ( m_Endianess != Endianess_Little )
-		m_Magic = PARSEDWORD_BIG( m_Magic );
+	m_Magic = ConvertEndian32( m_Magic );
 
 	m_CurrentHunk.Name = m_Header.Magic;
 	m_CurrentHunk.Size = m_Header.FileSize;
@@ -98,9 +113,9 @@ void TTSFI::Close( TBOOL free )
 {
 	PopForm();
 
-	if ( m_pFile != TNULL && free )
+	if ( m_pFile != TNULL && free == TTRUE )
 	{
-		TFile::Destroy( m_pFile );
+		m_pFile->Destroy();
 	}
 
 	m_pFile         = TNULL;
@@ -109,15 +124,12 @@ void TTSFI::Close( TBOOL free )
 
 // $deBlob: FUNCTION 00687fa0
 // $Barnyard: FUNCTION 006d8a60
-TUINT8 TTSFI::ReadHunk()
+TINT TTSFI::ReadHunk()
 {
 	m_pFile->Read( &m_CurrentHunk, sizeof( Hunk ) );
 
-	if ( m_Endianess != Endianess_Little )
-	{
-		m_CurrentHunk.Name = PARSEDWORD_BIG( m_CurrentHunk.Name );
-		m_CurrentHunk.Size = PARSEDWORD_BIG( m_CurrentHunk.Size );
-	}
+	m_CurrentHunk.Name = ConvertEndian32( m_CurrentHunk.Name );
+	m_CurrentHunk.Size = ConvertEndian32( m_CurrentHunk.Size );
 
 	m_iReadPos = 0;
 
@@ -126,7 +138,7 @@ TUINT8 TTSFI::ReadHunk()
 
 // $deBlob: FUNCTION 00688040
 // $Barnyard: FUNCTION 006d8e00
-TUINT8 TTSFI::ReadHunkData( void* dst )
+TINT TTSFI::ReadHunkData( void* dst )
 {
 	if ( m_CurrentHunk.Name == TFourCC( "FORM" ) )
 	{
@@ -142,18 +154,17 @@ TUINT8 TTSFI::ReadHunkData( void* dst )
 
 // $deBlob: FUNCTION 006880e0
 // $Barnyard: FUNCTION 006d8ba0
-TUINT8 TTSFI::SkipHunk()
+TINT TTSFI::SkipHunk()
 {
-	TUINT32 alignedSize = TAlignNumUp( m_CurrentHunk.Size );
-	m_pFile->Seek( alignedSize - m_iReadPos, TSEEK_CUR );
-	m_iReadPos = alignedSize;
+	m_pFile->Seek( TAlignNumUp( m_CurrentHunk.Size ) - m_iReadPos, TSEEK_CUR );
+	m_iReadPos = TAlignNumUp( m_CurrentHunk.Size );
 
 	return TTRB::ERROR_OK;
 }
 
 // $deBlob: FUNCTION 00688120
 // $Barnyard: FUNCTION 006d8ae0
-TUINT8 TTSFI::ReadFORM( TFORM* section )
+TINT TTSFI::ReadFORM( TFORM* section )
 {
 	if ( m_CurrentHunk.Name != TFourCC( "FORM" ) )
 	{
@@ -193,7 +204,7 @@ TUINT32 TTSFI::PopForm()
 	auto& fileInfo = m_FileInfo[ m_FileInfoCount ];
 
 	m_CurrentHunk.Size = fileInfo.FileSize;
-	m_iReadPos          = m_pFile->Tell() - fileInfo.FileStartOffset;
+	m_iReadPos         = m_pFile->Tell() - fileInfo.FileStartOffset;
 
 	TUINT32 alignedPos = TAlignNumUp( m_CurrentHunk.Size );
 	m_pFile->Seek( alignedPos - m_iReadPos, TSEEK_CUR );
@@ -254,15 +265,16 @@ void TTSFI::Seek( TINT a_iOffset )
 // $deBlob: FUNCTION 00688340
 TUINT32 TTSFI::Read( const TCHAR* a_szFilePath, TUINT32 a_uiMagic, t_HunkCallback a_fnCallback, void* a_pUserData )
 {
+	// NOTE: retail inlines the constructor (memset of m_FileInfo), Close and the destructor
 	TTSFI   oTTSFI;
 	TUINT32 uiResult = oTTSFI.Open( TFile::Create( a_szFilePath, TFILEMODE_READ ) );
 
 	if ( uiResult == TTRB::ERROR_OK )
 	{
-		// NOTE: retail stops with error 12 when the file has the given magic and walks it otherwise
+		// NOTE: retail stops with an error when the file has the given magic and walks it otherwise
 		if ( a_uiMagic == oTTSFI.m_Magic )
 		{
-			uiResult = 12;
+			uiResult = TTRB::ERROR_SAME_MAGIC;
 		}
 		else
 		{
@@ -276,12 +288,12 @@ TUINT32 TTSFI::Read( const TCHAR* a_szFilePath, TUINT32 a_uiMagic, t_HunkCallbac
 }
 
 // $deBlob: FUNCTION 00688470
-TUINT8 TTSFI::Parse( t_HunkCallback a_fnCallback, void* a_pUserData )
+TINT TTSFI::Parse( t_HunkCallback a_fnCallback, void* a_pUserData )
 {
 	if ( m_pFile->Tell() != 12 )
-		return 11;
+		return TTRB::ERROR_NOT_AT_START;
 
-	return ProcessForm_Parse( TREINTERPRETCAST( TFORM*, &m_Magic ), a_fnCallback, a_pUserData ) ? 0 : 10;
+	return ProcessForm_Parse( TREINTERPRETCAST( TFORM*, &m_Magic ), a_fnCallback, a_pUserData ) ? TTRB::ERROR_OK : TTRB::ERROR_PARSE_FAILED;
 }
 
 // $deBlob: FUNCTION 006884c0
@@ -476,11 +488,10 @@ TBOOL TTSFI::Tell( TUINT32* a_pOutPos )
 }
 
 // $deBlob: FUNCTION 00688920
-TBOOL TTSFI::Align()
+TBOOL TTSFI::Align( TINT a_iUnused )
 {
-	TUINT32 alignedSize = TAlignNumUp( m_CurrentHunk.Size );
-	m_pFile->Seek( alignedSize - m_iReadPos, TSEEK_CUR );
-	m_iReadPos = alignedSize;
+	m_pFile->Seek( TAlignNumUp( m_CurrentHunk.Size ) - m_iReadPos, TSEEK_CUR );
+	m_iReadPos = TAlignNumUp( m_CurrentHunk.Size );
 
 	return TTRUE;
 }
@@ -526,7 +537,7 @@ TTSFO::TTSFO()
 {
 	m_pFile         = TNULL;
 	m_PositionCount = 0;
-	TUtil::MemClear( m_Positions, sizeof( m_Positions ) );
+	memset( m_Positions, 0, sizeof( m_Positions ) );
 }
 
 // $deBlob: FUNCTION 00688ac0
@@ -556,8 +567,7 @@ TTSFO::ERROR TTSFO::Create( const TCHAR* filepath, TUINT32 magic, Endianess endi
 
 	TTSF::Hunk hunk{ ( m_Endianess == Endianess_Little ) ? IDMAGICL : IDMAGICB, 0 };
 
-	if ( m_Endianess != Endianess_Little )
-		magic = PARSEDWORD_BIG( magic );
+	magic = ConvertEndian32( magic );
 
 	m_pFile->Write( &hunk, sizeof( hunk ) );
 	m_pFile->Write( &magic, sizeof( magic ) );
@@ -574,7 +584,7 @@ void TTSFO::Close()
 	if ( m_pFile != TNULL )
 	{
 		EndForm();
-		TFile::Destroy( m_pFile );
+		m_pFile->Destroy();
 		m_pFile = TNULL;
 	}
 }
@@ -586,14 +596,13 @@ TSIZE TTSFO::BeginForm( TUINT32 name )
 
 	TTSF::Hunk hunk{ TFourCC( "FORM" ), 0 };
 
-	if ( m_Endianess != Endianess_Little )
-	{
-		hunk.Name = PARSEDWORD_BIG( hunk.Name );
-		name      = PARSEDWORD_BIG( name );
-	}
+	TUINT32 uiName = name;
+
+	hunk.Name = ConvertEndian32( hunk.Name );
+	uiName    = ConvertEndian32( uiName );
 
 	TSIZE written1 = m_pFile->Write( &hunk, sizeof( hunk ) );
-	TSIZE written2 = m_pFile->Write( &name, sizeof( name ) );
+	TSIZE written2 = m_pFile->Write( &uiName, sizeof( uiName ) );
 	m_PositionCount++;
 
 	return written1 + written2;
@@ -611,8 +620,7 @@ TSIZE TTSFO::EndForm()
 		m_pFile->Seek( m_Positions[ m_PositionCount ] + 4, TSEEK_SET );
 		formSize = ( uiOldPos - m_Positions[ m_PositionCount ] ) - 8;
 
-		if ( m_Endianess != Endianess_Little )
-			formSize = PARSEDWORD_BIG( formSize );
+		formSize = ConvertEndian32( formSize );
 
 		m_pFile->Write( &formSize, sizeof( formSize ) );
 		m_pFile->Seek( uiOldPos, TSEEK_SET );
@@ -652,11 +660,8 @@ TUINT32 TTSFO::WriteHunk( TUINT32 hunkName, void* buffer, TSIZE bufferSize )
 	TTSF::Hunk hunk{ hunkName, bufferSize };
 
 	// Convert endianess
-	if ( m_Endianess != Endianess_Little )
-	{
-		hunk.Name = PARSEDWORD_BIG( hunk.Name );
-		hunk.Size = PARSEDWORD_BIG( hunk.Size );
-	}
+	hunk.Name = ConvertEndian32( hunk.Name );
+	hunk.Size = ConvertEndian32( hunk.Size );
 
 	// Write hunk
 	TSIZE writtenSize = m_pFile->Write( &hunk, sizeof( hunk ) );

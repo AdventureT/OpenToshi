@@ -6,6 +6,41 @@
 
 static TCHAR s_szOutOfMemMessage[ 256 ];
 
+// The assert callback of the memory code (nothing sets it in retail); NOTE: names invented
+using t_MemoryAssertCallback = TINT ( * )( const TCHAR* a_szMessage, const TCHAR* a_szFileName, TINT a_iLine );
+static t_MemoryAssertCallback s_fnMemoryAssertCallback = TNULL; // 0x009b1fcc
+
+// $deBlob: FUNCTION 006fc1d0
+void TMemory_SetAssertCallback( t_MemoryAssertCallback a_fnCallback )
+{
+	s_fnMemoryAssertCallback = a_fnCallback;
+}
+
+// $deBlob: FUNCTION 006fc1e0
+t_MemoryAssertCallback TMemory_GetAssertCallback()
+{
+	return s_fnMemoryAssertCallback;
+}
+
+// Formats the message and passes it to the callback, or prints "<file>(<line>): Assertion failed: "<message>"" and
+// returns 1; NOTE: name invented
+// $deBlob: FUNCTION 006fc1f0
+static TINT TMemory_Assert( const TCHAR* a_szFileName, TINT a_iLine, const TCHAR* a_szFormat, ... )
+{
+	TCHAR szMessage[ 4096 ];
+
+	va_list args;
+	va_start( args, a_szFormat );
+	vsprintf( szMessage, a_szFormat, args );
+	va_end( args );
+
+	if ( s_fnMemoryAssertCallback != TNULL )
+		return s_fnMemoryAssertCallback( szMessage, a_szFileName, a_iLine );
+
+	TDebug_FinalPrintf( "%s(%d): Assertion failed: \"%s\"\n", a_szFileName, a_iLine, szMessage );
+	return 1;
+}
+
 // $deBlob: FUNCTION 006fc7c0
 void TMemory_OutOfMem( TMemoryHeap* a_pHeap, TSIZE a_uiSize )
 {
@@ -21,15 +56,20 @@ void TMemory_OutOfMem( TMemoryHeap* a_pHeap, TSIZE a_uiSize )
 	TMemoryHeapInfo_DebugDump( &oInfo );
 	TDebug_FinalPrintf( "=========================================================================\n" );
 
-	// Retail captures and prints the call stack here (TDebug_GetCallStack/TDebug_DumpCallStack, 50 frames)
-	TTODO( "FUN_006fadc0, FUN_006fae10" );
+	void* apCallStack[ 50 ];
+	TDebug_GetCallStack( 50, apCallStack );
+	TDebug_DumpCallStack( 50, apCallStack, 0 );
 
 	sprintf( s_szOutOfMemMessage, "Heap %s out of memory.\nAllocation of %i bytes failed.", a_pHeap->name, a_uiSize );
 
-	// NOTE: retail reports through FUN_006fc1f0 (Core's assert callback, prints "%s(%d): Assertion failed" without
-	// one), TDebug_AssertHandler does the same job here
+#ifdef DEBLOB_COMMUNITY_PATCH
+	// NOTE: the assert handler (logged with -noassertdialog) instead of retail's TMemory_Assert ("%s(%d): Assertion
+	// failed" without a callback)
 	TDebug_AssertHandler( s_szOutOfMemMessage, __FILE__, 47 );
-	TBREAK();
+#else
+	TMemory_Assert( "..\\..\\Source\\Core\\TMemory_dlmalloc.c", 47, s_szOutOfMemMessage );
+#endif
+	__debugbreak(); // retail: int3 in every configuration
 }
 
 // $deBlob: FUNCTION 006fc300

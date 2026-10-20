@@ -10,42 +10,58 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006ab880
 // $Barnyard: FUNCTION 006c8340
 TTransformObject::TTransformObject()
-    : m_eMode( Mode::Quat ), m_Quat( TQuaternion::IDENTITY ), m_Translation( TVector3::VEC_ZERO ), m_Scale( 1.0f, 1.0f, 1.0f )
 {
 	m_EulerOrder[ 0 ] = EULERAXIS_Z;
 	m_EulerOrder[ 1 ] = EULERAXIS_Y;
 	m_EulerOrder[ 2 ] = EULERAXIS_X;
+	m_bChanged        = TTRUE;
+
+	SetMatrix( TMatrix44::IDENTITY );
+	SetTranslate( TVector3::VEC_ZERO );
+	m_Scale = TVector3( 1.0f, 1.0f, 1.0f );
+}
+
+// $deBlob: FUNCTION 006ab930
+TTransformObject::TTransformObject( const TTransformObject& a_rcOther )
+    : TTransformData( a_rcOther )
+{
+	m_bChanged = TTRUE;
 }
 
 TTransformObject::~TTransformObject()
 {
 }
 
+// $deBlob: FUNCTION 006ab9a0
 // $Barnyard: FUNCTION 006c8180
 TTransformObject& TTransformObject::operator=( const TTransformObject& a_rcOther )
 {
 	if ( &a_rcOther != this )
-		TUtil::MemCopy( this, &a_rcOther, sizeof( TTransformObject ) );
+	{
+		// NOTE: copies everything up to the dirty flag, the cached matrix is rebuilt
+		TUtil::MemCopy( this, &a_rcOther, offsetof( TTransformObject, m_bChanged ) );
+		m_bChanged = TTRUE;
+	}
 
 	return *this;
 }
 
+// $deBlob: FUNCTION 006ab9f0
 // $Barnyard: FUNCTION 006c83b0
 void TTransformObject::Push()
 {
-	auto pRender = TRender::GetSingleton();
+	TRender* pRender = TRender::GetSingleton();
 
-	auto pPrevTransform = &pRender->GetTransforms().Top();
-
+	TMatrix44* pPrevTransform = &pRender->GetTransforms().Top();
 	pRender->GetTransforms().PushNull();
-	auto pPushTransform = &pRender->GetTransforms().Top();
+	TMatrix44* pPushTransform = &pRender->GetTransforms().Top();
 
 	if ( m_eMode == Mode::Quat )
 	{
-		pPushTransform->PushQuaternion( m_Quat, *pPrevTransform, m_Translation );
-		pPushTransform->Scale( m_Scale.x, m_Scale.y, m_Scale.z );
+		pPushTransform->PushQuaternion( GetQuat(), *pPrevTransform, m_Translation );
 	}
 	else if ( m_eMode == Mode::Euler )
 	{
@@ -57,88 +73,97 @@ void TTransformObject::Push()
 			switch ( m_EulerOrder[ i ] )
 			{
 				case EULERAXIS_X:
-					pPushTransform->RotateX( m_Euler.x );
+					RotateX( *pPushTransform, m_eMode, GetEuler().x );
 					break;
 				case EULERAXIS_Y:
-					pPushTransform->RotateY( m_Euler.y );
+					RotateY( *pPushTransform, m_eMode, GetEuler().y );
 					break;
 				case EULERAXIS_Z:
-					pPushTransform->RotateZ( m_Euler.z );
+					RotateZ( *pPushTransform, m_eMode, GetEuler().z );
 					break;
 			}
 		}
-
-		pPushTransform->Scale( m_Scale.x, m_Scale.y, m_Scale.z );
 	}
 	else
 	{
-		TASSERT( m_eMode == Mode::Matrix );
+		TASSERT( Mode::Matrix == GetMode() );
 		pPushTransform->Multiply( *pPrevTransform, m_Matrix );
 	}
 
+	// NOTE: de Blob scales in every mode (Barnyard doesn't in matrix mode)
+	pPushTransform->Scale( m_Scale.x, m_Scale.y, m_Scale.z );
+
 	pRender->GetCurrentContext()->SetModelViewMatrix( pRender->GetTransforms().Top() );
+	m_bChanged = TTRUE;
 }
 
+// $deBlob: FUNCTION 006abc20
 // $Barnyard: FUNCTION 006c84c0
 void TTransformObject::Pop()
 {
-	auto pRender = TRender::GetSingleton();
+	TRender* pRender = TRender::GetSingleton();
 
 	pRender->GetTransforms().Pop();
 	pRender->GetCurrentContext()->SetModelViewMatrix( pRender->GetTransforms().Top() );
+	m_bChanged = TTRUE;
 }
 
-Toshi::TVector3& TTransformObject::GetTranslation()
+TVector3& TTransformObject::GetTranslation()
 {
 	return ( m_eMode != Mode::Matrix ) ? m_Translation : m_Matrix.GetTranslation().AsVector3();
 }
 
+// $deBlob: FUNCTION 006abda0
 // $Barnyard: FUNCTION 006c8250
-void TTransformObject::GetLocalMatrixImp( TMatrix44& outMatrix )
+void TTransformObject::GetLocalMatrixImp( TMatrix44& a_rOutMatrix )
 {
 	if ( m_eMode == Mode::Quat )
 	{
-		outMatrix.SetFromQuaternion( m_Quat );
-		outMatrix.SetTranslation( m_Translation );
-		outMatrix.Scale( m_Scale.x, m_Scale.y, m_Scale.z );
+		a_rOutMatrix.SetFromQuaternion( GetQuat() );
+		a_rOutMatrix.SetTranslation( GetTranslation() );
 	}
 	else if ( m_eMode == Mode::Euler )
 	{
-		outMatrix.Identity();
-		outMatrix.SetTranslation( GetTranslation() );
+		a_rOutMatrix.Identity();
+		a_rOutMatrix.SetTranslation( GetTranslation() );
 
 		for ( TINT i = 0; i < 3; i++ )
 		{
 			switch ( m_EulerOrder[ i ] )
 			{
 				case EULERAXIS_X:
-					outMatrix.RotateX( m_Euler.x );
+					RotateX( a_rOutMatrix, m_eMode, GetEuler().x );
 					break;
 				case EULERAXIS_Y:
-					outMatrix.RotateY( m_Euler.y );
+					RotateY( a_rOutMatrix, m_eMode, GetEuler().y );
 					break;
 				case EULERAXIS_Z:
-					outMatrix.RotateZ( m_Euler.z );
+					RotateZ( a_rOutMatrix, m_eMode, GetEuler().z );
 					break;
 			}
 		}
-
-		outMatrix.Scale( m_Scale.x, m_Scale.y, m_Scale.z );
 	}
 	else
 	{
-		TASSERT( m_eMode == Mode::Matrix );
-		outMatrix = m_Matrix;
+		TASSERT( Mode::Matrix == GetMode() );
+		a_rOutMatrix = m_Matrix;
 	}
+
+	// NOTE: de Blob scales in every mode (Barnyard doesn't in matrix mode)
+	a_rOutMatrix.Scale( m_Scale.x, m_Scale.y, m_Scale.z );
 }
 
+// $deBlob: FUNCTION 006abc90
 // $Barnyard: FUNCTION 006c81b0
 void TTransformObject::SetEuler( const TVector3& a_rEuler )
 {
-	m_eMode = Mode::Euler;
-	m_Euler = a_rEuler;
+	m_bChanged = TTRUE;
+	m_eMode    = Mode::Euler;
+	GetEuler() = a_rEuler;
+	m_bChanged = TTRUE;
 }
 
+// $deBlob: FUNCTION 006abd80
 void TTransformObject::SetEulerOrder( EULERAXIS x, EULERAXIS y, EULERAXIS z )
 {
 	m_EulerOrder[ 0 ] = x;
@@ -146,6 +171,7 @@ void TTransformObject::SetEulerOrder( EULERAXIS x, EULERAXIS y, EULERAXIS z )
 	m_EulerOrder[ 2 ] = z;
 }
 
+// $deBlob: FUNCTION 006abd40
 // $Barnyard: FUNCTION 006c8210
 void TTransformObject::SetTranslate( const TVector3& a_rTranslation )
 {
@@ -153,41 +179,53 @@ void TTransformObject::SetTranslate( const TVector3& a_rTranslation )
 
 	if ( m_eMode == Mode::Matrix )
 		m_Matrix.SetTranslation( a_rTranslation );
+
+	m_bChanged = TTRUE;
 }
 
+// $deBlob: FUNCTION 006abcc0
 void TTransformObject::SetQuat( const TQuaternion& quaternion )
 {
-	m_eMode = Mode::Quat;
-	m_Quat  = quaternion;
+	m_bChanged = TTRUE;
+	m_eMode    = Mode::Quat;
+	GetQuat()  = quaternion;
+	m_bChanged = TTRUE;
 }
 
+// $deBlob: FUNCTION 006abcf0
 // $Barnyard: FUNCTION 006c81d0
 void TTransformObject::SetMatrix( const TMatrix44& matrix )
 {
+	m_bChanged    = TTRUE;
 	m_eMode       = Mode::Matrix;
 	m_Matrix      = matrix;
 	m_Translation = matrix.GetTranslation3();
+	m_bChanged    = TTRUE;
 }
 
+// $deBlob: FUNCTION 006abc70
 // $Barnyard: FUNCTION 006c81a0
 TTransformObject::Mode TTransformObject::SetMode( Mode a_eMode )
 {
 	Mode eOldMode = m_eMode;
 	m_eMode       = a_eMode;
+	m_bChanged    = TTRUE;
 
 	return eOldMode;
 }
 
 void TTransformObject::SetScale( TFLOAT a_flScaleX, TFLOAT a_flScaleY, TFLOAT a_flScaleZ )
 {
-	m_Scale.x = a_flScaleX;
-	m_Scale.y = a_flScaleY;
-	m_Scale.z = a_flScaleZ;
+	m_Scale.x  = a_flScaleX;
+	m_Scale.y  = a_flScaleY;
+	m_Scale.z  = a_flScaleZ;
+	m_bChanged = TTRUE;
 }
 
 void TTransformObject::SetScale( const TVector3& a_rScale )
 {
-	m_Scale = a_rScale;
+	m_Scale    = a_rScale;
+	m_bChanged = TTRUE;
 }
 
 TOSHI_NAMESPACE_END

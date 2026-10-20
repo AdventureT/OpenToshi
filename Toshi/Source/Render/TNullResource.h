@@ -11,6 +11,8 @@ public:
 	TDECLARE_CLASS( TNullResource, TResource );
 
 public:
+	// $deBlob: FUNCTION 006b5760
+	TNullResource() = default;
 	~TNullResource();
 };
 

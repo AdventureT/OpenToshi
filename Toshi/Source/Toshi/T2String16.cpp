@@ -2,6 +2,7 @@
 #include "T2CharTraits.h"
 #include "T2String16.h"
 #include "T2String8.h"
+#include "TStringManager.h"
 
 //-----------------------------------------------------------------------------
 // Enables memory debugging.
@@ -10,6 +11,8 @@
 #include "Core/TMemoryDebugOn.h"
 
 TOSHI_NAMESPACE_START
+
+T2Allocator* T2String16::sm_pDefaultAllocatorCB = GetDefaultAllocatorCB();
 
 TWCHAR T2String16::ms_aScratchMem[ T2String16::SCRATCH_MEM_SIZE ];
 
@@ -83,7 +86,7 @@ TINT T2String16::CompareNoCase( const TWCHAR* str1, const TWCHAR* str2, TSIZE si
 	return _wcsicmp( str1, str2 );
 }
 
-// NOTE: TStringManager::String16Copy (006bb310) is the same plain copy; retail only has that one.
+// NOTE: TStringManager::String16Copy is the same plain copy; retail only has that one.
 TWCHAR* T2String16::Copy( TWCHAR* dst, const TWCHAR* src, TSIZE size )
 {
 	if ( size != -1 )
@@ -185,9 +188,9 @@ TWCHAR* T2String16::FindString( TWCHAR* str, const TWCHAR* substr )
 
 // $deBlob: FUNCTION 006f1c90
 // $Barnyard: FUNCTION 006bb3c0
-TSIZE T2String16::Length( const TWCHAR* str )
+TINT T2String16::Length( const TWCHAR* str )
 {
-	if ( str != TNULL ) return wcslen( str );
+	if ( str != TNULL ) return TINT( wcslen( str ) );
 	return 0;
 }
 
@@ -319,7 +322,7 @@ TWCHAR* T2String16::CopyFromChar( TWCHAR* a_UnicodeString, const TCHAR* a_CharSt
 {
 	TASSERT( ( a_UnicodeString != TNULL ) && ( a_CharString != TNULL ) );
 
-	TINT iLength = TINT( T2String8::Length( a_CharString ) );
+	TINT iLength = TINT( TStringManager::String8Length( a_CharString ) );
 	TINT iCount  = ( a_iLength > iLength || a_iLength == -1 ) ? iLength : a_iLength;
 
 	TINT i;
@@ -354,7 +357,7 @@ TWCHAR* T2String16::CreateCopy( const TWCHAR* a_wszString, TSIZE a_uiSize )
 
 	// NOTE: de Blob uses TMalloc (Barnyard new[]), both are freed through TFree
 	TWCHAR* wszBuffer = TSTATICCAST( TWCHAR, TMalloc( uiSize * sizeof( TWCHAR ) + sizeof( TWCHAR ) ) );
-	memmove( wszBuffer, a_wszString, uiSize * sizeof( TWCHAR ) );
+	memcpy( wszBuffer, a_wszString, uiSize * sizeof( TWCHAR ) );
 	wszBuffer[ uiSize ] = L'\0';
 
 	return wszBuffer;

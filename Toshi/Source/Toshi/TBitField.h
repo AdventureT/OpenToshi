@@ -8,9 +8,9 @@ template <TUINT NUM_BITS>
 class TBitField
 {
 public:
-	using ValueType                        = TUINT32;
-	static constexpr TUINT MIN_NUM_BITS    = 8 * sizeof( ValueType );
-	static constexpr TUINT BIT_SUBNUM_MASK = MIN_NUM_BITS - 1;
+	using ValueType                             = TUINT32;
+	static TCONSTEXPR_VAR TUINT MIN_NUM_BITS    = 8 * sizeof( ValueType );
+	static TCONSTEXPR_VAR TUINT BIT_SUBNUM_MASK = MIN_NUM_BITS - 1;
 
 public:
 	TBitField()
@@ -21,28 +21,39 @@ public:
 		}
 	}
 
-	// TBitField<32> 00413220
+	// $deBlob: FUNCTION 005e3dc0
+	// $deBlob: FUNCTION 006f9590
 	// $Barnyard: FUNCTION 00413220
 	void Set( TINT a_iBitNum, TBOOL a_bSet )
 	{
 		TASSERT( a_iBitNum >= 0 );
 		TASSERT( a_iBitNum < NUM_BITS );
 
-		TUINT uiBit = 1 << ( a_iBitNum % NUM_BITS );
+		TUINT uiBit = 1 << ( a_iBitNum & BIT_SUBNUM_MASK );
 
 		if ( a_bSet ) m_Values[ a_iBitNum / MIN_NUM_BITS ] |= uiBit;
 		else
 			m_Values[ a_iBitNum / MIN_NUM_BITS ] &= ~uiBit;
 	}
 
-	// TBitField<32> 0040e940
+	// $deBlob: FUNCTION 0058c840
+	// $deBlob: FUNCTION 006f92d0
 	// $Barnyard: FUNCTION 0040e940
 	TBOOL IsSet( TINT a_iBitNum ) const
 	{
 		TASSERT( a_iBitNum >= 0 );
 		TASSERT( a_iBitNum < NUM_BITS );
 
-		return ( m_Values[ a_iBitNum / MIN_NUM_BITS ] & ( 1 << ( a_iBitNum % NUM_BITS ) ) ) != 0;
+		return ( m_Values[ a_iBitNum / MIN_NUM_BITS ] & ( 1 << ( a_iBitNum & BIT_SUBNUM_MASK ) ) ) != 0;
+	}
+
+	// Clears every bit
+	void Clear()
+	{
+		T2_FOREACH_ARRAY( m_Values, i )
+		{
+			m_Values[ i ] = 0;
+		}
 	}
 
 	// NOTE: TBitField<32> instance used on AUnitFlagSet masks by AInteraction::UpdatePriority

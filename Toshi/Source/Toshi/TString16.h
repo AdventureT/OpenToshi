@@ -11,11 +11,14 @@ class TString16
 public:
 	TString16();
 	TString16( T2Allocator* allocator );
-	TString16( TString16&& src ) noexcept;
-	TString16( const TString16& src, T2Allocator* allocator = TNULL );
-	TString16( const TWCHAR* src, T2Allocator* allocator = TNULL );
-	TString16( const TString8& src, T2Allocator* allocator = TNULL );
-	TString16( TINT size, T2Allocator* allocator = TNULL );
+#ifdef TOSHI_STRING_MOVE
+	TString16( TString16&& src ) TNOEXCEPT;
+#endif
+	TString16( const TString16& src, T2Allocator* allocator = sm_pDefaultAllocatorCB() );
+	TString16( const TWCHAR* src, T2Allocator* allocator = sm_pDefaultAllocatorCB() );
+	TString16( const TString8& src, T2Allocator* allocator = sm_pDefaultAllocatorCB() );
+	TString16( const TCHAR* src, T2Allocator* allocator = sm_pDefaultAllocatorCB() );
+	TString16( TINT size, T2Allocator* allocator = sm_pDefaultAllocatorCB() );
 	// $deBlob: FUNCTION 006f17d0
 	~TString16() { FreeBuffer(); }
 
@@ -48,7 +51,8 @@ public:
 	TINT Find( const TWCHAR* substr, TINT pos = 0 ) const;
 
 	// Returns string starting from specified index
-	const TWCHAR* GetString( TINT index = 0 ) const;
+	const TWCHAR* GetString( TINT index ) const;
+	const TWCHAR* GetString() const { return !IsIndexValid( 0 ) ? TNULL : m_pBuffer; }
 
 	// Returns string starting from specified a_iIndex. Use only if you are sure about what you do!
 	TWCHAR* GetStringUnsafe( TINT a_iIndex = 0 );
@@ -158,13 +162,9 @@ public:
 	// Copies a C-string, widening each character
 	TString16& operator=( const TCHAR* a_szStr );
 
-	// $deBlob: FUNCTION 006f1050
-	TString16& operator=( const TString16& str )
-	{
-		Copy( str, -1 );
-		return *this;
-	}
+	TString16& operator=( const TString16& str );
 
+#ifdef TOSHI_STRING_MOVE
 	TString16& operator=( TString16&& str )
 	{
 		FreeBuffer();
@@ -176,9 +176,20 @@ public:
 		str.Reset();
 		return *this;
 	}
+#endif
+
+public:
+	typedef T2Allocator* ( *func_DefaultAllocatorCB )();
+
+	// Sets the callback giving the allocator of new strings (de Blob: AppStringAllocator)
+	// $deBlob: FUNCTION 00575040
+	static void SetDefaultAllocatorCB( func_DefaultAllocatorCB a_pCallback )
+	{
+		TASSERT( TNULL != a_pCallback );
+		sm_pDefaultAllocatorCB = a_pCallback;
+	}
 
 private:
-	typedef T2Allocator* ( *func_DefaultAllocatorCB )();
 
 	// $deBlob: FUNCTION 006f1630
 	void Reset()
@@ -188,22 +199,14 @@ private:
 		m_iExcessLen = 0;
 	}
 
-	// $deBlob: FUNCTION 006f0170
-	T2Allocator* GetAllocator()
-	{
-		return sm_pDefaultAllocatorCB();
-	}
+	T2Allocator* GetAllocator();
 
 	void FreeMemory( TWCHAR* a_pMem );
 
-	// $deBlob: FUNCTION 006f0160
-	static T2Allocator* GetDefaultAllocatorCB()
-	{
-		return GetGlobalAllocator();
-	}
+	static T2Allocator* GetDefaultAllocatorCB();
 
 private:
-	static inline func_DefaultAllocatorCB sm_pDefaultAllocatorCB = &GetDefaultAllocatorCB;
+	static func_DefaultAllocatorCB sm_pDefaultAllocatorCB;
 
 private:
 	TWCHAR*      m_pBuffer;        // 0x0

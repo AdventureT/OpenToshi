@@ -12,38 +12,43 @@ public:
 		friend class T2Vector;
 
 	public:
-		constexpr Iterator()
+		TCONSTEXPR Iterator()
 		    : m_iIndex( 0 ), m_pVector( TNULL ) {}
-		constexpr Iterator( T2Vector* a_pVector )
+		TCONSTEXPR Iterator( T2Vector* a_pVector )
 		    : m_iIndex( 0 ), m_pVector( a_pVector ) {}
-		constexpr Iterator( TINT a_iIndex, T2Vector* a_pVector )
+		TCONSTEXPR Iterator( TINT a_iIndex, T2Vector* a_pVector )
 		    : m_iIndex( a_iIndex ), m_pVector( a_pVector ) {}
-		constexpr Iterator( const Iterator& a_rOther )
+		TCONSTEXPR Iterator( const Iterator& a_rOther )
 		    : m_iIndex( a_rOther.m_iIndex ), m_pVector( a_rOther.m_pVector ) {}
 
-		constexpr TINT Index() const noexcept
+		TCONSTEXPR TINT Index() const TNOEXCEPT
 		{
 			return m_iIndex;
 		}
 
-		T* Get() noexcept
+		T* Get() TNOEXCEPT
 		{
 			return &m_pVector->At( m_iIndex );
 		}
 
-		const T* Get() const noexcept
+		const T* Get() const TNOEXCEPT
 		{
 			return &m_pVector->At( m_iIndex );
 		}
 
-		T& Value() noexcept
+		// NOTE: de Blob's iterator checks the index against the capacity, not the size
+		T& Value() TNOEXCEPT
 		{
-			return m_pVector->At( m_iIndex );
+			TASSERT( m_iIndex >= 0 );
+			TASSERT( m_iIndex < CAPACITY );
+			return m_pVector->AtUnsafe( m_iIndex );
 		}
 
-		const T& Value() const noexcept
+		const T& Value() const TNOEXCEPT
 		{
-			return m_pVector->At( m_iIndex );
+			TASSERT( m_iIndex >= 0 );
+			TASSERT( m_iIndex < CAPACITY );
+			return m_pVector->AtUnsafe( m_iIndex );
 		}
 
 		Iterator Next() const
@@ -70,88 +75,116 @@ public:
 			return &Value();
 		}
 
-		T& operator*() noexcept
+		// $deBlob: FUNCTION 00573eb0
+		// $deBlob: FUNCTION 007a3420
+		T& operator*() TNOEXCEPT
 		{
 			return Value();
 		}
 
-		const T& operator*() const noexcept
+		const T& operator*() const TNOEXCEPT
 		{
 			return Value();
 		}
 
-		T* operator->() noexcept
+		// $deBlob: FUNCTION 00573f30
+		// $deBlob: FUNCTION 005c6520
+		// $deBlob: FUNCTION 005da270
+		// $deBlob: FUNCTION 005dbba0
+		// $deBlob: FUNCTION 005eba70
+		// $deBlob: FUNCTION 005f6bc0
+		// $deBlob: FUNCTION 007a34a0
+		T* operator->() TNOEXCEPT
 		{
 			return &Value();
 		}
 
-		const T* operator->() const noexcept
+		const T* operator->() const TNOEXCEPT
 		{
 			return &Value();
 		}
 
+		// NOTE: de Blob compares the index first
+		// $deBlob: FUNCTION 005dbb60
 		// $Barnyard: FUNCTION 0051bce0
-		TBOOL operator==( const Iterator& a_rOther ) const noexcept
+		TBOOL operator==( const Iterator& a_rOther ) const TNOEXCEPT
 		{
-			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex == m_iIndex;
+			return m_iIndex == a_rOther.m_iIndex && m_pVector == a_rOther.m_pVector;
 		}
 
-		// Shared (identical code folding) by the instantiations: 00513e50
+		// $deBlob: FUNCTION 007a3400
+		// $deBlob: FUNCTION 005c6500
 		// $Barnyard: FUNCTION 00513e50
-		TBOOL operator!=( const Iterator& a_rOther ) const noexcept
+		// $deBlob: FUNCTION 005eba20
+		// $deBlob: FUNCTION 005dbb80
+		// $deBlob: FUNCTION 00573e80
+		TBOOL operator!=( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return m_iIndex != a_rOther.m_iIndex || m_pVector != a_rOther.m_pVector;
 		}
 
-		TBOOL operator>( const Iterator& a_rOther ) const noexcept
+		TBOOL operator>( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex > m_iIndex;
 		}
 
-		TBOOL operator>=( const Iterator& a_rOther ) const noexcept
+		TBOOL operator>=( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex >= m_iIndex;
 		}
 
-		TBOOL operator<( const Iterator& a_rOther ) const noexcept
+		TBOOL operator<( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex < m_iIndex;
 		}
 
-		TBOOL operator<=( const Iterator& a_rOther ) const noexcept
+		TBOOL operator<=( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex <= m_iIndex;
 		}
 
-		constexpr Iterator operator++( TINT ) noexcept
+		TCONSTEXPR Iterator operator++( TINT ) TNOEXCEPT
 		{
 			Iterator temp = *this;
 			m_iIndex++;
 			return temp;
 		}
 
-		constexpr Iterator operator--( TINT ) noexcept
+		TCONSTEXPR Iterator operator--( TINT ) TNOEXCEPT
 		{
 			Iterator temp = *this;
 			m_iIndex--;
 			return temp;
 		}
 
-		constexpr Iterator& operator++() noexcept
+		// $deBlob: FUNCTION 00573fc0
+		// $deBlob: FUNCTION 005c65a0
+		// $deBlob: FUNCTION 005da300
+		// $deBlob: FUNCTION 005dbc20
+		// $deBlob: FUNCTION 005ebaf0
+		// $deBlob: FUNCTION 005f6d20
+		// $deBlob: FUNCTION 007a3520
+		Iterator& operator++() TNOEXCEPT
 		{
+			TASSERT( m_iIndex >= 0 );
+			TASSERT( m_iIndex < CAPACITY );
 			m_iIndex++;
 			return *this;
 		}
 
-		constexpr Iterator& operator--() noexcept
+		TCONSTEXPR Iterator& operator--() TNOEXCEPT
 		{
 			m_iIndex--;
 			return *this;
 		}
 
-		// Shared (identical code folding) by the instantiations: 00479c20
+		// $deBlob: FUNCTION 00573e60
+		// $deBlob: FUNCTION 005c64e0
+		// $deBlob: FUNCTION 005dbb20
+		// $deBlob: FUNCTION 005eba00
+		// $deBlob: FUNCTION 007a33e0
 		// $Barnyard: FUNCTION 00479c20
-		constexpr Iterator& operator=( const Iterator& a_rOther ) noexcept
+		TCONSTEXPR Iterator& operator=( const Iterator& a_rOther ) TNOEXCEPT
 		{
 			if ( this != &a_rOther )
 			{
@@ -162,26 +195,37 @@ public:
 			return *this;
 		}
 
-		Iterator operator+( TINT a_uiValue ) const noexcept
+		Iterator operator+( TINT a_uiValue ) const TNOEXCEPT
 		{
 			TASSERT( m_iIndex + a_uiValue < m_pVector->Size() );
 			return Iterator( m_iIndex + a_uiValue, m_pVector );
 		}
 
-		Iterator operator-( TINT a_uiValue ) const noexcept
+		Iterator operator-( TINT a_uiValue ) const TNOEXCEPT
 		{
 			TASSERT( m_iIndex - a_uiValue < m_pVector->Size() );
 			return Iterator( m_iIndex - a_uiValue, m_pVector );
 		}
 
-		Iterator& operator+=( TINT a_uiValue ) noexcept
+		// $deBlob: FUNCTION 005f6e10
+		Iterator& operator+=( TINT a_uiValue ) TNOEXCEPT
 		{
-			TASSERT( m_iIndex + a_uiValue < m_pVector->Size() );
+			if ( a_uiValue > 0 )
+			{
+				TASSERT( m_iIndex >= 0 );
+				TASSERT( m_iIndex < CAPACITY - a_uiValue );
+			}
+			else
+			{
+				TASSERT( m_iIndex >= a_uiValue );
+				TASSERT( m_iIndex < CAPACITY );
+			}
+
 			m_iIndex += a_uiValue;
 			return *this;
 		}
 
-		Iterator& operator-=( TINT a_uiValue ) noexcept
+		Iterator& operator-=( TINT a_uiValue ) TNOEXCEPT
 		{
 			TASSERT( m_iIndex - a_uiValue < m_pVector->Size() );
 			m_iIndex -= a_uiValue;
@@ -194,22 +238,40 @@ public:
 	};
 
 public:
-	constexpr static TINT CAPACITY = MaxSize;
+	static TCONSTEXPR_VAR TINT CAPACITY = MaxSize;
 
 public:
+	// de Blob's T2Vector stores its items as a T array: the constructor sets the count, then default-constructs all
+	// MaxSize items. Items with a trivial default constructor stay uninitialised. NOTE: our storage is a raw buffer
+	// (items are constructed in place by the inserting functions), so the items are default-constructed here
+	// explicitly; types without a default constructor are skipped.
+	// $deBlob: FUNCTION 005db9d0
 	T2Vector()
 	{
 		m_iNumElements = 0;
+		DefaultConstructItems( std::integral_constant < TBOOL, std::is_default_constructible<T>::value && !std::is_trivially_default_constructible<T>::value > () );
 	}
+
+	void DefaultConstructItems( std::true_type )
+	{
+		for ( TINT i = 0; i < MaxSize; i++ )
+			new ( &AtUnsafe( i ) ) T;
+	}
+
+	void DefaultConstructItems( std::false_type ) {}
 
 	~T2Vector()
 	{
 		Clear();
 	}
 
+	// $deBlob: FUNCTION 0078fbd0
 	// $Barnyard: FUNCTION 005ddb60
 	Iterator InsertBefore( Iterator a_itInsertBefore, const T& a_rcItem = T(), TBOOL a_bUseMemMove = TTRUE )
 	{
+		TASSERT( a_itInsertBefore.m_pVector == this );
+		TASSERT( a_itInsertBefore.m_iIndex >= 0 && a_itInsertBefore.m_iIndex <= m_iNumElements );
+
 		InsertGap( a_itInsertBefore.Index(), 1, a_bUseMemMove );
 		TConstruct<T>( &AtUnsafe( a_itInsertBefore.Index() ), a_rcItem );
 
@@ -224,6 +286,9 @@ public:
 		return Iterator( a_itInsertAfter.Index() + 1, this );
 	}
 
+	// $deBlob: FUNCTION 00731120
+	// $deBlob: FUNCTION 007e47c0
+	// $deBlob: FUNCTION 007ea360
 	template <class... Args>
 	Iterator EmplaceBack( Args&&... args )
 	{
@@ -233,21 +298,44 @@ public:
 		return Iterator( m_iNumElements - 1, this );
 	}
 
+	// $deBlob: FUNCTION 005741c0
+	// $deBlob: FUNCTION 005c6820
+	// $deBlob: FUNCTION 005c6870
+	// $deBlob: FUNCTION 005da9b0
+	// $deBlob: FUNCTION 005dbfc0
+	// $deBlob: FUNCTION 005e0570
+	// $deBlob: FUNCTION 005ebd10
+	// $deBlob: FUNCTION 005f7420
+	// $deBlob: FUNCTION 006c27e0
+	// $deBlob: FUNCTION 006c2840
+	// $deBlob: FUNCTION 007311f0
+	// $deBlob: FUNCTION 00731240
+	// $deBlob: FUNCTION 00731290
+	// $deBlob: FUNCTION 00733ea0
+	// $deBlob: FUNCTION 00733ef0
+	// $deBlob: FUNCTION 007a36f0
+	// $deBlob: FUNCTION 005eb900
 	// $Barnyard: FUNCTION 00573510
-	Iterator PushBack( const T& item = T() )
+	void PushBack( const T& item = T() )
 	{
 		TASSERT( m_iNumElements < CAPACITY );
 		TConstruct<T>( &AtUnsafe( m_iNumElements++ ), item );
-
-		return Iterator( m_iNumElements - 1, this );
 	}
 
+	// NOTE: de Blob assigns T() to the removed slot
+	// $deBlob: FUNCTION 005c6780
+	// $deBlob: FUNCTION 005c67d0
+	// $deBlob: FUNCTION 006c2720
+	// $deBlob: FUNCTION 006c2780
+	// $deBlob: FUNCTION 0078fe70
+	// $deBlob: FUNCTION 007ea290
 	// $Barnyard: FUNCTION 00517bb0
 	// $Barnyard: FUNCTION 0057cf00
 	void PopBack()
 	{
 		TASSERT( m_iNumElements > 0 );
-		AtUnsafe( --m_iNumElements ).~T();
+		m_iNumElements--;
+		AtUnsafe( m_iNumElements ) = T();
 	}
 
 	void PopFront()
@@ -286,8 +374,8 @@ public:
 		m_iNumElements = a_rcCopyFrom.Size();
 	}
 
+	// $deBlob: FUNCTION 005dbdd0
 	// $Barnyard: FUNCTION 0062fba0
-	// T2Vector<TVector4, 6>: 004a5430
 	// $Barnyard: FUNCTION 004a5430
 	Iterator Find( const T& a_rValue )
 	{
@@ -301,33 +389,35 @@ public:
 	}
 
 	// Erases element preserving order
+	// NOTE: de Blob takes the iterator by value, shifts the elements by assignment and assigns T() to the last slot
+	// $deBlob: FUNCTION 00574100
+	// $deBlob: FUNCTION 005dbd40
+	// $deBlob: FUNCTION 00730400
+	// $deBlob: FUNCTION 00733d00
+	// $deBlob: FUNCTION 00733d80
+	// $deBlob: FUNCTION 007a3640
 	// $Barnyard: FUNCTION 005141e0
 	// $Barnyard: FUNCTION 0051c230
 	// $Barnyard: FUNCTION 0062fb60
 	// $Barnyard: FUNCTION 005ddba0
-	Iterator Erase( const Iterator& a_rIterator )
+	Iterator Erase( Iterator a_itItem )
 	{
-		TINT uiItemIndex = a_rIterator.Index();
-		TASSERT( uiItemIndex < m_iNumElements );
+		TINT iIndex = a_itItem.Index();
+		TASSERT( iIndex >= 0 && iIndex < m_iNumElements );
 
-		AtUnsafe( uiItemIndex ).~T();
+		for ( TINT i = iIndex; i < m_iNumElements - 1; i++ )
+			AtUnsafe( i ) = AtUnsafe( i + 1 );
 
-		if ( uiItemIndex + 1 < Size() )
-		{
-			for ( TINT i = uiItemIndex + 1; i < Size(); i++ )
-			{
-				TConstruct<T>( &AtUnsafe( i - 1 ), std::move( AtUnsafe( i ) ) );
-				AtUnsafe( i ).~T();
-			}
-		}
-
+		AtUnsafe( m_iNumElements - 1 ) = T();
 		m_iNumElements--;
-		return Iterator( uiItemIndex, this );
+		return Iterator( iIndex, this );
 	}
 
 	// Returns the item if it's stored in the vector or TNULL otherwise (for pointer types)
+	// NOTE: a member template so that it's only instantiated when used (VS2013 can't take aligned types by value)
 	// $Barnyard: FUNCTION 00573600
-	T FindItem( T a_Item )
+	template <class U = T>
+	U FindItem( typename std::remove_reference<U>::type a_Item )
 	{
 		auto it = Find( a_Item );
 
@@ -371,7 +461,7 @@ public:
 		return m_iNumElements;
 	}
 
-	constexpr TINT Capacity() const
+	TCONSTEXPR TINT Capacity() const
 	{
 		return CAPACITY;
 	}
@@ -387,36 +477,56 @@ public:
 		return Iterator( 0, this );
 	}
 
-	Iterator Back()
+	// $deBlob: FUNCTION 005c6610
+	// $deBlob: FUNCTION 005c6950
+	// $deBlob: FUNCTION 006c24b0
+	// $deBlob: FUNCTION 006c2b80
+	T& Back()
 	{
 		TASSERT( m_iNumElements > 0 );
-		return Iterator( m_iNumElements - 1, this );
+		return AtUnsafe( m_iNumElements - 1 );
 	}
 
-	// de Blob: one instance (a 1024 element vector of a game class) 005ebc30
+	// $deBlob: FUNCTION 00574060
+	// $deBlob: FUNCTION 005da550
+	// $deBlob: FUNCTION 005dbcc0
 	// $deBlob: FUNCTION 005ebc30
-	// T2Vector<AGameState*, 10> (calls the folded Begin 004ab160): 00429680
+	// $deBlob: FUNCTION 005f6f60
+	// $deBlob: FUNCTION 007a35d0
+	// $deBlob: FUNCTION 005c6650
+	// $deBlob: FUNCTION 005c6670
 	// $Barnyard: FUNCTION 00429680
-	constexpr Iterator Begin()
+	TCONSTEXPR Iterator Begin()
 	{
 		return Iterator( this );
 	}
 
 	// Returns an iterator to the element at a_iIndex
-	// NOTE: Retail folds it with the same helper of the other index based containers and
-	// calls it e.g. from T2SortedVector::FindInsertionPoint and ACollisionModel::CollideRay (inlined in our code)
+	// NOTE: Retail folds it with the same helper of the other index based containers and calls it e.g. from
+	// T2SortedVector::FindInsertionPoint and ACollisionModel::CollideRay
+	// $deBlob: FUNCTION 00731070
+	// $deBlob: FUNCTION 00733e00
+	// $deBlob: FUNCTION 00733e50
+	// $deBlob: FUNCTION 0078fdd0
 	// $Barnyard: FUNCTION 0061a720
 	Iterator GetIterator( TINT a_iIndex )
 	{
+		TASSERT( a_iIndex >= 0 && a_iIndex <= m_iNumElements );
 		return Iterator( a_iIndex, this );
 	}
 
-	// de Blob: same vector as Begin 005ebc70
+	// $deBlob: FUNCTION 005740e0
+	// $deBlob: FUNCTION 005c66b0
+	// $deBlob: FUNCTION 005da600
+	// $deBlob: FUNCTION 005dbd20
 	// $deBlob: FUNCTION 005ebc70
+	// $deBlob: FUNCTION 005f6fb0
+	// $deBlob: FUNCTION 0078fa10
+	// $deBlob: FUNCTION 007a3620
 	// $Barnyard: FUNCTION 00575090
-	// T2Vector<AGameState*, 10> (calls the folded End 00575090): 004296a0
+	// $deBlob: FUNCTION 005c6690
 	// $Barnyard: FUNCTION 004296a0
-	constexpr Iterator End()
+	TCONSTEXPR Iterator End()
 	{
 		return Iterator( m_iNumElements, this );
 	}
@@ -444,21 +554,22 @@ public:
 	}
 
 private:
-	TFORCEINLINE constexpr T& AtUnsafe( TINT a_iIndex )
+	TFORCEINLINE TCONSTEXPR T& AtUnsafe( TINT a_iIndex )
 	{
 		return *( (T*)( m_aBuffer ) + a_iIndex );
 	}
 
-	TFORCEINLINE constexpr const T& AtUnsafe( TINT a_iIndex ) const
+	TFORCEINLINE TCONSTEXPR const T& AtUnsafe( TINT a_iIndex ) const
 	{
 		return *( (T*)( m_aBuffer ) + a_iIndex );
 	}
 
 	// $Barnyard: FUNCTION 00639ba0
-	// Instantiations: T2Vector<AGateManager::OpeningGate, 8> 005dd9d0
+	// $deBlob: FUNCTION 0078fc90
 	// $Barnyard: FUNCTION 005dd9d0
 	void InsertGap( TINT a_iGapAt, TINT a_iGapSize, TBOOL a_bUseMemMove = TTRUE )
 	{
+		TASSERT( a_iGapAt >= 0 && a_iGapAt <= m_iNumElements );
 		TASSERT( m_iNumElements + a_iGapSize <= CAPACITY );
 
 		if ( m_iNumElements > a_iGapAt )

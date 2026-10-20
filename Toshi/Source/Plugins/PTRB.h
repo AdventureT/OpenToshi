@@ -64,7 +64,7 @@ public:
 		friend PTRBSymbols;
 		friend PTRBRelocations;
 
-		static constexpr TUINT BUFFER_GROW_SIZE = 4096;
+		static TCONSTEXPR_VAR TUINT BUFFER_GROW_SIZE = 4096;
 
 		template <class T>
 		class Ptr
@@ -598,7 +598,7 @@ private:
 class PTRB
 {
 public:
-	static constexpr Toshi::TVersion VERSION = { TVERSION( 1, 1 ) };
+	static TCONSTEXPR_VAR TUINT32 VERSION = TVERSION( 1, 1 );
 
 public:
 	PTRB( Endianess a_eEndianess = Endianess_Little )
@@ -640,22 +640,22 @@ public:
 
 				switch ( ttsfi.GetCurrentHunk().Name )
 				{
-					case TFourCC( "HDRX" ):
+					case 0x58524448: // TFourCC( "HDRX" )
 						m_HDRX.Read( ttsfi, m_SECT, m_eEndianess );
 						break;
-					case TFourCC( "HEAD" ):
+					case 0x44414548: // TFourCC( "HEAD" )
 						m_HDRX.ReadLegacyHEAD( ttsfi, m_SECT, m_eEndianess );
 						break;
-					case TFourCC( "SECT" ):
+					case 0x54434553: // TFourCC( "SECT" )
 						m_SECT.Read( ttsfi, TFALSE, m_eEndianess );
 						break;
-					case TFourCC( "SECC" ):
+					case 0x43434553: // TFourCC( "SECC" )
 						m_SECT.Read( ttsfi, TTRUE, m_eEndianess );
 						break;
-					case TFourCC( "RELC" ):
+					case 0x434c4552: // TFourCC( "RELC" )
 						m_RELC.Read( ttsfi, m_SECT, m_eEndianess );
 						break;
-					case TFourCC( "SYMB" ):
+					case 0x424d5953: // TFourCC( "SYMB" )
 						m_SYMB.Read( ttsfi, m_SECT, m_eEndianess );
 						break;
 				}
@@ -924,7 +924,7 @@ inline PTRBSections::MemoryStream::Ptr<T> PTRBSections::MemoryStream::Alloc()
 {
 	m_BufferPos = TREINTERPRETCAST( TCHAR*, TAlignPointerUp( m_BufferPos ) );
 
-	constexpr TUINT TSize = sizeof( T );
+	TCONSTEXPR_VAR TUINT TSize = sizeof( T );
 	GrowBuffer( GetUsedSize() + TSize );
 
 	T* allocated = TREINTERPRETCAST( T*, m_BufferPos );
@@ -972,7 +972,7 @@ inline PTRBSections::MemoryStream::Ptr<T> PTRBSections::MemoryStream::Alloc( T**
 	TASSERT( (TUINT)outPtr >= (TUINT)m_Buffer && (TUINT)outPtr < (TUINT)m_Buffer + (TUINT)m_BufferSize, "Out pointer is out of buffer" );
 	m_BufferPos = TREINTERPRETCAST( TCHAR*, TAlignPointerUp( m_BufferPos ) );
 
-	constexpr TUINT TSize        = sizeof( T ) * Count;
+	TCONSTEXPR_VAR TUINT TSize        = sizeof( T ) * Count;
 	TUINT           outPtrOffset = GetOffset( outPtr );
 	GrowBuffer( GetUsedSize() + TSize );
 

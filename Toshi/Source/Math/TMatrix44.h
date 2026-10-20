@@ -31,14 +31,14 @@ enum BASISVECTOR_ : BASISVECTOR
 class TMatrix44
 {
 public:
-	constexpr TMatrix44() = default;
+	TCONSTEXPR TMatrix44() = default;
 
-	constexpr TMatrix44( const TMatrix44& a_rMatrix )
-	    : m_f11( a_rMatrix.m_f11 ), m_f12( a_rMatrix.m_f12 ), m_f13( a_rMatrix.m_f13 ), m_f14( a_rMatrix.m_f14 ), m_f21( a_rMatrix.m_f21 ), m_f22( a_rMatrix.m_f22 ), m_f23( a_rMatrix.m_f23 ), m_f24( a_rMatrix.m_f24 ), m_f31( a_rMatrix.m_f31 ), m_f32( a_rMatrix.m_f32 ), m_f33( a_rMatrix.m_f33 ), m_f34( a_rMatrix.m_f34 ), m_f41( a_rMatrix.m_f41 ), m_f42( a_rMatrix.m_f42 ), m_f43( a_rMatrix.m_f43 ), m_f44( a_rMatrix.m_f44 )
-	{}
+	// $deBlob: FUNCTION 0054ee50
+	TMatrix44( const TMatrix44& a_rMatrix ) { memcpy( this, &a_rMatrix, sizeof( TMatrix44 ) ); }
 
+	// $deBlob: FUNCTION 00572a40
 	// $Barnyard: FUNCTION 0041fab0
-	constexpr TMatrix44(
+	TCONSTEXPR TMatrix44(
 	    TFLOAT a_f11,
 	    TFLOAT a_f12,
 	    TFLOAT a_f13,
@@ -59,8 +59,9 @@ public:
 	    : m_f11( a_f11 ), m_f12( a_f12 ), m_f13( a_f13 ), m_f14( a_f14 ), m_f21( a_f21 ), m_f22( a_f22 ), m_f23( a_f23 ), m_f24( a_f24 ), m_f31( a_f31 ), m_f32( a_f32 ), m_f33( a_f33 ), m_f34( a_f34 ), m_f41( a_f41 ), m_f42( a_f42 ), m_f43( a_f43 ), m_f44( a_f44 )
 	{}
 
+	// $deBlob: FUNCTION 00550ed0
 	// $Barnyard: FUNCTION 0041fa30
-	constexpr void Set(
+	TCONSTEXPR void Set(
 	    TFLOAT a_f11,
 	    TFLOAT a_f12,
 	    TFLOAT a_f13,
@@ -97,7 +98,7 @@ public:
 		m_f44 = a_f44;
 	}
 
-	constexpr void Set( const TMatrix44& a_rcMatrix )
+	TCONSTEXPR void Set( const TMatrix44& a_rcMatrix )
 	{
 		Set(
 		    a_rcMatrix.m_f11, a_rcMatrix.m_f12, a_rcMatrix.m_f13, a_rcMatrix.m_f14,
@@ -107,42 +108,48 @@ public:
 		);
 	}
 
-	// NOTE: 006c8520 copies a static that is never written (all zeros) instead of the identity; its callers
+	// NOTE: retail copies a static that is never written (all zeros) instead of the identity; its callers
 	// overwrite or ignore the result
-	// $deBlob: FUNCTION 00663680
-	// $Barnyard: FUNCTION 006c8500
-	// $Barnyard: FUNCTION 006c8520
-	constexpr void Identity()
-	{
-		Set( IDENTITY );
-	}
+	void Identity();
 
+	// $deBlob: FUNCTION 00554b40
 	const TVector3& AsBasisVector3( BASISVECTOR a_iIndex ) const
 	{
+		TASSERT( a_iIndex >= 0 );
+		TASSERT( a_iIndex < 4 );
 		return *TREINTERPRETCAST(
 		    TVector3*,
 		    TREINTERPRETCAST( TUINTPTR, this ) + a_iIndex * sizeof( TVector4 )
 		);
 	}
 
+	// $deBlob: FUNCTION 00554bc0
 	TVector3& AsBasisVector3( BASISVECTOR a_iIndex )
 	{
+		TASSERT( a_iIndex >= 0 );
+		TASSERT( a_iIndex < 4 );
 		return *TREINTERPRETCAST(
 		    TVector3*,
 		    TREINTERPRETCAST( TUINTPTR, this ) + a_iIndex * sizeof( TVector4 )
 		);
 	}
 
+	// $deBlob: FUNCTION 00555a50
 	const TVector4& AsBasisVector4( BASISVECTOR a_iIndex ) const
 	{
+		TASSERT( a_iIndex >= 0 );
+		TASSERT( a_iIndex < 4 );
 		return *TREINTERPRETCAST(
 		    TVector4*,
 		    TREINTERPRETCAST( TUINTPTR, this ) + a_iIndex * sizeof( TVector4 )
 		);
 	}
 
+	// $deBlob: FUNCTION 0055dcb0
 	TVector4& AsBasisVector4( BASISVECTOR a_iIndex )
 	{
+		TASSERT( a_iIndex >= 0 );
+		TASSERT( a_iIndex < 4 );
 		return *TREINTERPRETCAST(
 		    TVector4*,
 		    TREINTERPRETCAST( TUINTPTR, this ) + a_iIndex * sizeof( TVector4 )
@@ -170,10 +177,34 @@ public:
 	}
 
 	// NOTE: an instance of it lives in the game code
+	// $deBlob: FUNCTION 00555b30
 	// $Barnyard: FUNCTION 0045d950
 	void SetBasisVector4( BASISVECTOR a_iIndex, const TVector4& a_rcVector )
 	{
+		TASSERT( ( a_iIndex < 3 && a_rcVector.w == 0.0f ) || ( a_iIndex == 3 && a_rcVector.w == 1.0f ) );
+		TASSERT( a_iIndex >= 0 );
+		TASSERT( a_iIndex < 4 );
 		AsBasisVector4( a_iIndex ) = a_rcVector;
+	}
+
+	// Sets the x, y and z of a column (w untouched)
+	// $deBlob: FUNCTION 0076c250
+	void SetBasisVector3( BASISVECTOR a_iIndex, const TVector3& a_rcVector )
+	{
+		TASSERT( a_iIndex >= 0 );
+		TASSERT( a_iIndex < 4 );
+		AsBasisVector3( a_iIndex ) = a_rcVector;
+	}
+
+	// Sets a column, its w 1 for the translation and 0 for the axes
+	// $deBlob: FUNCTION 00597dc0
+	void SetBasisVector( BASISVECTOR a_iIndex, const TVector4& a_rcVector )
+	{
+		TASSERT( a_iIndex >= 0 );
+		TASSERT( a_iIndex < 4 );
+		TVector4& rCol = AsBasisVector4( a_iIndex );
+		rCol           = a_rcVector;
+		rCol.w         = ( a_iIndex >= 3 ) ? 1.0f : 0.0f;
 	}
 
 	// NOTE: an instance of it lives in the game code
@@ -184,9 +215,12 @@ public:
 	}
 
 	// NOTE: an instance of it lives in the game code
+	// $deBlob: FUNCTION 00580360
 	// $Barnyard: FUNCTION 00415a20
 	void GetBasisVector4( BASISVECTOR a_iIndex, TVector4& a_rOutVector ) const
 	{
+		TASSERT( a_iIndex >= 0 );
+		TASSERT( a_iIndex < 4 );
 		a_rOutVector = AsBasisVector4( a_iIndex );
 	}
 
@@ -200,6 +234,13 @@ public:
 	void LookAtDirection( const TVector3& a_rVec, const TVector3& a_rVec2 );
 
 	TFLOAT Determinant() const;
+
+	// Whether the 3x3 part has a negative determinant (a mirroring matrix)
+	// $deBlob: FUNCTION 006655f0
+	TBOOL IsMirrored() const
+	{
+		return m_f32 * ( m_f13 * m_f21 - m_f11 * m_f23 ) + m_f31 * ( m_f12 * m_f23 - m_f13 * m_f22 ) + m_f33 * ( m_f11 * m_f22 - m_f12 * m_f21 ) < 0.0f;
+	}
 	TFLOAT Determinant4() const;
 	TBOOL  Invert4( const TMatrix44& a_rcMatrix );
 	TBOOL  InvertArbitrary( const TMatrix44& a_rcMatrix );
@@ -230,66 +271,19 @@ public:
 		}
 	}
 
-	// $deBlob: FUNCTION 006653a0
-	TBOOL IsEqual( const TMatrix44& a_rcMatrix ) const
-	{
-		for ( TINT i = 0; i < 4; i++ )
-			for ( TINT k = 0; k < 4; k++ )
-				if ( AsBasisVector4( i ).AsArray()[ k ] != a_rcMatrix.AsBasisVector4( i ).AsArray()[ k ] ) return TFALSE;
-
-		return TTRUE;
-	}
+	TBOOL IsEqual( const TMatrix44& a_rcMatrix ) const;
 
 	// The three basis vectors are perpendicular to each other
-	// $deBlob: FUNCTION 006653f0
-	TBOOL IsOrthogonal() const
-	{
-		TFLOAT fDot12 = m_f22 * m_f12 + m_f11 * m_f21 + m_f23 * m_f13;
-		TFLOAT fDot13 = m_f32 * m_f12 + m_f31 * m_f11 + m_f33 * m_f13;
-		TFLOAT fDot23 = m_f22 * m_f32 + m_f21 * m_f31 + m_f23 * m_f33;
-		return fDot13 * fDot13 + fDot12 * fDot12 + fDot23 * fDot23 < 0.01f;
-	}
+	TBOOL IsOrthogonal() const;
 
-	// $deBlob: FUNCTION 00665790
-	void GetScale( TVector4& a_rOutScale ) const
-	{
-		TFLOAT fX = AsBasisVector4( 0 ).Magnitude();
-		TFLOAT fY = AsBasisVector4( 1 ).Magnitude();
-		TFLOAT fZ = AsBasisVector4( 2 ).Magnitude();
-		a_rOutScale.Set( fX, fY, fZ, 1.0f );
-	}
+	// NOTE: retail returns a_rOutScale in EAX (callers chain on it, e.g. Magnitude of the scale)
+	TVector4& GetScale( TVector4& a_rOutScale ) const;
 
 	void Lerp( const TMatrix44& a_rFrom, const TMatrix44& a_rTo, TFLOAT a_flProgress );
 
-	// $deBlob: FUNCTION 00665660
-	// $Barnyard: FUNCTION 006c86f0
-	constexpr void Scale( TFLOAT a_fScalar1, TFLOAT a_fScalar2, TFLOAT a_fScalar3 )
-	{
-		m_f11 *= a_fScalar1;
-		m_f12 *= a_fScalar1;
-		m_f13 *= a_fScalar1;
-		m_f21 *= a_fScalar2;
-		m_f22 *= a_fScalar2;
-		m_f23 *= a_fScalar2;
-		m_f31 *= a_fScalar3;
-		m_f32 *= a_fScalar3;
-		m_f33 *= a_fScalar3;
-	}
+	void Scale( TFLOAT a_fScalar1, TFLOAT a_fScalar2, TFLOAT a_fScalar3 );
 
-	// $deBlob: FUNCTION 00665700
-	// $Barnyard: FUNCTION 006c8750
-	constexpr void Scale( const TVector4& a_rScalars )
-	{
-		m_f11 *= a_rScalars.x;
-		m_f12 *= a_rScalars.x;
-		m_f13 *= a_rScalars.x;
-		m_f21 *= a_rScalars.y;
-		m_f22 *= a_rScalars.y;
-		m_f23 *= a_rScalars.y;
-		m_f31 *= a_rScalars.z;
-		m_f32 *= a_rScalars.z;
-		m_f33 *= a_rScalars.z;
-	}
+	void Scale( const TVector4& a_rScalars );
 
 	// $deBlob: FUNCTION 006650d0
 	// $Barnyard: FUNCTION 006c86a0
@@ -306,41 +300,19 @@ public:
 		}
 	}
 
-	constexpr void Scale( TFLOAT a_fScale )
+	void Scale( TFLOAT a_fScale )
 	{
 		Scale( a_fScale, a_fScale, a_fScale );
 	}
 
-	// $deBlob: FUNCTION 00665490
-	constexpr TBOOL IsOrthonormal() const
-	{
-		TFLOAT fVar6 = m_f22 * m_f12 + m_f11 * m_f21 + m_f23 * m_f13;
-		TFLOAT fVar4 = m_f32 * m_f12 + m_f11 * m_f31 + m_f33 * m_f13;
-		TFLOAT fVar5 = ( m_f11 * m_f11 + m_f12 * m_f12 + m_f13 * m_f13 ) - 1.0f;
-		TFLOAT fVar3 = m_f22 * m_f32 + m_f21 * m_f31 + m_f23 * m_f33;
-		TFLOAT fVar2 = ( m_f22 * m_f22 + m_f21 * m_f21 + m_f23 * m_f23 ) - 1.0f;
-		TFLOAT fVar1 = ( m_f32 * m_f32 + m_f31 * m_f31 + m_f33 * m_f33 ) - 1.0f;
+	TBOOL IsOrthonormal() const;
 
-		return fVar2 * fVar2 + fVar5 * fVar5 + fVar1 * fVar1 + fVar4 * fVar4 + fVar6 * fVar6 + fVar3 * fVar3 < 0.01f &&
-		    m_f14 == 0.0f && m_f24 == 0.0f && m_f34 == 0.0f && m_f44 == 1.0f;
-	}
-
-	// $deBlob: FUNCTION 00664d60
-	// $Barnyard: FUNCTION 006c8540
-	void Transpose( const TMatrix44& a_rcMatrix )
-	{
-		TFLOAT f14 = a_rcMatrix.m_f41, f24 = a_rcMatrix.m_f42, f34 = a_rcMatrix.m_f43, f44 = a_rcMatrix.m_f44;
-		TFLOAT f13 = a_rcMatrix.m_f31, f23 = a_rcMatrix.m_f32, f33 = a_rcMatrix.m_f33, f43 = a_rcMatrix.m_f34;
-		TFLOAT f12 = a_rcMatrix.m_f21, f22 = a_rcMatrix.m_f22, f32 = a_rcMatrix.m_f23, f42 = a_rcMatrix.m_f24;
-		TFLOAT f11 = a_rcMatrix.m_f11, f21 = a_rcMatrix.m_f12, f31 = a_rcMatrix.m_f13, f41 = a_rcMatrix.m_f14;
-		Set( f11, f12, f13, f14, f21, f22, f23, f24, f31, f32, f33, f34, f41, f42, f43, f44 );
-	}
+	void Transpose( const TMatrix44& a_rcMatrix );
 
 	void Multiply( const TMatrix44& a_rLeft, const TMatrix44& a_rRight );
 	void Multiply( const TMatrix44& a_rRight );
 
 	// this = a_rcLeft * this
-	// NOTE: the name is invented
 	// $Barnyard: FUNCTION 00466830
 	void PreMultiply( const TMatrix44& a_rcLeft )
 	{
@@ -369,144 +341,26 @@ public:
 	void RotateY( TFLOAT a_fAngle );
 	void RotateZ( TFLOAT a_fAngle );
 
-	// $deBlob: FUNCTION 006657f0
-	// $Barnyard: FUNCTION 006c9160
-	void Rotate( TFLOAT a_fAngleX, TFLOAT a_fAngleY, TFLOAT a_fAngleZ )
-	{
-		RotateX( a_fAngleX );
-		RotateY( a_fAngleY );
-		RotateZ( a_fAngleZ );
-	}
+	void Rotate( TFLOAT a_fAngleX, TFLOAT a_fAngleY, TFLOAT a_fAngleZ );
 
 	void GetEulerXYZ( TVector3& a_rOutVec ) const;
 
-	// $deBlob: FUNCTION 00666a60
-	// $Barnyard: FUNCTION 006c8c20
-	static void MatToQuat( TQuaternion& a_rOutQuat, const TMatrix44& a_rMatrix )
-	{
-		TFLOAT fVar1;
-		TFLOAT fVar2;
-		TFLOAT fVar3;
-		TFLOAT fVar4;
-
-		fVar1 = a_rMatrix.m_f11;
-		fVar2 = a_rMatrix.m_f22;
-		fVar3 = a_rMatrix.m_f33;
-
-		// NOTE: de Blob's order of operations (Barnyard adds and subtracts in another order)
-		fVar4 = fVar1 + fVar2 + fVar3;
-
-		if ( 0.0f < fVar4 )
-		{
-			fVar1        = TMath::Sqrt( fVar4 + 1.0f ) * 0.5f;
-			a_rOutQuat.w = fVar1;
-			fVar1        = 0.25f / fVar1;
-			a_rOutQuat.x = ( a_rMatrix.m_f23 - a_rMatrix.m_f32 ) * fVar1;
-			a_rOutQuat.y = ( a_rMatrix.m_f31 - a_rMatrix.m_f13 ) * fVar1;
-			a_rOutQuat.z = ( a_rMatrix.m_f12 - a_rMatrix.m_f21 ) * fVar1;
-			return;
-		}
-		if ( fVar2 <= fVar1 )
-		{
-			if ( fVar3 < fVar1 )
-			{
-				fVar1        = TMath::Sqrt( ( ( fVar1 - fVar2 ) - fVar3 ) + 1.0f ) * 0.5f;
-				a_rOutQuat.x = fVar1;
-				fVar1        = 0.25f / fVar1;
-				a_rOutQuat.w = ( a_rMatrix.m_f23 - a_rMatrix.m_f32 ) * fVar1;
-				a_rOutQuat.y = ( a_rMatrix.m_f12 + a_rMatrix.m_f21 ) * fVar1;
-				a_rOutQuat.z = ( a_rMatrix.m_f13 + a_rMatrix.m_f31 ) * fVar1;
-				return;
-			}
-		}
-		else if ( fVar3 <= fVar2 )
-		{
-			fVar1        = TMath::Sqrt( ( ( fVar2 - fVar3 ) - fVar1 ) + 1.0f ) * 0.5f;
-			a_rOutQuat.y = fVar1;
-			fVar1        = 0.25f / fVar1;
-			a_rOutQuat.w = ( a_rMatrix.m_f31 - a_rMatrix.m_f13 ) * fVar1;
-			a_rOutQuat.z = ( a_rMatrix.m_f23 + a_rMatrix.m_f32 ) * fVar1;
-			a_rOutQuat.x = ( a_rMatrix.m_f21 + a_rMatrix.m_f12 ) * fVar1;
-			return;
-		}
-
-		fVar1        = TMath::Sqrt( ( ( fVar3 - fVar1 ) - fVar2 ) + 1.0f ) * 0.5f;
-		a_rOutQuat.z = fVar1;
-
-		fVar1        = 0.25f / fVar1;
-		a_rOutQuat.w = ( a_rMatrix.m_f12 - a_rMatrix.m_f21 ) * fVar1;
-		a_rOutQuat.x = ( a_rMatrix.m_f31 + a_rMatrix.m_f13 ) * fVar1;
-		a_rOutQuat.y = ( a_rMatrix.m_f32 + a_rMatrix.m_f23 ) * fVar1;
-	}
+	static void MatToQuat( TQuaternion& a_rOutQuat, const TMatrix44& a_rMatrix );
 
 	// NOTE: the vector/plane transforms below use de Blob's order of operations (Barnyard sums in another order)
 
-	// $deBlob: FUNCTION 00666990
-	// $Barnyard: FUNCTION 006c8bf0
-	static void TransformPlaneOrthogonal( TPlane& a_rOutPlane, const TMatrix44& a_rMatrix, const TPlane& a_rcSourcePlane )
-	{
-		const TVector4& vNormal = a_rcSourcePlane.AsVector4();
-		TFLOAT          fNX = vNormal.x, fNY = vNormal.y, fNZ = vNormal.z, fD = a_rcSourcePlane.GetD();
-
-		TFLOAT fY = a_rMatrix.m_f12 * fNX + a_rMatrix.m_f22 * fNY + a_rMatrix.m_f32 * fNZ;
-		TFLOAT fZ = a_rMatrix.m_f13 * fNX + a_rMatrix.m_f23 * fNY + a_rMatrix.m_f33 * fNZ;
-		TFLOAT fX = a_rMatrix.m_f21 * fNY + fNX * a_rMatrix.m_f11 + a_rMatrix.m_f31 * fNZ;
-
-		TVector4& vOut = a_rOutPlane.AsVector4();
-		vOut.x         = fX;
-		vOut.y         = fY;
-		vOut.z         = fZ;
-		a_rOutPlane.SetD( a_rMatrix.m_f42 * fY + fX * a_rMatrix.m_f41 + a_rMatrix.m_f43 * fZ + fD );
-	}
+	static void TransformPlaneOrthogonal( TPlane& a_rOutPlane, const TMatrix44& a_rMatrix, const TPlane& a_rcSourcePlane );
 
 	// Transforms a plane by any matrix (the inverse transpose is built from two vectors on the plane)
 	static void TransformPlane( TPlane& a_rOutPlane, const TMatrix44& a_rMatrix, const TPlane& a_rcSourcePlane );
 
-	// $deBlob: FUNCTION 00666330
-	// $Barnyard: FUNCTION 006c8b20
-	constexpr static void RotateVector( TVector3& a_rOutVector, const TMatrix44& a_rMatrix, const TVector3& a_rVector )
-	{
-		TFLOAT fX = a_rVector.x, fY = a_rVector.y, fZ = a_rVector.z;
+	static void RotateVector( TVector3& a_rOutVector, const TMatrix44& a_rMatrix, const TVector3& a_rVector );
 
-		a_rOutVector.y = a_rMatrix.m_f12 * fX + a_rMatrix.m_f22 * fY + a_rMatrix.m_f32 * fZ;
-		a_rOutVector.z = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + a_rMatrix.m_f33 * fZ;
-		a_rOutVector.x = a_rMatrix.m_f21 * fY + a_rMatrix.m_f11 * fX + a_rMatrix.m_f31 * fZ;
-	}
+	static void RotateVector( TVector4& a_rOutVector, const TMatrix44& a_rMatrix, const TVector4& a_rVector );
 
-	// $deBlob: FUNCTION 006663d0
-	// $Barnyard: FUNCTION 006c8b80
-	constexpr static void RotateVector( TVector4& a_rOutVector, const TMatrix44& a_rMatrix, const TVector4& a_rVector )
-	{
-		TFLOAT fX = a_rVector.x, fY = a_rVector.y, fZ = a_rVector.z, fW = a_rVector.w;
+	static void TransformVector( TVector3& a_rOutVector, const TMatrix44& a_rMatrix, const TVector3& a_rVector );
 
-		a_rOutVector.y = a_rMatrix.m_f12 * fX + a_rMatrix.m_f22 * fY + a_rMatrix.m_f32 * fZ;
-		a_rOutVector.z = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + a_rMatrix.m_f33 * fZ;
-		a_rOutVector.w = fW;
-		a_rOutVector.x = a_rMatrix.m_f21 * fY + a_rMatrix.m_f11 * fX + a_rMatrix.m_f31 * fZ;
-	}
-
-	// $deBlob: FUNCTION 00665e90
-	// $Barnyard: FUNCTION 006c8a20
-	constexpr static void TransformVector( TVector3& a_rOutVector, const TMatrix44& a_rMatrix, const TVector3& a_rVector )
-	{
-		TFLOAT fX = a_rVector.x, fY = a_rVector.y, fZ = a_rVector.z;
-
-		a_rOutVector.x = a_rMatrix.m_f21 * fY + a_rMatrix.m_f11 * fX + a_rMatrix.m_f31 * fZ + a_rMatrix.m_f41;
-		a_rOutVector.y = a_rMatrix.m_f12 * fX + a_rMatrix.m_f22 * fY + a_rMatrix.m_f32 * fZ + a_rMatrix.m_f42;
-		a_rOutVector.z = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + a_rMatrix.m_f33 * fZ + a_rMatrix.m_f43;
-	}
-
-	// $deBlob: FUNCTION 00666010
-	// $Barnyard: FUNCTION 006c8a80
-	constexpr static void TransformVector( TVector4& a_rOutVector, const TMatrix44& a_rMatrix, const TVector4& a_rVector )
-	{
-		TFLOAT fX = a_rVector.x, fY = a_rVector.y, fZ = a_rVector.z, fW = a_rVector.w;
-
-		a_rOutVector.z = a_rMatrix.m_f13 * fX + a_rMatrix.m_f23 * fY + a_rMatrix.m_f33 * fZ + a_rMatrix.m_f43 * fW;
-		a_rOutVector.w = a_rMatrix.m_f14 * fX + a_rMatrix.m_f24 * fY + a_rMatrix.m_f34 * fZ + a_rMatrix.m_f44 * fW;
-		a_rOutVector.y = a_rMatrix.m_f12 * fX + a_rMatrix.m_f22 * fY + a_rMatrix.m_f32 * fZ + a_rMatrix.m_f42 * fW;
-		a_rOutVector.x = a_rMatrix.m_f21 * fY + a_rMatrix.m_f11 * fX + a_rMatrix.m_f31 * fZ + a_rMatrix.m_f41 * fW;
-	}
+	static void TransformVector( TVector4& a_rOutVector, const TMatrix44& a_rMatrix, const TVector4& a_rVector );
 
 	// Batched versions (arrays of pointers / contiguous arrays)
 	static void TransformVectorBatched( TVector3* a_pOutVectors, const TMatrix44& a_rMatrix, const TVector3* const* a_ppVectors, TINT a_iBatchSize );
@@ -515,19 +369,10 @@ public:
 	static void RotateVectorBatched( TVector4* a_pOutVectors, const TMatrix44& a_rMatrix, const TVector4* const* a_ppVectors, TINT a_BatchSize );
 	static void RotateVectorBatched( TVector4* a_pOutVectors, const TMatrix44& a_rMatrix, const TVector4* a_pVectors, TINT a_BatchSize );
 
-	// Out of line copy used by AGameTimeFX::operator=: 004928a0
+	// $deBlob: FUNCTION 0057b850
 	// $Barnyard: FUNCTION 004928a0
-	constexpr TMatrix44& operator=( const TMatrix44& a_rcMatrix )
-	{
-		Set(
-		    a_rcMatrix.m_f11, a_rcMatrix.m_f12, a_rcMatrix.m_f13, a_rcMatrix.m_f14,
-		    a_rcMatrix.m_f21, a_rcMatrix.m_f22, a_rcMatrix.m_f23, a_rcMatrix.m_f24,
-		    a_rcMatrix.m_f31, a_rcMatrix.m_f32, a_rcMatrix.m_f33, a_rcMatrix.m_f34,
-		    a_rcMatrix.m_f41, a_rcMatrix.m_f42, a_rcMatrix.m_f43, a_rcMatrix.m_f44
-		);
-
-		return *this;
-	}
+	// NOTE: retail returns nothing and copies the whole matrix at once (movdqu)
+	void operator=( const TMatrix44& a_rcMatrix ) { memcpy( this, &a_rcMatrix, sizeof( TMatrix44 ) ); }
 
 #ifdef TRENDERINTERFACE_DX8
 	operator D3DXMATRIX*()
@@ -542,7 +387,7 @@ public:
 #endif
 
 public:
-	static constinit TMatrix44 IDENTITY;
+	static TCONSTINIT TMatrix44 IDENTITY;
 
 public:
 	TFLOAT m_f11, m_f12, m_f13, m_f14;

@@ -9,12 +9,17 @@
 
 TOSHI_NAMESPACE_START
 
+TFreeList* TFreeList::ms_pLastList = TNULL;
+#ifdef DEBLOB_COMMUNITY_PATCH
+TBOOL TFreeList::ms_bDeinitialised = TFALSE;
+#endif
+
 // $deBlob: FUNCTION 006f2b30
 // $Barnyard: FUNCTION 006c1840
 TFreeList::TFreeList( TUINT a_uiItemSize, TINT a_iInitialSize, TINT a_iGrowSize, const TCHAR* a_pchName )
 {
-	m_uiItemSize  = a_uiItemSize;
 	m_iCapacity   = 0;
+	m_uiItemSize  = a_uiItemSize;
 	m_pFreeNode   = TNULL;
 	m_pRootBlock  = TNULL;
 	m_pHeapHolder = TNULL;
@@ -40,7 +45,7 @@ TFreeList::Node* TFreeList::Allocate( TINT a_iNumber, TINT a_iSize )
 	m_iCapacity += a_iNumber;
 
 	// NOTE: de Blob allocates from the holder's heap (Barnyard: m_pMemoryHeap), or from the global heap
-	TMemoryHeap* pHeap    = m_pHeapHolder ? m_pHeapHolder->pHeap : TMemory_GetGlobalHeap();
+	TMemoryHeap* pHeap    = m_pHeapHolder == TNULL ? TMemory_GetGlobalHeap() : m_pHeapHolder->pHeap;
 	Node*        pNewNode = TREINTERPRETCAST( Node*, TMemoryHeap_Malloc( pHeap, a_iNumber * a_iSize + sizeof( Node ) ) );
 
 	pNewNode->pNext  = m_pRootBlock;
@@ -49,12 +54,18 @@ TFreeList::Node* TFreeList::Allocate( TINT a_iNumber, TINT a_iSize )
 	auto  pData = pNewNode + 1;
 	Node* pNext = TNULL;
 
-	for ( TINT i = a_iNumber - 1; i != 0; i-- )
-	{
-		pData->pNext = pNext;
-		pNext        = pData;
+	TINT iCount = a_iNumber - 1;
 
-		pData = TREINTERPRETCAST( Node*, TREINTERPRETCAST( uintptr_t, pData ) + a_iSize );
+	if ( iCount > 0 )
+	{
+		do
+		{
+			pData->pNext = pNext;
+			pNext        = pData;
+
+			pData = TREINTERPRETCAST( Node*, TREINTERPRETCAST( uintptr_t, pData ) + a_iSize );
+			iCount--;
+		} while ( iCount != 0 );
 	}
 
 	m_pFreeNode = pNext;
@@ -85,16 +96,14 @@ void* TFreeList::New( TUINT a_uiSize )
 
 	auto pNode = m_pFreeNode;
 
-	if ( pNode != TNULL )
-	{
-		m_pFreeNode = pNode->pNext;
-		return pNode;
-	}
-	else
+	if ( pNode == TNULL )
 	{
 		TASSERT( ( 0 < m_iGrowSize ), "Tried to grow TFreeList with 0 grow size\n" );
 		return Allocate( m_iGrowSize, a_uiSize );
 	}
+
+	m_pFreeNode = pNode->pNext;
+	return pNode;
 }
 
 // $deBlob: FUNCTION 006f2cf0
@@ -109,23 +118,24 @@ void TFreeList::Delete( void* a_Ptr )
 
 	Node* pNode = TSTATICCAST( Node, a_Ptr );
 
-	if ( m_pFreeNode != TNULL )
+	if ( m_pFreeNode == TNULL )
 	{
-		pNode->pNext     = m_pFreeNode;
-		m_pFreeNode = pNode;
+		m_pFreeNode  = pNode;
+		pNode->pNext = TNULL;
 	}
 	else
 	{
-		m_pFreeNode = pNode;
-		pNode->pNext     = TNULL;
+		pNode->pNext = m_pFreeNode;
+		m_pFreeNode  = pNode;
 	}
 }
 
 // $deBlob: FUNCTION 006f2de0
 void TFreeList::FreeChunks()
 {
-	while ( Node* pChunk = m_pRootBlock )
+	while ( m_pRootBlock != TNULL )
 	{
+		Node* pChunk = m_pRootBlock;
 		m_pRootBlock = pChunk->pNext;
 		TFree( pChunk );
 	}
@@ -137,8 +147,9 @@ void TFreeList::DeinitialiseAll()
 {
 	for ( TFreeList* pList = ms_pLastList; pList != TNULL; pList = pList->m_pPrevList )
 	{
-		while ( Node* pChunk = pList->m_pRootBlock )
+		while ( pList->m_pRootBlock != TNULL )
 		{
+			Node* pChunk        = pList->m_pRootBlock;
 			pList->m_pRootBlock = pChunk->pNext;
 			TFree( pChunk );
 		}

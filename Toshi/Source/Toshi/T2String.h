@@ -21,15 +21,15 @@ public:
 	using CharType = typename StringTraits::CharType;
 
 public:
-	TFORCEINLINE constexpr T2StringViewBase( const CharType* a_pszString )
+	TFORCEINLINE TCONSTEXPR T2StringViewBase( const CharType* a_pszString )
 	    : m_pszString( a_pszString )
 	{}
 
-	TFORCEINLINE constexpr T2StringViewBase()
+	TFORCEINLINE TCONSTEXPR T2StringViewBase()
 	    : m_pszString( TNULL )
 	{}
 
-	TFORCEINLINE constexpr T2StringViewBase( const T2StringViewBase& a_rOther )
+	TFORCEINLINE TCONSTEXPR T2StringViewBase( const T2StringViewBase& a_rOther )
 	    : m_pszString( a_rOther.m_pszString )
 	{}
 
@@ -43,20 +43,20 @@ public:
 	TFORCEINLINE const CharType* FindString( const CharType* a_pszSubstr ) { return StringTraits::FindString( m_pszString, a_pszSubstr ); }
 	TFORCEINLINE const CharType* SkipSpaces() { return StringTraits::SkipSpaces( m_pszString ); }
 
-	TFORCEINLINE constexpr T2StringViewBase& operator=( const CharType* a_pszString )
+	TFORCEINLINE TCONSTEXPR T2StringViewBase& operator=( const CharType* a_pszString )
 	{
 		m_pszString = a_pszString;
 		return *this;
 	}
 
-	TFORCEINLINE constexpr T2StringViewBase operator+( int a_iSize ) const { return T2StringViewBase( m_pszString + a_iSize ); }
-	TFORCEINLINE constexpr T2StringViewBase operator-( int a_iSize ) const { return T2StringViewBase( m_pszString - a_iSize ); }
-	TFORCEINLINE constexpr T2StringViewBase operator+=( int a_iSize )
+	TFORCEINLINE TCONSTEXPR T2StringViewBase operator+( int a_iSize ) const { return T2StringViewBase( m_pszString + a_iSize ); }
+	TFORCEINLINE TCONSTEXPR T2StringViewBase operator-( int a_iSize ) const { return T2StringViewBase( m_pszString - a_iSize ); }
+	TFORCEINLINE TCONSTEXPR T2StringViewBase operator+=( int a_iSize )
 	{
 		m_pszString += a_iSize;
 		return *this;
 	}
-	TFORCEINLINE constexpr T2StringViewBase operator-=( int a_iSize )
+	TFORCEINLINE TCONSTEXPR T2StringViewBase operator-=( int a_iSize )
 	{
 		m_pszString -= a_iSize;
 		return *this;
@@ -67,8 +67,8 @@ public:
 		return StringTraits::Compare( m_pszString, a_otherString.m_pszString ) == 0;
 	}
 
-	TFORCEINLINE constexpr const CharType* Get() const { return m_pszString; }
-	TFORCEINLINE constexpr operator const CharType*() const { return m_pszString; }
+	TFORCEINLINE TCONSTEXPR const CharType* Get() const { return m_pszString; }
+	TFORCEINLINE TCONSTEXPR operator const CharType*() const { return m_pszString; }
 
 private:
 	const CharType* m_pszString;
@@ -93,7 +93,7 @@ public:
 	using UCharType    = typename StringTraits::UCharType;
 
 public:
-	constexpr T2FormatString()
+	TCONSTEXPR T2FormatString()
 	{
 		m_szBuffer[ 0 ] = CharTraits::NullChar;
 	}
@@ -201,34 +201,34 @@ public:
 		return StringTraits::Length( m_szBuffer );
 	}
 
-	constexpr CharType* Get()
+	TCONSTEXPR CharType* Get()
 	{
 		return m_szBuffer;
 	}
 
-	constexpr const CharType* Get() const
+	TCONSTEXPR const CharType* Get() const
 	{
 		return m_szBuffer;
 	}
 
-	constexpr CharType* Get( TUINT a_uiIndex )
+	TCONSTEXPR CharType* Get( TUINT a_uiIndex )
 	{
 		TASSERT( a_uiIndex < Size );
 		return &m_szBuffer[ a_uiIndex ];
 	}
 
-	constexpr const CharType* Get( TUINT a_uiIndex ) const
+	TCONSTEXPR const CharType* Get( TUINT a_uiIndex ) const
 	{
 		TASSERT( a_uiIndex < Size );
 		return &m_szBuffer[ a_uiIndex ];
 	}
 
-	constexpr CharType& operator[]( TUINT a_uiIndex )
+	TCONSTEXPR CharType& operator[]( TUINT a_uiIndex )
 	{
 		return *Get( a_uiIndex );
 	}
 
-	constexpr const CharType& operator[]( TUINT a_uiIndex ) const
+	TCONSTEXPR const CharType& operator[]( TUINT a_uiIndex ) const
 	{
 		return *Get( a_uiIndex );
 	}
@@ -415,7 +415,7 @@ public:
 	using CharType     = typename StringTraits::CharType;
 
 public:
-	constexpr T2StringBuffer()
+	TCONSTEXPR T2StringBuffer()
 	{
 		m_szBuffer[ 0 ] = CharTraits::NullChar;
 		m_iPosition     = 0;
@@ -475,45 +475,45 @@ public:
 		m_iPosition += StringTraits::Length( a_szString );
 	}
 
-	constexpr void Clear()
+	TCONSTEXPR void Clear()
 	{
 		m_szBuffer[ 0 ] = CharTraits::NullChar;
 		m_iPosition     = 0;
 	}
 
-	constexpr TINT Length()
+	TCONSTEXPR TINT Length()
 	{
 		return m_iPosition;
 	}
 
-	constexpr CharType* Get()
+	TCONSTEXPR CharType* Get()
 	{
 		return m_szBuffer;
 	}
 
-	constexpr const CharType* Get() const
+	TCONSTEXPR const CharType* Get() const
 	{
 		return m_szBuffer;
 	}
 
-	constexpr CharType* Get( TUINT a_uiIndex )
+	TCONSTEXPR CharType* Get( TUINT a_uiIndex )
 	{
 		TASSERT( a_uiIndex < Size );
 		return &m_szBuffer[ a_uiIndex ];
 	}
 
-	constexpr const CharType* Get( TUINT a_uiIndex ) const
+	TCONSTEXPR const CharType* Get( TUINT a_uiIndex ) const
 	{
 		TASSERT( a_uiIndex < Size );
 		return &m_szBuffer[ a_uiIndex ];
 	}
 
-	constexpr CharType& operator[]( TUINT a_uiIndex )
+	TCONSTEXPR CharType& operator[]( TUINT a_uiIndex )
 	{
 		return *Get( a_uiIndex );
 	}
 
-	constexpr const CharType& operator[]( TUINT a_uiIndex ) const
+	TCONSTEXPR const CharType& operator[]( TUINT a_uiIndex ) const
 	{
 		return *Get( a_uiIndex );
 	}

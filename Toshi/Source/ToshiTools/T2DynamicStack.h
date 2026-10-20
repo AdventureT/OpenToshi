@@ -27,6 +27,9 @@ public:
 	// Removes the top element (it isn't destroyed), freeing its block when it was the block's first element
 	void Pop();
 
+	// Copies the elements of a_rcSource (same element size) on top of this stack
+	void Append( const T2GenericDynamicStack& a_rcSource );
+
 	// $deBlob: FUNCTION 006ebd90
 	void* At( TINT a_iElement )
 	{
@@ -41,7 +44,7 @@ public:
 		return At( m_iNumElements - 1 );
 	}
 
-	TINT Size() const { return m_iNumElements; }
+	TINT  Size() const { return m_iNumElements; }
 	TBOOL IsEmpty() const { return m_iNumElements == 0; }
 
 protected:
@@ -51,7 +54,7 @@ protected:
 	TINT                   m_iNumElements;      // 0x0C
 	T2DynamicVector<void*> m_vecBlocks;         // 0x10
 	TINT                   m_iBlockShift;       // 0x24 log2( m_iElementsPerBlock )
-}; // 0x28
+};                                              // 0x28
 
 template <class T>
 class T2DynamicStack : public T2GenericDynamicStack
@@ -61,7 +64,6 @@ public:
 	    : T2GenericDynamicStack( a_pAllocator, a_iElementsPerBlock, sizeof( T ) )
 	{}
 
-	// <TString8>: 006ebe00
 	// $deBlob: FUNCTION 006ebe00
 	void Push( const T& a_rcValue )
 	{
@@ -69,9 +71,9 @@ public:
 		new ( T2GenericDynamicStack::Top() ) T( a_rcValue );
 	}
 
-	T&       At( TINT a_iElement ) { return *TSTATICCAST( T, T2GenericDynamicStack::At( a_iElement ) ); }
-	T&       Top() { return *TSTATICCAST( T, T2GenericDynamicStack::Top() ); }
-	T&       operator[]( TINT a_iElement ) { return At( a_iElement ); }
+	T& At( TINT a_iElement ) { return *TSTATICCAST( T, T2GenericDynamicStack::At( a_iElement ) ); }
+	T& Top() { return *TSTATICCAST( T, T2GenericDynamicStack::Top() ); }
+	T& operator[]( TINT a_iElement ) { return At( a_iElement ); }
 
 	// Destroys and removes the top element
 	void Pop()

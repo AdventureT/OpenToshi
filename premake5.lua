@@ -42,7 +42,11 @@ workspace "OpenBlob"
 		systemversion "latest"
 		vectorextensions "SSE2"
 
-		exceptionhandling "Off"
+		-- Retail's build shape (DevTools/Matching/README.md): /Gz (__stdcall default calling convention: free and static
+		-- functions end in "ret n") and /EHsc (retail has C++ EH frames). Every project, the vendored C libraries too
+		-- (retail's ogg/vorbis code is __stdcall as well; their qsort comparators are explicitly __cdecl)
+		callingconvention "StdCall"   -- /Gz
+		exceptionhandling "On"        -- /EHsc
 		linkoptions "/SAFESEH:NO"
 
 		defines
@@ -64,12 +68,23 @@ workspace "OpenBlob"
 	filter "configurations:Release"
 		runtime "Release"
 		defines "TOSHI_RELEASE"
-		optimize "On"
 
 	filter "configurations:Final"
 		runtime "Release"
 		defines "TOSHI_FINAL"
-		optimize "On"
+
+	-- Retail's optimisation flags: /O2 /Oy- /Ob2 /Oi /GS /Gy /GR /GF /arch:SSE2 /fp:precise /MD, no /GL
+	filter "configurations:Release or Final"
+		optimize "Speed"              -- /O2
+		omitframepointer "Off"        -- /Oy-: every retail function has push ebp / mov ebp, esp
+		inlining "Auto"               -- /Ob2
+		intrinsics "On"               -- /Oi
+		functionlevellinking "On"     -- /Gy
+		stringpooling "On"            -- /GF
+		buffersecuritycheck "On"      -- /GS
+		rtti "On"                     -- /GR
+		floatingpoint "Default"       -- /fp:precise
+		linktimeoptimization "Off"    -- no /GL
 
 filter {}
 
@@ -77,3 +92,29 @@ filter {}
 group "Engine"
 	include "Toshi"
 	include "OpenBlob"
+
+-- Ogg Theora movies (Data\Movies\*.bik.ogv): libogg, libvorbis, libtheora and theoraplay (library code, see
+-- Tools/ProgressCalculation/ignorelist.txt)
+group "Vendor"
+	include "Toshi/Vendor/libogg"
+	include "Toshi/Vendor/libvorbis"
+	include "Toshi/Vendor/libtheora"
+	include "Toshi/Vendor/theoraplay"
+
+-- NOTE: the vendored projects link the static CRT; Toshi and OpenBlob use the CRT DLL
+for _, name in ipairs( { "libogg", "libvorbis", "libtheora", "theoraplay" } ) do
+	project( name )
+		staticruntime "off"
+		warnings "Off"
+
+		-- NOTE: optimised in Debug too (an unoptimised decoder can't keep up with the movies)
+		filter "configurations:Debug"
+			optimize "Speed"
+			runtimechecks "Off"
+
+		filter "configurations:Final"
+			runtime "Release"
+			optimize "On"
+
+		filter {}
+end

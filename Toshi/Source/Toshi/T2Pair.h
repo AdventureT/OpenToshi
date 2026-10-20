@@ -11,48 +11,54 @@ struct T2Pair
 
 	struct Comparator
 	{
-		auto operator()( const T2Pair& a, const T2Pair& b )
+		auto operator()( const T2Pair& a, const T2Pair& b ) -> decltype( C()( a.first, b.first ) )
 		{
 			return C()( a.first, b.first );
 		}
 	};
 
-	constexpr T2Pair()
+	TCONSTEXPR T2Pair()
 	    : first( First() )
 	    , second( Second() )
 	{}
 
-	// T2Pair<TPString8, ANamedAnimationTransition> 00581dc0
 	// $Barnyard: FUNCTION 00581dc0
-	constexpr T2Pair( const First& a_rcFirst, const Second& a_rcSecond )
+	// $deBlob: FUNCTION 007e3f90
+	TCONSTEXPR T2Pair( const First& a_rcFirst, const Second& a_rcSecond )
 	    : first( a_rcFirst )
 	    , second( a_rcSecond )
 	{}
 
-	constexpr T2Pair( const First& a_rcFirst )
+	TCONSTEXPR T2Pair( const First& a_rcFirst )
 	    : first( a_rcFirst )
 	    , second( Second() )
 	{}
 
-	constexpr T2Pair( First&& a_rFirst )
+	TCONSTEXPR T2Pair( First&& a_rFirst )
 	    : first( a_rFirst )
 	    , second( Second() )
 	{}
 
-	constexpr T2Pair( const First& a_rcFirst, Second&& a_rSecond )
+	TCONSTEXPR T2Pair( const First& a_rcFirst, Second&& a_rSecond )
 	    : first( a_rcFirst )
 	    , second( a_rSecond )
 	{}
 
-	constexpr T2Pair( First&& a_rFirst, Second&& a_rSecond )
+	TCONSTEXPR T2Pair( First&& a_rFirst, Second&& a_rSecond )
 	    : first( a_rFirst )
 	    , second( a_rSecond )
 	{}
 
-	constexpr First&  GetFirst() { return first; }
-	constexpr Second& GetSecond() { return second; }
+	// $deBlob: FUNCTION 007e3f40
+	TCONSTEXPR T2Pair( const T2Pair& a_rcOther )
+	    : first( a_rcOther.first )
+	    , second( a_rcOther.second )
+	{}
 
-	constexpr T2Pair& operator=( const T2Pair<First, Second, C>& a_rcOther )
+	TCONSTEXPR First&  GetFirst() { return first; }
+	TCONSTEXPR Second& GetSecond() { return second; }
+
+	TCONSTEXPR T2Pair& operator=( const T2Pair<First, Second, C>& a_rcOther )
 	{
 		if ( this != &a_rcOther )
 		{

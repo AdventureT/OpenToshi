@@ -87,19 +87,19 @@ template <typename Key, typename T>
 using UnorderedMap = std::unordered_map<Key, T, std::hash<Key>, std::equal_to<Key>, Toshi::STL::TAllocator<std::pair<const Key, T>>>;
 
 template <typename T, typename... Args>
-constexpr Ref<T> CreateRef( Args&&... args )
+TCONSTEXPR Ref<T> CreateRef( Args&&... args )
 {
 	return std::allocate_shared<T>( Toshi::STL::TAllocator<T>(), std::forward<Args>( args )... );
 }
 
 template <typename T, typename... Args>
-constexpr Scope<T> CreateScope( Args&&... args )
+TCONSTEXPR Scope<T> CreateScope( Args&&... args )
 {
 	return Scope<T>( new T( std::forward<Args>( args )... ) );
 }
 
 template <typename T, typename Result, typename... Args>
-constexpr Scope<Result> CreateScope( Args&&... args )
+TCONSTEXPR Scope<Result> CreateScope( Args&&... args )
 {
 	return Scope<Result>( new T( std::forward<Args>( args )... ) );
 }

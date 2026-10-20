@@ -9,6 +9,7 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 0068e590
 TKeyframeLibraryInstance::TKeyframeLibraryInstance()
 {
 	m_pLibrary      = TNULL;
@@ -23,16 +24,20 @@ TKeyframeLibraryInstance::TKeyframeLibraryInstance()
 	m_pScales       = TNULL;
 }
 
+// $deBlob: FUNCTION 0068e5e0
 TKeyframeLibraryInstance::~TKeyframeLibraryInstance()
 {
-	TASSERT( m_pLibrary == TNULL );
+	TASSERT( TNULL == m_pLibrary );
+	Destroy();
 }
 
+// $deBlob: FUNCTION 0068e630
 TKeyframeLibrary* TKeyframeLibraryInstance::Create( TKeyframeLibrary* a_pLibrary )
 {
 	return CreateEx( a_pLibrary, a_pLibrary->m_iNumTranslations, a_pLibrary->m_iNumQuaternions, a_pLibrary->m_iNumScales, 0, 0, 0 );
 }
 
+// $deBlob: FUNCTION 0068e650
 // $Barnyard: FUNCTION 006c9c90
 TKeyframeLibrary* TKeyframeLibraryInstance::CreateEx( TKeyframeLibrary* a_pLibrary, TINT a_iTKeyCount, TINT a_iQKeyCount, TINT a_iSKeyCount, TINT a_iTBaseIndex, TINT a_iQBaseIndex, TINT a_iSBaseIndex )
 {
@@ -59,6 +64,7 @@ TKeyframeLibrary* TKeyframeLibraryInstance::CreateEx( TKeyframeLibrary* a_pLibra
 	return pOldLibrary;
 }
 
+// $deBlob: FUNCTION 0068e6d0
 // $Barnyard: FUNCTION 006c9c80
 void TKeyframeLibraryInstance::Destroy()
 {

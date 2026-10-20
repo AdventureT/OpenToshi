@@ -13,19 +13,19 @@ public:
 		friend TNodeTree;
 
 	protected:
-		// <TTask>: 00660cb0
 		// $deBlob: FUNCTION 00660cb0
+		// $deBlob: FUNCTION 006915d0
 		TNode()
 		{
-			m_Tree   = TNULL;
-			m_Next   = (T*)this;
-			m_Prev   = (T*)this;
 			m_Parent = TNULL;
 			m_Child  = TNULL;
+			m_Next   = (T*)this;
+			m_Prev   = (T*)this;
+			m_Tree   = TNULL;
 		}
 
-		// <TTask>: 00660d20
 		// $deBlob: FUNCTION 00660d20
+		// $deBlob: FUNCTION 006916c0
 		~TNode()
 		{
 			TASSERT( IsLinked() == TFALSE );
@@ -38,8 +38,22 @@ public:
 			return m_Parent == (T*)( &Tree()->m_Root );
 		}
 
-		TBOOL         IsLinked() const { return m_Tree != TNULL; }
-		T*            Parent() const { return m_Parent; }
+		TBOOL IsLinked() const { return m_Tree != TNULL; }
+		T*    Parent() const { return m_Parent; }
+
+		// The parent, TNULL when it's the tree's root
+		// $deBlob: FUNCTION 00661260
+		// $deBlob: FUNCTION 00691c60
+		// $deBlob: FUNCTION 00691cc0
+		T* GetParent() const
+		{
+			TASSERT( TTRUE == IsLinked() );
+
+			if ( m_Tree != TNULL )
+				return ( m_Parent != m_Tree->GetRoot() ) ? m_Parent : TNULL;
+
+			return ( m_Parent != TNULL ) ? m_Parent : TNULL;
+		}
 		T*            Next() const { return m_Next; }
 		T*            Prev() const { return m_Prev; }
 		TNodeTree<T>* Tree() const { return m_Tree; }
@@ -54,15 +68,45 @@ public:
 	};
 
 public:
-	// <TTask>: 00660c60
+	// Walks the siblings from a node, the iteration ends (TNULL) when it's back at the first one
+	class Iterator
+	{
+	public:
+		Iterator( T* a_pNode )
+		    : m_pPtr( a_pNode ), m_pFirst( a_pNode )
+		{}
+
+		T* Get() const { return m_pPtr; }
+
+		// $deBlob: FUNCTION 00660d80
+		Iterator& operator++()
+		{
+			TASSERT( m_pPtr != TNULL );
+
+			if ( m_pPtr != TNULL )
+			{
+				T* pNext = m_pPtr->Next();
+				m_pPtr   = ( pNext == m_pFirst ) ? TNULL : pNext;
+			}
+
+			return *this;
+		}
+
+	private:
+		T* m_pPtr;   // 0x00
+		T* m_pFirst; // 0x04
+	};
+
+public:
 	// $deBlob: FUNCTION 00660c60
+	// $deBlob: FUNCTION 00691560
 	TNodeTree()
 	{
 		m_Count = 0;
 	}
 
-	// <TTask>: 00660cd0
 	// $deBlob: FUNCTION 00660cd0
+	// $deBlob: FUNCTION 00691640
 	~TNodeTree()
 	{
 		DeleteAll();
@@ -70,23 +114,23 @@ public:
 	}
 
 	// Links sourceNode before a_pSibling (in the sibling's parent)
-	// <TTask>: 00660fa0
 	// $deBlob: FUNCTION 00660fa0
+	// $deBlob: FUNCTION 00691a30
 	void InsertBefore( T* a_pSibling, T* sourceNode )
 	{
 		TASSERT( sourceNode->IsLinked() == TFALSE );
 
-		sourceNode->m_Tree           = this;
-		sourceNode->m_Next           = a_pSibling;
-		sourceNode->m_Prev           = a_pSibling->m_Prev;
-		a_pSibling->m_Prev->m_Next   = sourceNode;
-		a_pSibling->m_Prev           = sourceNode;
-		sourceNode->m_Parent         = a_pSibling->m_Parent;
+		sourceNode->m_Tree         = this;
+		sourceNode->m_Next         = a_pSibling;
+		sourceNode->m_Prev         = a_pSibling->m_Prev;
+		a_pSibling->m_Prev->m_Next = sourceNode;
+		a_pSibling->m_Prev         = sourceNode;
+		sourceNode->m_Parent       = a_pSibling->m_Parent;
 		m_Count += 1;
 	}
 
-	// <TTask>: 006610d0
 	// $deBlob: FUNCTION 006610d0
+	// $deBlob: FUNCTION 00691aa0
 	// $Barnyard: FUNCTION 00403980
 	// $Barnyard: FUNCTION 006beb10
 	/**
@@ -97,7 +141,6 @@ public:
 		*/
 	void Insert( T* parentNode, T* sourceNode )
 	{
-		// Toshi::TNodeTree<Toshi::TResource>::Insert - 00691aa0
 		TASSERT( sourceNode->IsLinked() == TFALSE, "The source node shouldn't be linked" );
 
 		// Remove the source node from the tree
@@ -133,7 +176,6 @@ public:
 		*
 		* @param sourceNode Pointer to the node you want to insert.
 		*/
-	// <TTask>: 006611d0
 	// $deBlob: FUNCTION 006611d0
 	void InsertAtRoot( T* sourceNode )
 	{
@@ -141,7 +183,6 @@ public:
 	}
 
 	// Inserts node as the first child of parentNode
-	// <TTask>: 00661010
 	// $deBlob: FUNCTION 00661010
 	void InsertHead( T* parentNode, T* sourceNode )
 	{
@@ -160,7 +201,6 @@ public:
 		sourceNode->m_Tree   = this;
 	}
 
-	// <TTask>: 006611a0
 	// $deBlob: FUNCTION 006611a0
 	// $Barnyard: FUNCTION 00645fa0
 	/**
@@ -173,8 +213,8 @@ public:
 		InsertHead( GetRoot(), sourceNode );
 	}
 
-	// <TTask>: 006613e0
 	// $deBlob: FUNCTION 006613e0
+	// $deBlob: FUNCTION 00692010
 	// $Barnyard: FUNCTION 004030d0
 	/**
 		 * Tries to remove sourceNode from the tree and inserts it to the parentNode or to the root
@@ -195,8 +235,8 @@ public:
 		Insert( parentNode, sourceNode );
 	}
 
-	// <TTask>: 006612d0
 	// $deBlob: FUNCTION 006612d0
+	// $deBlob: FUNCTION 00691e70
 	// $Barnyard: FUNCTION 006bf2b0
 	// TNodeTree<TTask>
 	// $Barnyard: FUNCTION 00403110
@@ -253,8 +293,8 @@ public:
 		return Remove( *node, flag );
 	}
 
-	// <TTask>: 00660ef0
 	// $deBlob: FUNCTION 00660ef0
+	// $deBlob: FUNCTION 00691960
 	// $Barnyard: FUNCTION 006bf3d0
 	// $Barnyard: FUNCTION 006bcaf0
 	void DeleteRecurse( T* node )
@@ -275,8 +315,44 @@ public:
 		}
 	}
 
-	// <TTask>: 00660e80
+	// The callbacks of Recurse (the node, the user data)
+	using t_RecurseCallback = void( __stdcall* )( T* a_pNode, void* a_pUserData );
+
+	// Calls a_cbNode for a_pStart (and its siblings if a_bSiblings) and walks into the children; a_cbEnter and
+	// a_cbLeave are called around each child list. NOTE: retail passes a_pStart (not the node whose children are
+	// visited) to a_cbEnter and a_cbLeave
+	// $deBlob: FUNCTION 00691d70
+	void Recurse( t_RecurseCallback a_cbEnter, t_RecurseCallback a_cbLeave, t_RecurseCallback a_cbNode, T* a_pStart, TBOOL a_bSiblings, void* a_pUserData )
+	{
+		T* pNode = a_pStart;
+
+		while ( pNode != TNULL )
+		{
+			T* pNext = pNode->Next();
+
+			if ( pNext == a_pStart || pNext == pNode || !a_bSiblings )
+				pNext = TNULL;
+
+			if ( a_cbNode != TNULL )
+				a_cbNode( pNode, a_pUserData );
+
+			if ( pNode->Child() != TNULL )
+			{
+				if ( a_cbEnter != TNULL )
+					a_cbEnter( a_pStart, a_pUserData );
+
+				Recurse( a_cbEnter, a_cbLeave, a_cbNode, pNode->Child(), TTRUE, a_pUserData );
+
+				if ( a_cbLeave != TNULL )
+					a_cbLeave( a_pStart, a_pUserData );
+			}
+
+			pNode = pNext;
+		}
+	}
+
 	// $deBlob: FUNCTION 00660e80
+	// $deBlob: FUNCTION 006918f0
 	void DeleteAll()
 	{
 		T* node = GetRoot()->Child();
@@ -301,6 +377,7 @@ public:
 		return m_Root.Child();
 	}
 
+	// $deBlob: FUNCTION 00660e50
 	size_t Count() const
 	{
 		return m_Count;

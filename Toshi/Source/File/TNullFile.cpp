@@ -9,6 +9,8 @@
 
 TOSHI_NAMESPACE_START
 
+TNullFileSystem* TNullFileSystem::s_pFileSystem;
+
 // $deBlob: FUNCTION 0068a4c0
 TNullFile::TNullFile( TNullFileSystem* a_pFileSystem )
     : TFile( a_pFileSystem )
@@ -40,7 +42,7 @@ TSIZE TNullFile::Write( const void* a_pSrc, TSIZE a_uiSize )
 
 // $deBlob: FUNCTION 0068a330
 // $Barnyard: FUNCTION 006dc9b0
-TCHAR TNullFile::GetCChar()
+TINT TNullFile::GetCChar()
 {
 	TUINT8 cCharacter;
 	if ( Read( &cCharacter, 1 ) != 1 )
@@ -51,11 +53,11 @@ TCHAR TNullFile::GetCChar()
 
 // $deBlob: FUNCTION 0068a360
 // $Barnyard: FUNCTION 006dc9d0
-TWCHAR TNullFile::GetWChar()
+TINT TNullFile::GetWChar()
 {
 	TWCHAR wcCharacter;
 	if ( Read( &wcCharacter, 2 ) != 2 )
-		return L'\xFFFF';
+		return -1;
 
 	return wcCharacter;
 }
@@ -104,7 +106,7 @@ TINT TNullFile::VWPrintf( const TWCHAR* a_wszFormat, va_list a_vargs )
 	TINT iWritten = TINT( Write( str, iResult * sizeof( TWCHAR ) ) );
 
 	if ( iWritten >= 0 )
-		iWritten /= 2;
+		iWritten >>= 1;
 
 	return iWritten;
 }
@@ -123,7 +125,7 @@ TNullFileSystem::TNullFileSystem( const TCHAR* a_szName )
 // $Barnyard: FUNCTION 006dcab0
 TNullFileSystem::~TNullFileSystem()
 {
-	UnmountFileSystem();
+	TFileManager::GetSingleton()->UnmountFileSystem( this );
 	s_pFileSystem = TNULL;
 }
 
@@ -146,7 +148,8 @@ void TNullFileSystem::DestroyFile( TFile* a_pFile )
 // $Barnyard: FUNCTION 006dc950
 TString8 TNullFileSystem::MakeInternalPath( const TString8& a_rcPath )
 {
-	return TString8();
+	TString8 strPath;
+	return strPath;
 }
 
 TOSHI_NAMESPACE_END

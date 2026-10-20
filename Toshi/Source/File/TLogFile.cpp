@@ -2,6 +2,8 @@
 #include "TLogFile.h"
 #include "File/TFile.h"
 
+#include <time.h>
+
 #ifdef TOSHI_SKU_WINDOWS
 #  include <windows.h>
 #  include <dbghelp.h>
@@ -18,21 +20,27 @@
 
 TOSHI_NAMESPACE_START
 
+const TINT TLogFile::cLevelMax;
+
+static const TCHAR* s_szDefUser = "DefUser";
+static const TCHAR* s_szDefSys  = "DefSys";
+
+const TCHAR* const TLogFile::cTypeStrings[ cTypeCount ] = { "Info", "Warning", "Error" };
+
 #ifdef TOSHI_SKU_WINDOWS
 
 //-----------------------------------------------------------------------------
 // Path helpers used by TLogFile::Create to make sure the folder of the log exists.
-// NOTE: names unknown, retail keeps them far from the engine (00828730..00828a40), the result buffer is a global
 //-----------------------------------------------------------------------------
-static TCHAR s_szCanonicalPath[ MAX_PATH ]; // 009ba198
+static TCHAR s_szCanonicalPath[ MAX_PATH ];
 
 // Returns the canonical form of a_szPath (relative to a_szBase when a_szPath has no drive), TNULL on failure
+// NOTE: also used by TIniFile::Open (File/TIniFile.cpp)
 // $deBlob: FUNCTION 00828730
-static TCHAR* CanonicalizePath( const TCHAR* a_szPath, const TCHAR* a_szBase )
+TCHAR* CanonicalizePath( const TCHAR* a_szPath, const TCHAR* a_szBase )
 {
-	TCHAR szBase[ MAX_PATH ];
+	TCHAR szBase[ MAX_PATH ] = { 0 };
 	TCHAR szCombined[ MAX_PATH ];
-	TUtil::MemClear( szBase, sizeof( szBase ) );
 
 	if ( a_szPath == TNULL )
 		return TNULL;
@@ -41,7 +49,6 @@ static TCHAR* CanonicalizePath( const TCHAR* a_szPath, const TCHAR* a_szBase )
 	for ( ; a_szPath[ iLength ] != '\0'; iLength++ )
 		s_szCanonicalPath[ iLength ] = ( a_szPath[ iLength ] == '/' ) ? '\\' : a_szPath[ iLength ];
 
-	TASSERT( iLength < MAX_PATH );
 	s_szCanonicalPath[ iLength ] = '\0';
 
 	TCHAR szDrive[ 4 ];
@@ -52,29 +59,31 @@ static TCHAR* CanonicalizePath( const TCHAR* a_szPath, const TCHAR* a_szBase )
 	if ( szExt[ 0 ] == '\0' )
 		PathAddBackslashA( s_szCanonicalPath );
 
-	if ( szDrive[ 0 ] != '\0' || a_szBase == TNULL )
-		return s_szCanonicalPath;
+	if ( szDrive[ 0 ] == '\0' && a_szBase != TNULL )
+	{
+		iLength = 0;
+		for ( ; a_szBase[ iLength ] != '\0'; iLength++ )
+			szBase[ iLength ] = ( a_szBase[ iLength ] == '/' ) ? '\\' : a_szBase[ iLength ];
 
-	iLength = 0;
-	for ( ; a_szBase[ iLength ] != '\0'; iLength++ )
-		szBase[ iLength ] = ( a_szBase[ iLength ] == '/' ) ? '\\' : a_szBase[ iLength ];
+		szBase[ iLength ] = '\0';
+		PathAddBackslashA( szBase );
 
-	TASSERT( iLength < MAX_PATH );
-	szBase[ iLength ] = '\0';
-	PathAddBackslashA( szBase );
+		T2String8::Copy( szCombined, szBase, -1 );
+		if ( s_szCanonicalPath[ 0 ] == '\\' )
+			strcat( szCombined, s_szCanonicalPath + 1 );
+		else
+			strcat( szCombined, s_szCanonicalPath );
 
-	T2String8::Copy( szCombined, szBase, -1 );
-	T2String8::Concat( szCombined, ( s_szCanonicalPath[ 0 ] == '\\' ) ? s_szCanonicalPath + 1 : s_szCanonicalPath );
-
-	if ( !PathCanonicalizeA( s_szCanonicalPath, szCombined ) )
-		return TNULL;
+		if ( !PathCanonicalizeA( s_szCanonicalPath, szCombined ) )
+			return TNULL;
+	}
 
 	return s_szCanonicalPath;
 }
 
 // Returns the folder part of a_szFullPath
 // $deBlob: FUNCTION 008289a0
-static TCHAR* GetPathDirectory( const TCHAR* a_szFullPath )
+static TNOINLINE TCHAR* GetPathDirectory( const TCHAR* a_szFullPath )
 {
 	TCHAR szDrive[ 4 ];
 	TCHAR szDir[ 256 ];
@@ -88,12 +97,12 @@ static TCHAR* GetPathDirectory( const TCHAR* a_szFullPath )
 
 // Creates every missing folder of a_szDirectory
 // $deBlob: FUNCTION 00828a40
-static TBOOL MakeSureDirectoryExists( const TCHAR* a_szDirectory )
+static TNOINLINE TBOOL MakeSureDirectoryExists( const TCHAR* a_szDirectory )
 {
 	TINT iLength = T2String8::Length( a_szDirectory );
 	if ( iLength == 0 ) return TFALSE;
 
-	TCHAR* pszBuffer = TSTATICCAST( TCHAR, TMalloc( iLength + 2 ) );
+	TCHAR* pszBuffer = new TCHAR[ iLength + 2 ];
 	if ( pszBuffer == TNULL ) return TFALSE;
 
 	T2String8::Copy( pszBuffer, a_szDirectory, -1 );
@@ -111,7 +120,7 @@ static TBOOL MakeSureDirectoryExists( const TCHAR* a_szDirectory )
 		pszBuffer[ iLength + 1 ] = '\0';
 	}
 
-	TBOOL bResult = MakeSureDirectoryPathExists( pszBuffer );
+	TBOOL bResult = MakeSureDirectoryPathExists( pszBuffer ) == 1;
 
 	if ( !bResult )
 	{
@@ -120,7 +129,7 @@ static TBOOL MakeSureDirectoryExists( const TCHAR* a_szDirectory )
 		LocalFree( pszMessage );
 	}
 
-	TFree( pszBuffer );
+	delete[] pszBuffer;
 	return bResult;
 }
 
@@ -135,12 +144,13 @@ TLogFile::TLogFile()
 	m_bAllowIndentation = TFALSE;
 	m_curLevel          = 0;
 	*m_LevelString      = 0;
-	*m_typeCounts       = 0;
-	m_unk2              = TNULL;
-	m_unk3              = 0;
+	m_typeCounts[ 0 ]   = 0;
+	m_typeCounts[ 1 ]   = 0;
+	m_typeCounts[ 2 ]   = 0;
 }
 
 // $deBlob: FUNCTION 00687780
+// $deBlob: FUNCTION 0065f340
 TLogFile::~TLogFile()
 {
 	TASSERT( TNULL == m_pFile );
@@ -161,9 +171,10 @@ TLogFile::Error TLogFile::Create( const TCHAR* fileName, const TCHAR* str2, TBOO
 	MakeSureDirectoryExists( GetPathDirectory( fileName ) );
 #endif // TOSHI_SKU_WINDOWS
 
-	TFILEMODE fileMode = writeExisting ?
-	    TFILEMODE_NOBUFFER | TFILEMODE_WRITE :
-	    TFILEMODE_NOBUFFER | TFILEMODE_WRITE | TFILEMODE_CREATENEW;
+	TFILEMODE fileMode = TFILEMODE_NOBUFFER | TFILEMODE_WRITE | TFILEMODE_CREATENEW;
+
+	if ( writeExisting )
+		fileMode = TFILEMODE_NOBUFFER | TFILEMODE_WRITE;
 
 	m_pFile = TFile::Create( fileName, fileMode );
 
@@ -181,10 +192,17 @@ TLogFile::Error TLogFile::Create( const TCHAR* fileName, const TCHAR* str2, TBOO
 	*m_LevelString   = 0;
 	m_curLevel       = 0;
 
+	__time64_t tNow;
+	_time64( &tNow );
+
 	m_pFile->CPrintf( "Log created [%s]:[%s]: %s\n", fileName, str2, TUtil::GetTime() );
 
-	// NOTE: retail prints ctime() of the link time stamp in the exe's PE header (00400158)
-	m_pFile->CPrintf( "Compilation: %s\n", __TIMESTAMP__ );
+	// NOTE: like retail, prints the link time stamp of the exe (PE header); retail reads it from the fixed image base 0x400000
+	// as a 64-bit time (the 32-bit stamp and the following PointerToSymbolTable, 0 in a linked exe)
+	const TUINT8* pImageBase = TREINTERPRETCAST( const TUINT8*, GetModuleHandleA( TNULL ) );
+	const TUINT8* pNtHeader  = pImageBase + *TREINTERPRETCAST( const TINT32*, pImageBase + 0x3c );
+
+	m_pFile->CPrintf( "Compilation: %s", _ctime64( TREINTERPRETCAST( const __time64_t*, pNtHeader + 8 ) ) );
 
 	return Error::OK;
 }
@@ -196,14 +214,14 @@ void TLogFile::Close()
 	m_curLevel = 0;
 	RecalcLevel();
 
-	for ( int i = TUtil::LogType_Info; i < TUtil::LogType_NUMOF; i++ )
+	for ( TINT i = 0; i < cTypeCount; i++ )
 	{
-		Print( "%s count = %d\n", TUtil::LogTypeToString( TUtil::LogType( i ) ), m_typeCounts[ i ] );
+		Print( "%s count = %d\n", cTypeStrings[ i ], m_typeCounts[ i ] );
 	}
 
 	if ( m_pFile != TNULL )
 	{
-		TFile::Destroy( m_pFile );
+		m_pFile->Destroy();
 		m_pFile = TNULL;
 	}
 }
@@ -213,6 +231,34 @@ void TLogFile::Flush()
 {
 	if ( m_pFile )
 		m_pFile->FlushBuffers();
+}
+
+// $deBlob: FUNCTION 00687b30
+void TLogFile::Down()
+{
+	m_curLevel++;
+	RecalcLevel();
+}
+
+// $deBlob: FUNCTION 00687b40
+void TLogFile::Up()
+{
+	m_curLevel--;
+	RecalcLevel();
+}
+
+// $deBlob: FUNCTION 00687b50
+void TLogFile::Indent()
+{
+	m_curLevel++;
+	RecalcLevel();
+}
+
+// $deBlob: FUNCTION 00687b60
+void TLogFile::UnIndent()
+{
+	m_curLevel--;
+	RecalcLevel();
 }
 
 // $deBlob: FUNCTION 00687ba0
@@ -272,7 +318,11 @@ void TLogFile::Log( TUtil::LogType type, const TCHAR* str1, const TCHAR* str2, c
 				m_pFile->CPrintf(
 				    "%d [%s]: %s",
 				    m_iTotalLogCount,
+#ifdef DEBLOB_COMMUNITY_PATCH
 				    TUtil::LogTypeToString( type ),
+#else
+				    cTypeStrings[ type ],
+#endif
 				    m_LevelString
 				);
 			}
@@ -282,7 +332,11 @@ void TLogFile::Log( TUtil::LogType type, const TCHAR* str1, const TCHAR* str2, c
 			m_pFile->CPrintf(
 			    "%d [%s] [%s]: %s: %s: %s",
 			    m_iTotalLogCount,
+#ifdef DEBLOB_COMMUNITY_PATCH
 			    TUtil::LogTypeToString( type ),
+#else
+			    cTypeStrings[ type ],
+#endif
 			    strTime,
 			    str1,
 			    str2 != TNULL ? str2 : "",
@@ -297,7 +351,12 @@ void TLogFile::Log( TUtil::LogType type, const TCHAR* str1, const TCHAR* str2, c
 
 		m_pFile->CPrintf( "\n" );
 
+		// NOTE: Barnyard's fourth log type (Critical) has no counter in de Blob
+#ifdef DEBLOB_COMMUNITY_PATCH
+		if ( type < cTypeCount ) m_typeCounts[ type ]++;
+#else
 		m_typeCounts[ type ]++;
+#endif
 		m_iTotalLogCount++;
 	}
 }
@@ -314,7 +373,7 @@ void TLogFile::LogSimple( TUtil::LogType type, const TCHAR* format, ... )
 	va_end( args );
 
 	// NOTE: retail passes the formatted text as the format of Log
-	Log( type, "DefUser", "DefSys", str );
+	Log( type, s_szDefUser, s_szDefSys, str );
 }
 
 TOSHI_NAMESPACE_END

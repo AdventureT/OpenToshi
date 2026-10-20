@@ -46,7 +46,7 @@ void T2GenericDynamicStack::Pop()
 
 	if ( ( m_iNumElements & ( m_iElementsPerBlock - 1 ) ) == 0 )
 	{
-		void* pBlock = m_vecBlocks.Back().Value();
+		void* pBlock = m_vecBlocks.Back();
 		m_vecBlocks.PopBack();
 		m_pAllocator->Free( pBlock );
 	}
@@ -80,6 +80,79 @@ void T2GenericDynamicStack::Init( T2Allocator* a_pAllocator, TINT a_iElementsPer
 
 	for ( TINT i = a_iElementsPerBlock; i > 1; i >>= 1 )
 		m_iBlockShift++;
+}
+
+// $deBlob: FUNCTION 006f3f20
+void T2GenericDynamicStack::Append( const T2GenericDynamicStack& a_rcSource )
+{
+	TASSERT( a_rcSource.m_iElementSize == m_iElementSize );
+
+	TINT   iBlockSize   = m_iElementSize * m_iElementsPerBlock;
+	TINT   iUsedInBlock = m_iElementSize * ( m_iNumElements & ( m_iElementsPerBlock - 1 ) );
+	TBYTE* pDst;
+
+	if ( iUsedInBlock != 0 )
+	{
+		pDst = TSTATICCAST( TBYTE, m_vecBlocks.Back() ) + iUsedInBlock;
+	}
+	else
+	{
+		pDst = TSTATICCAST( TBYTE, m_pAllocator->Malloc( iBlockSize ) );
+		m_vecBlocks.PushBack( pDst );
+		iUsedInBlock = 0;
+	}
+
+	TINT iFreeInBlock  = iBlockSize - iUsedInBlock;
+	TINT iSrcBlockSize = m_iElementSize * a_rcSource.m_iElementsPerBlock;
+	TINT iRemaining    = a_rcSource.m_iNumElements;
+
+	T2DynamicVector<void*>& rSrcBlocks = const_cast<T2DynamicVector<void*>&>( a_rcSource.m_vecBlocks );
+
+	for ( auto it = rSrcBlocks.Begin(); it != rSrcBlocks.End(); it++ )
+	{
+		TINT         iSrcLeft = iSrcBlockSize;
+		const TBYTE* pSrc     = TSTATICCAST( TBYTE, it.Value() );
+
+		while ( iSrcBlockSize > 0 )
+		{
+			if ( iFreeInBlock == 0 )
+			{
+				pDst = TSTATICCAST( TBYTE, m_pAllocator->Malloc( iBlockSize ) );
+				m_vecBlocks.PushBack( pDst );
+				iFreeInBlock = iBlockSize;
+			}
+
+			const TINT* pMin = ( iFreeInBlock >= iSrcLeft ) ? &iSrcLeft : &iFreeInBlock;
+			TINT        iRemainingSize = iRemaining * m_iElementSize;
+			TINT        copySize       = ( iRemainingSize >= *pMin ) ? *pMin : iRemainingSize;
+
+			TASSERT( copySize % m_iElementSize == 0 );
+			TUtil::MemCopy( pDst, pSrc, copySize );
+
+			iSrcLeft -= copySize;
+			pDst += copySize;
+			iFreeInBlock -= copySize;
+			pSrc += copySize;
+			iRemaining -= copySize / m_iElementSize;
+
+			TINT remainingElements = iRemaining;
+			TASSERT( remainingElements >= 0 );
+
+			if ( iRemaining == 0 )
+			{
+				m_iNumElements += a_rcSource.m_iNumElements;
+				return;
+			}
+
+			if ( iSrcLeft <= 0 )
+				break;
+		}
+
+		if ( iRemaining == 0 )
+			break;
+	}
+
+	m_iNumElements += a_rcSource.m_iNumElements;
 }
 
 TOSHI_NAMESPACE_END

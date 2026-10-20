@@ -18,7 +18,6 @@ public:
 	PProperty( const PPropertyName& a_rcName, const PPropertyValue& a_rcValue );
 	~PProperty();
 
-	// NOTE: always inlined in retail, the out of line copy is unreferenced
 	// $Barnyard: FUNCTION 006b29b0
 	PProperty( const PPropertyName& a_rcName, const PPropertyValue& a_rcValue, const Toshi::TPString8& a_rcComment )
 	    : m_oName( a_rcName )

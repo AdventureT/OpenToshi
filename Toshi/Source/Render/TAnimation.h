@@ -8,7 +8,7 @@
 
 TOSHI_NAMESPACE_START
 
-constexpr TINT TANIMATION_MAXBONES = 128;
+TCONSTEXPR_VAR TINT TANIMATION_MAXBONES = 128;
 
 using TAnimVector     = TVector3;
 using TAnimQuaternion = TQuaternion;
@@ -16,6 +16,10 @@ using TAnimScale      = TFLOAT;
 using TAnimationBone  = unsigned short;
 
 class TSkeletonInstance;
+
+// The heap of TKeyframeLibrary and TSkeletonInstance (TAnimation.cpp), set by the game
+void         SetTAnimMemoryHeap( TMemoryHeap* a_pHeap );
+TMemoryHeap* GetTAnimMemoryHeap();
 
 class TAnimation : public TQList<TAnimation>::TNode
 {
@@ -45,16 +49,27 @@ public:
 	TBOOL UpdateTime( TFLOAT a_fDeltaTime );
 	void  RemoveAnimation( TFLOAT a_fVal );
 
+	void MoveAnimationToFront();
+	void MoveAnimationToBack();
+
+	// $deBlob: FUNCTION 005747a0
 	void   SetState( State a_eState ) { m_eState = a_eState; }
-	TFLOAT SetSpeed( TFLOAT a_fSpeed ) { return std::exchange( m_fSpeed, a_fSpeed ); }
+	// $deBlob: FUNCTION 005747b0
+	TFLOAT SetSpeed( TFLOAT a_fSpeed ) { return TExchange( m_fSpeed, a_fSpeed ); }
 	TFLOAT SetDestWeight( TFLOAT a_fDestWeight, TFLOAT a_fBlendInSpeed );
 	void   SetBlendInSpeed( TFLOAT a_fBlendInSpeed ) { m_fBlendInSpeed = a_fBlendInSpeed; }
 	void   SetBlendOutSpeed( TFLOAT a_fBlendOutSpeed ) { m_fBlendOutSpeed = a_fBlendOutSpeed; }
 
+	// Sets the weight and switches to STATE_PLAYING, returns the previous weight
+	TFLOAT SetWeight( TFLOAT a_fWeight );
+
 	void ChangeToManaged( TFLOAT a_fBlendOutSpeed );
 
 	// Returns TTRUE if the managed animation finishes blending out within a_fDeltaTime
-	TBOOL IsFinishing( TFLOAT a_fDeltaTime ) const;
+	TBOOL WillFinishThisFrame( TFLOAT a_fDeltaTime ) const;
+
+	// The highest TSkeletonSequence::m_iBoundingSphereIndex of the animations in a_rList (-1 if it's empty)
+	static TINT __stdcall FindMaxBoundingSphereIndex( TQList<TAnimation>& a_rList );
 
 	// Sets the time of the animation (wrapped or clamped to the sequence), returns the previous total time
 	TFLOAT SetTime( TFLOAT a_fTime );
@@ -66,6 +81,7 @@ public:
 	TBOOL IsUpdateStateOnRemove() const { return m_eFlags & Flags_UpdateStateOnRemove; }
 
 	// Sets or clears Flags_UpdateStateOnRemove, returns the previous state
+	// $deBlob: FUNCTION 0068e060
 	// $Barnyard: FUNCTION 006ca2a0
 	TBOOL SetUpdateStateOnRemove( TBOOL a_bUpdateState )
 	{
@@ -74,9 +90,10 @@ public:
 		return bOld;
 	}
 
-	TUINT16                  GetSequence() const { return m_iSeqID; }
+	TINT16                   GetSequence() const { return m_iSeqID; }
 	class TSkeletonSequence* GetSequencePtr() const;
 	TSkeletonInstance*       GetSkeletonInstance() const { return m_pSkeletonInstance; }
+	// $deBlob: FUNCTION 0056f310
 	TFLOAT                   GetSpeed() const { return m_fSpeed; }
 	TFLOAT                   GetSeqTime() const { return m_fSeqTime; }
 	TFLOAT                   GetTotalTime() const { return m_fTotalTime; }
@@ -89,26 +106,33 @@ public:
 	TAnimationBone* GetBone( TINT a_iIndex ) { return &TREINTERPRETCAST( TAnimationBone*, this + 1 )[ a_iIndex ]; }
 
 private:
-	TSkeletonInstance* m_pSkeletonInstance;
-	TUINT16            m_iSeqID;
-	Flags              m_eFlags;
-	TINT16             m_iUnk3;
-	State              m_eState;
-	TFLOAT             m_fSpeed;
-	TFLOAT             m_fWeight;
-	TFLOAT             m_fDestWeight;
-	TFLOAT             m_fTotalTime;
-	TFLOAT             m_fSeqTime;
-	TFLOAT             m_fBlendInSpeed;
-	TFLOAT             m_fBlendOutSpeed;
+	TSkeletonInstance* m_pSkeletonInstance; // 0x08
+	TINT16             m_iSeqID;            // 0x0C
+	Flags              m_eFlags;            // 0x0E
+	TINT16             m_iUnk3;             // 0x10
+	State              m_eState;            // 0x14
+	TFLOAT             m_fSpeed;            // 0x18
+	TFLOAT             m_fWeight;           // 0x1C
+	TFLOAT             m_fDestWeight;       // 0x20
+	TFLOAT             m_fTotalTime;        // 0x24
+	TFLOAT             m_fSeqTime;          // 0x28
+	TFLOAT             m_fBlendInSpeed;     // 0x2C
+	TFLOAT             m_fBlendOutSpeed;    // 0x30
 
 	friend class TSkeletonInstance;
-};
+}; // 0x34, followed by a TAnimationBone (the current key) per auto bone
 
-class TKeyframeLibrary : public TDList<TKeyframeLibrary>::TNode
+TSTATICASSERT( sizeof( TAnimation ) == 0x34 );
+
+//-----------------------------------------------------------------------------
+// Purpose: a keyframe library ("tkey" TAssetInit entries, Source\Render\TAnimation.cpp). de Blob's keeps a
+// pointer to the TRB name and is allocated from TSkeleton's heap.
+//-----------------------------------------------------------------------------
+class TKeyframeLibrary : public TQList<TKeyframeLibrary>::TNode
 {
 public:
 	friend class TKeyframeLibraryInstance;
+	friend class TKeyframeLibraryManager;
 
 	struct TRBHeader
 	{
@@ -126,13 +150,13 @@ public:
 	};
 
 public:
-	static TKeyframeLibrary* CreateFromTRB( TTRB* a_pTRB, const TCHAR* a_szSymbolName );
-	static TKeyframeLibrary* CreateFromData( TRBHeader* a_pTRBHeader );
+	static TKeyframeLibrary* __stdcall Create( const TCHAR* a_szName, TINT a_iNumTranslations, TINT a_iNumQuaternions, TINT a_iNumScales, const TVector3& a_rSomeVector );
+	static TKeyframeLibrary* __stdcall CreateFromData( TRBHeader* a_pTRBHeader );
+	static TKeyframeLibrary* __stdcall CreateFromTRB( TTRB* a_pTRB, const TCHAR* a_szSymbolName );
 
 	void Delete();
 	void SetTRB( TTRB* a_pTRB ) { m_pTRB = a_pTRB; }
 
-	TINT         GetNameLength() const { return m_iNameLength; }
 	const TCHAR* GetName() const { return m_szName; }
 
 	TINT GetNumTranslations() const { return m_iNumTranslations; }
@@ -140,8 +164,6 @@ public:
 	TINT GetNumScales() const { return m_iNumScales; }
 
 private:
-	TKeyframeLibrary();
-
 	void IncreaseRefCount()
 	{
 		m_iReferenceCount++;
@@ -153,21 +175,20 @@ private:
 	}
 
 private:
-	TUINT8           m_iNameLength;
-	TCHAR            m_szName[ 31 ];
-	TVector3         m_SomeVector;
-	TINT             m_iReferenceCount;
-	TINT             m_iNumTranslations;
-	TINT             m_iNumQuaternions;
-	TINT             m_iNumScales;
-	TINT             m_iTranslationSize;
-	TINT             m_iQuaternionSize;
-	TINT             m_iScaleSize;
-	TAnimVector*     m_pTranslations;
-	TAnimQuaternion* m_pQuaternions;
-	TAnimScale*      m_pScales;
-	TTRB*            m_pTRB;
-};
+	const TCHAR*     m_szName;           // 0x08
+	TVector3         m_SomeVector;       // 0x0C
+	TINT             m_iReferenceCount;  // 0x18
+	TINT             m_iNumTranslations; // 0x1C
+	TINT             m_iNumQuaternions;  // 0x20
+	TINT             m_iNumScales;       // 0x24
+	TINT             m_iTranslationSize; // 0x28
+	TINT             m_iQuaternionSize;  // 0x2C
+	TINT             m_iScaleSize;       // 0x30
+	TAnimVector*     m_pTranslations;    // 0x34
+	TAnimQuaternion* m_pQuaternions;     // 0x38
+	TAnimScale*      m_pScales;          // 0x3C
+	TTRB*            m_pTRB;             // 0x40
+}; // 0x44
 
 class TKeyframeLibraryInstance
 {
@@ -180,12 +201,14 @@ public:
 
 	void Destroy();
 
+	// $deBlob: FUNCTION 0068fcd0
 	TAnimVector* GetT( TINT a_iIndex ) const
 	{
 		TASSERT( a_iIndex < m_iTKeyCount );
 		return &m_pTranslations[ a_iIndex ];
 	}
 
+	// $deBlob: FUNCTION 0068fc40
 	TAnimQuaternion* GetQ( TINT a_iIndex ) const
 	{
 		TASSERT( a_iIndex < m_iQKeyCount );
@@ -236,8 +259,8 @@ public:
 	void UnloadLibrary( TKeyframeLibrary* a_pLibrary );
 
 private:
-	TDList<TKeyframeLibrary> m_List;
-	TINT                     m_iNumLibraries = 0;
-};
+	TQList<TKeyframeLibrary> m_List;              // 0x00
+	TINT                     m_iNumLibraries = 0; // 0x08
+}; // 0x0C
 
 TOSHI_NAMESPACE_END

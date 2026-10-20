@@ -9,57 +9,77 @@
 
 TOSHI_NAMESPACE_START
 
-TKeyframeLibrary::TKeyframeLibrary()
+static TMemoryHeap* s_pAnimMemHeap;
+
+TSTATICASSERT( sizeof( TKeyframeLibrary ) == 0x44 );
+
+// $deBlob: FUNCTION 0068c290
+void SetTAnimMemoryHeap( TMemoryHeap* a_pHeap )
 {
-	m_szName[ 0 ]      = '\0';
-	m_iReferenceCount  = 0;
-	m_iNumTranslations = 0;
-	m_iNumQuaternions  = 0;
-	m_iNumScales       = 0;
-	m_iTranslationSize = 0;
-	m_iQuaternionSize  = 0;
-	m_iScaleSize       = 0;
-	m_pTranslations    = TNULL;
-	m_pQuaternions     = TNULL;
-	m_pScales          = TNULL;
-	m_pTRB             = TNULL;
+	s_pAnimMemHeap = a_pHeap;
 }
 
-void TKeyframeLibrary::Delete()
+// $deBlob: FUNCTION 0068c2a0
+TMemoryHeap* GetTAnimMemoryHeap()
 {
-	TASSERT( m_iReferenceCount == 0 );
+	return s_pAnimMemHeap;
+}
 
-	if ( m_pTRB )
+// $deBlob: FUNCTION 0068e310
+TKeyframeLibrary* __stdcall TKeyframeLibrary::Create( const TCHAR* a_szName, TINT a_iNumTranslations, TINT a_iNumQuaternions, TINT a_iNumScales, const TVector3& a_rSomeVector )
+{
+	TSIZE uiSize = sizeof( TKeyframeLibrary ) + a_iNumTranslations * sizeof( TAnimVector ) + a_iNumQuaternions * sizeof( TAnimQuaternion ) + a_iNumScales * sizeof( TAnimScale );
+
+	TKeyframeLibrary* pLibrary = TSTATICCAST( TKeyframeLibrary, ( s_pAnimMemHeap != TNULL ) ? TMemoryHeap_Malloc( s_pAnimMemHeap, uiSize ) : TMalloc( uiSize ) );
+
+	if ( pLibrary == TNULL )
+		return TNULL;
+
+	// The inlined constructor
+	new ( pLibrary ) TQList<TKeyframeLibrary>::TNode();
+	pLibrary->m_iReferenceCount  = 0;
+	pLibrary->m_iNumTranslations = 0;
+	pLibrary->m_iNumQuaternions  = 0;
+	pLibrary->m_iNumScales       = 0;
+	pLibrary->m_pTranslations    = TNULL;
+	pLibrary->m_pQuaternions     = TNULL;
+	pLibrary->m_pScales          = TNULL;
+	pLibrary->m_pTRB             = TNULL;
+
+	pLibrary->m_szName           = a_szName;
+	pLibrary->m_iReferenceCount  = 0;
+	pLibrary->m_SomeVector       = a_rSomeVector;
+	pLibrary->m_iNumQuaternions  = a_iNumQuaternions;
+	pLibrary->m_iNumTranslations = a_iNumTranslations;
+	pLibrary->m_pScales          = TREINTERPRETCAST( TAnimScale*, TREINTERPRETCAST( TAnimQuaternion*, TREINTERPRETCAST( TAnimVector*, pLibrary + 1 ) + a_iNumTranslations ) + a_iNumQuaternions );
+	pLibrary->m_iNumScales       = a_iNumScales;
+	pLibrary->m_pQuaternions     = TREINTERPRETCAST( TAnimQuaternion*, TREINTERPRETCAST( TAnimVector*, pLibrary + 1 ) + a_iNumTranslations );
+	pLibrary->m_pTranslations    = TREINTERPRETCAST( TAnimVector*, pLibrary + 1 );
+
+	return pLibrary;
+}
+
+// $deBlob: FUNCTION 0068e3e0
+TKeyframeLibrary* __stdcall TKeyframeLibrary::CreateFromData( TRBHeader* a_pTRBHeader )
+{
+	TKeyframeLibrary* pLibrary = TSTATICCAST( TKeyframeLibrary, ( s_pAnimMemHeap != TNULL ) ? TMemoryHeap_Malloc( s_pAnimMemHeap, sizeof( TKeyframeLibrary ) ) : TMalloc( sizeof( TKeyframeLibrary ) ) );
+
+	if ( pLibrary != TNULL )
 	{
-		m_pTRB->Close();
-		delete m_pTRB;
-		m_pTRB = TNULL;
+		// The inlined constructor
+		new ( pLibrary ) TQList<TKeyframeLibrary>::TNode();
+		pLibrary->m_iReferenceCount  = 0;
+		pLibrary->m_iNumTranslations = 0;
+		pLibrary->m_iNumQuaternions  = 0;
+		pLibrary->m_iNumScales       = 0;
+		pLibrary->m_pTranslations    = TNULL;
+		pLibrary->m_pQuaternions     = TNULL;
+		pLibrary->m_pScales          = TNULL;
+		pLibrary->m_pTRB             = TNULL;
 	}
 
-	delete this;
-}
-
-// $Barnyard: FUNCTION 006ca600
-TKeyframeLibrary* TKeyframeLibrary::CreateFromTRB( TTRB* a_pTRB, const TCHAR* a_szSymbolName )
-{
-	TVALIDPTR( a_pTRB );
-	TVALIDPTR( a_szSymbolName );
-
-	TRBHeader* pTRBHeader = TSTATICCAST( TRBHeader, a_pTRB->GetSymbolAddress( a_szSymbolName ) );
-
-	return CreateFromData( pTRBHeader );
-}
-
-TKeyframeLibrary* TKeyframeLibrary::CreateFromData( TRBHeader* a_pTRBHeader )
-{
-	TVALIDPTR( a_pTRBHeader );
-
-	TKeyframeLibrary* pLibrary = new TKeyframeLibrary;
-
-	TSIZE iNameLen          = TStringManager::String8Length( a_pTRBHeader->m_szName );
-	pLibrary->m_iNameLength = TUINT8( iNameLen );
-
-	TStringManager::String8Copy( pLibrary->m_szName, a_pTRBHeader->m_szName, TMath::Min( iNameLen, sizeof( pLibrary->m_szName ) ) );
+	// NOTE: retail doesn't check the allocation here
+	pLibrary->m_szName           = a_pTRBHeader->m_szName;
 	pLibrary->m_iReferenceCount  = 0;
 	pLibrary->m_SomeVector       = a_pTRBHeader->m_SomeVector;
 	pLibrary->m_iNumTranslations = a_pTRBHeader->m_iNumTranslations;
@@ -73,6 +93,30 @@ TKeyframeLibrary* TKeyframeLibrary::CreateFromData( TRBHeader* a_pTRBHeader )
 	pLibrary->m_pScales          = a_pTRBHeader->m_pScales;
 
 	return pLibrary;
+}
+
+// $deBlob: FUNCTION 0068e4a0
+TKeyframeLibrary* __stdcall TKeyframeLibrary::CreateFromTRB( TTRB* a_pTRB, const TCHAR* a_szSymbolName )
+{
+	return CreateFromData( TSTATICCAST( TRBHeader, a_pTRB->GetSymbolAddress( a_szSymbolName ) ) );
+}
+
+// $deBlob: FUNCTION 0068e4c0
+void TKeyframeLibrary::Delete()
+{
+	TASSERT( 0 == m_iReferenceCount );
+
+	if ( m_pTRB != TNULL )
+	{
+		m_pTRB->Close();
+
+		if ( m_pTRB )
+			delete m_pTRB;
+
+		m_pTRB = TNULL;
+	}
+
+	TFree( this );
 }
 
 TOSHI_NAMESPACE_END

@@ -9,7 +9,7 @@ public:
 	TStack()  = default;
 	~TStack() = default;
 
-	// TStack<TMatrix44, 20>: 00471520
+	// $deBlob: FUNCTION 005f0640
 	// $Barnyard: FUNCTION 00471520
 	void Push( const T& a_item = T() )
 	{
@@ -23,12 +23,14 @@ public:
 		return Top();
 	}
 
+	// de Blob's Pop returns the new top (the item below the popped one) and clamps a negative index to 0; Barnyard's
+	// returns the popped item and clamps only -1
+	// $deBlob: FUNCTION 005f0620
 	T& Pop()
 	{
-		T& item = AtUnsafe( m_iTop );
 		m_iTop--;
-		if ( IsEmpty() ) m_iTop = 0;
-		return item;
+		if ( m_iTop < 0 ) m_iTop = 0;
+		return AtUnsafe( m_iTop );
 	}
 
 	TBOOL IsFull() const
@@ -77,12 +79,12 @@ public:
 	}
 
 private:
-	TFORCEINLINE constexpr T& AtUnsafe( TUINT a_uiIndex )
+	TFORCEINLINE TCONSTEXPR T& AtUnsafe( TUINT a_uiIndex )
 	{
 		return *( (T*)( m_aBuffer ) + a_uiIndex );
 	}
 
-	TFORCEINLINE constexpr const T& AtUnsafe( TUINT a_uiIndex ) const
+	TFORCEINLINE TCONSTEXPR const T& AtUnsafe( TUINT a_uiIndex ) const
 	{
 		return *( (const T*)( m_aBuffer ) + a_uiIndex );
 	}

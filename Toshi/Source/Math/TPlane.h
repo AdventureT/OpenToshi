@@ -14,25 +14,27 @@ public:
 	};
 
 public:
-	constexpr TPlane() = default;
+	TCONSTEXPR TPlane() = default;
 
-	constexpr TPlane( const TVector4& a_PlaneData )
+	TCONSTEXPR TPlane( const TVector4& a_PlaneData )
 	    : m_Normal( a_PlaneData.AsVector3() ), m_fDistance( a_PlaneData.w )
 	{}
 
-	constexpr TPlane( const TVector3& a_Normal, TFLOAT a_fDistance )
+	TCONSTEXPR TPlane( const TVector3& a_Normal, TFLOAT a_fDistance )
 	    : m_Normal( a_Normal ), m_fDistance( a_fDistance )
 	{}
 
-	constexpr TPlane( const TVector3& a_Normal, const TVector3& a_Point )
+	// $deBlob: FUNCTION 0058c6d0
+	// $deBlob: FUNCTION 007a52a0
+	TCONSTEXPR TPlane( const TVector3& a_Normal, const TVector3& a_Point )
 	    : m_Normal( a_Normal ), m_fDistance( TVector3::DotProduct( a_Normal, a_Point ) )
 	{}
 
-	constexpr TPlane( TFLOAT a_fNormalX, TFLOAT a_fNormalY, TFLOAT a_fNormalZ, TFLOAT a_fDistance )
+	TCONSTEXPR TPlane( TFLOAT a_fNormalX, TFLOAT a_fNormalY, TFLOAT a_fNormalZ, TFLOAT a_fDistance )
 	    : m_Normal( a_fNormalX, a_fNormalY, a_fNormalZ ), m_fDistance( a_fDistance )
 	{}
 
-	constexpr TPlane( const TPlane& a_Other )
+	TCONSTEXPR TPlane( const TPlane& a_Other )
 	    : m_Normal( a_Other.m_Normal ), m_fDistance( a_Other.m_fDistance )
 	{}
 
@@ -45,10 +47,10 @@ public:
 
 	// Signed distance of a_rcPoint from the plane
 	// $deBlob: FUNCTION 00672220
-	constexpr TFLOAT GetDistance( const TVector3& a_rcPoint ) const { return ( a_rcPoint.y * m_Normal.y + a_rcPoint.x * m_Normal.x + a_rcPoint.z * m_Normal.z ) - m_fDistance; }
+	TCONSTEXPR TFLOAT GetDistance( const TVector3& a_rcPoint ) const { return ( a_rcPoint.y * m_Normal.y + a_rcPoint.x * m_Normal.x + a_rcPoint.z * m_Normal.z ) - m_fDistance; }
 
 	// $deBlob: FUNCTION 00672260
-	constexpr TFLOAT GetDistance( const TVector4& a_rcPoint ) const { return ( a_rcPoint.y * m_Normal.y + a_rcPoint.x * m_Normal.x + a_rcPoint.z * m_Normal.z ) - m_fDistance; }
+	TCONSTEXPR TFLOAT GetDistance( const TVector4& a_rcPoint ) const { return ( a_rcPoint.y * m_Normal.y + a_rcPoint.x * m_Normal.x + a_rcPoint.z * m_Normal.z ) - m_fDistance; }
 
 	// Projects a_rcPoint onto the plane
 	// $deBlob: FUNCTION 006723a0
@@ -60,57 +62,59 @@ public:
 		a_rOut.z         = a_rcPoint.z - m_Normal.z * fDistance;
 	}
 
-	constexpr void Set( const TVector4& a_PlaneData )
+	TCONSTEXPR void Set( const TVector4& a_PlaneData )
 	{
 		m_Normal    = a_PlaneData.AsVector3();
 		m_fDistance = a_PlaneData.w;
 	}
 
-	constexpr void Set( const TVector3& a_Normal, TFLOAT a_fDistance )
+	TCONSTEXPR void Set( const TVector3& a_Normal, TFLOAT a_fDistance )
 	{
 		m_Normal    = a_Normal;
 		m_fDistance = a_fDistance;
 	}
 
-	constexpr void Set( const TVector3& a_Normal, const TVector3& a_Point )
+	// $deBlob: FUNCTION 0058cef0
+	// $deBlob: FUNCTION 005f74b0
+	TCONSTEXPR void Set( const TVector3& a_Normal, const TVector3& a_Point )
 	{
 		m_Normal    = a_Normal;
 		m_fDistance = TVector3::DotProduct( a_Normal, a_Point );
 	}
 
-	constexpr void Set( TFLOAT a_fNormalX, TFLOAT a_fNormalY, TFLOAT a_fNormalZ, TFLOAT a_fDistance )
+	TCONSTEXPR void Set( TFLOAT a_fNormalX, TFLOAT a_fNormalY, TFLOAT a_fNormalZ, TFLOAT a_fDistance )
 	{
 		m_Normal.Set( a_fNormalX, a_fNormalY, a_fNormalZ );
 		m_fDistance = a_fDistance;
 	}
 
-	constexpr void Set( const TPlane& a_Other )
+	TCONSTEXPR void Set( const TPlane& a_Other )
 	{
 		m_Normal    = a_Other.m_Normal;
 		m_fDistance = a_Other.m_fDistance;
 	}
 
-	TFORCEINLINE constexpr TFLOAT GetD() const
+	TFORCEINLINE TCONSTEXPR TFLOAT GetD() const
 	{
 		return m_fDistance;
 	}
 
-	TFORCEINLINE constexpr void SetD( TFLOAT a_fDistance )
+	TFORCEINLINE TCONSTEXPR void SetD( TFLOAT a_fDistance )
 	{
 		m_fDistance = a_fDistance;
 	}
 
-	TFORCEINLINE constexpr const TVector3& GetNormal() const
+	TFORCEINLINE TCONSTEXPR const TVector3& GetNormal() const
 	{
 		return m_Normal;
 	}
 
-	TFORCEINLINE constexpr void SetNormal( const TVector3& a_rNormal )
+	TFORCEINLINE TCONSTEXPR void SetNormal( const TVector3& a_rNormal )
 	{
 		m_Normal = a_rNormal;
 	}
 
-	TFORCEINLINE constexpr void SetNormal( TFLOAT a_fNormalX, TFLOAT a_fNormalY, TFLOAT a_fNormalZ )
+	TFORCEINLINE TCONSTEXPR void SetNormal( TFLOAT a_fNormalX, TFLOAT a_fNormalY, TFLOAT a_fNormalZ )
 	{
 		m_Normal.Set( a_fNormalX, a_fNormalY, a_fNormalZ );
 	}
@@ -135,15 +139,15 @@ public:
 		AsVector4().Negate4();
 	}
 
-	constexpr TPlane& operator=( const TPlane& a_rPlane )
+	// NOTE: retail copies the whole plane at once (movdqu)
+	TPlane& operator=( const TPlane& a_rPlane )
 	{
-		m_Normal    = a_rPlane.m_Normal;
-		m_fDistance = a_rPlane.m_fDistance;
+		memcpy( this, &a_rPlane, sizeof( TPlane ) );
 		return *this;
 	}
 
-	TFORCEINLINE constexpr TVector3&       AsNormal() { return m_Normal; }
-	TFORCEINLINE constexpr const TVector3& AsNormal() const { return m_Normal; }
+	TFORCEINLINE TCONSTEXPR TVector3&       AsNormal() { return m_Normal; }
+	TFORCEINLINE TCONSTEXPR const TVector3& AsNormal() const { return m_Normal; }
 
 	// Projects a_rcPoint onto the plane (w of the result is 1.0f)
 	// $deBlob: FUNCTION 00672320

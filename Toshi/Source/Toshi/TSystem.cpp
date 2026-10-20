@@ -13,6 +13,17 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006616a0
+// $Barnyard: FUNCTION 006bbc50
+TBOOL TSystemManager::Pause( TBOOL a_bPause )
+{
+	TBOOL bOldState = m_bPaused;
+	m_bPaused       = a_bPause;
+	TBOOL bPause = a_bPause;
+	m_PauseEmitter.Throw( &bPause );
+	return bOldState;
+}
+
 // $deBlob: FUNCTION 00661870
 // $Barnyard: FUNCTION 00710770
 TSystemManager::TSystemManager()
@@ -27,6 +38,7 @@ TSystemManager::TSystemManager()
 }
 
 // $deBlob: FUNCTION 006618f0
+// $deBlob: FUNCTION 00661a40
 // $Barnyard: FUNCTION 00713e20
 TSystemManager::~TSystemManager()
 {
@@ -50,7 +62,6 @@ void TSystemManager::Update()
 
 	m_uiFrameCount += 1;
 
-	// NOTE: inlined in retail
 	m_pScheduler->Update( GetSingleton()->m_oTimer.GetDelta() );
 }
 
@@ -75,7 +86,7 @@ void TSystemManager::Destroy()
 		delete pSystemManager;
 }
 
-// NOTE: retail converts each field with TMath's checked casts (TMathInline.h:96, 97)
+// NOTE: retail converts each field with TMath's checked casts
 static TUINT8 TDate_ToUInt8( TINT a_iX )
 {
 	TASSERT( ( a_iX >= 0 ) && ( a_iX <= TMath::TUINT8_MAX ) );

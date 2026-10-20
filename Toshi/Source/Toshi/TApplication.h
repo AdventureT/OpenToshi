@@ -32,6 +32,8 @@ public:
 	virtual TBOOL OnCreate( TINT argc, TCHAR** argv );   // +0x04
 	virtual TBOOL OnUpdate( TFLOAT deltaTime );          // +0x08
 	virtual TBOOL OnDestroy();                           // +0x0C
+	// NOTE: emitted in AApplication.cpp (de Blob: AApplication's vftable)
+	// $deBlob: FUNCTION 0056c3b0
 	virtual TBOOL AllowedToHideConsole() { return TTRUE; } // +0x10
 
 	// $deBlob: FUNCTION 006ef3b0

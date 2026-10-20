@@ -53,8 +53,13 @@ TBOOL TGenericListener::Execute( void* pOwner, void* pData )
 void TGenericEmitter::Destroy()
 {
 	// NOTE: Disconnect unlinks the listener, so always take the first one
-	while ( !m_Listeners.IsEmpty() )
-		m_Listeners.Begin()->Disconnect();
+	TGenericPriList::TNode* pNode = m_Listeners.TGenericPriList::Begin();
+
+	while ( pNode != m_Listeners.TGenericPriList::End() )
+	{
+		pNode->As<TGenericListener>()->Disconnect();
+		pNode = m_Listeners.TGenericPriList::Begin();
+	}
 
 	m_pOwner = TNULL;
 }
@@ -70,11 +75,11 @@ void TGenericEmitter::Create( void* a_pOwner )
 // $Barnyard: FUNCTION 006c45e0
 void TGenericEmitter::Throw( void* a_pData )
 {
-	auto pListener = m_Listeners.Begin();
+	TGenericListener* pListener = m_Listeners.TGenericPriList::Begin()->As<TGenericListener>();
 
-	while ( pListener != m_Listeners.End() )
+	while ( pListener != m_Listeners.TGenericPriList::End() )
 	{
-		auto pNextListener = pListener->Next();
+		TGenericListener* pNextListener = pListener->Next()->As<TGenericListener>();
 
 		if ( !pListener->Execute( m_pOwner, a_pData ) )
 			break;

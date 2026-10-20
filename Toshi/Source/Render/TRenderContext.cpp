@@ -1,6 +1,7 @@
 #include "ToshiPCH.h"
 #include "TRenderContext.h"
 #include "TRender.h"
+#include "TRenderParamTable.h"
 
 //-----------------------------------------------------------------------------
 // Enables memory debugging.
@@ -10,9 +11,10 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 006934f0
 void TRenderContext::SetDirty( TBOOL a_bDirty )
 {
-	if ( a_bDirty ) m_eFlags |= FLAG_DIRTY;
+	if ( a_bDirty ) m_eFlags = ( m_eFlags & ~( FLAG_UNK4 | FLAG_UNK5 | FLAG_HAS_WORLDPLANES | FLAG_UNK7 ) ) | FLAG_DIRTY;
 	else m_eFlags &= ~FLAG_DIRTY;
 }
 
@@ -28,6 +30,7 @@ void TRenderContext::EnableFog( TBOOL a_bEnable )
 	else m_eFlags &= ~FLAG_FOG;
 }
 
+// $deBlob: FUNCTION 00692d90
 // $Barnyard: FUNCTION 006cef90
 void TRenderContext::SetFogDistance( TFLOAT a_fStart, TFLOAT a_fEnd )
 {
@@ -37,6 +40,7 @@ void TRenderContext::SetFogDistance( TFLOAT a_fStart, TFLOAT a_fEnd )
 	m_eFlags &= ~( FLAG_UNK4 | FLAG_UNK5 | FLAG_HAS_WORLDPLANES | FLAG_UNK7 );
 }
 
+// $deBlob: FUNCTION 00692660
 // $Barnyard: FUNCTION 006cecc0
 TRenderContext::TRenderContext( TRender* a_pRenderer )
     : m_pRenderer( a_pRenderer )
@@ -74,13 +78,16 @@ TRenderContext::TRenderContext( TRender* a_pRenderer )
 		m_oViewportParams.fHeight = 480.0f;
 	}
 
-	m_oViewportParams.fX    = 0.0f;
-	m_oViewportParams.fY    = 0.0f;
-	m_oViewportParams.fMinZ = 0.0f;
 	m_oViewportParams.fMaxZ = 1.0f;
+	m_oViewportParams.fMinZ = 0.0f;
+	m_oViewportParams.fY    = 0.0f;
+	m_oViewportParams.fX    = 0.0f;
 
-	// Setup projection parameters
-	m_oProjParams.SetFromFOV( m_oViewportParams.fWidth, m_oViewportParams.fHeight, TMath::DegToRad( 45.0f ), 1.0f, 1000.0f );
+	// Setup projection parameters (SetFromFOV inlined: tan( 45 degrees ))
+	m_oProjParams.SetFromFOV( m_oViewportParams.fWidth, m_oViewportParams.fHeight, TMath::DegToRad( 90.0f ), 1.0f, 1000.0f );
+
+	TASSERT( m_oProjParams.m_Proj.x != 0.0f );
+	TASSERT( m_oProjParams.m_Proj.y != 0.0f );
 
 	m_oModelViewMatrix.Identity();
 	m_oWorldViewMatrix.Identity();
@@ -90,20 +97,26 @@ TRenderContext::TRenderContext( TRender* a_pRenderer )
 	ClearLightIDs();
 }
 
+// $deBlob: FUNCTION 00692990
+// $deBlob: FUNCTION 00693530
 // $Barnyard: FUNCTION 006ce8e0
 // $Barnyard: FUNCTION 006ceed0
 TRenderContext::~TRenderContext()
 {
 }
 
+// $deBlob: FUNCTION 006929a0
 // $Barnyard: FUNCTION 006ce8f0
 void TRenderContext::SetModelViewMatrix( const TMatrix44& a_rMatrix )
 {
 	m_eFlags |= ( FLAG_DIRTY_WORLDMODELMATRIX | FLAG_DIRTY_VIEWMODELMATRIX );
 	m_oModelViewMatrix = a_rMatrix;
 	m_eFlags &= ~( FLAG_HAS_MODELWORLDMATRIX | FLAG_UNK4 );
+
+	TRender::GetSingleton()->GetParamTable()->SetParameterM44( TRenderParamTable::M44PARAM_MODELVIEW, a_rMatrix );
 }
 
+// $deBlob: FUNCTION 00692a00
 // $Barnyard: FUNCTION 006ce920
 void TRenderContext::SetWorldViewMatrix( const TMatrix44& a_rMatrix )
 {
@@ -112,8 +125,9 @@ void TRenderContext::SetWorldViewMatrix( const TMatrix44& a_rMatrix )
 	m_eFlags &= ~( FLAG_HAS_MODELWORLDMATRIX | FLAG_HAS_VIEWWORLDMATRIX | FLAG_UNK5 | FLAG_HAS_WORLDPLANES | FLAG_UNK7 );
 }
 
+// $deBlob: FUNCTION 00692a80
 // $Barnyard: FUNCTION 006cef30
-void TRenderContext::SetProjectionParams( const PROJECTIONPARAMS& params )
+void TRenderContext::SetProjectionParameters( const PROJECTIONPARAMS& params )
 {
 	TASSERT( params.m_Proj.x != 0.0f );
 	TASSERT( params.m_Proj.y != 0.0f );
@@ -126,6 +140,7 @@ void TRenderContext::SetProjectionParams( const PROJECTIONPARAMS& params )
 	m_eFlags      = ( m_eFlags & ( ~( FLAG_UNK4 | FLAG_UNK5 | FLAG_HAS_WORLDPLANES | FLAG_UNK7 ) ) ) | FLAG_DIRTY;
 }
 
+// $deBlob: FUNCTION 00692a50
 // $Barnyard: FUNCTION 006ceef0
 void TRenderContext::SetViewportParameters( const VIEWPORTPARAMS& params )
 {
@@ -133,13 +148,15 @@ void TRenderContext::SetViewportParameters( const VIEWPORTPARAMS& params )
 	m_eFlags          = ( m_eFlags & ( ~( FLAG_UNK4 | FLAG_UNK5 | FLAG_HAS_WORLDPLANES | FLAG_UNK7 ) ) ) | FLAG_DIRTY;
 }
 
+// $deBlob: FUNCTION 00692ce0
 // $Barnyard: FUNCTION 006cef70
-void TRenderContext::SetCameraMode( CameraMode cameraMode )
+void TRenderContext::SetProjType( CameraMode cameraMode )
 {
 	m_eCameraMode = cameraMode;
 	m_eFlags      = ( m_eFlags & ( ~( FLAG_UNK4 | FLAG_UNK5 | FLAG_HAS_WORLDPLANES | FLAG_UNK7 ) ) ) | FLAG_DIRTY;
 }
 
+// $deBlob: FUNCTION 006932f0
 // $Barnyard: FUNCTION 006ceba0
 void TRenderContext::ComputePerspectiveProjection( TMatrix44& a_rOutProjection, const VIEWPORTPARAMS& a_rViewportParams, const PROJECTIONPARAMS& a_rProjParams )
 {
@@ -161,19 +178,11 @@ void TRenderContext::ComputePerspectiveProjection( TMatrix44& a_rOutProjection, 
 	a_rOutProjection.m_f44 = 0.0f;
 }
 
+// NOTE: de Blob's has no asserts (Barnyard's has the ones of TRenderContextDX11::ComputeOrthographicProjection)
+// $deBlob: FUNCTION 006933f0
 // $Barnyard: FUNCTION 006cec30
 void TRenderContext::ComputeOrthographicProjection( TMatrix44& a_rOutProjection, const VIEWPORTPARAMS& a_rViewportParams, const PROJECTIONPARAMS& a_rProjParams )
 {
-	TASSERT( a_rProjParams.m_Proj.x != 0.0f );
-	TASSERT( a_rProjParams.m_Proj.y != 0.0f );
-	TASSERT( a_rViewportParams.fWidth != 0.0f );
-	TASSERT( a_rViewportParams.fHeight != 0.0f );
-
-	TASSERT( TMath::IsFinite( a_rProjParams.m_Proj.x ) && ( !TMath::IsNaN( a_rProjParams.m_Proj.x ) ) );
-	TASSERT( TMath::IsFinite( a_rProjParams.m_Proj.y ) && ( !TMath::IsNaN( a_rProjParams.m_Proj.y ) ) );
-	TASSERT( TMath::IsFinite( a_rProjParams.m_Centre.x ) && ( !TMath::IsNaN( a_rProjParams.m_Centre.x ) ) );
-	TASSERT( TMath::IsFinite( a_rProjParams.m_Centre.y ) && ( !TMath::IsNaN( a_rProjParams.m_Centre.y ) ) );
-
 	a_rOutProjection.m_f11 = ( a_rProjParams.m_Proj.x * 2.0f ) / a_rViewportParams.fWidth;
 	a_rOutProjection.m_f12 = 0.0f;
 	a_rOutProjection.m_f13 = 0.0f;
@@ -199,9 +208,10 @@ TUINT TRenderContext::GetClipFlags() const
 
 TUINT TRenderContext::SetClipFlags( TUINT a_uiClipFlags )
 {
-	return std::exchange( m_eClipFlags, a_uiClipFlags );
+	return TExchange( m_eClipFlags, a_uiClipFlags );
 }
 
+// $deBlob: FUNCTION 00692fc0
 // $Barnyard: FUNCTION 006cea00
 void TRenderContext::GetWorldPlanes( TPlane* a_pOutPlanes, TINT a_iNumPlanes )
 {
@@ -211,6 +221,7 @@ void TRenderContext::GetWorldPlanes( TPlane* a_pOutPlanes, TINT a_iNumPlanes )
 		a_pOutPlanes[ i ] = pWorldPlanes[ i ];
 }
 
+// $deBlob: FUNCTION 00692e40
 // $Barnyard: FUNCTION 006ce990
 const TPlane* TRenderContext::GetWorldPlanes()
 {
@@ -229,6 +240,7 @@ const TPlane* TRenderContext::GetWorldPlanes()
 	return m_aWorldPlanes;
 }
 
+// $deBlob: FUNCTION 00693280
 // $Barnyard: FUNCTION 006cead0
 TBOOL TRenderContext::CullSphereToFrustumSimple( const TSphere& a_rSphere, const TPlane* a_pPlanes, TINT a_iNumPlanes )
 {
@@ -243,9 +255,12 @@ TBOOL TRenderContext::CullSphereToFrustumSimple( const TSphere& a_rSphere, const
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 006930a0
 // $Barnyard: FUNCTION 006cea40
 TINT TRenderContext::CullSphereToFrustum( const TSphere& a_rSphere, const TPlane* a_pPlanes, TINT a_iClipFlags, TINT a_iClipFlagsMask )
 {
+	TASSERT( a_iClipFlags >= 0 );
+
 	TINT iLeftPlanes = a_iClipFlags & a_iClipFlagsMask;
 	TINT iPlaneFlag  = 1;
 
@@ -278,6 +293,7 @@ TINT TRenderContext::CullSphereToFrustum( const TSphere& a_rSphere, const TPlane
 	} while ( TTRUE );
 }
 
+// $deBlob: FUNCTION 00692d60
 // $Barnyard: FUNCTION 006ce950
 const TMatrix44& TRenderContext::GetViewWorldMatrix()
 {
@@ -290,6 +306,7 @@ const TMatrix44& TRenderContext::GetViewWorldMatrix()
 	return m_oViewWorldMatrix;
 }
 
+// $deBlob: FUNCTION 00692d00
 const TMatrix44& TRenderContext::GetModelWorldMatrix()
 {
 	if ( !HASANYFLAG( m_eFlags, FLAG_HAS_MODELWORLDMATRIX ) )
@@ -298,13 +315,15 @@ const TMatrix44& TRenderContext::GetModelWorldMatrix()
 		m_eFlags |= FLAG_HAS_MODELWORLDMATRIX;
 	}
 
+	TRender::GetSingleton()->GetParamTable()->SetParameterM44( TRenderParamTable::M44PARAM_MODELWORLD, m_oModelWorldMatrix );
 	return m_oModelWorldMatrix;
 }
 
+// $deBlob: FUNCTION 00693040
 // $Barnyard: FUNCTION 006ceb20
 const TMatrix44& TRenderContext::GetViewModelMatrix()
 {
-	if ( HASANYFLAG( m_eFlags, FLAG_DIRTY_VIEWMODELMATRIX ) )
+	if ( TBOOL( ( m_eFlags >> 9 ) & 1 ) )
 	{
 		m_oViewModelMatrix.Invert( m_oModelViewMatrix );
 		m_eFlags &= ~FLAG_DIRTY_VIEWMODELMATRIX;
@@ -313,9 +332,10 @@ const TMatrix44& TRenderContext::GetViewModelMatrix()
 	return m_oViewModelMatrix;
 }
 
+// $deBlob: FUNCTION 00693070
 const TMatrix44& TRenderContext::GetWorldModelMatrix()
 {
-	if ( HASANYFLAG( m_eFlags, FLAG_DIRTY_WORLDMODELMATRIX ) )
+	if ( TBOOL( ( m_eFlags >> 8 ) & 1 ) )
 	{
 		m_oWorldModelMatrix.Invert( GetModelWorldMatrix() );
 		m_eFlags &= ~FLAG_DIRTY_WORLDMODELMATRIX;
@@ -324,16 +344,96 @@ const TMatrix44& TRenderContext::GetWorldModelMatrix()
 	return m_oWorldModelMatrix;
 }
 
+// $deBlob: FUNCTION 00692e30
 // $Barnyard: FUNCTION 006ceb80
 void TRenderContext::ClearLightIDs()
 {
 	m_oLightIds.Reset();
 }
 
+// $deBlob: FUNCTION 00692dc0
 // $Barnyard: FUNCTION 006ceb50
 void TRenderContext::AddLight( TLightID a_iLightId )
 {
+	TASSERT( a_iLightId != TLightID( 0xFF ) );
 	m_oLightIds.Add( a_iLightId );
+}
+
+// $deBlob: FUNCTION 00692ec0
+const TPlane* TRenderContext::GetWorldGuardPlanes()
+{
+	if ( !HASANYFLAG( m_eFlags, FLAG_UNK7 ) )
+	{
+		auto& viewWorld = GetViewWorldMatrix();
+
+		for ( TSIZE i = 0; i < WORLDPLANE_NUMOF; i++ )
+		{
+			TMatrix44::TransformPlaneOrthogonal( m_aWorldGuardPlanes[ i ], viewWorld, m_aGuardPlanes[ i ] );
+		}
+
+		m_eFlags |= FLAG_UNK7;
+	}
+
+	return m_aWorldGuardPlanes;
+}
+
+// $deBlob: FUNCTION 00692f40
+void TRenderContext::GetViewPlanes( TPlane* a_pOutPlanes, TINT a_iNumPlanes ) const
+{
+	for ( TINT i = 0; i < a_iNumPlanes; i++ )
+		a_pOutPlanes[ i ] = m_aFrustumPlanes1[ i ];
+}
+
+// $deBlob: FUNCTION 00692f80
+void TRenderContext::GetGuardPlanes( TPlane* a_pOutPlanes, TINT a_iNumPlanes ) const
+{
+	for ( TINT i = 0; i < a_iNumPlanes; i++ )
+		a_pOutPlanes[ i ] = m_aGuardPlanes[ i ];
+}
+
+// $deBlob: FUNCTION 00693000
+void TRenderContext::GetWorldGuardPlanes( TPlane* a_pOutPlanes, TINT a_iNumPlanes )
+{
+	const TPlane* pWorldGuardPlanes = GetWorldGuardPlanes();
+
+	for ( TINT i = 0; i < a_iNumPlanes; i++ )
+		a_pOutPlanes[ i ] = pWorldGuardPlanes[ i ];
+}
+
+// NOTE: de Blob passes a TAABox* (centre, half extents); Math has no TAABox yet: a_pBox[ 0 ] is the centre and
+// a_pBox[ 1 ] the extents
+// $deBlob: FUNCTION 00693160
+TINT TRenderContext::CullAABoxToFrustum( const TVector3* a_pBox, const TPlane* a_pPlanes, TINT a_iClipFlags, TINT a_iClipFlagsMask )
+{
+	TASSERT( a_iClipFlags >= 0 );
+
+	TINT iLeftPlanes = a_iClipFlags & a_iClipFlagsMask;
+	TINT iPlaneFlag  = 1;
+
+	while ( iLeftPlanes != 0 )
+	{
+		if ( iLeftPlanes & iPlaneFlag )
+		{
+			TVector3 vAbsNormal;
+			vAbsNormal.Abs( a_pPlanes->GetNormal() );
+
+			TFLOAT fDist   = TVector3::DotProduct( a_pBox[ 0 ], a_pPlanes->GetNormal() ) - a_pPlanes->GetD();
+			TFLOAT fRadius = TVector3::DotProduct( a_pBox[ 1 ], vAbsNormal );
+
+			if ( fRadius < fDist )
+				return -1;
+
+			if ( fDist < -fRadius )
+				a_iClipFlags &= ~iPlaneFlag;
+
+			iLeftPlanes &= ~iPlaneFlag;
+		}
+
+		iPlaneFlag <<= 1;
+		a_pPlanes++;
+	}
+
+	return a_iClipFlags;
 }
 
 void TRenderContext::ComputePerspectiveFrustum( TFrustum& a_rcFrustum, const VIEWPORTPARAMS& a_rViewportParams, const PROJECTIONPARAMS& a_rProjParams )
@@ -403,18 +503,20 @@ void TRenderContext::SetFogColor( const TVector4& a_rcFogColor )
 	m_FogColor = a_rcFogColor;
 }
 
+// NOTE: de Blob halves the FOV (Barnyard: tan( a_fFOV )) and sets m_fUnk
+// $deBlob: FUNCTION 006925e0
 void TRenderContext::PROJECTIONPARAMS::SetFromFOV( TFLOAT a_fViewportWidth, TFLOAT a_fViewportHeight, TFLOAT a_fFOV, TFLOAT a_fNearPlane, TFLOAT a_fFarPlane )
 {
-	TFLOAT fHalfWidth  = a_fViewportWidth * 0.5f;
 	TFLOAT fHalfHeight = a_fViewportHeight * 0.5f;
-	TFLOAT fProj       = fHalfHeight / TMath::Tan( a_fFOV );
+	TFLOAT fProj       = fHalfHeight / TMath::Tan( a_fFOV * 0.5f );
 
-	m_fNearClip = a_fNearPlane;
-	m_fFarClip  = a_fFarPlane;
-	m_Centre.x  = fHalfWidth;
+	m_fUnk      = 1.0f;
 	m_Centre.y  = fHalfHeight;
 	m_Proj.x    = fProj;
 	m_Proj.y    = fProj;
+	m_Centre.x  = a_fViewportWidth * 0.5f;
+	m_fNearClip = a_fNearPlane;
+	m_fFarClip  = a_fFarPlane;
 }
 
 void TLightIDList::Add( TLightID a_iLightId )

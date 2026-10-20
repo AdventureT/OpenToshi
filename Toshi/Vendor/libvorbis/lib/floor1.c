@@ -127,7 +127,8 @@ static void floor1_pack (vorbis_info_floor *i,oggpack_buffer *opb){
   }
 }
 
-static int icomp(const void *a,const void *b){
+/* OpenBlob: __cdecl, the build uses /Gz (qsort comparator) */
+static int __cdecl icomp(const void *a,const void *b){
   return(**(int **)a-**(int **)b);
 }
 

@@ -1,6 +1,7 @@
 #include "ToshiPCH.h"
 #include "TMSWindow_DX11.h"
 #include "TRender_DX11.h"
+#include "Platform/Windows/Input/TInputInterface_Win.h"
 #include "Toshi/TApplication.h"
 #include "Toshi/TSystem.h"
 #include "Toshi/T2String8.h"
@@ -13,7 +14,20 @@
 
 TOSHI_NAMESPACE_START
 
-// NOTE: de Blob's TMSWindow is a TObject (vftable ??_7TMSWindow@Toshi@@6B@)
+const GUID TMSWindow::WceusbshGUID = { 0x25dbce51, 0x6c8f, 0x4a72, { 0x8a, 0x6d, 0xb5, 0x4c, 0x2b, 0x4f, 0xc8, 0x35 } };
+TBOOL      TMSWindow::ms_bIsFocused;
+STICKYKEYS TMSWindow::ms_StickyKeys;
+BOOL       TMSWindow::ms_bIsFullscreen;
+HDEVNOTIFY TMSWindow::ms_hDeviceNotify;
+
+// NOTE: de Blob's TMSWindow is a TObject
+// $deBlob: FUNCTION 006b0980
+// $deBlob: FUNCTION 006b0990
+// $deBlob: FUNCTION 006b09b0
+// $deBlob: FUNCTION 006b09d0
+// $deBlob: FUNCTION 006b09e0
+// $deBlob: FUNCTION 0053ec80
+// $deBlob: FUNCTION 00858fa0
 TDEFINE_CLASS( TMSWindow );
 
 // $deBlob: FUNCTION 006b09f0
@@ -48,6 +62,7 @@ TMSWindow::TMSWindow()
 }
 
 // $deBlob: FUNCTION 006b0a80
+// $deBlob: FUNCTION 006b1630
 TMSWindow::~TMSWindow()
 {
 }
@@ -252,7 +267,6 @@ void TMSWindow::SetFocused( TBOOL a_bFocused )
 // $deBlob: FUNCTION 006b0ef0
 LRESULT CALLBACK TMSWindow::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	// TODO: retail null-checks TSystemManager::ms_pSingleton (now a TSingleton like in retail)
 	TMSWindow*   pWindow = TREINTERPRETCAST( TMSWindow*, GetWindowLongA( hWnd, GWL_USERDATA ) );
 	TRenderDX11* pRender = TRenderDX11::Interface();
 
@@ -347,8 +361,12 @@ LRESULT CALLBACK TMSWindow::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 			{
 				if ( wParam == DBT_DEVNODES_CHANGED )
 				{
-					// TInputDXInterface::LostDevice( TInputInterface::s_Instance )
-					TTODO( "TInputDXInterface::LostDevice 00680030" );
+					// A device got plugged in or out: enumerate the input devices again
+#ifdef DEBLOB_COMMUNITY_PATCH
+					// Retail doesn't check for a missing input interface
+					if ( TInputInterface::GetSingleton() != TNULL )
+#endif
+						TSTATICCAST( TInputDXInterface, TInputInterface::GetSingleton() )->LostDevice();
 				}
 
 				return 1;
@@ -383,7 +401,9 @@ LRESULT CALLBACK TMSWindow::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 #endif
 
 		// NOTE: retail has separate branches for windowed and fullscreen that do the same
-		TSystemManager::GetSingleton()->Pause( wParam != TRUE );
+		if ( TSystemManager::GetSingleton() != TNULL )
+			TSystemManager::GetSingleton()->Pause( wParam != TRUE );
+
 		return 0;
 	}
 

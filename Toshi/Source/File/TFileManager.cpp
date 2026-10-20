@@ -86,6 +86,12 @@ void TFileManager::MountFileSystem( TFileSystem* a_pFileSystem )
 	InvalidateSystemPath();
 }
 
+// $deBlob: FUNCTION 00685920
+void TFileManager::UnmountFileSystem( TFileSystem* a_pFileSystem )
+{
+	a_pFileSystem->Remove();
+}
+
 // $deBlob: FUNCTION 00685950
 // $Barnyard: FUNCTION 006be260
 TFileSystem* TFileManager::FindFileSystem( const TString8& name )
@@ -299,18 +305,18 @@ void TFileManager::SetWorkingDirectory( const TString8& a_rcPath )
 
 // $deBlob: FUNCTION 00685ab0
 // $Barnyard: FUNCTION 006be140
-void TFileManager::CreateCommon()
+TBOOL TFileManager::CreateCommon()
 {
 	TFileManager::CreateSingleton()->m_pMutex->Create();
+	return TTRUE;
 }
 
 // $deBlob: FUNCTION 00685ae0
 // $Barnyard: FUNCTION 006be320
 void TFileManager::DestroyCommon()
 {
-	TFileManager* pFileManager = TFileManager::GetSingletonSafe();
-	pFileManager->m_pMutex->Destroy();
-	delete pFileManager;
+	TFileManager::GetSingleton()->m_pMutex->Destroy();
+	delete TFileManager::GetSingleton();
 }
 
 TOSHI_NAMESPACE_END

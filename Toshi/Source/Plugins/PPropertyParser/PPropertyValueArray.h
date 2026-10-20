@@ -12,7 +12,7 @@ class PPropertyValueArray
     : public Toshi::TRefCounted
 {
 public:
-	// NOTE: inlined everywhere, retail zeroes the whole array (grow size included)
+	// NOTE: retail zeroes the whole array (grow size included)
 	PPropertyValueArray()
 	    : m_iGrowSize( 0 )
 	    , m_iNumValues( 0 )
@@ -37,7 +37,6 @@ public:
 	TBOOL GetTQuaternion( Toshi::TQuaternion& a_rOut ) const;
 
 	// Checks if a_iCount values (or any number if -1) can be converted to a_pType
-	// NOTE: inlined in retail, the out of line copy is unreferenced
 	// $Barnyard: FUNCTION 006afb30
 	TBOOL CanBeTypeArray( const Toshi::TClass* a_pType, TINT a_iCount ) const
 	{
@@ -56,7 +55,6 @@ public:
 	// Changes the capacity of the array, the values that fit are kept
 	void Resize( TINT a_iNewSize );
 
-	// NOTE: inlined in retail (see PBPropertyReader::ToValueArray)
 	// $Barnyard: FUNCTION 00596a90
 	PPropertyValue* Push( const PPropertyValue& a_rcValue )
 	{
@@ -69,7 +67,7 @@ public:
 		return &m_pValues[ m_iNumValues - 1 ];
 	}
 
-	// NOTE: inlined TArray<PPropertyValue>::SetSize, the capacity only grows
+	// NOTE: like TArray<PPropertyValue>::SetSize, the capacity only grows
 	void SetSize( TINT a_iSize )
 	{
 		if ( a_iSize > m_iNumAllocValues )
@@ -78,7 +76,7 @@ public:
 		m_iNumValues = a_iSize;
 	}
 
-	// NOTE: inlined TArray<PPropertyValue>::Clear, keeps the allocated values
+	// NOTE: like TArray<PPropertyValue>::Clear, keeps the allocated values
 	void Clear()
 	{
 		if ( m_iNumAllocValues < 0 )

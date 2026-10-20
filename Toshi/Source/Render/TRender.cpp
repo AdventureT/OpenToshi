@@ -1,6 +1,8 @@
 #include "ToshiPCH.h"
 #include "TRender.h"
 #include "TRenderParamTable.h"
+#include "Toshi/T2ResourceManager.h"
+#include "TModelManager.h"
 #include "File/TFile.h"
 
 #ifdef TRENDERINTERFACE_DX11
@@ -15,15 +17,62 @@
 
 TOSHI_NAMESPACE_START
 
+// $deBlob: FUNCTION 00690590
+TNodeList<TRenderAdapter>* TRender::GetAdapterList()
+{
+	return &m_AdapterList;
+}
+
+// $deBlob: FUNCTION 00690c20
+TBOOL TRender::IsInScene()
+{
+	return m_bInScene;
+}
+
+// $deBlob: FUNCTION 00690c30
+TBOOL TRender::IsCreated()
+{
+	return m_bCreated;
+}
+
+// $deBlob: FUNCTION 00690c40
+TBOOL TRender::IsDisplayCreated()
+{
+	return m_bDisplayCreated;
+}
+
+// $deBlob: FUNCTION 00690c90
+TNodeTree<TResource>* TRender::GetResources()
+{
+	return &m_Resources;
+}
+
+// $deBlob: FUNCTION 00691170
+TRenderContext* TRender::GetCurrentContext() const
+{
+	return m_pCurrentContext;
+}
+
+// $deBlob: FUNCTION 00691180
+// Sets new render context and returns the old one
+TRenderContext* TRender::SetCurrentRenderContext( TRenderContext* a_pRenderContext )
+{
+	return TExchange( m_pCurrentContext, a_pRenderContext );
+}
+
 // $deBlob: FUNCTION 0068ff20
+// $deBlob: FUNCTION 0068ff30
+// $deBlob: FUNCTION 0068ff40
+// $deBlob: FUNCTION 0068ff50
+// $deBlob: FUNCTION 0068ff60
+// $deBlob: FUNCTION 0053eb20
+// $deBlob: FUNCTION 00858eb0
 TDEFINE_CLASS_NORUNTIME( TRender );
 
 // $deBlob: FUNCTION 0068ff70
 // $Barnyard: FUNCTION 006bf490
 TRender::TRender()
 {
-	TIMPLEMENT();
-
 	m_bCreateSystemResources = TTRUE;
 	m_bInScene               = TFALSE;
 	m_bCreated               = TFALSE;
@@ -41,21 +90,10 @@ TRender::TRender()
 	m_Transforms.Reset();
 	m_Transforms.PushNull().Identity();
 
-#if 0 // GHIDRA 0068ff70: TRender * __fastcall Toshi::TRender::TRender(TRender *param_1)
-	this = operator_new(0x10);
-	if (this != (T2ResourceManager *)0x0) {
-		T2ResourceManager::T2ResourceManager(this,6000);
-	}
-#endif
-
+	new T2ResourceManager( 6000 );
 	m_pParamTable = new TRenderParamTable();
 
-#if 0 // GHIDRA 0068ff70: (continued)
-	pTVar3 = operator_new(4);
-	if (pTVar3 != (TModelManager *)0x0) {
-		TModelManager::TModelManager(pTVar3);
-	}
-#endif
+	new TModelManager();
 
 	TUtil::MemClear( m_aSysResources, sizeof( m_aSysResources ) );
 
@@ -78,23 +116,14 @@ TRender::TRender()
 // $Barnyard: FUNCTION 006bf6d0
 TRender::~TRender()
 {
-	TIMPLEMENT();
-
 	if ( m_pParamTable )
 		delete m_pParamTable;
 
-#if 0 // GHIDRA 00690220: void __fastcall Toshi::TRender::~TRender(TRender *this)
-	pTVar2 = TModelManager::s_Instance;
-	if (TModelManager::s_Instance != (TModelManager *)0x0) {
-		TModelManager::~TModelManager(TModelManager::s_Instance);
-		TFree((int *)pTVar2);
-	}
-	pTVar3 = T2ResourceManager::s_Instance;
-	if (T2ResourceManager::s_Instance != (T2ResourceManager *)0x0) {
-		T2ResourceManager::~T2ResourceManager(T2ResourceManager::s_Instance);
-		TFree(&pTVar3->m_iMaxNumResources);
-	}
-#endif
+	if ( TModelManager::GetSingleton() )
+		delete TModelManager::GetSingleton();
+
+	if ( T2ResourceManager::GetSingleton() )
+		delete T2ResourceManager::GetSingleton();
 }
 
 // $deBlob: FUNCTION 00690320
@@ -107,7 +136,7 @@ TBOOL TRender::CreateDisplay()
 	return TTRUE;
 }
 
-// NOTE: pure virtual with a body, inlined into TRenderDX11::DestroyDisplay 006a57e0
+// NOTE: pure virtual with a body, called by TRenderDX11::DestroyDisplay
 TBOOL TRender::DestroyDisplay()
 {
 	FlushDyingResources();
@@ -188,7 +217,7 @@ TBOOL TRender::Destroy()
 // $Barnyard: FUNCTION 006becf0
 void TRender::DumpStats()
 {
-	static const TCHAR* s_aDepthStencilFormats[] = { "D16_S0", "D15_S1", "D24_S0", "D24_S8", "D32_S0" }; // 0x00981b7c
+	static const TCHAR* s_aDepthStencilFormats[] = { "D16_S0", "D15_S1", "D24_S0", "D24_S8", "D32_S0" };
 
 	TFile* pFile = TFile::Create( "TRender.txt", TFILEMODE_CREATENEW );
 
@@ -227,7 +256,7 @@ void TRender::DumpStats()
 					pFile->CPrintf( "        Supports Windowed? [\"%s\"]: \r\n", pDevice->CanRenderWindowed() == TTRUE ? "Yes!" : "No" );
 					pFile->CPrintf( "        Supported Depth/Stencil Modes : " );
 
-					for ( TINT k = 0; k < DEPTHSTENCILFORMAT_NUMOF; k++ )
+					for ( TINT k = 0; k < TINT( DEPTHSTENCILFORMAT_NUMOF ); k++ )
 					{
 						if ( pDevice->IsDepthStencilFormatSupported( k ) == TTRUE )
 							pFile->CPrintf( "\"%s\" ", s_aDepthStencilFormats[ k ] );
@@ -276,7 +305,7 @@ TRenderAdapter::Mode::Device* TRender::FindDevice( const DISPLAYPARAMS& a_rDispl
 				const TUINT32 uiWidth  = pDevice->GetMode()->GetWidth();
 				const TUINT32 uiHeight = pDevice->GetMode()->GetHeight();
 
-				if ( uiHeight < uiWidth || a_rDisplayParams.bWindowed != TTRUE || a_rDisplayParams.uiWidth <= a_rDisplayParams.uiHeight )
+				if ( uiHeight < uiWidth || a_rDisplayParams.bWindowed != TTRUE || TINT( a_rDisplayParams.uiWidth ) <= TINT( a_rDisplayParams.uiHeight ) )
 				{
 					if ( pDevice->GetMode()->GetWidth() != a_rDisplayParams.uiWidth || pDevice->GetMode()->GetHeight() != a_rDisplayParams.uiHeight )
 						continue;
@@ -395,6 +424,22 @@ TResource* TRender::CreateResourceInPlace( const TClass* a_pClass, void* a_pMemo
 	pResource->AddState( TResourceState_External );
 
 	return pResource;
+}
+
+// Moves a_pResource to the end of its parent's children
+// $deBlob: FUNCTION 00690ee0
+void TRender::SetAsLastChild( TResource* a_pResource )
+{
+	if ( a_pResource != TNULL && a_pResource->GetParent() != TNULL )
+	{
+		TResource* pParent = a_pResource->GetParent();
+		m_Resources.Remove( *a_pResource, TFALSE );
+
+		if ( pParent == TNULL )
+			pParent = m_Resources.GetRoot();
+
+		m_Resources.Insert( pParent, a_pResource );
+	}
 }
 
 // $deBlob: FUNCTION 00690f50

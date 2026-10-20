@@ -19,7 +19,21 @@
 
 TOSHI_NAMESPACE_USING
 
-// NOTE: retail TClass::IsA (006bbd60) tolerates a TNULL class, ours is a member function
+const Toshi::TClass* PPropertyValue::TYPE_INT        = &TGetClass( PProperties::INT );
+const Toshi::TClass* PPropertyValue::TYPE_UINT32     = &TGetClass( PProperties::UINT32 );
+const Toshi::TClass* PPropertyValue::TYPE_FLOAT      = &TGetClass( PProperties::FLOAT );
+const Toshi::TClass* PPropertyValue::TYPE_BOOL       = &TGetClass( PProperties::BOOL );
+const Toshi::TClass* PPropertyValue::TYPE_TPSTRING8  = &TGetClass( PProperties::TPString8 );
+const Toshi::TClass* PPropertyValue::TYPE_STRING16   = &TGetClass( PProperties::String16 );
+const Toshi::TClass* PPropertyValue::TYPE_STRING16A  = &TGetClass( PProperties::String16A );
+const Toshi::TClass* PPropertyValue::TYPE_LOCALEID   = &TGetClass( PProperties::LocaleID );
+const Toshi::TClass* PPropertyValue::TYPE_PROPS      = &TGetClass( PProperties );
+const Toshi::TClass* PPropertyValue::TYPE_PROPNAME   = &TGetClass( PProperties::PPropertyName );
+const Toshi::TClass* PPropertyValue::TYPE_ARRAY      = &TGetClass( PProperties::PPropertyValueArray );
+const Toshi::TClass* PPropertyValue::TYPE_MANAGEDPTR = &TGetClass( PProperties::TManagedPtr );
+const Toshi::TClass* PPropertyValue::TYPE_UNDEF      = TNULL;
+
+// NOTE: retail TClass::IsA tolerates a TNULL class, ours is a member function
 static TBOOL IsTypeA( const TClass* a_pType, const TClass* a_pBase )
 {
 	return a_pType != TNULL && a_pType->IsA( a_pBase );
@@ -500,8 +514,8 @@ void PPropertyValue::Assign( const PPropertyValue& a_rcOther )
 	m_uValue.pData = a_rcOther.m_uValue.pData;
 }
 
-// NOTE: shared by ChangeType (006b0ef0) and the destructor (006b1290), not a separate function in retail.
-// String16A values aren't released here, both callers handle them first.
+// NOTE: shared by ChangeType and the destructor, not a separate function in retail. String16A values
+// aren't released here, both callers handle them first.
 void PPropertyValue::ReleaseValue()
 {
 	const TClass* pType = m_pType;
@@ -520,7 +534,7 @@ void PPropertyValue::ReleaseValue()
 	}
 	else if ( pType == TYPE_ARRAY )
 	{
-		// Retail destroys the TRef in place (006b1c50)
+		// Retail destroys the TRef in place
 		GetPropArrayMP().~TRef();
 	}
 	else if ( pType == TYPE_PROPNAME )
@@ -877,7 +891,7 @@ TBOOL PPropertyValue::GetTQuaternion( TQuaternion& a_rOut ) const
 }
 
 //-----------------------------------------------------------------------------
-// Unreferenced in retail (see the note in PPropertyValue.h)
+// Not used by the game
 //-----------------------------------------------------------------------------
 
 // $Barnyard: FUNCTION 006af150

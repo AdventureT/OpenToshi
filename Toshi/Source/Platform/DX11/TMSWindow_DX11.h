@@ -10,7 +10,6 @@ class TRenderDX11;
 class TRender;
 
 //-----------------------------------------------------------------------------
-// de Blob: Source\Render\TMSWindow_DX11.cpp (asserts at lines 698 and 705).
 // The window of TRenderDX11 (embedded at TRenderDX11+0x6B0), size 0x28.
 //-----------------------------------------------------------------------------
 class TMSWindow : public TObject
@@ -20,8 +19,8 @@ public:
 
 public:
 	// Styles of the popup window (the window class style is set by TRenderDX11::CreateDisplay)
-	static constexpr DWORD s_uiPopupStyles       = 0x80ca0000; // WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX
-	static constexpr DWORD s_uiPopupStylesAdjust = 0x80c80000; // WS_POPUP | WS_CAPTION | WS_SYSMENU
+	static TCONSTEXPR_VAR DWORD s_uiPopupStyles       = 0x80ca0000; // WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX
+	static TCONSTEXPR_VAR DWORD s_uiPopupStylesAdjust = 0x80c80000; // WS_POPUP | WS_CAPTION | WS_SYSMENU
 
 public:
 	TMSWindow();
@@ -40,7 +39,15 @@ public:
 	TBOOL IsDestroyed() const { return m_bIsDestroyed; }
 	TBOOL IsWindowed() const { return m_bIsWindowed; }
 	TBOOL IsPopup() const { return m_bIsPopup; }
+	TBOOL IsCursorHidden() const { return m_bCursorHidden; }
 	HWND  GetHWND() const { return m_hWnd; }
+
+	// $deBlob: FUNCTION 0067fbb0
+	void GetMousePosition( TINT& a_rX, TINT& a_rY ) const
+	{
+		a_rX = m_iMouseX;
+		a_rY = m_iMouseY;
+	}
 
 #ifdef DEBLOB_COMMUNITY_PATCH
 	// Development: "-background" keeps the window of unattended test runs out of the user's way.
@@ -58,12 +65,12 @@ private:
 
 public:
 	// GUID_DEVINTERFACE_USB_DEVICE (WCEUSBSH), registered for WM_DEVICECHANGE in WM_CREATE
-	static constexpr GUID WceusbshGUID = { 0x25dbce51, 0x6c8f, 0x4a72, { 0x8a, 0x6d, 0xb5, 0x4c, 0x2b, 0x4f, 0xc8, 0x35 } };
+	static const GUID WceusbshGUID;
 
-	inline static TBOOL      ms_bIsFocused;     // 0x009a8c7c
-	inline static STICKYKEYS ms_StickyKeys;     // the user's setting, restored when the game loses the focus
-	inline static BOOL       ms_bIsFullscreen;  // 0x009a8cb8 swap chain fullscreen state while deactivated
-	inline static HDEVNOTIFY ms_hDeviceNotify;  // 0x009a8cbc
+	static TBOOL      ms_bIsFocused;
+	static STICKYKEYS ms_StickyKeys;    // the user's setting, restored when the game loses the focus
+	static BOOL       ms_bIsFullscreen; // swap chain fullscreen state while deactivated
+	static HDEVNOTIFY ms_hDeviceNotify;
 
 private:
 	HWND         m_hWnd;            // 0x04

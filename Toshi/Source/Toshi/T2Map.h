@@ -11,9 +11,9 @@ class T2Map
 public:
 	using Pair      = T2Pair<KeyType, ValueType, Comparator>;
 	using Tree      = T2RedBlackTree<Pair, typename Pair::Comparator>;
-	using Iterator  = Tree::Iterator;
-	using CIterator = Tree::CIterator;
-	using Node      = Tree::Node;
+	using Iterator  = typename Tree::Iterator;
+	using CIterator = typename Tree::CIterator;
+	using Node      = typename Tree::Node;
 
 public:
 	T2Map( T2Allocator* a_pAllocator = GetGlobalAllocator() )
@@ -21,22 +21,16 @@ public:
 	{
 	}
 
-	~T2Map()
-	{
-		Clear();
-	}
+	// NOTE: de Blob's T2Map destructor doesn't clear the map, only the tree's destructor runs (which asserts that it's
+	// empty), the owners clear their maps themselves
+	~T2Map() {}
 
 	// NOTE: retail erases the range [Begin(), End()) of the tree, which deletes every node as well
-	// ANamedAnimationTransitionSet map (T2Map<TPString8, ANamedAnimationTransition>) 00582110
 	// $Barnyard: FUNCTION 00582110
-	// AInputMap (T2Map<Doodad, CommandBinding>) 00596b70, AInputMapManager maps (<Doodad, TPString8> and <AInputCommand, Command>) 0059adc0
 	// $Barnyard: FUNCTION 00596b70
 	// $Barnyard: FUNCTION 0059adc0
-	// Instantiations: T2Map<TPString8, TINT/TSIZE> 005a5c00 (AInteractionManager, ASoundManager), T2Map<TPString8, TUINT> 005d1e70 (AUnitFlagSetsManager)
 	// $Barnyard: FUNCTION 005a5c00
 	// $Barnyard: FUNCTION 005d1e70
-	// Instantiations: T2Map<TPString8, ...> 00607270 (AKeyFrameLibraryManager), T2Map<TPString8, AModel*> 00612ef0 (AModelRepos),
-	// T2Map<TPString8, ...> 00614520 (AMaterialLibraryManager)
 	// $Barnyard: FUNCTION 00607270
 	// $Barnyard: FUNCTION 00612ef0
 	// $Barnyard: FUNCTION 00614520
@@ -58,23 +52,19 @@ public:
 		return &result.GetValue()->GetSecond();
 	}
 
-	// Instantiations: T2Map<TPString8, TINT/TKeyframeLibrary*> 00606ef0 (AKeyFrameLibraryManager, AMaterialLibraryManager)
 	// $Barnyard: FUNCTION 00606ef0
-	// ANamedAnimationSet map (T2Map<TPString8, ANamedAnimation*>) 00581550, ANamedAnimationTransitionSet map (T2Map<TPString8, ANamedAnimationTransition>) 00581f30
 	// $Barnyard: FUNCTION 00581550
 	// $Barnyard: FUNCTION 00581f30
-	// AInputMap (T2Map<Doodad, CommandBinding>) 00596af0, AInputMapManager maps (<Doodad, ActionId>) 00597460
 	// $Barnyard: FUNCTION 00596af0
 	// $Barnyard: FUNCTION 00597460
-	// T2Map<TPString8, TINT/TSIZE> 005a5560 (AInteractionManager, ASoundManager), T2Map<TPString8, TUINT> 005d1c60 (AUnitFlagSetsManager), T2Map<TPString8, AWaveBank*> 005dcd00
 	// $Barnyard: FUNCTION 005a5560
 	// $Barnyard: FUNCTION 005d1c60
 	// $Barnyard: FUNCTION 005dcd00
-	// T2Map<TINT, ASound*/ASoundLegacy*> 005d8120 (ASoundManager)
 	// $Barnyard: FUNCTION 005d8120
-	// T2Map<TPString8, AModel*> 00612a30 (AModelRepos), T2Map<TPString8, ...> 00614970 (AMaterialLibraryManager)
 	// $Barnyard: FUNCTION 00612a30
 	// $Barnyard: FUNCTION 00614970
+	// $deBlob: FUNCTION 0075f570
+	// $deBlob: FUNCTION 007e4610
 	ValueType* Insert( const KeyType& key, const ValueType& value )
 	{
 		Pair     pair{ key, value };
@@ -105,10 +95,10 @@ public:
 		m_RedBlackTree.Delete( result.GetNode() );
 	}
 
+	// NOTE: de Blob's tree asserts the iterator (Erase), Barnyard's map asserted it != End()
 	void Remove( Iterator& it )
 	{
-		TASSERT( it != End() );
-		m_RedBlackTree.Delete( it.GetNode() );
+		m_RedBlackTree.Erase( it );
 	}
 
 	Iterator FindByValue( const ValueType& value )

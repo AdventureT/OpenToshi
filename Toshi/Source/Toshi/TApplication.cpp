@@ -108,7 +108,8 @@ TBOOL TApplication::OnCreate( TINT argc, TCHAR** argv )
 // $Barnyard: FUNCTION 006c1780
 TBOOL TApplication::OnUpdate( TFLOAT deltaTime )
 {
-	return ( m_Flags & TApplicationFlag_Destroyed ) == 0;
+	TBOOL bNotDestroyed = TUINT8( ~( TUINT8( m_Flags ) >> 1 ) ) & 1;
+	return bNotDestroyed;
 }
 
 // $deBlob: FUNCTION 006ef250
@@ -143,7 +144,7 @@ TBOOL TApplication::ToggleConsole()
 
 	if ( bShow || AllowedToHideConsole() )
 	{
-		ShowWindow( m_hConsole, bShow );
+		ShowWindow( m_hConsole, bShow == TTRUE );
 		UpdateWindow( m_hConsole );
 	}
 

@@ -40,6 +40,7 @@ public:
 		void AddShader( TShader* pShader );
 		void RemoveShader( TShader* pShader );
 		void EnumerateShaders( t_EnumerateCallback a_fnCallback );
+		void FlushShaders();
 
 		TShader* GetRootShader() { return m_pRoot; }
 
@@ -76,26 +77,32 @@ public:
 	/* We don't need the shader, at least for now. */
 	virtual void Invalidate();
 
+	/* Prefix of the shader's resources (e.g. "ss_" for ASkinShader). */
+	virtual const TCHAR* GetShaderPrefix() = 0;
+
 	/* Why? I don't know */
+	// $deBlob: FUNCTION 00567730
 	virtual TBOOL TryInvalidate() { return TTRUE; }
 
 	/* Why? I don't know */
+	// $deBlob: FUNCTION 00567740
 	virtual TBOOL TryValidate() { return TTRUE; }
 
 	/* Renders the mesh stored in the render packet containing other useful info. */
 	virtual void Render( TRenderPacket* a_pRenderPacket ) = 0;
 
 	TBOOL IsCreated() const { return m_State & State_Created; }
-	TBOOL IsValidated() const { return m_State & State_Validated; }
+	// $deBlob: FUNCTION 005696c0
+	TUINT IsValidated() const { return TBOOL( ( m_State >> 1 ) & 1 ); }
 
 	TShader* GetNextShader() { return m_pNextShader; }
 
 public:
-	inline static TShaderList sm_oShaderList;
+	static TShaderList sm_oShaderList;
 
 private:
-	State    m_State;
-	TShader* m_pNextShader;
+	State    m_State;       // 0x04
+	TShader* m_pNextShader; // 0x08
 };
 
 TOSHI_NAMESPACE_END

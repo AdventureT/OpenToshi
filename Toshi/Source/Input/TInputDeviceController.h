@@ -20,7 +20,7 @@ public:
 	TDECLARE_CLASS( TInputDeviceController, TInputDevice );
 
 public:
-	constexpr static TUINT NUM_BUTTONS = 8;
+	static TCONSTEXPR_VAR TUINT NUM_BUTTONS = 8;
 
 	enum : Doodad
 	{
@@ -67,23 +67,30 @@ public:
 	virtual const TCHAR* GetButtonFromDoodad( Doodad a_iDoodad ) const override;
 	virtual TBOOL        IsDown( Doodad a_iDoodad ) const override;
 
-	virtual void  SetVibration( VIBRATION_ACTUATOR a_eActuator, TFLOAT a_fValue, TBOOL a_bUnknown ); // +0x60, does nothing on PC (00413930)
-	virtual TBOOL WasDown( Doodad a_iDoodad ) const;
-	virtual TINT  GetPortIndex() = 0; // +0x68, the DX controller returns -1 (folded stub 004ee130)
-	virtual TBOOL Unknown2();
-	virtual TINT  ProcessVirtualButtons( EventEmitter& a_rEmitter, float a_fDeltaTime );
+	// NOTE: no controller overrides it, the XInput controller vibrates through its own Vibrate
+	virtual void  SetVibration( VIBRATION_ACTUATOR a_eActuator, TFLOAT a_fValue );       // +0x5C
+	virtual TBOOL WasDown( Doodad a_iDoodad ) const;                                     // +0x60
+	virtual TINT  GetPortIndex() = 0;                                                    // +0x64, every controller returns -1
+	virtual TBOOL Unknown2();                                                            // +0x68
+	virtual TINT  ProcessVirtualButtons( EventEmitter& a_rEmitter, float a_fDeltaTime ); // +0x6C
+
+	// Maps a button index of the game's button layouts (0-11) to the PlayStation layout if a_bPSLayout is set
+	// (swaps 0-2 and moves 6-7 behind 8-11), -1 for invalid indices
+	static TINT RemapButtonIndex( TINT a_iButton, TBOOL a_bPSLayout );
 
 protected:
 	// Turns the sticks into the virtual direction buttons (0x10011-0x10018) and the D-pad into m_fMag1/m_fMag2
 	void UpdateVirtualButtons();
 
 private:
-	TBOOL* m_CurrentState; // 0x3C
-	TBOOL* m_OldState;     // 0x40
-	TFLOAT m_fMag1;        // 0x44
-	TFLOAT m_fMag2;        // 0x48
-	TFLOAT m_fOldMag1;     // 0x4C
-	TFLOAT m_fOldMag2;     // 0x50
+	TBOOL* m_CurrentState; // 0x40
+	TBOOL* m_OldState;     // 0x44
+	TFLOAT m_fMag1;        // 0x48
+	TFLOAT m_fMag2;        // 0x4C
+	TFLOAT m_fOldMag1;     // 0x50
+	TFLOAT m_fOldMag2;     // 0x54
 };
+
+TSTATICASSERT( sizeof( TInputDeviceController ) == 0x58 );
 
 TOSHI_NAMESPACE_END

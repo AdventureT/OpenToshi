@@ -11,6 +11,12 @@ TDEFINE_FREELIST_ALLOCATOR1( Toshi::TPooledString8, 64 );
 
 TOSHI_NAMESPACE_START
 
+const TString8 TPString8::ms_sEmpty = TString8( "" );
+#ifdef BARNYARD_COMMUNITY_PATCH
+TBOOL TPString8::ms_bPoolDestroyed = TFALSE;
+#endif
+TPString8Initialiser* TPString8Initialiser::ms_pHeadInitialiser;
+
 // $Barnyard: FUNCTION 006bc3e0
 void TPString8Pool::Get( TPooledString8*& a_pOutString, const TCHAR* a_szString, bool* a_pWasInPool )
 {
@@ -60,8 +66,8 @@ TString8 operator+( const TString8& a_rcString, const TPString8& a_rcPString )
 }
 
 // $Barnyard: FUNCTION 006bc760
-TPString8Pool::TPString8Pool( TINT a_iUnknown1, TINT a_iUnknown2, T2Allocator* a_pAllocator, void* m_pUnknown3 )
-    : m_pAllocator( a_pAllocator ), m_Unk1( TUINT( m_pUnknown3 ) ), m_oMap( a_pAllocator ), m_Unk2( 0 ), m_Unk3( 0 ), m_Unk4( 0 ), m_Unk5( 0 )
+TPString8Pool::TPString8Pool( TINT a_iUnknown1, TINT a_iUnknown2, T2Allocator* a_pAllocator, void* a_pUnknown3 )
+    : m_pAllocator( a_pAllocator ), m_Unk1( TUINT( a_pUnknown3 ) ), m_oMap( a_pAllocator ), m_Unk2( 0 ), m_Unk3( 0 ), m_Unk4( 0 ), m_Unk5( 0 )
 {
 
 	for ( auto it = TPString8Initialiser::Head(); it != TNULL; it = it->Next() )

@@ -35,6 +35,8 @@ public:
 
 	void    SetSeed( TUINT a_uiSeed );
 	TUINT32 GetSeed() const { return m_uiSeed; }
+	// $deBlob: FUNCTION 007184c0
+	TUINT32 GetRndCnt() const { return m_uiRndCnt; }
 
 protected:
 	void Isaac();

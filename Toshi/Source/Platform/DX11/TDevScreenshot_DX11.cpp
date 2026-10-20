@@ -17,7 +17,7 @@
 
 TOSHI_NAMESPACE_START
 
-static constexpr TINT MAX_SHOTS = 64;
+static TCONSTEXPR_VAR TINT MAX_SHOTS = 64;
 
 // Copies the argument that follows a_szSwitch (which includes the trailing space) into a_szOut.
 // Returns TFALSE if the switch isn't on the command line.

@@ -98,7 +98,7 @@ void T2AtomicMutex::Unlock()
 {
 	if ( --m_uiThreadDepth == 0 )
 	{
-		constexpr TINT ONE_LOCK_FLAGS = STATEFLAG_LOCKED | GET_STATEFLAG_NUM_WAITS( 1 );
+		TCONSTEXPR_VAR TINT ONE_LOCK_FLAGS = STATEFLAG_LOCKED | GET_STATEFLAG_NUM_WAITS( 1 );
 
 		// Mark as unused and remove one wait from the total count
 		TINT iOldState   = m_iState.Add( -ONE_LOCK_FLAGS );

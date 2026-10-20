@@ -4,7 +4,61 @@
 
 TOSHI_NAMESPACE_START
 
+const TFLOAT TQuaternion::DELTA = 0.001f;
+
 const TQuaternion TQuaternion::IDENTITY = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+// $deBlob: FUNCTION 00674570
+TQuaternion& TQuaternion::operator/=( TFLOAT a_fScalar )
+{
+	if ( a_fScalar != 0.0f )
+	{
+		TFLOAT fRatio = 1.0f / a_fScalar;
+		x *= fRatio;
+		y *= fRatio;
+		z *= fRatio;
+		w *= fRatio;
+	}
+
+	return *this;
+}
+
+// $deBlob: FUNCTION 006746a0
+TQuaternion TQuaternion::operator-( const TQuaternion& a_rcQuat ) const
+{
+	TQuaternion result = *this;
+	result -= a_rcQuat;
+	return result;
+}
+
+// $deBlob: FUNCTION 006746f0
+// $Barnyard: FUNCTION 006c9290
+TQuaternion TQuaternion::operator*( const TQuaternion& a_rcQuat ) const
+{
+	TQuaternion result = *this;
+	result *= a_rcQuat;
+	return result;
+}
+
+// $deBlob: FUNCTION 00674800
+TQuaternion TQuaternion::operator*( TFLOAT a_fScalar ) const
+{
+	TQuaternion result = *this;
+	result *= a_fScalar;
+	return result;
+}
+
+// $deBlob: FUNCTION 00674910
+TBOOL TQuaternion::operator!=( const TQuaternion& a_rcQuat ) const
+{
+	return !( *this == a_rcQuat );
+}
+
+// $deBlob: FUNCTION 00674cc0
+void TQuaternion::Negate()
+{
+	Set( -x, -y, -z, -w );
+}
 
 // $deBlob: FUNCTION 00675f40
 void TQuaternion::SetFromEulerYX( const TFLOAT* fVal )
@@ -150,6 +204,7 @@ void TQuaternion::RotateAroundAxis( const TVector3& param_1, TFLOAT param_2 )
 // $deBlob: FUNCTION 00675c80
 void TQuaternion::GetEulerXYZ( TVector3& outVec ) const
 {
+	// NOTE: retail inlines TMatrix44::GetEulerXYZ (Sqrt, ASin, TMath::ATan2 and atan2 with its IsFinite assert)
 	TMatrix44 matrix;
 	matrix.SetFromQuaternion( *this );
 
@@ -160,7 +215,7 @@ void TQuaternion::GetEulerXYZ( TVector3& outVec ) const
 // $Barnyard: FUNCTION 006c9190
 TQuaternion& TQuaternion::operator*=( const TQuaternion& a_Quat )
 {
-	// NOTE: de Blob's order of operations (from its inlined copies and operator* 00674dd0)
+	// NOTE: de Blob's order of operations
 	TFLOAT fX = ( w * a_Quat.x + x * a_Quat.w + y * a_Quat.z ) - z * a_Quat.y;
 	TFLOAT fY = ( w * a_Quat.y + y * a_Quat.w + z * a_Quat.x ) - x * a_Quat.z;
 	TFLOAT fZ = ( w * a_Quat.z + z * a_Quat.w + x * a_Quat.y ) - y * a_Quat.x;

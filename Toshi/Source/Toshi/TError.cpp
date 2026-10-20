@@ -21,6 +21,7 @@ TError::TError( TINT a_iStringBufferSize, TINT a_iMaxErrors )
 }
 
 // $deBlob: FUNCTION 006634d0
+// $deBlob: FUNCTION 0065f310
 TError::~TError()
 {
 	delete[] m_pStringBuffer;
@@ -53,7 +54,7 @@ void TError::AddError( const TCHAR* a_szFormat, ... )
 		if ( m_iStringBufferUsed + iLength <= m_iStringBufferSize )
 		{
 #ifdef DEBLOB_COMMUNITY_PATCH
-			// NOTE: retail copies the characters without the terminator, but skips a byte for it (see Docs/RetailBugs.md)
+			// NOTE: retail copies the characters without the terminator, but skips a byte for it
 			TUtil::MemCopy( m_pStringBuffer + m_iStringBufferUsed, szError, iLength );
 
 			if ( m_iStringBufferUsed + iLength < m_iStringBufferSize )

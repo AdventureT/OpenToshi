@@ -180,12 +180,12 @@ TFORCEINLINE void TDestruct( T* a_pPtr )
 void* __CRTDECL operator new( size_t a_uiSize, TMemoryHeap* a_pHeap );
 void* __CRTDECL operator new[]( size_t a_uiSize, TMemoryHeap* a_pHeap );
 
-TFORCEINLINE void __CRTDECL operator delete( void* a_pMem, TMemoryHeap* a_pHeap ) noexcept
+TFORCEINLINE void __CRTDECL operator delete( void* a_pMem, TMemoryHeap* a_pHeap ) TNOEXCEPT
 {
 	TFree( a_pMem );
 }
 
-TFORCEINLINE void __CRTDECL operator delete[]( void* a_pMem, TMemoryHeap* a_pHeap ) noexcept
+TFORCEINLINE void __CRTDECL operator delete[]( void* a_pMem, TMemoryHeap* a_pHeap ) TNOEXCEPT
 {
 	TFree( a_pMem );
 }

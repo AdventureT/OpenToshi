@@ -9,8 +9,18 @@
 
 TOSHI_NAMESPACE_START
 
+TShader::TShaderList TShader::sm_oShaderList;
+
+// $deBlob: FUNCTION 006921a0
+// $deBlob: FUNCTION 006921b0
+// $deBlob: FUNCTION 006921c0
+// $deBlob: FUNCTION 006921d0
+// $deBlob: FUNCTION 006921e0
+// $deBlob: FUNCTION 0053ebe0
+// $deBlob: FUNCTION 00858ee0
 TDEFINE_CLASS_NORUNTIME( TShader );
 
+// $deBlob: FUNCTION 00692200
 // $Barnyard: FUNCTION 006ccbb0
 TShader::TShader()
 {
@@ -18,22 +28,27 @@ TShader::TShader()
 	sm_oShaderList.AddShader( this );
 }
 
+// $deBlob: FUNCTION 00692290
+// $deBlob: FUNCTION 006925a0
 // $Barnyard: FUNCTION 006ccd90
 TShader::~TShader()
 {
 	sm_oShaderList.RemoveShader( this );
 }
 
+// $deBlob: FUNCTION 006921f0
 // $Barnyard: FUNCTION 006ccc30
 void TShader::OnDestroy()
 {
 	m_State &= ~State_Created;
 }
 
+// $deBlob: FUNCTION 00692250
 void TShader::Flush()
 {
 }
 
+// $deBlob: FUNCTION 00692260
 // $Barnyard: FUNCTION 006ccc20
 TBOOL TShader::Create()
 {
@@ -41,6 +56,7 @@ TBOOL TShader::Create()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00692270
 // $Barnyard: FUNCTION 006ccc40
 TBOOL TShader::Validate()
 {
@@ -48,6 +64,7 @@ TBOOL TShader::Validate()
 	return TTRUE;
 }
 
+// $deBlob: FUNCTION 00692280
 // $Barnyard: FUNCTION 006ccc50
 void TShader::Invalidate()
 {
@@ -69,6 +86,7 @@ void TShader::TShaderList::AddShader( TShader* pShader )
 	pShader->m_pNextShader = TNULL;
 }
 
+// $deBlob: FUNCTION 006920d0
 // $Barnyard: FUNCTION 006ccb20
 void TShader::TShaderList::RemoveShader( TShader* pShader )
 {
@@ -92,7 +110,6 @@ void TShader::TShaderList::RemoveShader( TShader* pShader )
 	{
 		if ( pPrevShader )
 		{
-			TASSERT( m_pRoot != pShader );
 			pPrevShader->m_pNextShader = pShader->m_pNextShader;
 		}
 		else
@@ -105,6 +122,15 @@ void TShader::TShaderList::RemoveShader( TShader* pShader )
 	}
 }
 
+// Flushes all the shaders of the list
+// $deBlob: FUNCTION 00692160
+void TShader::TShaderList::FlushShaders()
+{
+	for ( TShader* pShader = m_pRoot; pShader != TNULL; pShader = pShader->GetNextShader() )
+		pShader->Flush();
+}
+
+// $deBlob: FUNCTION 00692180
 // $Barnyard: FUNCTION 006ccb90
 void TShader::TShaderList::EnumerateShaders( t_EnumerateCallback a_fnCallback )
 {

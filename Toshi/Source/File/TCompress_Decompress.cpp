@@ -9,6 +9,8 @@
 
 TOSHI_NAMESPACE_START
 
+TBOOL TCompress::ms_bIsBigEndian = TFALSE;
+
 // Copies a_iSize bytes that were already unpacked a_iOffset bytes back
 // NOTE: not referenced in retail (Decompress has its own copy of it)
 // $deBlob: FUNCTION 0068abc0
@@ -40,7 +42,7 @@ TINT TCompress::Decompress( TFile* file, TCompress::Header* header, TBYTE* buffe
 		return TCOMPRESS_ERROR_WRONG_MAGIC;
 	if ( header->Version != TVERSION( 1, 2 ) )
 		return TCOMPRESS_ERROR_WRONG_VERSION;
-	if ( header->size > bufferSize )
+	if ( TINT( header->size ) > TINT( bufferSize ) )
 		return TCOMPRESS_ERROR_WRONG_SIZE;
 
 	TBYTE* pBufferPos     = buffer;
@@ -79,7 +81,7 @@ TINT TCompress::Decompress( TFile* file, TCompress::Header* header, TBYTE* buffe
 
 // $deBlob: FUNCTION 0068a9b0
 // $Barnyard: FUNCTION 006dc220
-int8_t TCompress::GetHeader( TFile* file, TCompress::Header& btecHeader )
+TINT TCompress::GetHeader( TFile* file, TCompress::Header& btecHeader )
 {
 	TSIZE uiSavedPos = file->Tell();
 

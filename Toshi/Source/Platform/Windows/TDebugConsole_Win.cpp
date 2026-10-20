@@ -2,6 +2,8 @@
 #include "TDebugConsole_Win.h"
 #include "Toshi/TString8.h"
 
+#include <time.h>
+
 #include <conio.h>
 #include <windows.h>
 
@@ -11,7 +13,7 @@
 //-----------------------------------------------------------------------------
 #include "Core/TMemoryDebugOn.h"
 
-static constexpr const WORD kTypeColours[]{
+static const WORD kTypeColours[] = {
 	FOREGROUND_GREEN,
 	FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN,
 	FOREGROUND_INTENSITY | FOREGROUND_RED,
@@ -111,12 +113,17 @@ TBOOL __stdcall TDebugConsole::OnLog( TDebugConsole* a_pCaller, TUtil* a_pOwner,
 
 	SetConsoleTextAttribute( hStd, kTypeColours[ pLogEvent->m_eType ] );
 
+	// NOTE: de Blob's log messages mostly don't end with a new line (Barnyard's did): end the console line here
+	TSIZE        uiLength = TStringManager::String8Length( pLogEvent->m_szString );
+	const TCHAR* szEnd    = ( uiLength == 0 || pLogEvent->m_szString[ uiLength - 1 ] != '\n' ) ? "\n" : "";
+
 	if ( s_bIsSimpleMode )
 	{
 		TDebug_FinalPrintf(
-		    "[%s]: %s",
+		    "[%s]: %s%s",
 		    TUtil::LogTypeToString( pLogEvent->m_eType ),
-		    pLogEvent->m_szString
+		    pLogEvent->m_szString,
+		    szEnd
 		);
 	}
 	else
@@ -125,12 +132,13 @@ TBOOL __stdcall TDebugConsole::OnLog( TDebugConsole* a_pCaller, TUtil* a_pOwner,
 		_strtime( strTime );
 
 		TDebug_FinalPrintf(
-		    "[%s] [%s/%s] [%s]: %s",
+		    "[%s] [%s/%s] [%s]: %s%s",
 		    strTime,
 		    "Toshi",
 		    "Kernel",
 		    TUtil::LogTypeToString( pLogEvent->m_eType ),
-		    pLogEvent->m_szString
+		    pLogEvent->m_szString,
+		    szEnd
 		);
 	}
 

@@ -39,6 +39,11 @@ protected:
 		m_poElements   = a_poElements;
 	}
 
+	~T2GenericDynamicVector()
+	{
+		TASSERT( m_poElements == TNULL );
+	}
+
 	void Reallocate( TINT a_iNewSize, TINT a_iElementSize );
 	void Grow( TINT a_iNumElements, TINT a_iElementSize );
 
@@ -64,18 +69,18 @@ public:
 		friend T2DynamicVector;
 
 	public:
-		constexpr Iterator()
+		TCONSTEXPR Iterator()
 		    : m_iIndex( 0 ), m_pVector( TNULL ) {}
-		constexpr Iterator( T2DynamicVector* a_pVector )
+		TCONSTEXPR Iterator( T2DynamicVector* a_pVector )
 		    : m_iIndex( 0 ), m_pVector( a_pVector ) {}
-		constexpr Iterator( T2DynamicVector& a_rVector )
+		TCONSTEXPR Iterator( T2DynamicVector& a_rVector )
 		    : m_iIndex( 0 ), m_pVector( &a_rVector ) {}
-		constexpr Iterator( TINT a_iIndex, T2DynamicVector* a_pVector )
+		TCONSTEXPR Iterator( TINT a_iIndex, T2DynamicVector* a_pVector )
 		    : m_iIndex( a_iIndex ), m_pVector( a_pVector ) {}
-		constexpr Iterator( const Iterator& a_rOther )
+		TCONSTEXPR Iterator( const Iterator& a_rOther )
 		    : m_iIndex( a_rOther.m_iIndex ), m_pVector( a_rOther.m_pVector ) {}
 
-		constexpr TINT Index() const
+		TCONSTEXPR TINT Index() const
 		{
 			return m_iIndex;
 		}
@@ -85,32 +90,33 @@ public:
 			return m_pVector && *this != m_pVector->End();
 		}
 
-		T* Get() noexcept
+		// NOTE: de Blob's iterator checks the index against the size
+		T* Get() TNOEXCEPT
 		{
 			TASSERT( m_iIndex >= 0 );
-			TASSERT( m_pVector );
-			return &m_pVector->At( m_iIndex );
+			TASSERT( m_iIndex < m_pVector->m_iNumElements );
+			return &m_pVector->AtUnsafe( m_iIndex );
 		}
 
-		const T* Get() const noexcept
+		const T* Get() const TNOEXCEPT
 		{
 			TASSERT( m_iIndex >= 0 );
-			TASSERT( m_pVector );
-			return &m_pVector->At( m_iIndex );
+			TASSERT( m_iIndex < m_pVector->m_iNumElements );
+			return &m_pVector->AtUnsafe( m_iIndex );
 		}
 
 		T& Value()
 		{
 			TASSERT( m_iIndex >= 0 );
-			TASSERT( m_pVector );
-			return m_pVector->At( m_iIndex );
+			TASSERT( m_iIndex < m_pVector->m_iNumElements );
+			return m_pVector->AtUnsafe( m_iIndex );
 		}
 
 		const T& Value() const
 		{
 			TASSERT( m_iIndex >= 0 );
-			TASSERT( m_pVector );
-			return m_pVector->At( m_iIndex );
+			TASSERT( m_iIndex < m_pVector->m_iNumElements );
+			return m_pVector->AtUnsafe( m_iIndex );
 		}
 
 		Iterator Next() const
@@ -137,6 +143,11 @@ public:
 			return &Value();
 		}
 
+		// $deBlob: FUNCTION 005b0100
+		// $deBlob: FUNCTION 005b0180
+		// $deBlob: FUNCTION 005c0640
+		// $deBlob: FUNCTION 006f4390
+		// $deBlob: FUNCTION 007eb630
 		T* operator->()
 		{
 			return &Value();
@@ -147,50 +158,66 @@ public:
 			return &Value();
 		}
 
-		T& operator*() noexcept
+		// $deBlob: FUNCTION 005b0080
+		// $deBlob: FUNCTION 005c05c0
+		// $deBlob: FUNCTION 007eb5b0
+		T& operator*() TNOEXCEPT
 		{
 			return Value();
 		}
 
-		const T& operator*() const noexcept
+		const T& operator*() const TNOEXCEPT
 		{
 			return Value();
 		}
 
-		TBOOL operator==( const Iterator& a_rOther ) const noexcept
+		TBOOL operator==( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex == m_iIndex;
 		}
 
-		TBOOL operator>( const Iterator& a_rOther ) const noexcept
+		// $deBlob: FUNCTION 005b0030
+		TBOOL operator!=( const Iterator& a_rOther ) const TNOEXCEPT
+		{
+			return m_iIndex != a_rOther.m_iIndex || m_pVector != a_rOther.m_pVector;
+		}
+
+		TBOOL operator>( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex > m_iIndex;
 		}
 
-		TBOOL operator>=( const Iterator& a_rOther ) const noexcept
+		TBOOL operator>=( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex >= m_iIndex;
 		}
 
-		TBOOL operator<( const Iterator& a_rOther ) const noexcept
+		TBOOL operator<( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex < m_iIndex;
 		}
 
-		TBOOL operator<=( const Iterator& a_rOther ) const noexcept
+		TBOOL operator<=( const Iterator& a_rOther ) const TNOEXCEPT
 		{
 			return a_rOther.m_pVector == m_pVector && a_rOther.m_iIndex <= m_iIndex;
 		}
 
-		constexpr Iterator& operator=( const Iterator& a_rOther ) noexcept
+		TCONSTEXPR Iterator& operator=( const Iterator& a_rOther ) TNOEXCEPT
 		{
 			m_iIndex  = a_rOther.m_iIndex;
 			m_pVector = a_rOther.m_pVector;
 			return *this;
 		}
 
+		// $deBlob: FUNCTION 005b0200
+		// $deBlob: FUNCTION 005b0280
+		// $deBlob: FUNCTION 005c0710
+		// $deBlob: FUNCTION 006f4410
+		// $deBlob: FUNCTION 007eb6b0
 		Iterator& operator++()
 		{
+			TASSERT( m_iIndex >= 0 );
+			TASSERT( m_iIndex < m_pVector->m_iNumElements );
 			m_iIndex++;
 			return *this;
 		}
@@ -231,6 +258,15 @@ public:
 	};
 
 public:
+	// $deBlob: FUNCTION 005cb3c0
+	// $deBlob: FUNCTION 0072d220
+	// $deBlob: FUNCTION 0072d240
+	// $deBlob: FUNCTION 005afb40
+	// $deBlob: FUNCTION 005afb60
+	// $deBlob: FUNCTION 005afb80
+	// $deBlob: FUNCTION 005afba0
+	// $deBlob: FUNCTION 005afbc0
+	// $deBlob: FUNCTION 005afbe0
 	T2DynamicVector( T2Allocator* a_pAllocator = GetGlobalAllocator(), TINT a_iInitialSize = 0, TINT a_iGrowSize = -1 )
 	    : T2GenericDynamicVector( a_pAllocator, a_iInitialSize, a_iGrowSize, sizeof( T ) )
 	{}
@@ -239,7 +275,17 @@ public:
 	    : T2GenericDynamicVector( a_poElements, a_iInitialSize, a_iNumElements )
 	{}
 
-	// T2DynamicVector<AMiniGame>: 00469fd0
+	// $deBlob: FUNCTION 005afd50
+	// $deBlob: FUNCTION 005afde0
+	// $deBlob: FUNCTION 005afea0
+	// $deBlob: FUNCTION 005c0370
+	// $deBlob: FUNCTION 005cb3f0
+	// $deBlob: FUNCTION 006f42d0
+	// $deBlob: FUNCTION 0072e1d0
+	// $deBlob: FUNCTION 0072e230
+	// $deBlob: FUNCTION 0072f6c0
+	// $deBlob: FUNCTION 0072f730
+	// $deBlob: FUNCTION 007e9560
 	// $Barnyard: FUNCTION 0059dce0
 	// $Barnyard: FUNCTION 00469fd0
 	~T2DynamicVector()
@@ -263,6 +309,7 @@ public:
 		return Iterator( a_itInsertAfter.Index() + 1, this );
 	}
 
+	// $deBlob: FUNCTION 005b0460
 	// $Barnyard: FUNCTION 006ce330
 	void Clear()
 	{
@@ -293,6 +340,20 @@ public:
 		}
 	}
 
+	// Reallocates to a_iSize elements, destroying the ones beyond it
+	// $deBlob: FUNCTION 005b0c70
+	// $deBlob: FUNCTION 005b0cc0
+	// $deBlob: FUNCTION 005b0d10
+	void SetCapacity( TINT a_iSize )
+	{
+		if ( a_iSize < m_iNumElements )
+			Erase( Iterator( a_iSize, this ), End() );
+
+		Reallocate( a_iSize, sizeof( T ) );
+	}
+
+	// $deBlob: FUNCTION 005b0a30
+	// $deBlob: FUNCTION 005b0ad0
 	template <class... Args>
 	T* EmplaceBack( Args&&... args )
 	{
@@ -300,10 +361,16 @@ public:
 		return TConstruct<T>( &AtUnsafe( m_iNumElements++ ), std::forward<Args>( args )... );
 	}
 
-	// T2DynamicVector<TPString8> (AGUISlideshow::m_Images) 0059db20
 	// $Barnyard: FUNCTION 0059db20
-	// Instantiations: T2DynamicVector<ACollisionHit> 00616580 (ACollisionManager)
 	// $Barnyard: FUNCTION 00616580
+	// NOTE: de Blob's instances return nothing; the reference is kept for the callers that use it
+	// $deBlob: FUNCTION 005b0aa0
+	// $deBlob: FUNCTION 005c0ab0
+	// $deBlob: FUNCTION 005cb5a0
+	// $deBlob: FUNCTION 006f4570
+	// $deBlob: FUNCTION 00731190
+	// $deBlob: FUNCTION 007311c0
+	// $deBlob: FUNCTION 007e9720
 	T& PushBack( const T& item = T() )
 	{
 		Grow( 1, sizeof( T ) );
@@ -316,13 +383,13 @@ public:
 		return *TConstruct<T>( &AtUnsafe( m_iNumElements++ ), item );
 	}
 
+	// $deBlob: FUNCTION 006f4530
 	void PopBack()
 	{
 		TASSERT( m_iNumElements > 0 );
 		AtUnsafe( --m_iNumElements ).~T();
 	}
 
-	// Instantiations: T2DynamicVector<ASSeq*> 0062a0a0 (ASSeqController)
 	// $Barnyard: FUNCTION 0062a0a0
 	Iterator Find( const T& a_rcValue )
 	{
@@ -336,28 +403,25 @@ public:
 	}
 
 	// Erases element preserving order
-	// T2DynamicVector<AInteractionManager::Candidates::Candidate> 005a22a0 (moves the elements with MemMove)
-	// Instantiations: T2DynamicVector<ASSeq*> 0062a110 (ASSeqController)
 	// $Barnyard: FUNCTION 005a22a0
 	// $Barnyard: FUNCTION 0062a110
-	Iterator Erase( const Iterator& a_rIterator )
+	// NOTE: de Blob takes the iterator by value and moves the rest down with MemMove
+	// $deBlob: FUNCTION 005b0590
+	// $deBlob: FUNCTION 005b06f0
+	// $deBlob: FUNCTION 00730300
+	// $deBlob: FUNCTION 00730380
+	Iterator Erase( Iterator a_itItem )
 	{
-		TINT uiItemIndex = a_rIterator.Index();
-		TASSERT( uiItemIndex < m_iNumElements );
+		TINT iIndex = a_itItem.Index();
+		TASSERT( iIndex >= 0 && iIndex < m_iNumElements );
 
-		AtUnsafe( uiItemIndex ).~T();
+		AtUnsafe( iIndex ).~T();
 
-		if ( uiItemIndex + 1 < Size() )
-		{
-			for ( TINT i = uiItemIndex + 1; i < Size(); i++ )
-			{
-				TConstruct<T>( &AtUnsafe( i - 1 ), std::move( AtUnsafe( i ) ) );
-				AtUnsafe( i ).~T();
-			}
-		}
+		if ( m_iNumElements > 1 )
+			TUtil::MemMove( &AtUnsafe( iIndex ), &AtUnsafe( iIndex + 1 ), ( m_iNumElements - iIndex - 1 ) * sizeof( T ) );
 
 		m_iNumElements--;
-		return Iterator( uiItemIndex, this );
+		return Iterator( iIndex, this );
 	}
 
 	// Finds and erases element preserving order
@@ -394,26 +458,40 @@ public:
 		return Iterator( 0, this );
 	}
 
-	Iterator Back()
+	// $deBlob: FUNCTION 006f4490
+	T& Back()
 	{
 		TASSERT( m_iNumElements > 0 );
-		return Iterator( m_iNumElements - 1, this );
+		return AtUnsafe( m_iNumElements - 1 );
 	}
 
+	// $deBlob: FUNCTION 005b0390
+	// $deBlob: FUNCTION 005b03b0
+	// $deBlob: FUNCTION 005c07e0
+	// $deBlob: FUNCTION 006f44e0
+	// $deBlob: FUNCTION 007eb740
 	Iterator Begin()
 	{
 		return Iterator( 0, this );
 	}
 
-	// NOTE: retail folds every instantiation (005d6a40, AGUISlideshow, ASSeqController, ASoundManager, AInteractionManager...)
+	// NOTE: retail folds every instantiation de Blob instances:
+	// $deBlob: FUNCTION 005c0840
+	// $deBlob: FUNCTION 006f4510
+	// $deBlob: FUNCTION 005b04a0
+	// $deBlob: FUNCTION 005b04c0
+	// $deBlob: FUNCTION 007eb760
 	// $Barnyard: FUNCTION 005d6a40
 	Iterator End()
 	{
 		return Iterator( m_iNumElements, this );
 	}
 
+	// $deBlob: FUNCTION 00730fd0
+	// $deBlob: FUNCTION 00731020
 	Iterator MakeIterator( TINT a_iIndex )
 	{
+		TASSERT( a_iIndex >= 0 && a_iIndex <= m_iNumElements );
 		return Iterator( a_iIndex, this );
 	}
 
@@ -423,21 +501,25 @@ public:
 	}
 
 	// Destroys the elements in the [a_itFrom; a_itTo) range and moves the rest down
-	// Instances: T2DynamicVector<AInteractionManager::Candidates::Candidate> 005a2250 (trivial element dtor)
 	// $Barnyard: FUNCTION 005a2250
 	// $Barnyard: FUNCTION 006ce1e0
+	// $deBlob: FUNCTION 005b04e0
+	// $deBlob: FUNCTION 005b0610
+	// $deBlob: FUNCTION 005b0780
 	Iterator Erase( Iterator a_itFrom, Iterator a_itTo )
 	{
-		TINT iFrom = a_itFrom.Index();
-		TINT iTo   = a_itTo.Index();
+		TINT iFirstIndex = a_itFrom.Index();
+		TINT iLastIndex  = a_itTo.Index();
+		TASSERT( iFirstIndex >= 0 && iFirstIndex < m_iNumElements );
+		TASSERT( iLastIndex <= m_iNumElements );
 
-		for ( TINT i = iFrom; i < iTo; i++ )
+		for ( TINT i = iFirstIndex; i < iLastIndex; i++ )
 			AtUnsafe( i ).~T();
 
-		TUtil::MemMove( &AtUnsafe( iFrom ), &AtUnsafe( iTo ), sizeof( T ) * ( m_iNumElements - iTo ) );
-		m_iNumElements += iFrom - iTo;
+		TUtil::MemMove( &AtUnsafe( iFirstIndex ), &AtUnsafe( iLastIndex ), sizeof( T ) * ( m_iNumElements - iLastIndex ) );
+		m_iNumElements += iFirstIndex - iLastIndex;
 
-		return Iterator( iFrom, this );
+		return Iterator( iFirstIndex, this );
 	}
 
 	// $Barnyard: FUNCTION 006ce280
@@ -491,12 +573,12 @@ public:
 	}
 
 private:
-	TFORCEINLINE constexpr T& AtUnsafe( TINT a_iIndex )
+	TFORCEINLINE TCONSTEXPR T& AtUnsafe( TINT a_iIndex )
 	{
 		return *( TREINTERPRETCAST( T*, m_poElements ) + a_iIndex );
 	}
 
-	TFORCEINLINE constexpr const T& AtUnsafe( TINT a_iIndex ) const
+	TFORCEINLINE TCONSTEXPR const T& AtUnsafe( TINT a_iIndex ) const
 	{
 		return *( TREINTERPRETCAST( T*, m_poElements ) + a_iIndex );
 	}

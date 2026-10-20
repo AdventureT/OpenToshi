@@ -22,7 +22,7 @@ TNativeFileSystem::TNativeFileSystem( const TCHAR* name )
     : TFileSystem( name )
 {
 	m_NextFileHandle = INVALID_HANDLE_VALUE;
-	TFileManager::GetSingletonSafe()->MountFileSystem( this );
+	TFileManager::GetSingleton()->MountFileSystem( this );
 }
 
 // $deBlob: FUNCTION 006892f0
@@ -31,7 +31,7 @@ TNativeFileSystem::TNativeFileSystem( const TCHAR* name )
 // $Barnyard: FUNCTION 006dd6b0
 TNativeFileSystem::~TNativeFileSystem()
 {
-	UnmountFileSystem();
+	TFileManager::GetSingleton()->UnmountFileSystem( this );
 }
 
 // $deBlob: FUNCTION 00689310
@@ -210,6 +210,7 @@ TNativeFile::TNativeFile( const TNativeFile& other )
 }
 
 // $deBlob: FUNCTION 0068a150
+// $deBlob: FUNCTION 00689dc0
 // $Barnyard: FUNCTION 006dd450
 TNativeFile::~TNativeFile()
 {
@@ -255,7 +256,7 @@ TINT TNativeFile::FlushWriteBuffer()
 
 #endif // DEBLOB_COMMUNITY_PATCH
 
-	if ( m_Position != m_RBufferPosition )
+	if ( m_RBufferPosition != m_Position )
 	{
 		TASSERT( TFALSE == m_bWriteBuffered || m_iWriteBufferUsed == 0 );
 		m_RBufferPosition = SetFilePointer( m_Handle, m_Position, NULL, FILE_BEGIN );
@@ -285,7 +286,7 @@ TINT TNativeFile::ReadUnbuffered( LPVOID dst, TUINT size )
 	DWORD lpNumberOfBytesRead;
 	FlushWriteBuffer();
 
-	if ( m_Position != m_RBufferPosition )
+	if ( m_RBufferPosition != m_Position )
 	{
 		m_RBufferPosition = SetFilePointer( m_Handle, m_Position, TNULL, FILE_BEGIN );
 
@@ -479,7 +480,7 @@ TBOOL TNativeFile::Seek( TINT a_iOffset, TSEEK a_eOrigin )
 
 // $deBlob: FUNCTION 00689b40
 // $Barnyard: FUNCTION 006dd0c0
-TCHAR TNativeFile::GetCChar()
+TINT TNativeFile::GetCChar()
 {
 	FlushWriteBuffer();
 
@@ -488,13 +489,13 @@ TCHAR TNativeFile::GetCChar()
 		TINT curBufferPos = m_Position & ~( BUFFER_SIZE - 1 );
 		if ( ( curBufferPos == m_PrevBufferPos ) && ( m_Position - curBufferPos <= m_LastBufferSize - 1 ) )
 		{
-			TCHAR c = m_pBuffer[ m_Position - curBufferPos ];
+			TUINT8 c = m_pBuffer[ m_Position - curBufferPos ];
 			m_Position += sizeof( c );
 			return c;
 		}
 	}
 
-	TCHAR result;
+	TUINT8 result;
 	if ( Read( &result, sizeof( result ) ) != sizeof( result ) )
 		return -1;
 
@@ -503,7 +504,7 @@ TCHAR TNativeFile::GetCChar()
 
 // $deBlob: FUNCTION 00689bb0
 // $Barnyard: FUNCTION 006dd120
-TWCHAR TNativeFile::GetWChar()
+TINT TNativeFile::GetWChar()
 {
 	FlushWriteBuffer();
 
@@ -520,7 +521,7 @@ TWCHAR TNativeFile::GetWChar()
 
 	TWCHAR result;
 	if ( Read( &result, sizeof( result ) ) != sizeof( result ) )
-		return L'\xFFFF';
+		return -1;
 
 	return result;
 }
@@ -578,7 +579,7 @@ TINT TNativeFile::VWPrintf( const TWCHAR* a_wszFormat, va_list a_vargs )
 	TINT iWritten = TINT( Write( str, iResult * sizeof( TWCHAR ) ) );
 
 	if ( iWritten >= 0 )
-		iWritten /= 2;
+		iWritten >>= 1;
 
 	return iWritten;
 }

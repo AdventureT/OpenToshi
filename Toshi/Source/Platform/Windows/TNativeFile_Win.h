@@ -3,7 +3,7 @@
 
 TOSHI_NAMESPACE_START
 
-// NOTE: de Blob: 0x28 bytes (TNativeFileSystem::TNativeFileSystem 006892c0, allocated with 40 by TFileManager::Create)
+// TFileManager::Create allocates 40 bytes for it
 class TNativeFileSystem : public TFileSystem
 {
 public:
@@ -23,11 +23,10 @@ protected:
 	TFileLookupHandle m_NextFileHandle; // 0x24
 };
 
-// NOTE: de Blob: 0x2C bytes (TNativeFileSystem::CreateFile 00689310)
 class TNativeFile : public TFile
 {
 public:
-	static constexpr TUINT32 BUFFER_SIZE = 0x800;
+	static TCONSTEXPR_VAR TUINT32 BUFFER_SIZE = 0x800;
 
 public:
 	TNativeFile( TNativeFileSystem* a_pFileSystem );
@@ -44,8 +43,8 @@ public:
 	virtual void    FlushBuffers() OVERRIDE;
 	virtual TSIZE   GetSize() OVERRIDE;
 	virtual TUINT64 GetDate() OVERRIDE;
-	virtual TCHAR   GetCChar() OVERRIDE;
-	virtual TWCHAR  GetWChar() OVERRIDE;
+	virtual TINT    GetCChar() OVERRIDE;
+	virtual TINT    GetWChar() OVERRIDE;
 	virtual TINT    PutCChar( TCHAR a_cCharacter ) OVERRIDE;
 	virtual TINT    PutWChar( TWCHAR a_wcCharacter ) OVERRIDE;
 	virtual TINT    VCPrintf( const TCHAR* a_szFormat, va_list a_vargs ) OVERRIDE;

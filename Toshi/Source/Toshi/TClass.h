@@ -13,10 +13,23 @@ public:
 	using Deinitialise_t        = void ( * )();
 
 	using RecurseTreeCheck_t       = TBOOL ( * )( TClass*, void* );
-	using RecurseTreeBaseBeginCb_t = void ( * )( TClass*, void* );
-	using RecurseTreeBaseEndCb_t   = void ( * )( TClass*, void* );
+	using RecurseTreeBaseBeginCb_t = TBOOL ( * )( TClass*, void* );
+	using RecurseTreeBaseEndCb_t   = TBOOL ( * )( TClass*, void* );
 
 public:
+	TClass(
+	    const TCHAR*          a_szName,
+	    TClass*               a_pParentClass,
+	    CreateObject_t        a_fnCreate,
+	    CreateObjectInPlace_t a_fnCreateInPlace,
+	    Initialise_t          a_fnInitialise,
+	    Deinitialise_t        a_fnUnitialise,
+	    TUINT32               a_uiVersion,
+	    TUINT32               a_uiClassSize,
+	    TUINT32               a_uiClassAlignment
+	);
+
+	// NOTE: retail's constructor takes the version as one dword (minor << 16 | major); this form packs it
 	TClass(
 	    const TCHAR*          a_szName,
 	    TClass*               a_pParentClass,
@@ -28,9 +41,11 @@ public:
 	    TUINT16               a_uiVersionMinor,
 	    TUINT32               a_uiClassSize,
 	    TUINT32               a_uiClassAlignment
-	);
+	)
+	    : TClass( a_szName, a_pParentClass, a_fnCreate, a_fnCreateInPlace, a_fnInitialise, a_fnUnitialise, TUINT32( a_uiVersionMinor ) << 16 | a_uiVersionMajor, a_uiClassSize, a_uiClassAlignment )
+	{}
 
-	constexpr TClass(
+	TCONSTEXPR TClass(
 	    const TCHAR*          a_szName,
 	    CreateObject_t        a_fnCreate,
 	    CreateObjectInPlace_t a_fnCreateInPlace,
@@ -70,7 +85,7 @@ public:
 	// $deBlob: FUNCTION 0065cc00
 	const TCHAR* GetName() const { return m_szName; }
 	// $deBlob: FUNCTION 0065cc10
-	TUINT32 GetVersion() const { return *TREINTERPRETCAST( const TUINT32*, &m_uiVersionMajor ); }
+	TUINT32 GetVersion() const { return m_uiVersion; }
 	// NOTE: de Blob reads only the low byte (movzx byte [ecx+20h])
 	// $deBlob: FUNCTION 0065cc30
 	// $Barnyard: FUNCTION 006bbd50
@@ -91,26 +106,33 @@ public:
 	static TBOOL TryInitialize( TClass* tClass );
 
 	// Looks for a class in parent
-	static const TClass* FindRecurse( const TCHAR* const& name, const TClass* parent, TBOOL hasPrevious );
+	static const TClass* FindRecurse( const TCHAR* name, const TClass* parent, TBOOL hasPrevious );
 	static const TClass* Find( const TCHAR* name, const TClass* parent = TNULL );
 
 public:
 	inline TBOOL operator==( const TClass* other ) const { return this == other; }
 
 private:
-	const TCHAR*          m_szName;           // 0x00
-	CreateObject_t        m_fnCreate;         // 0x04
-	CreateObjectInPlace_t m_fnCreateInPlace;  // 0x08
-	Initialise_t          m_fnInitialise;     // 0x0C
-	Deinitialise_t        m_fnDeinitialise;   // 0x10
-	TClass*               m_pParent;          // 0x14
-	TClass*               m_pPrevious;        // 0x18
-	TClass*               m_pLastChildren;    // 0x1C
-	TUINT16               m_uiVersionMajor;   // 0x20
-	TUINT16               m_uiVersionMinor;   // 0x22
-	TUINT32               m_uiClassSize;      // 0x24
-	TUINT32               m_uiClassAlignment; // 0x28
-	TBOOL                 m_bInitialised;     // 0x2C
+	const TCHAR*          m_szName;          // 0x00
+	CreateObject_t        m_fnCreate;        // 0x04
+	CreateObjectInPlace_t m_fnCreateInPlace; // 0x08
+	Initialise_t          m_fnInitialise;    // 0x0C
+	Deinitialise_t        m_fnDeinitialise;  // 0x10
+	TClass*               m_pParent;         // 0x14
+	TClass*               m_pPrevious;       // 0x18
+	TClass*               m_pLastChildren;   // 0x1C
+	union
+	{
+		struct
+		{
+			TUINT16 m_uiVersionMajor; // 0x20
+			TUINT16 m_uiVersionMinor; // 0x22
+		};
+		TUINT32 m_uiVersion; // 0x20
+	};
+	TUINT32 m_uiClassSize;      // 0x24
+	TUINT32 m_uiClassAlignment; // 0x28
+	TBOOL   m_bInitialised;     // 0x2C
 };
 
 TOSHI_NAMESPACE_END

@@ -28,8 +28,8 @@ public:
 		T2LocalisedString* Strings;
 	};
 
-	// NOTE: de Blob's T2Locale::GetString calls two game functions directly (ALocaleManager 005e2210 and 005e23c0),
-	// here the game installs them (TNULL: no remapping/overrides)
+	// NOTE: de Blob's T2Locale::GetString calls two game functions directly, here the game installs them (TNULL: no
+	// remapping/overrides)
 	using t_FixStringIdPlatform        = TINT ( * )( TINT a_iStringId );
 	using t_GetOverwrittenLocaleString = T2LocalisedString ( * )( TINT a_iStringId, Lang a_iLang );
 
@@ -57,8 +57,8 @@ public:
 protected:
 	T2Locale( TINT langCount, size_t bufferSize, void* buffer );
 
-	static void* __stdcall TRBAllocator( TTRB::AllocType alloctype, size_t size, short unk, size_t unk2, void* userData );
-	static void __stdcall TRBDeallocator( TTRB::AllocType alloctype, void* ptr, short unk, size_t unk2, void* userData );
+	static void* __stdcall TRBAllocator( TTRB::AllocType alloctype, size_t size, short alignment, size_t unk2, void* userData );
+	static void __stdcall TRBDeallocator( TTRB::AllocType alloctype, void* ptr, short alignment, size_t unk2, void* userData );
 
 	// $deBlob: FUNCTION 00662fb0
 	void* TRBAlloc( size_t size )
@@ -68,12 +68,12 @@ protected:
 		return ptr;
 	}
 
-	TINT FixStringId( TINT a_iStringId ) const { return ms_fnFixStringIdPlatform ? ms_fnFixStringIdPlatform( a_iStringId ) : a_iStringId; }
+	TINT              FixStringId( TINT a_iStringId ) const { return ms_fnFixStringIdPlatform ? ms_fnFixStringIdPlatform( a_iStringId ) : a_iStringId; }
 	T2LocalisedString GetOverwrittenString( TINT a_iStringId ) const { return ms_fnGetOverwrittenLocaleString ? ms_fnGetOverwrittenLocaleString( a_iStringId, m_LangId ) : TNULL; }
 
 protected:
-	inline static t_FixStringIdPlatform        ms_fnFixStringIdPlatform        = TNULL;
-	inline static t_GetOverwrittenLocaleString ms_fnGetOverwrittenLocaleString = TNULL;
+	static t_FixStringIdPlatform        ms_fnFixStringIdPlatform;
+	static t_GetOverwrittenLocaleString ms_fnGetOverwrittenLocaleString;
 
 	TTRB           m_Locale;      // 0x04
 	void*          m_pBuffer;     // 0x18

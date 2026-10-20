@@ -21,7 +21,7 @@ private:
 	};
 
 public:
-	constexpr T2AtomicMutex() = default;
+	TCONSTEXPR T2AtomicMutex() = default;
 	~T2AtomicMutex()          = default;
 
 	void Lock();

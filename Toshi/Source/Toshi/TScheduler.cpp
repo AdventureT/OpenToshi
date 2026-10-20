@@ -19,12 +19,12 @@ TFLOAT TScheduler::s_DebugSlowMaxTimeDeltaAllowed = 0.005f;
 // $deBlob: FUNCTION 006603d0
 // $Barnyard: FUNCTION 006bccd0
 TScheduler::TScheduler()
+    : m_fDeltaTime( 0.0f )
+    , m_fFrameTime( 0.0f )
+    , m_fTotalTime( 0.0f )
+    , m_fMaxDeltaTime( 0.25f )
+    , m_uiNumFrames( 0 )
 {
-	m_fDeltaTime             = 0.0f;
-	m_fFrameTime             = 0.0f;
-	m_fTotalTime             = 0.0f;
-	m_fMaxDeltaTime          = 0.25f;
-	m_uiNumFrames            = 0;
 	m_fPausedMaxDeltaTime    = 0.0f;
 	m_bDebugPause            = TFALSE;
 	m_bUseDebugDeltaTimeMult = TFALSE;
@@ -67,7 +67,7 @@ TTask* TScheduler::CreateTask( TClass* a_rTaskClass, TTask* a_pParent )
 
 void TScheduler::Update( TFLOAT a_fDeltaTime )
 {
-	// NOTE: this is the scheduler part of TSystemManager::Update, inlined in retail
+	// The scheduler part of TSystemManager::Update
 	m_uiNumFrames += 1;
 	m_fDeltaTime = a_fDeltaTime;
 	m_fTotalTime += a_fDeltaTime;
@@ -102,9 +102,9 @@ void TScheduler::Update( TFLOAT a_fDeltaTime )
 // $deBlob: FUNCTION 00660640
 void TScheduler::KillTask( TTask* a_pTask )
 {
-	if ( !a_pTask->IsDying() )
+	if ( !( a_pTask->m_ulFlags & TTask::FLAGS_DYING ) )
 	{
-		a_pTask->GetFlags() |= TTask::FLAGS_DYING;
+		a_pTask->m_ulFlags |= TTask::FLAGS_DYING;
 		DestroyTaskRecurse( a_pTask->Child() );
 	}
 }
@@ -211,22 +211,22 @@ void TScheduler::DestroyTask( TTask* a_pTask )
 
 // $deBlob: FUNCTION 006609a0
 // $Barnyard: FUNCTION 006bca80
-void TScheduler::DestroyTaskRecurse( TTask* a_pTask )
+inline void TScheduler::DestroyTaskRecurse( TTask* a_pTask )
 {
-	TTask* pTask = a_pTask;
+	TTask* pStart = a_pTask;
 
-	if ( pTask == TNULL )
+	if ( a_pTask == TNULL )
 		return;
 
 	do
 	{
-		pTask->GetFlags() |= TTask::FLAGS_DYING;
+		a_pTask->m_ulFlags |= TTask::FLAGS_DYING;
 
-		if ( pTask->Child() != TNULL )
-			DestroyTaskRecurse( pTask->Child() );
+		if ( a_pTask->Child() != TNULL )
+			DestroyTaskRecurse( a_pTask->Child() );
 
-		pTask = pTask->Next();
-	} while ( pTask != a_pTask && pTask != TNULL );
+		a_pTask = a_pTask->Next();
+	} while ( a_pTask != pStart && a_pTask != TNULL );
 }
 
 // $deBlob: FUNCTION 00660b00
@@ -263,6 +263,7 @@ void TScheduler::DeleteTaskAtomic( TTask* a_pTask )
 	}
 }
 
+// NOTE: retail inlines DeleteTaskAtomic here
 // $deBlob: FUNCTION 006609e0
 // $Barnyard: FUNCTION 006bcac0
 void TScheduler::DeleteTaskRecurse( TTask* a_pTask )

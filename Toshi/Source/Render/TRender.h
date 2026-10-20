@@ -21,8 +21,7 @@ TOSHI_NAMESPACE_START
 class TRenderParamTable;
 
 //-----------------------------------------------------------------------------
-// de Blob's abstract renderer (vftable 008c80d8, 19 slots, size 0x61C). The platform renderer is TRenderDX11.
-//
+// de Blob's abstract renderer. The platform renderer is TRenderDX11.
 // NOTE: OpenBarnyard's TRenderInterface is the same class of a later TOSHI 2.0 branch; de Blob's has fewer virtuals
 // (no capture/debug text/model factories/pixel aspect ratio), only 12 system resources, an aspect ratio, a shader
 // parameter table and no begin/end scene emitters.
@@ -36,9 +35,9 @@ public:
 	TDECLARE_CLASS( TRender, TObject );
 
 public:
-	static constexpr size_t MAXNUMRESOURCES = 6000;
+	static TCONSTEXPR_VAR size_t MAXNUMRESOURCES = 6000;
 
-	// Indices of the system resources (set by ARenderer::CreateTRender's resources 005f0a50)
+	// Indices of the system resources (set by ARenderer::CreateTRender)
 	typedef TUINT8 SYSRESOURCE;
 	enum SYSRESOURCE_ : SYSRESOURCE
 	{
@@ -76,7 +75,7 @@ public:
 		DEPTHSTENCILFORMAT_NUMOF  = 5,
 	};
 
-	// TRender_DisplayParams (see ARenderer::CreateTRender 005f0780)
+	// TRender_DisplayParams (see ARenderer::CreateTRender)
 	struct DISPLAYPARAMS
 	{
 		TUINT32            uiWidth;                   // 0x00
@@ -115,6 +114,11 @@ public:
 	// Platform specific (TRender_DX11.cpp): creates the render context of the renderer
 	TRenderContext* CreateRenderContext();
 
+	// The platform's screen capture (ARenderer's loading screen; none on DX11). NOTE: the capture type is the game's
+	// (ARenderer::ScreenCapture), opaque here
+	void* CreateScreenCapture();
+	void  DestroyScreenCapture( void* a_pCapture );
+
 	// Flushes the order tables of the platform renderer (TRenderDX11::FlushOrderTables)
 	void FlushShaders();
 
@@ -145,36 +149,31 @@ public:
 	// Creates resource in a_pMemory (external, not deleted with the tree) and returns it
 	TResource* CreateResourceInPlace( const TClass* a_pClass, void* a_pMemory, const TCHAR* a_szName, TResource* a_pParent );
 
-	// $deBlob: FUNCTION 00691180
+	void SetAsLastChild( TResource* a_pResource );
+
 	// Sets new render context and returns the old one
-	TRenderContext* SetCurrentRenderContext( TRenderContext* a_pRenderContext )
-	{
-		return std::exchange( m_pCurrentContext, a_pRenderContext );
-	}
+	TRenderContext* SetCurrentRenderContext( TRenderContext* a_pRenderContext );
 
 	// Height of the display relative to the height of the aspect ratio for its width
 	TFLOAT GetResolutionScalar();
 
 	void SetAutoCreateSystemResources( TBOOL a_bAutoCreate ) { m_bCreateSystemResources = a_bAutoCreate; }
 
-	// $deBlob: FUNCTION 00690c20
-	TBOOL IsInScene() { return m_bInScene; }
-	// $deBlob: FUNCTION 00690c30
-	TBOOL IsCreated() { return m_bCreated; }
-	// $deBlob: FUNCTION 00690c40
-	TBOOL IsDisplayCreated() { return m_bDisplayCreated; }
+	TBOOL IsInScene();
+	TBOOL IsCreated();
+	TBOOL IsDisplayCreated();
 
 	const TMatrix44& GetLightDirection() const { return m_LightDirection; }
 	const TMatrix44& GetLightColour() const { return m_LightColour; }
+	TMatrix44&       GetLightDirection() { return m_LightDirection; }
+	TMatrix44&       GetLightColour() { return m_LightColour; }
 
-	// $deBlob: FUNCTION 00691170
-	TRenderContext* GetCurrentContext() const { return m_pCurrentContext; }
+	TRenderContext* GetCurrentContext() const;
 	TRenderContext* GetCreatedContext() const { return m_pCreatedContext; }
+	// $deBlob: FUNCTION 00581970
 	TUINT32         GetFrameCount() const { return m_iFrameCount; }
-	// $deBlob: FUNCTION 00690590
-	TNodeList<TRenderAdapter>* GetAdapterList() { return &m_AdapterList; }
-	// $deBlob: FUNCTION 00690c90
-	TNodeTree<TResource>*    GetResources() { return &m_Resources; }
+	TNodeList<TRenderAdapter>* GetAdapterList();
+	TNodeTree<TResource>* GetResources();
 	TKeyframeLibraryManager& GetKeyframeLibraryManager() { return m_KeyframeManager; }
 	TStack<TMatrix44, 20>&   GetTransforms() { return m_Transforms; }
 	TRenderParamTable*       GetParamTable() const { return m_pParamTable; }
