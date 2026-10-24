@@ -1,81 +1,91 @@
 #include "ToshiPCH.h"
-#include "Toshi2/T2Allocator.h"
-#include "Toshi/Utils/TUtil.h"
-#include <queue>
+#include "Toshi/TUtil.h"
+#include "Toshi/T2String8.h"
+
+#include <vector>
+#include <algorithm>
+#include <time.h>
+#include <windows.h>
+
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include "Core/TMemoryDebugOn.h"
 
 TOSHI_NAMESPACE_START
 
-void TUtil::TrimLog(const TCHAR* fileName, size_t trimTo)
+// A log file found by TrimLog (0x10C bytes)
+struct TrimLogEntry
 {
-	// and yes they actually did it with std
-
-	WIN32_FIND_DATAA        ffd;
-	std::queue<std::string> queue;
-
-	HANDLE hFind = FindFirstFileA(fileName, &ffd);
-
-	if (INVALID_HANDLE_VALUE == hFind)
+	// $deBlob: FUNCTION 0065dd20
+	TrimLogEntry( const TCHAR* a_szName, TUINT32 a_uiTimeLow, TUINT32 a_uiTimeHigh )
 	{
-		FindClose(hFind);
+		uiTimeLow  = a_uiTimeLow;
+		uiTimeHigh = a_uiTimeHigh;
+		strcpy( szName, a_szName );
+	}
+
+	TUINT64 GetTime() const { return ( TUINT64( uiTimeHigh ) << 32 ) | uiTimeLow; }
+
+	// $deBlob: FUNCTION 0065dd60
+	TBOOL operator<( const TrimLogEntry& a_rcOther ) const { return GetTime() < a_rcOther.GetTime(); }
+
+	TCHAR   szName[ MAX_PATH ]; // 0x000
+	TUINT32 uiTimeLow;          // 0x104 creation time
+	TUINT32 uiTimeHigh;         // 0x108
+};
+
+// $deBlob: FUNCTION 0065ddb0
+static TBOOL TrimLogEntry_Less( const TrimLogEntry& a_rcLeft, const TrimLogEntry& a_rcRight )
+{
+	return a_rcLeft < a_rcRight;
+}
+
+// $deBlob: FUNCTION 0065db40
+// Deletes the oldest (by creation time) files matching a_szFileName until a_uiTrimTo of them are left
+void TUtil::TrimLog( const TCHAR* a_szFileName, TSIZE a_uiTrimTo )
+{
+	std::vector<TrimLogEntry> vecFiles;
+
+	WIN32_FIND_DATAA oFindData;
+	HANDLE           hFind = FindFirstFileA( a_szFileName, &oFindData );
+
+	if ( hFind == INVALID_HANDLE_VALUE )
+	{
+		// NOTE: like retail, closes the invalid handle
+		FindClose( hFind );
 		return;
 	}
 
 	do
 	{
-		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
-		{
-			queue.push(ffd.cFileName);
-		}
+		if ( oFindData.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE )
+			vecFiles.push_back( TrimLogEntry( oFindData.cFileName, oFindData.ftCreationTime.dwLowDateTime, oFindData.ftCreationTime.dwHighDateTime ) );
 
-		BOOL found = FindNextFileA(hFind, &ffd);
+	} while ( FindNextFileA( hFind, &oFindData ) );
 
-		if (found == FALSE)
-		{
-			FindClose(hFind);
-			do
-			{
-				DeleteFileA(queue.front().c_str());
-				queue.pop();
-			} while (queue.size() > trimTo);
-			return;
-		}
+	FindClose( hFind );
+	std::sort( vecFiles.begin(), vecFiles.end(), TrimLogEntry_Less );
 
-	} while (TTRUE);
+	TINT iNumToDelete = TINT( vecFiles.size() ) - TINT( a_uiTrimTo );
+
+	for ( TINT i = 0; i < iNumToDelete; i++ )
+		DeleteFileA( vecFiles[ i ].szName );
 }
 
 // $deBlob: FUNCTION 00828b00
 const TCHAR* TUtil::GetTime()
 {
-	time_t t   = time(NULL);
-	TCHAR* str = ctime(&t);
-	return strtok(str, "\n");
+	static TCHAR s_szTime[ 32 ];
+
+	__time64_t iTime;
+	_time64( &iTime );
+
+	T2String8::Copy( s_szTime, _ctime64( &iTime ), -1 );
+	*T2String8::FindChar( s_szTime, '\n' ) = '\0';
+
+	return s_szTime;
 }
-
-// Note from AdventureT: GetUnixSeconds is 1:1 just time() from <time.h>
-
-//uint64_t TUtil::GetUnixSeconds(uint64_t* pOut)
-//{
-//	// 007f0f93
-//	// https://stackoverflow.com/questions/20370920/convert-current-time-from-windows-to-unix-timestamp-in-c-or-c
-//	// Get the number of seconds since January 1, 1970 12:00am UTC
-//	// Code released into public domain; no attribution required.
-//	const uint64_t UNIX_TIME_START = 0x019DB1DED53E8000; // January 1, 1970 (start of Unix epoch) in "ticks"
-//	const uint64_t TICKS_PER_SECOND = 10000000;          // a tick is 100ns
-
-//	FILETIME ft;
-//	GetSystemTimeAsFileTime(&ft); //returns ticks in UTC
-
-//	// Copy the low and high parts of FILETIME into a LARGE_INTEGER
-//	// This is so we can access the full 64-bits as an Int64 without causing an alignment fault
-//	LARGE_INTEGER li;
-//	li.LowPart = ft.dwLowDateTime;
-//	li.HighPart = ft.dwHighDateTime;
-
-//	// Convert ticks since 1/1/1970 into seconds
-//	uint64_t result = (li.QuadPart - UNIX_TIME_START) / TICKS_PER_SECOND;
-
-//	if (pOut != NULL) { *pOut = result; }
-//	return result;
-//}
 
 TOSHI_NAMESPACE_END

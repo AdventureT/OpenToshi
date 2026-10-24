@@ -1,8 +1,26 @@
 #include "ToshiPCH.h"
 #include "TDebugConsole_Win.h"
-#include "Toshi/Strings/TString8.h"
+#include "Toshi/TString8.h"
+
+#include <time.h>
 
 #include <conio.h>
+#include <windows.h>
+
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include "Core/TMemoryDebugOn.h"
+
+static const WORD kTypeColours[] = {
+	FOREGROUND_GREEN,
+	FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN,
+	FOREGROUND_INTENSITY | FOREGROUND_RED,
+	BACKGROUND_RED | FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN
+};
+
+TSTATICASSERT( Toshi::TUtil::LogType_NUMOF == TARRAYSIZE( kTypeColours ) );
 
 TOSHI_NAMESPACE_START
 
@@ -10,99 +28,123 @@ TDebugConsole::TDebugConsole()
 {
 	m_HWND    = FindConsole();
 	m_Created = m_HWND != TNULL;
+
+	m_LogListener.Connect(
+	    TUtil::GetSingleton()->GetLogEvent(),
+	    this,
+	    TDebugConsole::OnLog,
+	    1
+	);
 }
 
 TDebugConsole::~TDebugConsole()
 {
-	if (IsCreated())
+	if ( IsCreated() )
 	{
-		if (IsVisible())
+		if ( IsVisible() )
 		{
-			TOSHI_CORE_WARN("Press any key to exit...");
+			TWARN( "Press any key to exit...\n" );
 			_getch();
 		}
 	}
 }
 
-TBOOL TDebugConsole::Show(TBOOL state)
+TBOOL TDebugConsole::Show( TBOOL state )
 {
 	TBOOL oldState = m_Visible;
 	m_Visible      = state;
 
-	ShowWindow(m_HWND, state);
-	UpdateWindow(m_HWND);
+	ShowWindow( m_HWND, state );
+	UpdateWindow( m_HWND );
 
 	return oldState;
 }
 
 TBOOL TDebugConsole::Toggle()
 {
-	Show(!m_Visible);
+	Show( !m_Visible );
 	return m_Visible;
 }
 
-// $deBlob: FUNCTION 006ef3c0
+// $Barnyard: FUNCTION 006c1600
 HWND TDebugConsole::FindConsole() const
 {
-	TString8 str = TString8(TDebugConsoleUUID);
+	// Generate a unique title for the console so we can find its HWND
+	TCHAR szTimeHex[ 32 ];
+	_ultoa( timeGetTime(), szTimeHex, 16 );
 
-	// Generate title for the console so we can find it's HWND
-	LARGE_INTEGER time;
-	QueryPerformanceCounter(&time);
-	TCHAR timeHex[sizeof(time.QuadPart) + 1] = { 0 };
-	_ultoa_s((unsigned long)time.QuadPart, timeHex, 0x10);
-	str += timeHex;
+	static TCHAR s_szWindowName[ 256 ];
+	strcpy( s_szWindowName, TDebugConsoleUUID );
+	strcat( s_szWindowName, szTimeHex );
 
 	// Save the current title
-	TCHAR lpConsoleTitle[256];
-	DWORD titleLength = GetConsoleTitleA(lpConsoleTitle, 256);
-	if (titleLength == 0)
-	{
+	TCHAR szConsoleTitle[ 512 ];
+	if ( GetConsoleTitleA( szConsoleTitle, sizeof( szConsoleTitle ) ) == 0 )
 		return TNULL;
+
+	SetConsoleTitleA( s_szWindowName );
+
+#ifdef BARNYARD_COMMUNITY_PATCH
+	// Wait for the new title to be applied
+	ThreadSleep( 50 );
+#endif // BARNYARD_COMMUNITY_PATCH
+
+	// Find the window with the generated title and restore the title
+	HWND hConsole = FindWindowA( TNULL, s_szWindowName );
+	SetConsoleTitleA( szConsoleTitle );
+
+	return hConsole;
+}
+
+static TBOOL s_bIsSimpleMode = TFALSE;
+
+TBOOL __stdcall TDebugConsole::OnLog( TDebugConsole* a_pCaller, TUtil* a_pOwner, TUtil::LogEvent* pLogEvent )
+{
+	TASSERT( pLogEvent );
+
+	HANDLE hStd;
+	WORD   wOldColorAttrs;
+
+	hStd = GetStdHandle( STD_OUTPUT_HANDLE );
+
+	CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+	GetConsoleScreenBufferInfo( hStd, &csbiInfo );
+	wOldColorAttrs = csbiInfo.wAttributes;
+
+	SetConsoleTextAttribute( hStd, kTypeColours[ pLogEvent->m_eType ] );
+
+	// NOTE: de Blob's log messages mostly don't end with a new line (Barnyard's did): end the console line here
+	TSIZE        uiLength = TStringManager::String8Length( pLogEvent->m_szString );
+	const TCHAR* szEnd    = ( uiLength == 0 || pLogEvent->m_szString[ uiLength - 1 ] != '\n' ) ? "\n" : "";
+
+	if ( s_bIsSimpleMode )
+	{
+		TDebug_FinalPrintf(
+		    "[%s]: %s%s",
+		    TUtil::LogTypeToString( pLogEvent->m_eType ),
+		    pLogEvent->m_szString,
+		    szEnd
+		);
+	}
+	else
+	{
+		TCHAR strTime[ 9 ];
+		_strtime( strTime );
+
+		TDebug_FinalPrintf(
+		    "[%s] [%s/%s] [%s]: %s%s",
+		    strTime,
+		    "Toshi",
+		    "Kernel",
+		    TUtil::LogTypeToString( pLogEvent->m_eType ),
+		    pLogEvent->m_szString,
+		    szEnd
+		);
 	}
 
-	// Set the genereated title and wait for 50ms so it's applied
-	SetConsoleTitleA(str);
-	Sleep(50);
+	SetConsoleTextAttribute( hStd, wOldColorAttrs );
 
-	// Find a window with the generated title and restore it
-	HWND consoleHWND = FindWindowA(TNULL, str);
-	SetConsoleTitleA(lpConsoleTitle);
-
-	return consoleHWND;
-
-	/*  Stuff de blob does Reminder: puVar5 = buf
-		* Start of code
-		pcVar3 = DAT_009823b0;
-	  do {
-		cVar1 = *pcVar3;
-		pcVar3 = pcVar3 + 1;
-		pcVar3[(TINT)&uStack229 - (TINT)DAT_009823b0] = cVar1;
-	  } while (cVar1 != '\0');
-	  puVar5 = local_1c;
-	  do {
-		cVar1 = *(TCHAR *)puVar5;
-		puVar5 = (undefined4 *)((TINT)puVar5 + 1);
-	  } while (cVar1 != '\0');
-	  uVar6 = (TINT)puVar5 - (TINT)local_1c;
-	  puVar5 = &uStack229;
-	  do {
-		pcVar3 = (TCHAR *)((TINT)puVar5 + 1);
-		puVar5 = (undefined4 *)((TINT)puVar5 + 1);
-	  } while (*pcVar3 != '\0');
-	  puVar7 = local_1c;
-	  for (uVar4 = uVar6 >> 2; uVar4 != 0; uVar4 = uVar4 - 1) {
-		*puVar5 = *puVar7;
-		puVar7 = puVar7 + 1;
-		puVar5 = puVar5 + 1;
-	  }
-	  for (uVar6 = uVar6 & 3; uVar6 != 0; uVar6 = uVar6 - 1) {
-		*(undefined *)puVar5 = *(undefined *)puVar7;
-		puVar7 = (undefined4 *)((TINT)puVar7 + 1);
-		puVar5 = (undefined4 *)((TINT)puVar5 + 1);
-	  }
-
-	  */
+	return true;
 }
 
 TOSHI_NAMESPACE_END

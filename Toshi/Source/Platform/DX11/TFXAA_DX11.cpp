@@ -2,101 +2,134 @@
 #include "TFXAA_DX11.h"
 #include "TRender_DX11.h"
 
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include "Core/TMemoryDebugOn.h"
+
 TOSHI_NAMESPACE_START
+
+#include "TFXAAShader_DX11.inl"
 
 // $deBlob: FUNCTION 006b4d30
 TFXAA::TFXAA()
-    : m_Width(1280), m_Height(720), m_pTexture(TNULL), m_pShader(TNULL), m_pRenderTarget(TNULL), m_pTextureView(TNULL)
 {
-	D3D_SHADER_MACRO macro[5];
-	macro[0].Name       = "FXAA_PC";
-	macro[0].Definition = "1";
-	macro[1].Name       = "FXAA_HLSL_4";
-	macro[1].Definition = "1";
-	macro[2].Name       = "FXAA_QUALITY__PRESET";
-	macro[2].Definition = "12";
-	macro[3].Name       = "FXAA_GREEN_AS_LUMA";
-	macro[3].Definition = "1";
-	macro[4].Name       = TNULL;
-	macro[4].Definition = TNULL;
+	m_pTexture      = TNULL;
+	m_pTextureView  = TNULL;
+	m_pRenderTarget = TNULL;
+	m_uiWidth       = 1280;
+	m_uiHeight      = 720;
+	m_pShader       = TNULL;
 
-	ID3DBlob* shader = TRenderDX11::CompileShaderFromFile("Data/Shaders/Other/FXAA.ps", "main", "ps_4_0", macro);
-	TRenderDX11::Interface()->CreatePixelShader(shader->GetBufferPointer(), shader->GetBufferSize(), &m_pShader);
-	Initialize();
+	D3D_SHADER_MACRO aMacros[ 5 ];
+	aMacros[ 0 ].Name       = "FXAA_PC";
+	aMacros[ 0 ].Definition = "1";
+	aMacros[ 1 ].Name       = "FXAA_HLSL_4";
+	aMacros[ 1 ].Definition = "1";
+	aMacros[ 2 ].Name       = "FXAA_QUALITY__PRESET";
+	aMacros[ 2 ].Definition = "12";
+	aMacros[ 3 ].Name       = "FXAA_GREEN_AS_LUMA";
+	aMacros[ 3 ].Definition = "1";
+	aMacros[ 4 ].Name       = TNULL;
+	aMacros[ 4 ].Definition = TNULL;
+
+	// NOTE: retail compiles one string literal; it's stored in parts here (see TFXAAShader_DX11.inl)
+	TCHAR* pszSource = new TCHAR[ s_uiFXAAShaderSize + 1 ];
+	TSIZE  uiOffset  = 0;
+
+	for ( TSIZE i = 0; i < TARRAYSIZE( s_apFXAAShaderParts ); i++ )
+	{
+		TSIZE uiLength = TStringManager::String8Length( s_apFXAAShaderParts[ i ] );
+		TUtil::MemCopy( pszSource + uiOffset, s_apFXAAShaderParts[ i ], uiLength );
+		uiOffset += uiLength;
+	}
+
+	TASSERT( uiOffset == s_uiFXAAShaderSize );
+	pszSource[ uiOffset ] = '\0';
+
+	// NOTE: retail doesn't release the blob
+	ID3DBlob* pShader = TRenderDX11::CompileShader( pszSource, "main", "ps_4_0", aMacros );
+	delete[] pszSource;
+
+	TRenderDX11::Interface()->CreatePixelShader( pShader->GetBufferPointer(), pShader->GetBufferSize(), &m_pShader );
+	Initialise();
 }
 
 // $deBlob: FUNCTION 006b4e20
+// $deBlob: FUNCTION 006aa800
 TFXAA::~TFXAA()
 {
-	if (m_pTexture != TNULL)
-	{
-		m_pTexture->Release();
-	}
-
-	if (m_pTextureView != TNULL)
-	{
-		m_pTextureView->Release();
-	}
-
-	if (m_pRenderTarget != TNULL)
-	{
-		m_pRenderTarget->Release();
-	}
-
-	if (m_pRenderTarget != TNULL)
+	if ( m_pShader )
 	{
 		m_pShader->Release();
+		m_pShader = TNULL;
 	}
-}
 
-// $deBlob: FUNCTION 006b4fb0
-void TFXAA::Initialize()
-{
-	auto renderInterface = TRenderDX11::Interface();
-	auto swapChainDesk   = renderInterface->GetSwapChainDesc();
-	m_Width              = swapChainDesk->BufferDesc.Width;
-	m_Height             = swapChainDesk->BufferDesc.Height;
-
-	m_pTextureView  = renderInterface->CreateTexture(m_Width, m_Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 4, D3D11_USAGE_DEFAULT, 0, 1);
-	m_pRenderTarget = renderInterface->CreateRenderTargetView(m_pTextureView);
-
-	TASSERT(m_pRenderTarget != TNULL);
-
-	if (m_pTextureView != TNULL)
+	if ( m_pRenderTarget )
 	{
-		ID3D11Resource* pResource;
-		m_pTextureView->GetResource(&pResource);
-		pResource->QueryInterface(_uuidof(ID3D11Texture2D), (void**)&m_pTexture);
-		pResource->Release();
+		m_pRenderTarget->Release();
+		m_pRenderTarget = TNULL;
 	}
 
-	m_pTextureView->SetPrivateData(WKPDID_D3DDebugObjectName, 8, "FXAA SRV");
-	m_pRenderTarget->SetPrivateData(WKPDID_D3DDebugObjectName, 7, "FXAA RT");
+	if ( m_pTextureView )
+	{
+		m_pTextureView->Release();
+		m_pTextureView = TNULL;
+	}
+
+	if ( m_pTexture )
+	{
+		m_pTexture->Release();
+		m_pTexture = TNULL;
+	}
 }
 
 // $deBlob: FUNCTION 006b4e80
-void TFXAA::Render(ID3D11ShaderResourceView* pShaderResourceView)
+void TFXAA::Render( ID3D11ShaderResourceView* a_pShaderResourceView )
 {
-	auto                    pRender        = TRenderDX11::Interface();
-	auto                    pDeviceContext = pRender->GetDeviceContext();
-	ID3D11RenderTargetView* pRenderTargetViews;
-	ID3D11DepthStencilView* pDepthStencilView;
+	TRenderDX11*         pRender        = TRenderDX11::Interface();
+	ID3D11DeviceContext* pDeviceContext = pRender->GetDeviceContext();
 
-	// Save current render targets
-	pDeviceContext->OMGetRenderTargets(1, &pRenderTargetViews, &pDepthStencilView);
-	pRender->SetBlendMode(TFALSE, D3D11_BLEND_OP_ADD, D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_INV_SRC_ALPHA);
+	ID3D11RenderTargetView* pOldRenderTarget;
+	ID3D11DepthStencilView* pOldDepthStencil;
+	pDeviceContext->OMGetRenderTargets( 1, &pOldRenderTarget, &pOldDepthStencil );
 
-	// Set our render target
-	pDeviceContext->OMSetRenderTargets(1, &m_pRenderTarget, NULL);
+	pRender->SetBlendMode( TFALSE, D3D11_BLEND_OP_ADD, D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_INV_SRC_ALPHA );
+	pDeviceContext->OMSetRenderTargets( 1, &m_pRenderTarget, TNULL );
 
-	TVector4 screenSize = { (TFLOAT)m_Width, (TFLOAT)m_Height, 0, 0 };
+	TVector4 vScreenSize( TFLOAT( m_uiWidth ), TFLOAT( m_uiHeight ), 0.0f, 0.0f );
+	pRender->SetVec4InPSBuffer( 26, &vScreenSize, 1 );
+	TRenderDX11::RenderOverlay( 0.0f, 0.0f, TFLOAT( m_uiWidth ), TFLOAT( m_uiHeight ), a_pShaderResourceView, m_pShader, TNULL );
 
-	pRender->SetVec4InPSBuffer(PSBufferOffset_V2ScreenSize, &screenSize, 1);
-	TRenderDX11::RenderOverlay(0.0f, 0.0f, (TFLOAT)m_Width, (TFLOAT)m_Height, pShaderResourceView, m_pShader, NULL);
+	// NOTE: retail never releases the views OMGetRenderTargets returned
+	pDeviceContext->OMSetRenderTargets( 1, &pOldRenderTarget, pOldDepthStencil );
+	TRenderDX11::RenderOverlay( 0.0f, 0.0f, TFLOAT( m_uiWidth ), TFLOAT( m_uiHeight ), m_pTextureView, TNULL, TNULL );
+}
 
-	// Restore original render targets
-	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetViews, pDepthStencilView);
-	TRenderDX11::RenderOverlay(0.0f, 0.0f, (TFLOAT)m_Width, (TFLOAT)m_Height, m_pTextureView, NULL, NULL);
+// $deBlob: FUNCTION 006b4fb0
+void TFXAA::Initialise()
+{
+	TRenderDX11* pRender = TRenderDX11::Interface();
+	m_uiWidth            = pRender->GetSwapChainDesc()->BufferDesc.Width;
+	m_uiHeight           = pRender->GetSwapChainDesc()->BufferDesc.Height;
+
+	m_pTextureView  = pRender->CreateTexture( m_uiWidth, m_uiHeight, DXGI_FORMAT_R8G8B8A8_UNORM, TNULL, TRenderDX11::TEXTUREFLAGS_RENDERTARGET, D3D11_USAGE_DEFAULT, 0, 1 );
+	m_pRenderTarget = pRender->CreateRenderTargetView( m_pTextureView );
+	TASSERT( m_pRenderTarget );
+
+	if ( m_pTextureView )
+	{
+		ID3D11Resource* pResource = TNULL;
+		m_pTextureView->GetResource( &pResource );
+		pResource->QueryInterface( __uuidof( ID3D11Texture2D ), (void**)&m_pTexture );
+
+		if ( pResource )
+			pResource->Release();
+	}
+
+	m_pTextureView->SetPrivateData( WKPDID_D3DDebugObjectName, 8, "FXAA SRV" );
+	m_pRenderTarget->SetPrivateData( WKPDID_D3DDebugObjectName, 7, "FXAA RT" );
 }
 
 TOSHI_NAMESPACE_END

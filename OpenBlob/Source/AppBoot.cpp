@@ -1,163 +1,378 @@
 #include "pch.h"
-
-// Predefining Toshi initialization settings
-#define TOSHI_TMEMORY_SIZE  640 * 1024 * 1024
-#define TOSHI_TMEMORY_FLAGS Toshi::TMemory::Flags_Standard
-
-// Including the entrypoint
-#include <Toshi.h>
-
-// Including everything else
-#include "AAssetStreaming.h"
-#include "AExampleClass.h"
-#include "ALevelInformation.h"
-#include "GameInterface/AAppInitState.h"
-#include "Movie/AMoviePlayer.h"
-#include "Locale/ALocaleManager.h"
-#include "Input/AInputManager2.h"
-#include "Console/AConsoleVar.h"
 #include "Cameras/ACameraManager.h"
+#include "AppBoot.h"
+#include "SteamManager.h"
+#include "AAssetStreaming.h"
+#include "Memory/AMemory.h"
+#include "Render/ARenderer.h"
+#include "Input/AInputManager2.h"
+#include "Input/ABlobInputMap.h"
+#include "GUI/AGUIManager.h"
+#include "GUI/AFontManager.h"
+#include "Locale/ALocaleManager.h"
+#include "GameInterface/AGameStateController.h"
+#include "GameInterface/AAppInitState.h"
+#include "GameInterface/AXUIState.h"
+#include "GUI/A2GUIRenderer_DX11.h"
+#include "Movie/AXUIBinkMovie_DX11.h"
 #include "Sound/AXUIFMODExAudio.h"
 
-#include <Toshi/Xui/TXUI.h>
-#include <Toshi/Core/TArray.h>
-#include <Toshi2/T2GUI/T2GUI.h>
-#include <Toshi2/T2SimpleArray.h>
-#include <Toshi/Sound/TSound.h>
-#include <Toshi/Render/TRender.h>
-#include <Platform/Windows/TSound_Win.h>
-#include <Toshi/Input/TInputInterface.h>
-#include <GameInterface/AXUIState.h>
+#include <Toshi/TUtil.h>
+#include <Sound/TSound.h>
+#include <File/TFile.h>
+#include <Toshi/TSystem.h>
+#include <Toshi/T2String8.h>
+#include <Toshi/TString16.h>
+#include <Toshi/TRegion.h>
+#include <GUI/T2GUI.h>
+#include <GUI/T2GUIFontManager.h>
+#include <XUI/TXUI.h>
+#include <XUI/TXUICanvas.h>
+#include <XUI/TXUIText.h>
+#include <Render/TRender.h>
 
-#ifdef TOSHI_RENDERER_DX11
-#  include "Platform/DX11/A2GUI/A2GUIRenderer_DX11.h"
-#  include "Platform/DX11/TRender_DX11.h"
-#elif defined(TOSHI_RENDERER_OPENGL) // TOSHI_RENDERER_DX11
-#  include "Platform/SDL/A2GUI/A2GUIRenderer_SDL.h"
-#  include "Platform/SDL/TRender_SDL.h"
-#endif // TOSHI_RENDERER_OPENGL
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include <Core/TMemoryDebugOn.h>
 
-AApplication AApplication::g_oTheApp;
+TOSHI_NAMESPACE_USING
 
-CVAR_CREATE(testcvar, TFALSE)
+static const TCHAR* s_szBuildVersion = "0.28";
+
+// OSVERSIONINFOEXW of RtlGetVersion
+typedef LONG( WINAPI* t_RtlGetVersion )( OSVERSIONINFOEXW* );
+
+// The allocator of the strings: the pool of the frequent allocations
+// $deBlob: FUNCTION 00574d90
+static T2Allocator* AppStringAllocator()
+{
+	return AMemory::GetAllocator( AMemory::POOL_FrequentAllocations );
+}
+
+// Initialises the classes that aren't
+// $deBlob: FUNCTION 00574da0
+static TBOOL InitialiseStaticCallback( TClass* a_pClass, void* a_pUserData )
+{
+	if ( !a_pClass->IsInitialized() )
+		a_pClass->Initialize();
+
+	return TTRUE;
+}
+
+// The movie of the XUI video elements (TXUI::CreateMovie)
+// $deBlob: FUNCTION 00574dc0
+static TXUIMovie* CreateXUIMovie()
+{
+	return new ( TXUI::ms_pXUIMemoryBlock ) AXUIBinkMovie();
+}
+
+// The game's string overrides as T2Locale's hook (T2Locale's strings aren't const)
+static T2LocalisedString GetOverwrittenLocaleString( TINT a_iStringId, T2Locale::Lang a_iLangId )
+{
+	return const_cast<T2LocalisedString>( ALocaleManager::GetOverwrittenString( a_iStringId, a_iLangId ) );
+}
 
 // $deBlob: FUNCTION 005747d0
-TBOOL AApplication::OnCreate(TINT argc, TCHAR** argv)
+TBOOL AApplication::OnCreate( TINT argc, TCHAR** argv )
 {
-	TOSHI_INFO("Starting Blob...");
-	AMemory::CreatePools();
+	ParseCommandLineParams( argc, argv );
+	TDebug_FinalPrintf( "Starting Blob...\n" );
 
-	ARenderer::CreateSingleton();
-	AAssetStreaming::CreateSingleton();
+	AMemory::CreatePools();
+	AMemory::SetupTRBAllocators();
+	InitialiseFreeLists();
+
+	TString8::SetDefaultAllocatorCB( AppStringAllocator );
+	TString16::SetDefaultAllocatorCB( AppStringAllocator );
+
+	m_pRenderer = new ARenderer();
+
+	if ( !m_pRenderer->CreateInterface() )
+		return TFALSE;
+
+	T2GUI::Open( AMemory::GetPool( AMemory::POOL_FrequentAllocations ) );
+
+	TGetClass( TObject ).RecurseTree( TNULL, TNULL, InitialiseStaticCallback, TNULL );
+
+	new AInputManager2();
+
+	new TSound();
+
+	m_pSoundMempool = TMemoryHeap_Memalign( TMemory_GetGlobalHeap(), 32, 0x8000000 );
+
+	TBOOL bResult = TSound::GetSingleton()->Create( m_pSoundMempool, 0x8000000, -1, -1, TSound::SpeakerType_Driver );
+	TASSERT( TTRUE == bResult );
+
+#ifdef DEBLOB_COMMUNITY_PATCH
+	// -gamedir: FMOD reads through TFileManager so the sound banks fall back to the game folder
+	if ( TFileManager::GetSingleton()->FindFileSystem( "gamedir" ) != TNULL )
+		TSound::GetSingleton()->SetTFileSystem( 0x10000 );
+	else
+#endif
+		TSound::GetSingleton()->GetSystem()->setFileSystem( TNULL, TNULL, TNULL, TNULL, TNULL, TNULL, 0x10000 );
+
 	ALocaleManager::Create();
 
-	m_Renderer             = ARenderer::GetSingletonSafe();
-	TBOOL interfaceCreated = m_Renderer->CreateInterface();
+	// NOTE: retail's T2Locale::GetString calls ALocaleManager::FixStringIdPlatform and GetOverwrittenString directly
+	T2Locale::SetGameHooks( ALocaleManager::FixStringIdPlatform, GetOverwrittenLocaleString );
 
-	TOSHI_INFO("testcvar value: {0}", CVAR_GET_BOOL(testcvar));
-	//TASSERT(TFALSE, "Assertion test");
+	TXUI::ms_pXUIMemoryBlock    = AMemory::GetPool( AMemory::POOL_XUI );
+	TXUI::ms_pXUITRBMemoryBlock = AMemory::GetPool( AMemory::POOL_XUI );
+	TMemoryHeap* pOldTRBHeap    = AMemory::SetTRBHeap( AMemory::GetPool( AMemory::POOL_XUI ) );
 
-	/*Toshi::T2SimpleArray<TINT> simpleArray;
-	simpleArray.Create(4);
+	TXUI* pXUI = new TXUI();
 
-	simpleArray[0] = 1;
-	simpleArray[1] = 2;
-	simpleArray[2] = 3;
-	simpleArray[3] = 4;*/
+	pXUI->SetCreateMovieCallback( CreateXUIMovie );
 
-	Toshi::TArray<TINT>::Storage genArray;
-	genArray.Push(5);
-	genArray.Push(9);
+	// NOTE: retail's TXUIScene reads the bindings of ABlobInputMap_Win.cpp directly
+	ABlobInputMap::InstallXUIBindings();
 
-	Toshi::TArray<TINT> arr(genArray);
+	TXUIText::SetClipExtended( TTRUE );
 
-	for (TINT i = 0; i < genArray.GetNumElements(); i++)
-	{
-		TOSHI_INFO("{0}", genArray[i]);
-	}
+	// NOTE: retail's T2GUIFont::SetRegion calls SteamManager directly
+	T2GUIFont::ms_fnIsJapaneseLanguage = SteamManager::IsJapaneseLanguage;
+	T2GUIFont::ms_fnIsChineseLanguage  = SteamManager::IsChineseLanguage;
+	T2GUIFontManager::Open();
 
-	if (interfaceCreated)
-	{
-		auto pGUIRenderer = new A2GUIRenderer;
-		auto pGUI         = Toshi::T2GUI::Open(AMemory::ms_apMemoryBlocks[AMemory::POOL_FrequentAllocations]);
-		pGUI->SetRenderer(pGUIRenderer);
+	const TCHAR* szDefaultFont;
 
-		AInputManager2::CreateSingleton();
+	if ( SteamManager::IsJapaneseLanguage() )
+		szDefaultFont = "data/font/JP/Arial_Unicode_MS_14.font.trb";
+	else if ( SteamManager::IsKoreanLanguage() )
+		szDefaultFont = "data/font/KO/Arial_Unicode_MS_14.font.trb";
+	else if ( SteamManager::IsChineseLanguage() )
+		szDefaultFont = "data/font/ZH/Arial_Unicode_MS_14.font.trb";
+	else
+		szDefaultFont = "data/font/Arial_Unicode_MS_14.font.trb";
 
-		// Temp solution
-		Toshi::TXUI::ms_pXUIMemoryBlock    = AMemory::GetPool(AMemory::POOL_XUI);
-		Toshi::TXUI::ms_pXUITRBMemoryBlock = AMemory::GetPool(AMemory::POOL_XUI);
-		auto txui                          = Toshi::TXUI::CreateSingleton();
+	pXUI->SetDefaultFont( szDefaultFont, "Arial_Unicode_MS_14" );
+	AXUIState::SetSkin1( "commonskin.trb", "commonskin.xur" );
+	AXUIState::SetSkin2( "frontendskin.trb", "frontendskin.xur" );
 
-		const size_t poolSize = 128 * 1024 * 1024;
-		void*        mempool  = Toshi::TMemory::GetGlobalHeap()->Memalign(0x20, poolSize);
+	const TCHAR* szFont;
 
-		TBOOL bResult = Toshi::TSound::CreateSingleton()->Create(mempool, poolSize, -1, -1, Toshi::TSound::SpeakerType_7POINT1);
-		TASSERT(TTRUE == bResult);
+	if ( SteamManager::IsJapaneseLanguage() )
+		szFont = "data/font/JP/blob.font.trb";
+	else if ( SteamManager::IsKoreanLanguage() )
+		szFont = "data/font/KO/blob.font.trb";
+	else if ( SteamManager::IsChineseLanguage() )
+		szFont = "data/font/ZH/blob.font.trb";
+	else
+		szFont = "data/font/blob.font.trb";
 
-		FMOD::System* system = Toshi::TSound::GetSingleton()->GetSystem();
-		system->setFileSystem(NULL, NULL, NULL, NULL, NULL, NULL, 0);
+	AXUIState::InitFont( szFont );
+	AXUIState::SetCommonSkin( "common.trb" );
+	AXUIState::SetSkinWithFont( "frontend.trb", TFALSE );
 
-		// Doens't Load
+	pXUI->SetAudio( new AXUIFMODExAudio() );
 
-		Toshi::TMemoryHeap* oldHeap = AXUIState::SetFontMemBlock(AMemory::GetPool(AMemory::POOL_XUI));
+	pXUI->SetCanvasDimensions( 1920.0f, 1080.0f );
+	AMemory::SetTRBHeap( pOldTRBHeap );
 
-		//AXUIState::SetSkin1("commonskin.trb", "commonskin.xur");
-		AXUIState::SetSkin2("frontendskin.trb", "frontendskin.xur");
-		TIMPLEMENT_D("Font according to steam language");
-		AXUIState::InitFont("data/font/blob.font.trb");
-		AXUIState::SetCommonSkin("common.trb");
-		TIMPLEMENT_D("Implement rest of XUI Classes")
-		//AXUIState::SetSkinWithFont("frontend.trb", TFALSE);
+	// The canvas (1920x1080) is scaled to the display
+	TRender::DISPLAYPARAMS* pDisplayParams = TRender::GetSingleton()->GetCurrentDisplayParams();
+	TFLOAT                  fScaleX        = TFLOAT( ceil( ( TFLOAT( TINT( pDisplayParams->uiWidth ) ) / 1920.0f ) * 256.0f ) );
+	TFLOAT                  fScaleY        = TFLOAT( ceil( ( TFLOAT( TINT( pDisplayParams->uiHeight ) ) / 1080.0f ) * 256.0f ) );
+	pXUI->GetCanvas()->SetScale( fScaleX * ( 1.0f / 256.0f ), fScaleY * ( 1.0f / 256.0f ) );
 
-		txui->m_pAudio = new AXUIFMODExAudio();
-		AXUIState::SetFontMemBlock(oldHeap);
+	new AAssetStreaming();
 
-		//Toshi::TInputInterface::CreateSingleton();
+	if ( !m_pRenderer->Create() )
+		return TFALSE;
 
-		m_Renderer->Create();
-		AGameState::SetupLoadIcon();
-		SetRenderWorld(TTRUE);
+	const TCHAR* szGUIFonts;
 
-		m_pGameStateController = AGameStateController::CreateSingleton();
-		ACameraManager::CreateSingleton();
+	if ( SteamManager::IsJapaneseLanguage() )
+		szGUIFonts = "data/gui/JP/fonts.trb";
+	else if ( SteamManager::IsKoreanLanguage() )
+		szGUIFonts = "data/gui/KO/fonts.trb";
+	else if ( SteamManager::IsChineseLanguage() )
+		szGUIFonts = "data/gui/ZH/fonts.trb";
+	else
+		szGUIFonts = "data/gui/fonts.trb";
 
-		m_pGameStateController->Create();
-		m_pGameStateController->PushState(new AAppInitState);
+	T2GUIFontManager::LoadFontTRB( szGUIFonts );
+	AFontManager::Create();
+	new AGUIManager();
 
-		TApplication::OnCreate(argc, argv);
-		//ALevelInformation info = ALevelInformation();
-		//info.Create("C:\\Program Files (x86)\\Steam\\steamapps\\common\\de Blob\\Data\\Levels.trb");
+	T2GUI::GetSingleton()->SetRenderer( new A2GUIRenderer() );
 
-		AExampleClass* exampleClass = new AExampleClass();
-		exampleClass->Delete();
-	}
+	AGameState::SetupLoadIcon();
+	g_oTheApp.SetRenderWorld( TTRUE );
 
-	return TTRUE;
+	m_pGameStateController = new AGameStateController();
+	m_pGameStateController->Create();
+	m_bInitialised = TTRUE;
+
+	new ACameraManager();
+
+	AGameStateController::GetSingleton()->PushState( new AAppInitState() );
+
+	return TApplication::OnCreate( argc, argv );
 }
 
-// $deBlob: FUNCTION 0056aa30
-TBOOL AApplication::OnUpdate(TFLOAT deltaTime)
+// $deBlob: FUNCTION 00576760
+static LONG WINAPI TopLevelExceptionFilter( EXCEPTION_POINTERS* a_pExceptionInfo )
 {
-	UpdateSound(deltaTime);
+	printf( "Blob_UnhandledExceptionFilter\n" );
 
-	Toshi::T2GUI*   pGUI          = Toshi::T2GUI::GetSingleton();
-	AMoviePlayer*   pMoviePlayer  = AMoviePlayer::GetSingleton();
-	AInputManager2* pInputManager = AInputManager2::GetSingleton();
+	DWORD uiExceptionCode = a_pExceptionInfo->ExceptionRecord->ExceptionCode;
+	SteamAPI_SetMiniDumpComment( "Deblob07.exe\n" );
+	SteamAPI_WriteMiniDump( uiExceptionCode, a_pExceptionInfo, 0 );
 
-	if (pGUI) pGUI->Tick(deltaTime);
-	if (pInputManager) pInputManager->Update(deltaTime);
-	if (pMoviePlayer) pMoviePlayer->OnUpdate(deltaTime);
-
-	m_pGameStateController->Update(deltaTime);
-	ARenderer::GetSingleton()->Update(deltaTime);
-	return TTRUE;
+	return EXCEPTION_EXECUTE_HANDLER;
 }
 
-// $deBlob: FUNCTION 0056b9b0
-TBOOL AApplication::UpdateSound(TFLOAT deltaTime)
+// The name of the Windows version
+struct OSName
 {
-	Toshi::TSound* sound = Toshi::TSound::GetSingletonSafe();
-	sound->Update();
-	return TFALSE;
+	const TCHAR* szName;
+	DWORD        dwMajorVersion;
+	DWORD        dwMinorVersion;
+	TBOOL        bWorkstation;
+};
+
+static const OSName s_aOSNames[] = {
+	{ "Windows 10", 10, 0, TTRUE },
+	{ "Windows Server 2016", 10, 0, TFALSE },
+	{ "Windows 8.1", 6, 3, TTRUE },
+	{ "Windows Server 2012 R2", 6, 3, TFALSE },
+	{ "Windows 8", 6, 2, TTRUE },
+	{ "Windows Server 2012", 6, 2, TFALSE },
+	{ "Windows 7", 6, 1, TTRUE },
+	{ "Windows Server 2008 R2", 6, 1, TFALSE },
+	{ "Windows Server 2008", 6, 0, TFALSE },
+	{ "Windows Vista", 6, 0, TTRUE },
+};
+
+// Fills a_pVersionInfo (0x11c bytes) with RtlGetVersion: TRUE if it succeeded
+// $deBlob: FUNCTION 005767a0
+BOOL GetOSVersion( OSVERSIONINFOEXW* a_pVersionInfo )
+{
+	memset( a_pVersionInfo, 0, sizeof( *a_pVersionInfo ) );
+	a_pVersionInfo->dwOSVersionInfoSize = sizeof( *a_pVersionInfo );
+
+	HMODULE         hNtDll           = GetModuleHandleW( L"ntdll.dll" );
+	t_RtlGetVersion pfnRtlGetVersion = (t_RtlGetVersion)GetProcAddress( hNtDll, "RtlGetVersion" );
+
+	if ( pfnRtlGetVersion == NULL )
+		return FALSE;
+
+	return pfnRtlGetVersion( a_pVersionInfo ) == 0;
+}
+
+// $deBlob: FUNCTION 005767f0
+static const TCHAR* GetOSName()
+{
+	OSVERSIONINFOEXW oVersionInfo;
+	memset( &oVersionInfo, 0, sizeof( oVersionInfo ) );
+	oVersionInfo.dwOSVersionInfoSize = sizeof( oVersionInfo );
+
+	HMODULE         hNtDll           = GetModuleHandleW( L"ntdll.dll" );
+	t_RtlGetVersion pfnRtlGetVersion = (t_RtlGetVersion)GetProcAddress( hNtDll, "RtlGetVersion" );
+	if ( pfnRtlGetVersion != NULL ) pfnRtlGetVersion( &oVersionInfo );
+
+	for ( TINT i = 0; i < TINT( TARRAYSIZE( s_aOSNames ) ); i++ )
+	{
+		if ( oVersionInfo.dwMajorVersion == s_aOSNames[ i ].dwMajorVersion &&
+		     oVersionInfo.dwMinorVersion == s_aOSNames[ i ].dwMinorVersion &&
+		     ( oVersionInfo.wProductType == VER_NT_WORKSTATION ) == s_aOSNames[ i ].bWorkstation )
+			return s_aOSNames[ i ].szName;
+	}
+
+	return "unknown";
+}
+
+#ifdef DEBLOB_COMMUNITY_PATCH
+static TBOOL HasSwitch( const TCHAR* a_szSwitch )
+{
+	return T2String8::FindString( GetCommandLineA(), a_szSwitch ) != TNULL;
+}
+#endif
+
+// $deBlob: FUNCTION 005768c0
+#ifdef TOSHI_FINAL
+int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, INT cmdShow )
+{
+	TINT    argc = __argc;
+	TCHAR** argv = __argv;
+#else  // TOSHI_FINAL
+int __cdecl main( int argc, TCHAR** argv ) // __cdecl: the build uses /Gz
+{
+#endif // !TOSHI_FINAL
+	SetProcessDPIAware();
+	TRegion_SetRegion( TREGION_UK );
+
+	TMemoryParams oMemoryParams;
+	oMemoryParams.flags  = 0;
+	oMemoryParams.uiSize = 640 * 1024 * 1024;
+	TUtil::ToshiCreate( argc, argv, &oMemoryParams );
+
+	TUtil::Log( "Build Version %s", s_szBuildVersion );
+
+	OSVERSIONINFOEXW oVersionInfo;
+	TUtil::MemClear( &oVersionInfo, sizeof( oVersionInfo ) );
+	oVersionInfo.dwOSVersionInfoSize = sizeof( oVersionInfo );
+
+	HMODULE         hNtDll           = GetModuleHandleW( L"ntdll.dll" );
+	t_RtlGetVersion pfnRtlGetVersion = (t_RtlGetVersion)GetProcAddress( hNtDll, "RtlGetVersion" );
+	if ( pfnRtlGetVersion != NULL ) pfnRtlGetVersion( &oVersionInfo );
+
+	TCHAR szCommandLine[ 4096 ];
+	TINT  iCommandLineLength = 0;
+
+	for ( TINT i = 0; i < argc; i++ )
+		iCommandLineLength += sprintf( &szCommandLine[ iCommandLineLength ], "%s ", argv[ i ] );
+
+	TUtil::Log( "Command Line: %s", szCommandLine );
+	TUtil::Log( "OS Name: %s", GetOSName() );
+
+	// NOTE: retail logs the (wide) service pack string with %s: only its first character
+	TUtil::Log( "OS Version: %d.%d Build:%d %s", oVersionInfo.dwMajorVersion, oVersionInfo.dwMinorVersion, oVersionInfo.dwBuildNumber, oVersionInfo.szCSDVersion );
+
+	// Single instance
+	HANDLE hMutex = TNULL;
+
+#ifdef DEBLOB_COMMUNITY_PATCH
+	// Development: "-multiinstance" allows several (test) runs at once
+	if ( !HasSwitch( "-multiinstance" ) )
+#endif
+	{
+		hMutex = CreateMutexA( NULL, TRUE, "BLOB07" );
+
+		if ( GetLastError() == ERROR_ALREADY_EXISTS )
+		{
+			MessageBoxA( NULL, "Game is already running", "de Blob", MB_OK );
+			return 0;
+		}
+	}
+
+	if ( !IsDebuggerPresent() )
+		SetUnhandledExceptionFilter( TopLevelExceptionFilter );
+
+	SteamManager::Create();
+
+	if ( !SteamManager::GetInstance()->InitializeSteam() )
+	{
+		MessageBoxA( NULL, "Failed to init steam", "de Blob", MB_OK );
+		return -1;
+	}
+
+	SteamManager::GetInstance();
+	const TCHAR* szLanguage = SteamManager::GetSteamLanguage();
+	printf( "Application language = %s\n", szLanguage ? szLanguage : "none" );
+
+	if ( g_oTheApp.Create( "Blob07 - (c) Blue Tongue Software", argc, argv ) == TTRUE )
+		g_oTheApp.Execute();
+
+	g_oTheApp.Destroy();
+	SteamManager::Unload();
+
+	if ( hMutex ) ReleaseMutex( hMutex );
+
+	// NOTE: like retail, nothing is destroyed: TUtil::ToshiDestroy is never called and ExitProcess skips the static
+	// destructors
+	ExitProcess( 0 );
 }

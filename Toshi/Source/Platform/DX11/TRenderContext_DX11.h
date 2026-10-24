@@ -1,26 +1,28 @@
 #pragma once
-#include "Toshi/Render/TRender.h"
+#include "Render/TRenderContext.h"
 
 TOSHI_NAMESPACE_START
 
+//-----------------------------------------------------------------------------
+// The render context of TRenderDX11.
+//-----------------------------------------------------------------------------
 class TRenderContextDX11 : public TRenderContext
 {
 public:
-	// $deBlob: FUNCTION 006b9680
-	TRenderContextDX11(TRender* pRender)
-	    : TRenderContext(pRender) {}
+	TRenderContextDX11( TRender* a_pRender );
+	~TRenderContextDX11();
 
-	TMatrix44& GetProjectionMatrix() { return m_Projection; }
+	virtual void Update() OVERRIDE;
 
 	void ComputePerspectiveProjection();
 	void ComputePerspectiveFrustum();
 	void ComputeOrthographicProjection();
 	void ComputeOrthographicFrustum();
 
-	virtual void Update() override;
+	TMatrix44& GetProjectionMatrix() { return m_oProjection; }
 
 private:
-	TMatrix44 m_Projection;
+	TMatrix44 m_oProjection; // 0x3C4
 };
 
 TOSHI_NAMESPACE_END

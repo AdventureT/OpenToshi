@@ -1,34 +1,25 @@
 #pragma once
+#include <XUI/TXUIAudio.h>
+#include <Sound/TSound.h>
 
-#include "Toshi/Xui/TXUIAudio.h"
-#include "Options/AOptions.h"
-
+//-----------------------------------------------------------------------------
+// AXUIFMODExAudio (0xC): the TXUIAudio of the game (TXUI::SetAudio in AppBoot).
+// The sound bank is an FMOD sound whose sub sounds are the XUI sounds.
+//-----------------------------------------------------------------------------
 class AXUIFMODExAudio : public Toshi::TXUIAudio
 {
 public:
-	// $deBlob: FUNCTION 00617f70
-	AXUIFMODExAudio()
-	{
-		m_iNumSubSounds = 0;
-		m_pSound        = TNULL;
-	}
+	AXUIFMODExAudio();
+	~AXUIFMODExAudio();
 
-	virtual TBOOL        Create(TCHAR* a_szSoundName);
-	virtual TBOOL        Release();
-	virtual FMOD::Sound* GetSubSound(TCHAR* a_pSubSoundName);
-	virtual TBOOL        PlaySound(FMOD::Sound* a_pSound, TFLOAT a_fVolume, FMOD::Channel* a_pChannel);
+	virtual TBOOL Create( const TCHAR* a_szSoundBankName ) OVERRIDE;                       // +0x04
+	virtual TBOOL Release() OVERRIDE;                                                      // +0x08
+	virtual void* GetSubSound( const TCHAR* a_szSubSoundName ) OVERRIDE;                   // +0x0C
+	virtual TBOOL PlaySound( void* a_pSound, TFLOAT a_fVolume, void** a_ppOutChannel ) OVERRIDE; // +0x10
+	virtual void  Stop( void* a_pChannel ) OVERRIDE;                                       // +0x14
+	virtual void  SetVolume( void* a_pChannel, TFLOAT a_fVolume ) OVERRIDE;                // +0x18
 
-	// $deBlob: FUNCTION 00618260
-	virtual void Stop(FMOD::Channel* a_pChannel)
-	{
-		if (a_pChannel) a_pChannel->stop();
-	}
-	// $deBlob: FUNCTION 00618280
-	virtual void SetVolume(FMOD::Channel* a_pChannel, TFLOAT a_fVolume)
-	{
-		if (a_pChannel) a_pChannel->setVolume(AOptions::GetSingleton()->GetPitch() * a_fVolume);
-	}
-
-	TINT         m_iNumSubSounds; // 0x4
-	FMOD::Sound* m_pSound;        // 0x8
+private:
+	TINT         m_iNumSubSounds; // 0x04
+	FMOD::Sound* m_pSound;        // 0x08
 };

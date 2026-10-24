@@ -16,6 +16,10 @@
 
 #pragma once
 
+#if defined( _MSC_VER ) && _MSC_VER < 1900 && !defined( noexcept )
+#define noexcept throw() // NOTE: VS2013 (the matching build) has no noexcept
+#endif
+
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <d3d11_x.h>
 #else
@@ -40,7 +44,11 @@ namespace DirectX
     };
 #endif
 
+#if defined( _MSC_VER ) && _MSC_VER < 1900
+    namespace DX11
+#else
     inline namespace DX11
+#endif
     {
         enum DDS_LOADER_FLAGS : uint32_t
         {
@@ -49,6 +57,9 @@ namespace DirectX
             DDS_LOADER_IGNORE_SRGB = 0x2,
         };
     }
+#if defined( _MSC_VER ) && _MSC_VER < 1900 // NOTE: VS2013 has no inline namespaces
+    using namespace DX11;
+#endif
 
     // Standard version
     HRESULT __cdecl CreateDDSTextureFromMemory(
@@ -171,10 +182,17 @@ namespace DirectX
 #pragma clang diagnostic ignored "-Wdeprecated-dynamic-exception-spec"
 #endif
 
+#if defined( _MSC_VER ) && _MSC_VER < 1900
+    namespace DX11
+#else
     inline namespace DX11
+#endif
     {
         DEFINE_ENUM_FLAG_OPERATORS(DDS_LOADER_FLAGS);
     }
+#if defined( _MSC_VER ) && _MSC_VER < 1900 // NOTE: VS2013 has no inline namespaces
+    using namespace DX11;
+#endif
 
 #ifdef __clang__
 #pragma clang diagnostic pop

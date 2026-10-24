@@ -1,0 +1,73 @@
+#pragma once
+#include "TTMDBase.h"
+#include "TSkeleton.h"
+#include "TModelCollision.h"
+#include "Math/TSphere.h"
+
+TOSHI_NAMESPACE_START
+
+namespace TTMDPS2
+{
+
+struct TRBLODHeader
+{
+	TINT m_iMeshCount1;
+	TINT m_iMeshCount2;
+
+	// TTMDBase::SHADERTYPE, but it is only 2 bytes on PS2!
+	TUINT16 m_eShader;
+
+	TSphere m_RenderVolume;
+};
+
+struct TRBPS2Header
+{
+	TINT          m_iNumLODs;
+	TFLOAT        m_fLODDistance;
+	TRBLODHeader* m_pLODs;
+
+	TRBLODHeader* GetLOD( TINT a_iIndex ) { return m_pLODs + a_iIndex; }
+};
+
+// SubMesh flags are set dynamically by the Engine:
+// 0x14000163 for Skin
+// 0x140001df for World
+// 0x1400005e for StaticInstance
+
+namespace StaticInstance
+{
+
+static TCONSTEXPR_VAR TFLOAT POSITION_SCALE     = 1.0f / 128.0f;
+static TCONSTEXPR_VAR TFLOAT UV_SCALE           = 1.0f / 4096.0f;
+static TCONSTEXPR_VAR TINT   POSITIONS_HDR_SIZE = 48; // VIF packet header bytes before the position data
+static TCONSTEXPR_VAR TINT   UV_HDR_SIZE        = 12; // header bytes before the UV data
+static TCONSTEXPR_VAR TINT   INDEX_HDR_SIZE     = 4;  // header bytes before the index data
+static TCONSTEXPR_VAR TINT   COLOR_HDR_SIZE     = 4;  // header bytes before the color data
+
+struct SubMesh
+{
+	Toshi::TSphere m_BoundingSphere;
+	TINT16*        m_pPositions;
+	TUINT8*        m_pColors;
+	TINT16*        m_pUVs;
+	TUINT8*        m_pIndices;
+	void*          m_pUnk;
+	TUINT32        m_uiNumVertices;
+	TUINT32        m_uiNumIndices;
+	TUINT32        m_uiFlags;
+};
+
+struct TRBMeshLODHeader
+{
+	SubMesh* m_pSubMeshes;
+	TUINT32  m_uiNumSubMeshes;
+	TUINT32  m_uiTotalVerts;
+	TFLOAT   m_fUnk;
+	TCHAR*   m_szMaterialName;
+};
+
+} // namespace StaticInstance
+
+} // namespace TTMDPS2
+
+TOSHI_NAMESPACE_END

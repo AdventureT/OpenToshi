@@ -1,84 +1,124 @@
 #include "pch.h"
 #include "AXUIFMODExAudio.h"
+#include "Options/AOptions.h"
+
+#include <Toshi/TStringManager.h>
+
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include <Core/TMemoryDebugOn.h>
 
 TOSHI_NAMESPACE_USING
 
-// $deBlob: FUNCTION 00618000
-TBOOL AXUIFMODExAudio::Create(TCHAR* a_szSoundName)
+// $deBlob: FUNCTION 00617f70
+AXUIFMODExAudio::AXUIFMODExAudio()
 {
-	auto sound = TSound::GetSingleton();
+	m_iNumSubSounds = 0;
+	m_pSound        = TNULL;
+}
 
-	if (sound != TNULL && a_szSoundName != TNULL)
+// $deBlob: FUNCTION 00617f90
+// $deBlob: FUNCTION 006182d0
+AXUIFMODExAudio::~AXUIFMODExAudio()
+{
+	if ( m_pSound != TNULL )
 	{
-		auto        system  = sound->GetSystem();
-		FMOD_RESULT eResult = system->createSound(a_szSoundName, FMOD_DEFAULT, NULL, &m_pSound);
-		if (!TSound::ErrorCheck(eResult))
-		{
-			eResult = m_pSound->getNumSubSounds(&m_iNumSubSounds);
-			return !TSound::ErrorCheck(eResult);
-		}
+		m_pSound->release();
+		m_pSound = TNULL;
 	}
-	return TFALSE;
+}
+
+// $deBlob: FUNCTION 00618000
+TBOOL AXUIFMODExAudio::Create( const TCHAR* a_szSoundBankName )
+{
+	if ( TSound::GetSingleton() == TNULL || a_szSoundBankName == TNULL )
+		return TFALSE;
+
+	Release();
+
+	if ( TSound::ErrorCheck( TSound::GetSingleton()->GetSystem()->createSound( a_szSoundBankName, FMOD_DEFAULT, TNULL, &m_pSound ) ) )
+		return TFALSE;
+
+	return !TSound::ErrorCheck( m_pSound->getNumSubSounds( &m_iNumSubSounds ) );
 }
 
 // $deBlob: FUNCTION 00618070
 TBOOL AXUIFMODExAudio::Release()
 {
-	if (m_pSound != TNULL)
+	if ( m_pSound != TNULL )
 	{
 		FMOD_RESULT eResult = m_pSound->release();
-		TASSERT(eResult == FMOD_OK);
-		if (eResult == FMOD_OK)
+		TASSERT( eResult == FMOD_OK );
+
+		if ( eResult == FMOD_OK )
 		{
 			m_pSound = TNULL;
 			return TTRUE;
 		}
 	}
+
 	return TFALSE;
 }
 
 // $deBlob: FUNCTION 006180d0
-FMOD::Sound* AXUIFMODExAudio::GetSubSound(TCHAR* a_pSubSoundName)
+void* AXUIFMODExAudio::GetSubSound( const TCHAR* a_szSubSoundName )
 {
-	auto sound = TSound::GetSingleton();
-	if (sound == TNULL || m_pSound != TNULL) return TNULL;
+	if ( TSound::GetSingleton() == TNULL )
+		return TNULL;
 
-	for (TINT i = 0; i < m_iNumSubSounds; i++)
+	if ( m_pSound != TNULL )
 	{
-		FMOD::Sound* subSound;
-		TCHAR        subSoundName[256];
-
-		FMOD_RESULT eResult = m_pSound->getSubSound(i, &subSound);
-		if (TSound::ErrorCheck(eResult)) return TNULL;
-
-		eResult = subSound->getName(subSoundName, sizeof(subSoundName));
-		TASSERT(!TSound::ErrorCheck(eResult), "Error retrieving subsound %d\n", i);
-
-		if (TStringManager::String8Compare(a_pSubSoundName, subSoundName) == 0)
+		for ( TINT i = 0; i < m_iNumSubSounds; i++ )
 		{
-			return subSound;
+			FMOD::Sound* pSubSound;
+
+			if ( TSound::ErrorCheck( m_pSound->getSubSound( i, &pSubSound ) ) )
+				break;
+
+			TCHAR       szName[ 256 ];
+			FMOD_RESULT result = pSubSound->getName( szName, sizeof( szName ) );
+			TASSERT( !TSound::ErrorCheck( result ) );
+
+			if ( TStringManager::String8Compare( a_szSubSoundName, szName ) == 0 )
+				return pSubSound;
 		}
 	}
+
 	return TNULL;
 }
 
-TBOOL AXUIFMODExAudio::PlaySound(FMOD::Sound* a_pSound, TFLOAT a_fVolume, FMOD::Channel* a_pChannel)
+// $deBlob: FUNCTION 006181d0
+TBOOL AXUIFMODExAudio::PlaySound( void* a_pSound, TFLOAT a_fVolume, void** a_ppOutChannel )
 {
-	auto sound = TSound::GetSingleton();
-	if (a_pSound == TNULL) return TFALSE;
-	auto system = sound->GetSystem();
+	if ( TSound::GetSingleton() == TNULL )
+		return TFALSE;
 
-	FMOD_RESULT eResult = system->playSound(a_pSound, TNULL, TTRUE, &a_pChannel);
+	FMOD::Channel** ppChannel = TREINTERPRETCAST( FMOD::Channel**, a_ppOutChannel );
 
-	if (!TSound::ErrorCheck(eResult))
-	{
-		eResult = a_pChannel->setVolume(AOptions::GetSingleton()->GetPitch() * a_fVolume);
-		if (!TSound::ErrorCheck(eResult))
-		{
-			a_pChannel->setPaused(TFALSE);
-			if (!TSound::ErrorCheck(eResult)) return TTRUE;
-		}
-	}
+	if ( TSound::ErrorCheck( TSound::GetSingleton()->GetSystem()->playSound( FMOD_CHANNEL_FREE, TSTATICCAST( FMOD::Sound, a_pSound ), true, ppChannel ) ) )
+		return TFALSE;
 
-	return TFALSE;
+	if ( *ppChannel == TNULL )
+		return TTRUE;
+
+	if ( TSound::ErrorCheck( ( *ppChannel )->setVolume( AOptions::GetSingleton()->GetSFXVolume() * a_fVolume ) ) )
+		return TFALSE;
+
+	return !TSound::ErrorCheck( ( *ppChannel )->setPaused( false ) );
+}
+
+// $deBlob: FUNCTION 00618260
+void AXUIFMODExAudio::Stop( void* a_pChannel )
+{
+	if ( a_pChannel != TNULL )
+		TSTATICCAST( FMOD::Channel, a_pChannel )->stop();
+}
+
+// $deBlob: FUNCTION 00618280
+void AXUIFMODExAudio::SetVolume( void* a_pChannel, TFLOAT a_fVolume )
+{
+	if ( a_pChannel != TNULL )
+		TSTATICCAST( FMOD::Channel, a_pChannel )->setVolume( AOptions::GetSingleton()->GetSFXVolume() * a_fVolume );
 }

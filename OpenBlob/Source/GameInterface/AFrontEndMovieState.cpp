@@ -1,116 +1,185 @@
 #include "pch.h"
 #include "AFrontEndMovieState.h"
+#include "AGameStateController.h"
+#include "AFXViewState.h"
+#include "AXUIState.h"
+#include "GUI/AGUIManager.h"
+#include "ASaveLoadStartAppState.h"
+#include "AApplication.h"
+#include "APlayerProfileManager.h"
+#include "Memory/AMemory.h"
+#include "Render/ARenderer.h"
+#include "XUI/FrontEnd/ABlobFrontEnd.h"
 #include "Movie/AMoviePlayer.h"
-#include "ImGui/AImGui.h"
-#include "AppBoot.h"
+#include "Entities/AEntityData.h"
 
-#include <Toshi2/T2GUI/T2GUI.h>
-#include <Toshi/Shaders/SysShader/TSysShaderHAL.h>
+#include <Toshi/TRegion.h>
+#include <GUI/T2GUI.h>
+#include <XUI/TXUI.h>
 
-#ifdef TOSHI_DEBUG
-// Used to output debug info
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include <Core/TMemoryDebugOn.h>
 
-#  ifdef TOSHI_RENDERER_DX11
-#	include "Platform/DX11/Movie/ADX11MoviePlayer_DX11.h"
-#  elif defined(TOSHI_RENDERER_OPENGL) // TOSHI_RENDERER_DX11
-#	include "Platform/SDL/Movie/ASDLMoviePlayer_SDL.h"
-#  endif // TOSHI_RENDERER_OPENGL
+TOSHI_NAMESPACE_USING
 
-#endif // TOSHI_DEBUG
+// $deBlob: FUNCTION 005d4650
+// $deBlob: FUNCTION 005d4660
+// $deBlob: FUNCTION 005d46d0
+// $deBlob: FUNCTION 005d4730
+// $deBlob: FUNCTION 005d4740
+// $deBlob: FUNCTION 0053c8d0
+// $deBlob: FUNCTION 008585a0
+TDEFINE_CLASS( AFrontEndMovieState );
 
-#include "Input/AInputHelper.h"
-#include "Toshi/Xui/TXUI.h"
-#include "XUI/Frontend/ABlobFrontEnd.h"
+const TCHAR* AFrontEndMovieState::scm_szAssetName[ 4 ] = {
+	"bkg_Legal_Blob_ENG",
+	"THQNORDIC_LOGO_Color_white",
+	"logoMovie",
+	"00_ChromaCity",
+};
+
+// $deBlob: FUNCTION 005d4750
+AFrontEndMovieState::AFrontEndMovieState()
+    : m_fBackgroundLeftTime( 5.0f )
+    , m_eState( STATE_LEGAL )
+    , m_bSkipMovie( TFALSE )
+    , m_bSkipAllMovies( TFALSE )
+{
+	m_bEntityDataLoaded = TFALSE;
+	m_eNextState        = STATE_FADETOBLACK;
+	m_fFadeInTime       = 0.0f;
+}
+
+// $deBlob: FUNCTION 005d54c0
+// $deBlob: FUNCTION 005d47f0
+AFrontEndMovieState::~AFrontEndMovieState()
+{
+}
 
 // $deBlob: FUNCTION 005d4900
-AGameState::UpdateResult AFrontEndMovieState::OnUpdate(TFLOAT deltaTime)
+AGameState::UpdateResult AFrontEndMovieState::OnUpdate( TFLOAT a_fDeltaTime )
 {
-	TIMPLEMENT();
-	m_InputHelper.Update(deltaTime);
+	m_InputHelper.Update( a_fDeltaTime );
 
-	if (m_iAssetId != Asset_Legal)
+	// The skip buttons work once the legal screen is over
+	if ( m_eState != STATE_LEGAL )
 	{
-		if (m_InputHelper.IsJustDown(0x2A))
+		if ( m_InputHelper.IsJustDown( 42 ) == TTRUE )
+			m_bSkipMovie = TTRUE;
+
+		if ( m_InputHelper.IsJustDown( 43 ) == TTRUE )
+			m_bSkipAllMovies = TTRUE;
+	}
+
+	if ( m_bSkipAllMovies && m_eState != STATE_LEGAL && m_eState != STATE_FADEFROMBLACK && m_eState != STATE_FADETOBLACK && m_eState != STATE_RESTART )
+	{
+		StopMovieIfPlaying();
+		return Finish();
+	}
+
+	AGameState::OnUpdate( a_fDeltaTime );
+
+	if ( m_eState == STATE_LEGAL || ( TUINT32( m_eState - 1 ) <= 1 && AMoviePlayer::GetSingleton()->IsMoviePlaying() == TTRUE ) )
+		m_fBackgroundLeftTime -= a_fDeltaTime;
+
+	// The entity data is loaded while the legal screen shows
+	if ( !m_bEntityDataLoaded && AEntityData::GetSingleton() == TNULL )
+	{
+		new AEntityData();
+		AEntityData::GetSingleton()->Load();
+		m_bEntityDataLoaded = TTRUE;
+	}
+
+	STATE eState = m_eState;
+
+	if ( ( ( eState == STATE_THQLOGO || eState == STATE_LOGOMOVIE || eState == STATE_INTRO ) && m_bSkipMovie == TTRUE ) || m_fBackgroundLeftTime <= 0.0f )
+	{
+		if ( g_oTheApp.m_bFXView )
+			m_bSkipAllMovies = TTRUE;
+
+		if ( g_oTheApp.m_bSkipFrontend )
 		{
-			// Commenting this cause handling input is not finished atm and it would skip all instantly
-			m_bSkip = true;
+			if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+				AMoviePlayer::GetSingleton()->StopMovie();
+
+			return Finish();
 		}
 	}
 
-	AGameState::OnUpdate(deltaTime);
-	AMoviePlayer* pMoviePlayer = AMoviePlayer::GetSingleton();
-
-	if (m_iAssetId == Asset_Legal || (m_iAssetId < 3 && pMoviePlayer->IsMoviePlaying()))
+	switch ( eState )
 	{
-		m_fBackgroundLeftTime -= deltaTime;
-	}
-
-	switch (m_iAssetId)
-	{
-		case Asset_THQLogo:
-		case Asset_LogoMovie:
-		case Asset_Intro:
-			if (m_bSkip)
+		case STATE_LEGAL:
+			if ( HasBackgroundStoppedShowing() == TTRUE )
+				GoToNextMovie( STATE_THQLOGO );
+			break;
+		case STATE_THQLOGO:
+			if ( HasMovieStopped() == TTRUE )
+				GoToNextMovie( STATE_LOGOMOVIE );
+			break;
+		case STATE_LOGOMOVIE:
+			if ( HasMovieStopped() == TTRUE )
+				GoToNextMovie( STATE_INTRO );
+			break;
+		case STATE_INTRO:
+			if ( HasMovieStopped() == TTRUE )
 			{
-				if (AApplication::g_oTheApp.m_bUnk4)
-				{
-					StopMovieIfPlaying();
-					TIMPLEMENT_D("Start Rendering Frontend menu");
-				}
+				StopMovieIfPlaying();
+				m_bSkipMovie = TFALSE;
+				return Finish();
+			}
+			break;
+		case STATE_FADETOBLACK:
+		{
+			AGameStateController* pController = AGameStateController::GetSingleton();
+
+			if ( pController->GetFade( 0 ) < 1.0f && pController->IsFadingToBlack( 0 ) )
+				break;
+
+			if ( m_bSkipAllMovies )
+			{
+				pController->SetFade( 0.0f, 0 );
+				StopMovieIfPlaying();
+				return Finish();
+			}
+
+			if ( m_fFadeInTime <= 0.0f )
+			{
+				pController->SetFade( 0.0f, 0 );
+				GoToNextBackground( m_eNextState, 0.0f, 0.0f );
 			}
 			else
 			{
-				if (m_fBackgroundLeftTime <= 0.0f)
-				{
-					if (AApplication::g_oTheApp.m_bUnk4)
-					{
-						StopMovieIfPlaying();
-						TIMPLEMENT_D("Start Rendering Frontend menu");
-					}
-				}
+				InitState( STATE_FADEFROMBLACK );
+				CreateBackGround( m_eNextState );
+				pController->FadeFromBlack( m_fFadeInTime, 0 );
 			}
-			break;
-		default:
-			if (m_fBackgroundLeftTime <= 0.0f)
-			{
-				if (AApplication::g_oTheApp.m_bUnk4)
-				{
-					StopMovieIfPlaying();
-					TIMPLEMENT_D("Start Rendering Frontend menu");
-				}
-			}
-			break;
-	}
 
-	switch (m_iAssetId)
-	{
-		case Asset_Legal:
-			if (HasBackgroundStoppedShowing())
-			{
-				StartMovie(Asset_THQLogo);
-			}
 			break;
-		case Asset_THQLogo:
-			if (HasMovieStopped())
-			{
-				StartMovie(Asset_LogoMovie);
-			}
+		}
+		case STATE_FADEFROMBLACK:
+		{
+			AGameStateController* pController = AGameStateController::GetSingleton();
+
+			if ( pController->GetFade( 0 ) <= 0.0f || !pController->IsFading( 0 ) )
+				GoToNextBackground( m_eNextState, 0.0f, 0.0f );
+
 			break;
-		case Asset_LogoMovie:
-			if (HasMovieStopped())
+		}
+		case STATE_RESTART:
+		{
+			AGameStateController* pController = AGameStateController::GetSingleton();
+
+			if ( pController->GetFade( 0 ) >= 1.0f || !pController->IsFadingToBlack( 0 ) )
 			{
-				StartMovie(Asset_Intro);
-			}
-			break;
-		case Asset_Intro:
-			if (HasMovieStopped())
-			{
-				StopMovieIfPlaying();
-				m_bSkip = TFALSE;
-				TIMPLEMENT_D("Start Rendering Frontend menu");
+				pController->ResetFades();
 				StartBlobFrontendMenu();
 			}
+
 			break;
+		}
 	}
 
 	return UpdateResult_OK;
@@ -119,25 +188,23 @@ AGameState::UpdateResult AFrontEndMovieState::OnUpdate(TFLOAT deltaTime)
 // $deBlob: FUNCTION 005d4860
 void AFrontEndMovieState::OnInsertion()
 {
-	auto pGUI         = Toshi::T2GUI::GetSingletonSafe();
-	auto pGUIRenderer = pGUI->GetRenderer();
-	auto pRootElement = pGUI->GetRootElement();
+	AInputManager2::GetSingleton()->SetContext( AInputMap::INPUTCONTEXT_FrontEndMovie );
+	m_InputHelper.AddMapping( 42, TFALSE, -1.0f );
+	m_InputHelper.AddMapping( 43, TFALSE, -1.0f );
 
-	AInputManager2::GetSingleton()->SetContext(AInputMap::INPUTCONTEXT_UNK8);
-	m_InputHelper.AddMapping(0x2A, TFALSE, -1.0f); // SPACE
-	m_InputHelper.AddMapping(0x2B, TFALSE, -1.0f); // RETURN
+	m_Background.Create( scm_szAssetName[ m_eState ] );
+	m_Background.SetVisible( TTRUE );
 
-	m_Background.Create(s_Assets[m_iAssetId]);
-	m_Background.SetVisible(TTRUE);
+	AGUIManager::GetSingleton()->SetCursorEnabled( TFALSE );
 
-	TIMPLEMENT();
 	AGameState::OnInsertion();
 }
 
 // $deBlob: FUNCTION 005d48e0
 void AFrontEndMovieState::OnRemoval()
 {
-	TIMPLEMENT();
+	AInputManager2::GetSingleton()->RemoveCurrentContext();
+
 	AGameState::OnRemoval();
 }
 
@@ -146,43 +213,38 @@ void AFrontEndMovieState::OnActivate()
 {
 	AGameState::OnActivate();
 
-	auto pRootElement = Toshi::T2GUI::GetSingleton()->GetRootElement();
-	pRootElement->AddChildHead(&m_Background);
+	T2GUIElement* pRoot = T2GUI::GetSingleton()->GetRootElement();
+	pRoot->AddChildHead( &m_Background );
 
 	TFLOAT fWidth, fHeight;
-	pRootElement->GetDimensions(fWidth, fHeight);
-	m_Background.SetDimensions(fWidth, fHeight);
+	pRoot->GetDimensions( fWidth, fHeight );
+	m_Background.SetDimensions( fWidth, fHeight );
 
-	AApplication::g_oTheApp.SetRenderWorld(TFALSE);
+	g_oTheApp.SetRenderWorld( TFALSE );
 }
 
 // $deBlob: FUNCTION 005d4d60
 void AFrontEndMovieState::OnDeactivate()
 {
 	AGameState::OnDeactivate();
-	AMoviePlayer* pPlayer = AMoviePlayer::GetSingletonSafe();
 
-	if (pPlayer->IsMoviePlaying())
-	{
-		pPlayer->StopMovie();
-	}
+	if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+		AMoviePlayer::GetSingleton()->StopMovie();
 
-	m_Background.Unlink();
-	AApplication::g_oTheApp.SetRenderWorld(TTRUE);
+	m_Background.RemoveSelf();
+	g_oTheApp.SetRenderWorld( TTRUE );
 }
 
 // $deBlob: FUNCTION 005d4f50
 TBOOL AFrontEndMovieState::HasBackgroundStoppedShowing()
 {
-	switch (m_iAssetId)
+	switch ( m_eState )
 	{
-		case Asset_THQLogo:
-		case Asset_LogoMovie:
-		case Asset_Intro:
-			if (m_bSkip)
-			{
+		case STATE_THQLOGO:
+		case STATE_LOGOMOVIE:
+		case STATE_INTRO:
+			if ( m_bSkipMovie == TTRUE )
 				return TTRUE;
-			}
 	}
 
 	return m_fBackgroundLeftTime <= 0.0f;
@@ -191,95 +253,187 @@ TBOOL AFrontEndMovieState::HasBackgroundStoppedShowing()
 // $deBlob: FUNCTION 005d4f90
 TBOOL AFrontEndMovieState::HasMovieStopped()
 {
-	switch (m_iAssetId)
+	switch ( m_eState )
 	{
-		case Asset_THQLogo:
-		case Asset_LogoMovie:
-		case Asset_Intro:
-			if (m_bSkip)
-			{
+		case STATE_THQLOGO:
+		case STATE_LOGOMOVIE:
+		case STATE_INTRO:
+			if ( m_bSkipMovie == TTRUE )
 				return TTRUE;
-			}
 	}
-	return !AMoviePlayer::GetSingleton()->IsMoviePlaying();
+
+	return AMoviePlayer::GetSingleton()->IsMoviePlaying() == TFALSE;
 }
 
 // $deBlob: FUNCTION 005d4f30
 void AFrontEndMovieState::StopMovieIfPlaying()
 {
-	AMoviePlayer* pPlayer = AMoviePlayer::GetSingleton();
-	if (pPlayer->IsMoviePlaying())
-	{
-		pPlayer->StopMovie();
-	}
+	if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+		AMoviePlayer::GetSingleton()->StopMovie();
 }
 
 // $deBlob: FUNCTION 005d4fe0
-void AFrontEndMovieState::StartMovie(Asset assetId)
+void AFrontEndMovieState::GoToNextMovie( STATE a_eState )
 {
-	AMoviePlayer* pPlayer = AMoviePlayer::GetSingleton();
+	if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+		AMoviePlayer::GetSingleton()->StopMovie();
 
-	if (pPlayer->IsMoviePlaying())
-	{
-		pPlayer->StopMovie();
-	}
-
-	m_iAssetId            = assetId;
 	m_fBackgroundLeftTime = 5.0f;
-	m_bSkip               = TFALSE;
-	m_Background.SetVisible(TFALSE);
-	pPlayer->PlayMovie(s_Assets[assetId], 0, 0);
+	m_eState              = a_eState;
+	m_bSkipMovie          = TFALSE;
+	m_Background.SetVisible( TFALSE );
+
+	AMoviePlayer::GetSingleton()->PlayMovie( scm_szAssetName[ a_eState ], 0, AMoviePlayer::PlayFlags_None );
 }
 
+// $deBlob: FUNCTION 005d5050
+void AFrontEndMovieState::GoToNextBackground( STATE a_eState, TFLOAT a_fFadeOutTime, TFLOAT a_fFadeInTime )
+{
+	if ( 0.0f < a_fFadeOutTime )
+	{
+		m_eNextState  = a_eState;
+		m_fFadeInTime = a_fFadeInTime;
+
+		if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+			AMoviePlayer::GetSingleton()->StopMovie();
+
+		m_fBackgroundLeftTime = 5.0f;
+		m_eState              = STATE_FADETOBLACK;
+		m_bSkipMovie          = TFALSE;
+		AGameStateController::GetSingleton()->FadeToBlack( a_fFadeOutTime, 0 );
+		return;
+	}
+
+	if ( 0.0f < a_fFadeInTime )
+	{
+		m_fFadeInTime = a_fFadeInTime;
+		m_eNextState  = a_eState;
+
+		if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+			AMoviePlayer::GetSingleton()->StopMovie();
+
+		m_fBackgroundLeftTime = 5.0f;
+		m_eState              = STATE_FADEFROMBLACK;
+		m_bSkipMovie          = TFALSE;
+		m_Background.Create( scm_szAssetName[ a_eState ] );
+		m_Background.SetVisible( TTRUE );
+		AGameStateController::GetSingleton()->FadeFromBlack( m_fFadeInTime, 0 );
+		return;
+	}
+
+	if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+		AMoviePlayer::GetSingleton()->StopMovie();
+
+	m_fBackgroundLeftTime = 5.0f;
+	m_eState              = a_eState;
+	m_bSkipMovie          = TFALSE;
+	m_Background.Create( scm_szAssetName[ a_eState ] );
+	m_Background.SetVisible( TTRUE );
+}
+
+// $deBlob: FUNCTION 005d5280
+void AFrontEndMovieState::InitState( STATE a_eState )
+{
+	if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+		AMoviePlayer::GetSingleton()->StopMovie();
+
+	m_fBackgroundLeftTime = 5.0f;
+	m_eState              = a_eState;
+	m_bSkipMovie          = TFALSE;
+}
+
+// $deBlob: FUNCTION 005d51c0
+void AFrontEndMovieState::Restart()
+{
+	if ( AMoviePlayer::GetSingleton()->IsMoviePlaying() )
+		AMoviePlayer::GetSingleton()->StopMovie();
+
+	m_fBackgroundLeftTime = 5.0f;
+	m_eState              = STATE_RESTART;
+	m_bSkipMovie          = TFALSE;
+	AGameStateController::GetSingleton()->FadeToBlack( 0.5f, 0 );
+}
+
+// $deBlob: FUNCTION 005d5220
+void AFrontEndMovieState::CreateBackGround( STATE a_eState )
+{
+	m_Background.Create( scm_szAssetName[ a_eState ] );
+	m_Background.SetVisible( TTRUE );
+}
+
+// Creates the frontend: frontend.xur (ABlobFrontEnd) and the splash screen (an AXUIState waiting for
+// frontendcarousel.trb)
 // $deBlob: FUNCTION 005d5300
+AGameState::UpdateResult AFrontEndMovieState::Finish()
+{
+	if ( g_oTheApp.m_bFXView )
+	{
+		AGameStateController::GetSingleton()->ResetStack();
+
+		AGameStateController::GetSingleton()->PushState( new ( AMemory::GetPool( AMemory::POOL_FrequentAllocations ) ) AFXViewState() );
+		return UpdateResult_OK;
+	}
+
+	if ( g_oTheApp.m_bSkipFrontend )
+	{
+		APlayerProfileManager* pProfileManager = APlayerProfileManager::GetSingleton();
+		pProfileManager->SetCurrentProfile( 0 );
+
+		if ( pProfileManager->IsProfileUsed( 0 ) )
+			return UpdateResult_OK;
+
+		pProfileManager->SetCurrentProfileName( L"Archie" );
+		return UpdateResult_OK;
+	}
+
+	AGameStateController::GetSingleton()->ResetStack();
+	AXUIState::LoadFrontendCarousel();
+	AGameStateController::GetSingleton()->SetFade( 1.0f, 0 );
+	ARenderer::GetSingleton()->Update( 0.0f );
+	ARenderer::GetSingleton()->Update( 0.0f );
+
+	TXUI*      pXUI      = TXUI::GetSingleton();
+	TXUIScene* pFrontEnd = pXUI->CreateScene( pXUI->FindResource( "frontend.xur" ), TUINT32( 0 ) );
+	TASSERT( pFrontEnd->IsA( &TGetClass( ABlobFrontEnd ) ) );
+
+	TSTATICCAST( ABlobFrontEnd, pFrontEnd )->SetCursorTrailsVisible( TFALSE );
+
+	AXUIState::Assets oAssets;
+	oAssets.m_sResourceName = "splash.xur";
+	oAssets.m_wszSceneName  = TNULL;
+	oAssets.m_fSoundVolume  = 0.5f;
+	oAssets.m_pTargetParent = pFrontEnd;
+	oAssets.m_bDelayed      = TTRUE;
+
+	AGameStateController::GetSingleton()->PushState( new ( AMemory::GetPool( AMemory::POOL_FrequentAllocations ) ) AXUIState( oAssets ) );
+
+	return UpdateResult_OK;
+}
+
+// $deBlob: FUNCTION 005d4dc0
 void AFrontEndMovieState::StartBlobFrontendMenu()
 {
-	TIMPLEMENT();
-#if 0
-    AGameStateController* pGameStateController = AGameStateController::GetSingleton();
-    Toshi::TXUI* pXui = Toshi::TXUI::GetSingleton();
-
-    if (AApplication::g_oTheApp.m_bUnk3) {
-        pGameStateController->ResetStack();
-        return;
-    }
-    else if (AApplication::g_oTheApp.m_bUnk4) {
-        return;
-    }
-    pGameStateController->ResetStack();
-    Toshi::TXUIScene* pFrontend = pXui->CreateScene(pXui->FindResource("frontend.xur"), 0);
-    TASSERT(pFrontend->IsA(TGetClass(ABlobFrontEnd)));
-#endif
-}
-
-#ifdef TOSHI_DEBUG
-void AFrontEndMovieState::DEBUG_RenderImGui()
-{
-	auto pMoviePlayer = TSTATICCAST(ADX11MoviePlayer, AMoviePlayer::GetSingleton());
-
-	TUINT audioPosition = 0;
-
-	if (pMoviePlayer->m_pChannel)
-		pMoviePlayer->m_pChannel->getPosition(&audioPosition, FMOD_TIMEUNIT_MS);
-
-	AIMGUI_FORMAT("Video file: %s", pMoviePlayer->m_CurrentFileName);
-	AIMGUI_FORMAT("Current asset: %s", s_Assets[m_iAssetId]);
-	AIMGUI_FORMAT("Video position: %.0lfms", pMoviePlayer->m_Position);
-	AIMGUI_FORMAT("Audio position: %ums", audioPosition);
-	AIMGUI_FORMAT("Audio delay: %dms", TINT(pMoviePlayer->m_Position - audioPosition));
-	AIMGUI_FORMAT("Background image left time: %.2fs", m_fBackgroundLeftTime);
-
-	if (ImGui::Button("Skip"))
+	switch ( TRegion_GetRegion() )
 	{
-		StopMovieIfPlaying();
+		case 0:
+		case 3:
+		{
+			AXUIState::Assets oAssets;
+			oAssets.m_sResourceName = "language.xur";
+			oAssets.m_wszSceneName  = TNULL;
+			oAssets.m_fSoundVolume  = 0.5f;
+
+			AGameStateController::GetSingleton()->PushState( new ( AMemory::GetPool( AMemory::POOL_FrequentAllocations ) ) AXUIState( oAssets ) );
+
+			AGUIManager::GetSingleton()->SetCursorVisible( TFALSE, TTRUE );
+			return;
+		}
+		case 1:
+		case 2:
+			break;
+		default:
+			return;
 	}
 
-	if (ImGui::Button("Reset state"))
-	{
-		m_iAssetId            = Asset_Legal;
-		m_fBackgroundLeftTime = 5.0f;
-		m_Background.SetVisible(TTRUE);
-		StopMovieIfPlaying();
-	}
+	AGameStateController::GetSingleton()->PushState( new ( AMemory::GetPool( AMemory::POOL_FrequentAllocations ) ) ASaveLoadStartAppState() );
 }
-#endif // TOSHI_DEBUG

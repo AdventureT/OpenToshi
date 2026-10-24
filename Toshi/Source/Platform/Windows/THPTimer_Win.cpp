@@ -1,2 +1,64 @@
 #include "ToshiPCH.h"
 #include "THPTimer_Win.h"
+
+#include <windows.h>
+
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include "Core/TMemoryDebugOn.h"
+
+TOSHI_NAMESPACE_START
+
+// $deBlob: FUNCTION 00663050
+// $Barnyard: FUNCTION 006bdcb0
+THPTimer::THPTimer()
+{
+	Reset();
+}
+
+// $deBlob: FUNCTION 00663080
+// NOTE: empty in de Blob (Barnyard resets the timer)
+THPTimer::~THPTimer()
+{
+}
+
+TUINT32 THPTimer::GetRaw32()
+{
+	LARGE_INTEGER raw32;
+	QueryPerformanceCounter( &raw32 );
+	return static_cast<TUINT32>( raw32.QuadPart );
+}
+
+int64_t THPTimer::GetRaw64()
+{
+	LARGE_INTEGER raw64;
+	QueryPerformanceCounter( &raw64 );
+	return raw64.QuadPart;
+}
+
+// $deBlob: FUNCTION 005ac380
+// $Barnyard: FUNCTION 006bdc10
+void THPTimer::Reset()
+{
+	QueryPerformanceCounter( (LARGE_INTEGER*)&m_iCurrentTime );
+	QueryPerformanceFrequency( (LARGE_INTEGER*)&m_iFrequency );
+	m_iOldTime = m_iCurrentTime;
+	m_fDelta   = 0;
+}
+
+// $deBlob: FUNCTION 00663090
+// $Barnyard: FUNCTION 006bdc50
+void THPTimer::Update()
+{
+	m_iOldTime = m_iCurrentTime;
+	QueryPerformanceCounter( (LARGE_INTEGER*)&m_iCurrentTime );
+
+	// NOTE: de Blob divides by the frequency (Barnyard multiplies by its inverse)
+	double dFrequency = double( TINT64( m_iFrequency ) );
+	m_fDelta          = TFLOAT( double( TINT64( m_iCurrentTime - m_iOldTime ) ) / dFrequency );
+	m_fCurrentSeconds = TFLOAT( double( TINT64( m_iCurrentTime ) ) / dFrequency );
+}
+
+TOSHI_NAMESPACE_END

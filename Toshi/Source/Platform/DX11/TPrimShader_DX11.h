@@ -1,27 +1,38 @@
 #pragma once
 #include "TTexture_DX11.h"
+#include "Math/TVector2.h"
+#include "Math/TVector3.h"
+
+#include <d3d11.h>
 
 TOSHI_NAMESPACE_START
 
-class TPrimShader : public TSingleton<TPrimShader>
+//-----------------------------------------------------------------------------
+// Purpose: draws 2D/3D primitives (quads, lines, strips) with a colour and an optional texture straight from a dynamic
+// vertex buffer, in the current render context's model view and projection. Used by the GUI and XUI renderers and the
+// debug draws. Created by ARenderer. NOTE: retail keeps the fields in a member m_Data
+// (the asserts say "m_Data.m_bIsRendering") whose constructor (Initialise) and destructor (Destroy) are out of line;
+// here they are TPrimShader's own
+//-----------------------------------------------------------------------------
+class TPrimShader
 {
 public:
-	static constexpr size_t ONE_VERTEX_BUFFER_SIZE = 40000;
+	static TCONSTEXPR_VAR TINT ONE_VERTEX_BUFFER_SIZE = 40000;
 
 	struct Mesh
 	{
-		UINT uiStartPrim;
-		UINT uiNumPrims;
+		UINT uiStartVertex; // 0x00
+		UINT uiNumVerts;    // 0x04
 	};
 
 	struct Vertex
 	{
-		TVector3 Position;
-		UINT     Color;
-		TVector2 UV;
-	};
+		TVector3 Position; // 0x00
+		TUINT32  Colour;   // 0x0C B8G8R8A8
+		TVector2 UV;       // 0x10
+	}; // 0x18
 
-	typedef UINT PrimType;
+	typedef TUINT32 PrimType;
 	enum PrimType_ : PrimType
 	{
 		PrimType_TriangleStrip,
@@ -30,76 +41,75 @@ public:
 		PrimType_LineList,
 	};
 
-	typedef UINT BlendMode;
+	// 0: opaque, 2: additive, anything else: alpha blended
+	typedef TUINT32 BlendMode;
+	enum BlendMode_ : BlendMode
+	{
+		BlendMode_Opaque   = 0,
+		BlendMode_Alpha    = 1,
+		BlendMode_Additive = 2,
+	};
 
 public:
 	TPrimShader();
 	~TPrimShader();
 
-	void Initialize();
-	void Destroy();
-
-	TBOOL AddMesh();
-	void  AddVert();
-
-	void Unlock();
-	void StartRendering(PrimType primType);
+	// Starts a batch of a_ePrimType primitives: binds the shaders, the image and the render states and takes a mesh
+	void StartRendering( PrimType a_ePrimType );
+	// Draws the vertices added since StartRendering and restores the render states
 	void StopRendering();
 
-	// $deBlob: FUNCTION 007064e0
-	void SetBlendModeAndUnlock(BlendMode blendMode)
-	{
-		if (m_eBlendMode != blendMode && (m_eBlendMode = blendMode, m_bIsLocked))
-		{
-			Unlock();
-		}
-	}
+	// Takes the next mesh and maps the vertex buffer (discarding it)
+	TBOOL AddMesh();
+	// Finishes the current vertex (GetCurrentVertex) and advances
+	void AddVert();
+	// Unmaps the vertex buffer and draws the current mesh
+	void Unlock();
+	// Draws the current mesh if the buffer is mapped
+	void Flush();
 
-	// $deBlob: FUNCTION 00706500
-	void SetImageAndUnlock(TTexture* pTexture)
-	{
-		if (m_pImage != pTexture && (m_pImage = pTexture, m_bIsLocked))
-		{
-			Unlock();
-		}
-	}
+	void SetBlendModeAndUnlock( BlendMode a_eBlendMode );
+	void SetImageAndUnlock( TTexture* a_pTexture );
 
-	Mesh* GetCurrentMesh()
-	{
-		TASSERT(m_uiNumUsedMeshes - 1 < m_uiNumMeshes);
-		return &m_pMeshes[m_uiNumUsedMeshes - 1];
-	}
+	Vertex*   GetCurrentVertex() const { return m_pCurrentVertex; }
+	BlendMode GetBlendMode() const { return m_eBlendMode; }
+	TTexture* GetImage() const { return m_pImage; }
 
-	Vertex* GetCurrentVertex() { return m_pCurrentVertex; }
+	ID3D11VertexShader* GetVertexShader() const { return m_pVertexShader; }
+	ID3D11PixelShader*  GetImagePixelShader() const { return m_pImagePixelShader; }
+	ID3D11PixelShader*  GetColourPixelShader() const { return m_pColourPixelShader; }
+	ID3D11InputLayout*  GetInputLayout() const { return m_pInputLayout; }
 
-	ID3D11VertexShader* GetVertexShader() const { return m_pVShader; }
-
-	ID3D11PixelShader* GetPixelBasicShader() const { return m_pPShaderBasic; }
-
-	ID3D11PixelShader* GetPixelImageShader() const { return m_pPShaderImage; }
-
-	ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout; }
+	static TPrimShader* GetSingleton() { return s_pSingleton; }
 
 private:
-	void DrawPrim(PrimType primType, UINT numPrim, UINT startPrim);
+	// Compiles the shaders, creates the input layout, the meshes and the vertex buffer (retail: m_Data's constructor)
+	void Initialise();
+	// Releases them (retail: m_Data's destructor)
+	void Destroy();
+
+	void DrawPrim( PrimType a_ePrimType, UINT a_uiNumVerts, UINT a_uiStartVertex );
 
 private:
-	Mesh*               m_pMeshes;
-	UINT                m_uiNumMeshes;
-	UINT                m_uiNumUsedMeshes;
-	UINT                m_uiNumDrawnFrames;
-	UINT                m_uiNumUsedVerts;
-	Vertex*             m_pCurrentVertex;
-	TBOOL               m_bIsLocked;
-	TBOOL               m_bIsRendering;
-	PrimType            m_ePrimType;
-	BlendMode           m_eBlendMode;
-	TTexture*           m_pImage;
-	ID3D11VertexShader* m_pVShader;
-	ID3D11PixelShader*  m_pPShaderImage;
-	ID3D11PixelShader*  m_pPShaderBasic;
-	ID3D11InputLayout*  m_pInputLayout;
-	ID3D11Buffer*       m_pBuffer;
-};
+	static TPrimShader* s_pSingleton;
+
+private:
+	Mesh*               m_pMeshes;            // 0x00
+	TINT                m_iNumMeshes;         // 0x04
+	TINT                m_iNumUsedMeshes;     // 0x08
+	TUINT32             m_uiFrame;            // 0x0C TRenderDX11's frame of the meshes
+	TINT                m_iNumUsedVerts;      // 0x10
+	Vertex*             m_pCurrentVertex;     // 0x14
+	TBOOL               m_bLocked;            // 0x18
+	TBOOL               m_bIsRendering;       // 0x19
+	PrimType            m_ePrimType;          // 0x1C
+	BlendMode           m_eBlendMode;         // 0x20
+	TTexture*           m_pImage;             // 0x24
+	ID3D11VertexShader* m_pVertexShader;      // 0x28
+	ID3D11PixelShader*  m_pImagePixelShader;  // 0x2C
+	ID3D11PixelShader*  m_pColourPixelShader; // 0x30
+	ID3D11InputLayout*  m_pInputLayout;       // 0x34
+	ID3D11Buffer*       m_pVertexBuffer;      // 0x38
+}; // 0x3C
 
 TOSHI_NAMESPACE_END

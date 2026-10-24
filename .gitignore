@@ -367,3 +367,39 @@ MigrationBackup/
 FodyWeavers.xsd
 
 Tools/Vendor/Catch2/lib/*/*.lib
+*.slnx
+
+# Third-party SDKs supplied locally (licences: see each folder)
+!Toshi/Vendor/havok/Source/**/[Ww][Ii][Nn]32/
+# Havok 6.5 SDK: headers and the libs the build links (Toshi/premake5.lua) are tracked, the rest of the SDK is not
+Toshi/Vendor/havok/Lib/*
+!Toshi/Vendor/havok/Lib/win32_net_9-0/
+Toshi/Vendor/havok/Lib/win32_net_9-0/*
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/
+Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/*
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkBase.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkSerialize.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkSceneData.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkInternal.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkGeometryUtilities.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkVisualize.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkCompat.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkpCollide.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkpConstraintSolver.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkpDynamics.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkpInternal.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/debug_multithreaded_dll/hkpUtilities.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/
+Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/*
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkBase.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkSerialize.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkSceneData.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkInternal.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkGeometryUtilities.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkVisualize.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkCompat.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkpCollide.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkpConstraintSolver.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkpDynamics.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkpInternal.lib
+!Toshi/Vendor/havok/Lib/win32_net_9-0/release_multithreaded_dll/hkpUtilities.lib

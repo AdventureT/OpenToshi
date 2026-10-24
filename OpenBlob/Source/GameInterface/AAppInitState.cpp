@@ -1,48 +1,170 @@
 #include "pch.h"
-#include "AppBoot.h"
+#include "AModelViewState.h"
+#include "Console/AConsole.h"
+#include "Console/AStaticCVars.h"
+#include "Sound/ASoundTextureSwapMap.h"
+#include "Cheats/ACheatManager.h"
+#include "Render/Decal/ADecalManager.h"
+#include "Sound/APositionalSoundManager.h"
+#include "Entities/APickupManager.h"
+#include <Physics/Havok/TPhysicsManager.h>
+#include "Collision/ACollisionManager2.h"
 #include "AAppInitState.h"
-#include "Render/ARenderer.h"
-#include "Render/ModelLoading/AModelLoader.h"
-#include "Movie/AMoviePlayer.h"
-#include "GameInterface/AFrontEndMovieState.h"
-#include "GameInterface/ATestState.h"
+#include "Sound/AStreamingSoundPlayer.h"
+#include "AGameStateController.h"
+#include "AApplication.h"
 #include "AAssetStreaming.h"
+#include "Render/ARenderer.h"
+#include "AXUIState.h"
+#include "APlayerProfileManager.h"
+#include "APlayerManager.h"
 #include "ALevelInformation.h"
+#include "GameController/AGameStatus.h"
+#include "AFrontEndMovieState.h"
+#include "Movie/AMoviePlayer_DX11.h"
+#include "Memory/AMemory.h"
+#include "Render/ModelLoading/AModelLoader.h"
+#include "Animation/AModelFactory.h"
+#include "Buildings/ABuildingManager.h"
+#include "Platform/DX11/AJellyShader_DX11.h"
 #include "Options/AOptions.h"
+#include "MemoryCard/SaveLoad_Win.h"
 #include "ARandom.h"
+#include "Subtitles/ASubtitleManager.h"
+#include <GUI/T2GUITextureSectionManager.h>
+#include <T2Locale/T2Locale.h>
+#include "AAchievements.h"
+#include "Sound/ASoundInterface.h"
+#include "Sound/ASoundLoadHelper.h"
+#include "Sound/AMusicManager.h"
+#include "Challenges/AChallengeManager.h"
 
-#ifdef TOSHI_RENDERER_DX11
-#  include "Platform/DX11/Movie/ADX11MoviePlayer_DX11.h"
-#elif defined(TOSHI_RENDERER_OPENGL) // TOSHI_RENDERER_DX11
-#  include "Platform/SDL/Movie/ASDLMoviePlayer_SDL.h"
-#endif // TOSHI_RENDERER_OPENGL
+#include <XUI/TXUI.h>
 
-#include <Toshi2/T2GUI/T2GUI.h>
-#include <Toshi2/T2GUI/T2GUIRectangle.h>
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include "FXComposition/AFXCompositionManager.h"
 
-using namespace Toshi;
+#include "Render/Material/AMaterialManager.h"
+#include <TParticleSystem/TParticleSystem.h>
+#include "MemoryCard/AAutosaveManager.h"
+#include "Input/AVibrationManager.h"
+#include "Sound/APhysicsSoundManager.h"
+
+#include <Core/TMemoryDebugOn.h>
+
+TOSHI_NAMESPACE_USING
+
+// $deBlob: FUNCTION 005c1550
+// $deBlob: FUNCTION 005c1560
+// $deBlob: FUNCTION 005c15d0
+// $deBlob: FUNCTION 005c1640
+// $deBlob: FUNCTION 005c1650
+// $deBlob: FUNCTION 0053c500
+// $deBlob: FUNCTION 00858490
+TDEFINE_CLASS( AAppInitState );
+
+// $deBlob: FUNCTION 005c1660
+AAppInitState::AAppInitState()
+{
+}
+
+// $deBlob: FUNCTION 005c1680
+// $deBlob: FUNCTION 005c1c60
+AAppInitState::~AAppInitState()
+{
+}
 
 // $deBlob: FUNCTION 005c1690
-AGameState::UpdateResult AAppInitState::OnUpdate(TFLOAT deltaTime)
+AGameState::UpdateResult AAppInitState::OnUpdate( TFLOAT a_fDeltaTime )
 {
-	TIMPLEMENT();
-
-	if (AAssetStreaming::GetSingleton()->HasActiveJobs())
+	if ( AAssetStreaming::GetSingleton()->HasActiveJobs() )
 	{
-		ARenderer::GetSingleton()->SetBackgroundColour(0, 0, 0);
-		return AGameState::OnUpdate(deltaTime);
+		ARenderer::GetSingleton()->SetBackgroundColour( 0, 0, 0 );
+		return AGameState::OnUpdate( a_fDeltaTime );
 	}
 
-	TString8 str;
-	str = str.Format("data/%s.trb", AApplication::g_oTheApp.GetLevelInformationFileName());
+	AConsole::RegisterCommands();
 
-	ALevelInformation* levelInformation = ALevelInformation::CreateSingleton();
-	levelInformation->Create(str);
+	TString8 strLevelInformation;
+	strLevelInformation.Format( "data/%s.trb", g_oTheApp.GetLevelPropertiesFile() );
 
-	AOptions::CreateSingleton();
-	ARandom::CreateSingleton();
-	AModelLoader::CreateSingleton();
-	ADX11MoviePlayer::CreateSingleton<ADX11MoviePlayer>()->OnCreate();
+	ALevelInformation* pLevelInformation = new ALevelInformation();
+	pLevelInformation->Create( strLevelInformation.GetString() );
+
+	g_oTheApp.CreateSaveData();
+
+	new SaveLoadSKU();
+
+	new AOptions();
+
+	new ARandom();
+
+	new AVibrationManager();
+
+	if ( AVibrationManager::GetSingleton() != TNULL )
+		AVibrationManager::GetSingleton()->EnableAllVibrators( TTRUE );
+
+	new AFXCompositionManager();
+
+	new APickupManager();
+
+	new AGameStatus();
+	new APlayerManager();
+
+	new APlayerProfileManager();
+
+	new ACheatManager();
+
+	new AAchievements();
+
+	new ADecalManager();
+
+	AStaticCVars::RegisterStaticCVars();
+
+	if ( TSound::GetSingleton() != TNULL )
+		ASoundInterface::LoadEventSystem();
+
+	new AMusicManager();
+
+	new ASoundLoadHelper();
+
+	ADX11MoviePlayer::Create();
+	AMoviePlayer::GetSingleton()->OnCreate();
+
+	new ASubtitleManager();
+	ASubtitleManager::GetSingleton()->LoadSubtitles( T2Locale::GetSingleton()->GetLanguage() );
+	T2GUITextureSectionManager::UpdateMaterials();
+
+	TParticleSystem::s_oCreateData.m_iNumSystems = 80;
+	new TParticleSystem( TParticleSystem::s_oCreateData );
+
+	new AAutosaveManager();
+
+	Toshi::TPhysicsManager::Create();
+
+	new ACollisionManager2();
+
+	new AMaterialManager();
+
+	new AModelLoader();
+
+	new AModelFactory();
+
+	new AJellyShader_DX11();
+
+	new ABuildingManager();
+	new AChallengeManager();
+
+	new APositionalSoundManager();
+
+	new APhysicsSoundManager();
+
+	new AStreamingSoundPlayer();
+
+	new ASoundTextureSwapMap();
 
 	return UpdateResult_Remove;
 }
@@ -50,7 +172,9 @@ AGameState::UpdateResult AAppInitState::OnUpdate(TFLOAT deltaTime)
 // $deBlob: FUNCTION 005c1bd0
 void AAppInitState::OnInsertion()
 {
-	TIMPLEMENT();
+	TMemoryHeap* pOldTRBHeap = AMemory::SetTRBHeap( TXUI::ms_pXUIMemoryBlock );
+	AMemory::SetTRBHeap( pOldTRBHeap );
+
 	AGameState::OnInsertion();
 }
 
@@ -59,13 +183,12 @@ void AAppInitState::OnRemoval()
 {
 	AGameState::OnRemoval();
 
-	if (AApplication::g_oTheApp.ShouldLoadModelViewState())
+	if ( g_oTheApp.ShouldLoadModelViewState() == TFALSE )
 	{
-		TIMPLEMENT_D("AModelViewState");
+		AFrontEndMovieState::StartBlobFrontendMenu();
 	}
 	else
 	{
-		AGameStateController::GetSingletonSafe()->PushState(new AFrontEndMovieState);
-		TIMPLEMENT_D("The game");
+		AGameStateController::GetSingleton()->PushState( new ( AMemory::GetPool( AMemory::POOL_FrequentAllocations ) ) AModelViewState() );
 	}
 }

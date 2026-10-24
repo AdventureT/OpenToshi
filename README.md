@@ -30,6 +30,9 @@ Then compile the generated solution and that's it
 ## Thirdparty libraries
 - [catch2](https://github.com/catchorg/Catch2)
 - [fmod](https://fmod.com/)
+- FMOD Ex 4.44.64 + FMOD Event (Toshi/Vendor/fmodex, supplied locally, see its LICENSE.TXT; retail uses 4.44.47):
+  Audio Engine supplied by FMOD by Firelight Technologies.
 - [premake](https://github.com/premake/premake-core)
-- [spdlog](https://github.com/gabime/spdlog)
 - Fork of [theoraplay](https://github.com/InfiniteC0re/theoraplay)
+- [WiiYourself!](http://gl.tter.org) 1.15 (Toshi/Vendor/WiiYourself, see its License.txt): binary distributions contain
+  WiiYourself! wiimote code by gl.tter http://gl.tter.org

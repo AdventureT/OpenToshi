@@ -1,60 +1,72 @@
 #pragma once
-#include "GameInterface/AGameState.h"
-
-#include <Toshi2/T2GUI/T2GUIRectangle.h>
-#include <A2GUI/A2GUIBackground.h>
+#include "AGameState.h"
+#include "GUI/A2GUIBackground.h"
 #include "Input/AInputHelper.h"
 
-class AFrontEndMovieState : public Toshi::TGenericClassDerived<AFrontEndMovieState, AGameState, "AFrontEndMovieState", TMAKEVERSION(1, 0), TTRUE>
+//-----------------------------------------------------------------------------
+// Purpose: the frontend's legal screen and movies: the legal background for 5 seconds, the THQ Nordic logo, the logo
+// movie and the intro movie (each can be skipped), then Finish creates the frontend (frontend.xur and the splash
+// screen).
+//-----------------------------------------------------------------------------
+class AFrontEndMovieState : public AGameState
 {
 public:
-	constexpr static const TCHAR* s_Assets[] = {
-		"bkg_Legal_Blob_ENG",
-		"THQNORDIC_LOGO_Color_white",
-		"logoMovie",
-		"00_ChromaCity"
+	TDECLARE_CLASS( AFrontEndMovieState, AGameState );
+
+	enum STATE
+	{
+		STATE_LEGAL,         // the background bkg_Legal_Blob_ENG
+		STATE_THQLOGO,       // the movie THQNORDIC_LOGO_Color_white
+		STATE_LOGOMOVIE,     // the movie logoMovie
+		STATE_INTRO,         // the movie 00_ChromaCity
+		STATE_FADETOBLACK,   // fading to black before the background m_eNextState
+		STATE_FADEFROMBLACK, // fading from black to the background m_eNextState
+		STATE_RESTART,       // fading to black before the frontend restarts
 	};
 
-	typedef TUINT32 Asset;
-	enum Asset_ : Asset
-	{
-		Asset_Legal,
-		Asset_THQLogo,
-		Asset_LogoMovie,
-		Asset_Intro
-	};
+	// The background/movie of each state
+	static const TCHAR* scm_szAssetName[ 4 ];
 
 public:
-	// $deBlob: FUNCTION 005d4750
-	AFrontEndMovieState()
-	{
-		m_iAssetId            = Asset_Legal;
-		m_fBackgroundLeftTime = 5.0f;
-	}
+	AFrontEndMovieState();
+	~AFrontEndMovieState();
 
+	//-----------------------------------------------------------------------------
+	// AGameState
+	//-----------------------------------------------------------------------------
+	virtual UpdateResult OnUpdate( TFLOAT a_fDeltaTime ) override; // +0x18
+	virtual void         OnInsertion() override;                   // +0x1C
+	virtual void         OnRemoval() override;                     // +0x20
+	virtual void         OnActivate() override;                    // +0x2C
+	virtual void         OnDeactivate() override;                  // +0x30
 
-	virtual UpdateResult OnUpdate(TFLOAT deltaTime) override;
-	virtual void         OnInsertion() override;
-	virtual void         OnRemoval() override;
-	virtual void         OnActivate() override;
-	virtual void         OnDeactivate() override;
+	// Pushes the first frontend state: the language menu or ASaveLoadStartAppState (by region)
+	static void StartBlobFrontendMenu();
 
-#ifdef TOSHI_DEBUG
-	virtual void DEBUG_RenderImGui() override;
-#endif
+	// $deBlob: FUNCTION 005d5800
+	void SetState( STATE a_eState ) { m_eState = a_eState; }
 
 private:
 	TBOOL HasBackgroundStoppedShowing();
 	TBOOL HasMovieStopped();
 	void  StopMovieIfPlaying();
 
-	void StartMovie(Asset assetId);
-	void StartBlobFrontendMenu();
+	void GoToNextMovie( STATE a_eState );
+	void GoToNextBackground( STATE a_eState, TFLOAT a_fFadeOutTime, TFLOAT a_fFadeInTime );
+	// Stops the movie and fades to black before the frontend restarts
+	void         Restart();
+	void         InitState( STATE a_eState );
+	void         CreateBackGround( STATE a_eState );
+	UpdateResult Finish();
 
 private:
 	A2GUIBackground m_Background;          // 0x02C
 	TFLOAT          m_fBackgroundLeftTime; // 0x104
-	Asset           m_iAssetId;            // 0x108
-	TBOOL           m_bSkip;               // 0x10C
-	AInputHelper    m_InputHelper;         // 0x110
+	STATE           m_eState;              // 0x108
+	TBOOL           m_bSkipMovie;          // 0x10C
+	TBOOL           m_bSkipAllMovies;      // 0x10D
+	AInputHelper    m_InputHelper;         // 0x110 the skip buttons
+	TBOOL           m_bEntityDataLoaded;   // 0x134
+	STATE           m_eNextState;          // 0x138 the background after the fade
+	TFLOAT          m_fFadeInTime;         // 0x13C
 };

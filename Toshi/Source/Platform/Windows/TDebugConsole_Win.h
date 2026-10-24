@@ -1,8 +1,10 @@
 #pragma once
 
+#include <windows.h>
+
 TOSHI_NAMESPACE_START
 
-constexpr const TCHAR* TDebugConsoleUUID = "{1B5D8052-529A-4c88-9DDE-EE523D440B00}";
+TCONSTEXPR_VAR const TCHAR* TDebugConsoleUUID = "{1B5D8052-529A-4c88-9DDE-EE523D440B00}";
 
 class TDebugConsole
 {
@@ -10,7 +12,7 @@ public:
 	TDebugConsole();
 	~TDebugConsole();
 
-	TBOOL Show(TBOOL state);
+	TBOOL Show( TBOOL state );
 	TBOOL Toggle();
 
 	// Returns TTRUE if the console is visible
@@ -23,9 +25,14 @@ public:
 	HWND FindConsole() const;
 
 private:
-	TBOOL m_Visible = TFALSE;
-	TBOOL m_Created = TFALSE;
-	HWND  m_HWND;
+	// Gets called after logging system printed something to a log file
+	static TBOOL __stdcall OnLog( TDebugConsole* a_pCaller, TUtil* a_pOwner, TUtil::LogEvent* pLogEvent );
+
+private:
+	TBOOL                                            m_Visible = TFALSE;
+	TBOOL                                            m_Created = TFALSE;
+	HWND                                             m_HWND;
+	TListener<TUtil, TUtil::LogEvent, TDebugConsole> m_LogListener;
 };
 
 TOSHI_NAMESPACE_END

@@ -1,0 +1,138 @@
+#pragma once
+
+TOSHI_NAMESPACE_START
+
+class TObject;
+
+class TClass
+{
+public:
+	using CreateObject_t        = TObject* (*)();
+	using CreateObjectInPlace_t = TObject* (*)( void* a_pPtr );
+	using Initialise_t          = void ( * )();
+	using Deinitialise_t        = void ( * )();
+
+	using RecurseTreeCheck_t       = TBOOL ( * )( TClass*, void* );
+	using RecurseTreeBaseBeginCb_t = TBOOL ( * )( TClass*, void* );
+	using RecurseTreeBaseEndCb_t   = TBOOL ( * )( TClass*, void* );
+
+public:
+	TClass(
+	    const TCHAR*          a_szName,
+	    TClass*               a_pParentClass,
+	    CreateObject_t        a_fnCreate,
+	    CreateObjectInPlace_t a_fnCreateInPlace,
+	    Initialise_t          a_fnInitialise,
+	    Deinitialise_t        a_fnUnitialise,
+	    TUINT32               a_uiVersion,
+	    TUINT32               a_uiClassSize,
+	    TUINT32               a_uiClassAlignment
+	);
+
+	// NOTE: retail's constructor takes the version as one dword (minor << 16 | major); this form packs it
+	TClass(
+	    const TCHAR*          a_szName,
+	    TClass*               a_pParentClass,
+	    CreateObject_t        a_fnCreate,
+	    CreateObjectInPlace_t a_fnCreateInPlace,
+	    Initialise_t          a_fnInitialise,
+	    Deinitialise_t        a_fnUnitialise,
+	    TUINT16               a_uiVersionMajor,
+	    TUINT16               a_uiVersionMinor,
+	    TUINT32               a_uiClassSize,
+	    TUINT32               a_uiClassAlignment
+	)
+	    : TClass( a_szName, a_pParentClass, a_fnCreate, a_fnCreateInPlace, a_fnInitialise, a_fnUnitialise, TUINT32( a_uiVersionMinor ) << 16 | a_uiVersionMajor, a_uiClassSize, a_uiClassAlignment )
+	{}
+
+	TCONSTEXPR TClass(
+	    const TCHAR*          a_szName,
+	    CreateObject_t        a_fnCreate,
+	    CreateObjectInPlace_t a_fnCreateInPlace,
+	    Initialise_t          a_fnInitialise,
+	    Deinitialise_t        a_fnUnitialise,
+	    TUINT16               a_uiVersionMajor,
+	    TUINT16               a_uiVersionMinor,
+	    TUINT32               a_uiClassSize,
+	    TUINT32               a_uiClassAlignment
+	)
+	    : m_szName( a_szName ), m_pParent( TNULL ), m_pPrevious( TNULL ), m_pLastChildren( TNULL ), m_fnCreate( a_fnCreate ), m_fnCreateInPlace( a_fnCreateInPlace ), m_fnInitialise( a_fnInitialise ), m_fnDeinitialise( a_fnUnitialise ), m_uiVersionMajor( a_uiVersionMajor ), m_uiVersionMinor( a_uiVersionMinor ), m_uiClassSize( a_uiClassSize ), m_uiClassAlignment( a_uiClassAlignment ), m_bInitialised( TFALSE )
+	{}
+
+	~TClass();
+
+	void           Initialize();
+	void           Deinitialize();
+	void           RecurseTree( RecurseTreeBaseBeginCb_t fBaseBegin, RecurseTreeBaseEndCb_t fBaseEnd, RecurseTreeCheck_t fCheck, void* custom );
+	void           RecurseTree2( RecurseTreeBaseBeginCb_t fBaseBegin, RecurseTreeBaseEndCb_t fBaseEnd, RecurseTreeCheck_t fCheck, void* custom );
+	class TObject* CreateObject() const;
+
+	// $deBlob: FUNCTION 0065cb30
+	// $Barnyard: FUNCTION 006bbcf0
+	class TObject* CreateObjectInPlace( void* a_pPtr ) const { return m_fnCreateInPlace ? m_fnCreateInPlace( a_pPtr ) : TNULL; }
+
+	TBOOL IsA( const TClass* pClass ) const;
+	TBOOL IsExactly( const TClass* toCompare ) const { return this == toCompare; }
+	// $deBlob: FUNCTION 0065cdd0
+	// $Barnyard: FUNCTION 006bbda0
+	TBOOL IsInitialized() const { return m_bInitialised; }
+	// $deBlob: FUNCTION 0065cc40
+	TUINT32 GetClassSize() const { return m_uiClassSize; }
+	// $deBlob: FUNCTION 0065ccd0
+	TUINT32 GetClassAlignment() const { return m_uiClassAlignment; }
+	// $deBlob: FUNCTION 0065cbf0
+	const TClass* GetParent() { return static_cast<const TClass*>( m_pParent ); }
+	// $deBlob: FUNCTION 0065cc00
+	const TCHAR* GetName() const { return m_szName; }
+	// $deBlob: FUNCTION 0065cc10
+	TUINT32 GetVersion() const { return m_uiVersion; }
+	// NOTE: de Blob reads only the low byte (movzx byte [ecx+20h])
+	// $deBlob: FUNCTION 0065cc30
+	// $Barnyard: FUNCTION 006bbd50
+	TUINT16 GetVersionMajor() const { return TUINT8( m_uiVersionMajor ); }
+	// $deBlob: FUNCTION 0065cc20
+	// $Barnyard: FUNCTION 006bbd40
+	TUINT16 GetVersionMinor() const { return m_uiVersionMinor; }
+	TUINT32 GetMaxSizeOfDerivedClasses();
+	TUINT32 GetMaxAlignmentOfDerivedClasses();
+
+	TBOOL IsAttached() const;
+	TBOOL AttachClassToParent();
+
+	static const TClass* FindCommonBaseClass( const TClass* a_pClass1, const TClass* a_pClass2 );
+	static void          DumpObjectClassTree();
+
+	// todo: move this function away from this class
+	static TBOOL TryInitialize( TClass* tClass );
+
+	// Looks for a class in parent
+	static const TClass* FindRecurse( const TCHAR* name, const TClass* parent, TBOOL hasPrevious );
+	static const TClass* Find( const TCHAR* name, const TClass* parent = TNULL );
+
+public:
+	inline TBOOL operator==( const TClass* other ) const { return this == other; }
+
+private:
+	const TCHAR*          m_szName;          // 0x00
+	CreateObject_t        m_fnCreate;        // 0x04
+	CreateObjectInPlace_t m_fnCreateInPlace; // 0x08
+	Initialise_t          m_fnInitialise;    // 0x0C
+	Deinitialise_t        m_fnDeinitialise;  // 0x10
+	TClass*               m_pParent;         // 0x14
+	TClass*               m_pPrevious;       // 0x18
+	TClass*               m_pLastChildren;   // 0x1C
+	union
+	{
+		struct
+		{
+			TUINT16 m_uiVersionMajor; // 0x20
+			TUINT16 m_uiVersionMinor; // 0x22
+		};
+		TUINT32 m_uiVersion; // 0x20
+	};
+	TUINT32 m_uiClassSize;      // 0x24
+	TUINT32 m_uiClassAlignment; // 0x28
+	TBOOL   m_bInitialised;     // 0x2C
+};
+
+TOSHI_NAMESPACE_END

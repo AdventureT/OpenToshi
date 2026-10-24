@@ -1,110 +1,88 @@
 #include "pch.h"
+#include "GUI/AGUIManager.h"
 #include "ATestState.h"
-#include "Render/ATestModel.h"
-#include "ImGui/AImGui.h"
+#include "GUI/AFontManager.h"
 
-#include <Toshi2/T2GUI/T2GUI.h>
-#include <Toshi2/T2Map.h>
+#include <GUI/T2GUIRectangle.h>
+#include <GUI/T2GUITextBox.h>
 
-AGameState::UpdateResult ATestState::OnUpdate(TFLOAT deltaTime)
+//-----------------------------------------------------------------------------
+// Enables memory debugging.
+// Note: Should be the last include!
+//-----------------------------------------------------------------------------
+#include <Core/TMemoryDebugOn.h>
+
+TOSHI_NAMESPACE_USING
+
+TSTATICASSERT( sizeof( ATestState ) == 0x2C );
+
+// $deBlob: FUNCTION 005d2d10
+// $deBlob: FUNCTION 005d2d20
+// $deBlob: FUNCTION 005d2d90
+// $deBlob: FUNCTION 005d2e00
+// $deBlob: FUNCTION 005d2e10
+// $deBlob: FUNCTION 0053c7b0
+// $deBlob: FUNCTION 00858530
+TDEFINE_CLASS( ATestState );
+
+// An ARGB colour from 0-1 components
+// $deBlob: FUNCTION 005d2fb0
+static TUINT32 MakeColour( TFLOAT a_fRed, TFLOAT a_fGreen, TFLOAT a_fBlue, TFLOAT a_fAlpha )
 {
-	return UpdateResult_OK;
+	return TUINT32( TINT( a_fBlue * 255.0f ) ) |
+	    ( ( TUINT32( TINT( a_fGreen * 255.0f ) ) | ( ( ( TUINT32( TINT( a_fAlpha * 255.0f ) ) << 8 ) | TUINT32( TINT( a_fRed * 255.0f ) ) ) << 8 ) ) << 8 );
 }
 
-void ATestState::OnRemoval()
+// $deBlob: FUNCTION 005d2e20
+ATestState::ATestState()
 {
-	ATestModel::DestroySingleton();
 }
 
+// $deBlob: FUNCTION 005d2e40
+// $deBlob: FUNCTION 005d3010
+ATestState::~ATestState()
+{
+}
+
+// $deBlob: FUNCTION 005d2e50
+AGameState::UpdateResult ATestState::OnUpdate( TFLOAT a_fDeltaTime )
+{
+	return AGameState::OnUpdate( a_fDeltaTime );
+}
+
+// $deBlob: FUNCTION 005d2e70
 void ATestState::OnInsertion()
 {
-	ATestModel::CreateSingleton();
+	T2GUIRectangle* pRectangle = new T2GUIRectangle();
+	pRectangle->Create( 100.0f, 100.0f );
+	pRectangle->SetColour( 0x3F00FF00 );
+
+	AGUIManager::GetSingleton()->GetSafeArea()->AddChildTail( pRectangle );
+
+	T2GUITextBox* pTextBox = new T2GUITextBox();
+	pTextBox->Create( AFontManager::sm_pMsgFont, 300.0f );
+	pTextBox->SetText( L"Blob07" );
+	pTextBox->SetMaxChars( -1 );
+
+	AGUIManager::GetSingleton()->GetSafeArea()->AddChildTail( pTextBox );
+
+	AGameState::OnInsertion();
 }
 
+// $deBlob: FUNCTION 005d2f80
+void ATestState::OnRemoval()
+{
+	AGameState::OnRemoval();
+}
+
+// $deBlob: FUNCTION 005d2f90
 void ATestState::OnActivate()
 {
-	auto pGUI         = Toshi::T2GUI::GetSingletonSafe();
-	auto pGUIRenderer = pGUI->GetRenderer();
-	auto pRootElement = pGUI->GetRootElement();
-
-	m_Menu.Create(320, 370);
-	m_Menu.SetAnchor(Toshi::T2GUIElement::Anchor::TopLeft);
-	m_Menu.SetPivot(Toshi::T2GUIElement::Pivot::TopLeft);
-	m_Menu.SetColour(0x00202020);
-	m_Menu.SetTransform(20, -20);
-
-	Toshi::T2GUIRectangle* rectangle;
-
-	rectangle = new Toshi::T2GUIRectangle;
-	rectangle->Create(300, 50);
-	rectangle->SetColour(0x00303030);
-	rectangle->SetAnchor(Toshi::T2GUIElement::Anchor::BottomCenter);
-	rectangle->SetPivot(Toshi::T2GUIElement::Pivot::BottomCenter);
-	rectangle->SetTransform(0, 10);
-	m_Menu.AddChildHead(rectangle);
-	m_Elements.PushBack(rectangle);
-
-	rectangle = new Toshi::T2GUIRectangle;
-	rectangle->Create(300, 50);
-	rectangle->SetColour(0x00343434);
-	rectangle->SetAnchor(Toshi::T2GUIElement::Anchor::BottomCenter);
-	rectangle->SetPivot(Toshi::T2GUIElement::Pivot::BottomCenter);
-	rectangle->SetTransform(0, 70);
-	m_Menu.AddChildHead(rectangle);
-	m_Elements.PushBack(rectangle);
-
-	rectangle = new Toshi::T2GUIRectangle;
-	rectangle->Create(300, 50);
-	rectangle->SetColour(0x00383838);
-	rectangle->SetAnchor(Toshi::T2GUIElement::Anchor::BottomCenter);
-	rectangle->SetPivot(Toshi::T2GUIElement::Pivot::BottomCenter);
-	rectangle->SetTransform(0, 130);
-	m_Menu.AddChildHead(rectangle);
-	m_Elements.PushBack(rectangle);
-
-	rectangle = new Toshi::T2GUIRectangle;
-	rectangle->Create(300, 50);
-	rectangle->SetColour(0x003C3C3C);
-	rectangle->SetAnchor(Toshi::T2GUIElement::Anchor::BottomCenter);
-	rectangle->SetPivot(Toshi::T2GUIElement::Pivot::BottomCenter);
-	rectangle->SetTransform(0, 190);
-	m_Menu.AddChildHead(rectangle);
-	m_Elements.PushBack(rectangle);
-
-	rectangle = new Toshi::T2GUIRectangle;
-	rectangle->Create(300, 50);
-	rectangle->SetColour(0x00404040);
-	rectangle->SetAnchor(Toshi::T2GUIElement::Anchor::BottomCenter);
-	rectangle->SetPivot(Toshi::T2GUIElement::Pivot::BottomCenter);
-	rectangle->SetTransform(0, 250);
-	m_Menu.AddChildHead(rectangle);
-	m_Elements.PushBack(rectangle);
-
-	rectangle = new Toshi::T2GUIRectangle;
-	rectangle->Create(300, 50);
-	rectangle->SetColour(0x00444444);
-	rectangle->SetAnchor(Toshi::T2GUIElement::Anchor::BottomCenter);
-	rectangle->SetPivot(Toshi::T2GUIElement::Pivot::BottomCenter);
-	rectangle->SetTransform(0, 310);
-	m_Menu.AddChildHead(rectangle);
-	m_Elements.PushBack(rectangle);
-
-	pRootElement->AddChildHead(&m_Menu);
+	AGameState::OnActivate();
 }
 
+// $deBlob: FUNCTION 005d2fa0
 void ATestState::OnDeactivate()
 {
-	for (auto it = m_Elements.Begin(); it != m_Elements.End(); it++)
-		delete *it;
-
-	m_Elements.Clear();
-	m_Menu.Unlink();
+	AGameState::OnDeactivate();
 }
-
-#ifdef TOSHI_DEBUG
-void ATestState::DEBUG_RenderImGui()
-{
-	auto& position = ATestModel::GetSingletonSafe()->GetPosition();
-	ImGui::DragFloat3("Test model position", (TFLOAT*)&position, 0.1f, -50.0f, 50.0f, "%.4f", 1);
-}
-#endif // TOSHI_DEBUG
